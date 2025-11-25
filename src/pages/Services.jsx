@@ -17,39 +17,39 @@ import {
 const services = [
   {
     icon: TrendingUp,
-    title: 'Investment Management',
-    description: 'Personalized portfolio management designed to achieve your long-term financial goals with risk-appropriate strategies.',
-    features: ['Diversified portfolios', 'Risk assessment', 'Regular rebalancing', 'Tax-efficient investing']
+    title: 'Управление на инвестиции',
+    description: 'Персонализирано управление на портфолио, проектирано да постигне вашите дългосрочни финансови цели с подходящи стратегии за риска.',
+    features: ['Диверсифицирани портфолиа', 'Оценка на риска', 'Редовно ребалансиране', 'Данъчно ефективно инвестиране']
   },
   {
     icon: PiggyBank,
-    title: 'Retirement Planning',
-    description: 'Comprehensive retirement strategies to ensure you can enjoy the lifestyle you deserve in your golden years.',
-    features: ['401(k) optimization', 'IRA strategies', 'Social Security planning', 'Income projections']
+    title: 'Пенсионно планиране',
+    description: 'Изчерпателни пенсионни стратегии, за да се насладите на заслужения начин на живот в златните години.',
+    features: ['Оптимизация на пенсии', 'Стратегии за спестяване', 'Планиране на доходи', 'Прогнози за бъдещето']
   },
   {
     icon: Shield,
-    title: 'Wealth Protection',
-    description: 'Safeguard your assets and legacy with sophisticated insurance and estate planning solutions.',
-    features: ['Estate planning', 'Trust services', 'Insurance analysis', 'Asset protection']
+    title: 'Защита на богатството',
+    description: 'Защитете активите и наследството си със сложни застрахователни и наследствени решения.',
+    features: ['Наследствено планиране', 'Тръстови услуги', 'Застрахователен анализ', 'Защита на активи']
   },
   {
     icon: Wallet,
-    title: 'Tax Planning',
-    description: 'Strategic tax planning to minimize your tax burden and maximize your wealth accumulation.',
-    features: ['Tax-loss harvesting', 'Roth conversions', 'Charitable giving', 'Business tax strategies']
+    title: 'Данъчно планиране',
+    description: 'Стратегическо данъчно планиране за минимизиране на данъчната тежест и максимизиране на натрупването на богатство.',
+    features: ['Данъчна оптимизация', 'Данъчни облекчения', 'Благотворителни дарения', 'Бизнес данъчни стратегии']
   },
   {
     icon: GraduationCap,
-    title: 'Education Funding',
-    description: 'Plan for your children\'s education with smart savings strategies and investment vehicles.',
-    features: ['529 plans', 'Coverdell accounts', 'UGMA/UTMA', 'Financial aid planning']
+    title: 'Финансиране на образование',
+    description: 'Планирайте образованието на децата си с интелигентни стратегии за спестяване и инвестиционни инструменти.',
+    features: ['Образователни планове', 'Спестовни сметки', 'Детски фондове', 'Планиране на помощи']
   },
   {
     icon: Building2,
-    title: 'Business Planning',
-    description: 'Financial strategies for business owners including succession planning and employee benefits.',
-    features: ['Succession planning', 'Key person insurance', 'Employee benefits', 'Business valuation']
+    title: 'Бизнес планиране',
+    description: 'Финансови стратегии за собственици на бизнес, включително наследствено планиране и служителски придобивки.',
+    features: ['Планиране на наследство', 'Ключова застраховка', 'Служителски придобивки', 'Бизнес оценка']
   },
 ];
 
@@ -66,14 +66,14 @@ export default function Services() {
             className="text-center max-w-3xl mx-auto"
           >
             <span className="text-blue-600 font-medium text-sm tracking-widest uppercase mb-4 block">
-              Our Services
+              Нашите услуги
             </span>
             <h1 className="text-4xl md:text-6xl font-light text-slate-900 mb-6">
-              Comprehensive <span className="font-semibold text-blue-600">Financial</span> Solutions
+              Цялостни <span className="font-semibold text-blue-600">финансови</span> решения
             </h1>
             <p className="text-lg text-slate-600 font-light leading-relaxed">
-              From investment management to estate planning, we offer a full suite of 
-              services tailored to your unique financial situation.
+              От управление на инвестиции до наследствено планиране, предлагаме пълен набор от 
+              услуги, съобразени с вашата уникална финансова ситуация.
             </p>
           </motion.div>
         </div>
@@ -130,19 +130,19 @@ export default function Services() {
             className="text-center mb-16"
           >
             <span className="text-blue-600 font-medium text-sm tracking-widest uppercase mb-4 block">
-              Our Process
+              Нашият процес
             </span>
             <h2 className="text-3xl md:text-4xl font-light text-slate-900">
-              How We <span className="font-semibold text-blue-600">Work</span>
+              Как <span className="font-semibold text-blue-600">работим</span>
             </h2>
           </motion.div>
 
           <div className="grid md:grid-cols-4 gap-8">
             {[
-              { step: '01', title: 'Discovery', desc: 'We learn about your goals, values, and current situation' },
-              { step: '02', title: 'Analysis', desc: 'Our team analyzes your finances and identifies opportunities' },
-              { step: '03', title: 'Strategy', desc: 'We create a customized plan tailored to your needs' },
-              { step: '04', title: 'Implementation', desc: 'We execute the plan and provide ongoing management' },
+              { step: '01', title: 'Проучване', desc: 'Научаваме за вашите цели, ценности и текуща ситуация' },
+              { step: '02', title: 'Анализ', desc: 'Нашият екип анализира финансите ви и идентифицира възможности' },
+              { step: '03', title: 'Стратегия', desc: 'Създаваме персонализиран план, съобразен с вашите нужди' },
+              { step: '04', title: 'Изпълнение', desc: 'Изпълняваме плана и осигуряваме текущо управление' },
             ].map((item, index) => (
               <motion.div
                 key={item.step}
@@ -171,16 +171,16 @@ export default function Services() {
             transition={{ duration: 0.8 }}
           >
             <h2 className="text-3xl md:text-4xl font-light text-white mb-6">
-              Let's build your financial future together
+              Нека изградим финансовото ви бъдеще заедно
             </h2>
             <p className="text-xl text-blue-100 mb-10 font-light">
-              Schedule a free consultation to discuss how we can help you achieve your goals.
+              Запазете безплатна консултация, за да обсъдим как можем да ви помогнем да постигнете целите си.
             </p>
             <Button 
               size="lg" 
               className="bg-white text-blue-700 hover:bg-blue-50 px-10 py-6 text-lg rounded-full"
             >
-              Schedule Consultation
+              Запазете консултация
               <ArrowRight className="ml-2 h-5 w-5" />
             </Button>
           </motion.div>

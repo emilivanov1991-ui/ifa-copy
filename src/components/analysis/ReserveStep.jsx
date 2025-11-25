@@ -464,7 +464,23 @@ export default function ReserveStep({ data, onChange }) {
               const agg = data.aggressive_percent || 0;
               const total = cons + mod + dyn + agg;
               
-              if (total > 0) {
+              // Only show messages if all 4 fields are filled
+              const allFilled = data.conservative_percent !== undefined && data.conservative_percent !== '' &&
+                               data.moderate_percent !== undefined && data.moderate_percent !== '' &&
+                               data.dynamic_percent !== undefined && data.dynamic_percent !== '' &&
+                               data.aggressive_percent !== undefined && data.aggressive_percent !== '';
+              
+              if (allFilled) {
+                if (total !== 100) {
+                  return (
+                    <div className="p-4 bg-amber-50 border border-amber-200 rounded-lg">
+                      <p className="text-amber-700">
+                        Моля разпределете активите така, че общия сбор да прави 100%
+                      </p>
+                    </div>
+                  );
+                }
+                
                 const hasOver80 = cons > 80 || mod > 80 || dyn > 80 || agg > 80;
                 
                 if (hasOver80) {
@@ -572,12 +588,15 @@ export default function ReserveStep({ data, onChange }) {
           <div className="space-y-3">
             <Label className="text-slate-700">Имат спестявания, но не са предприели инвестиционни решения?</Label>
             {(data.referrals_have_savings || ['']).map((name, index) => {
-              // Check if name exists in housing referrals
-              const housingNames = [
+              // Check if name exists in housing or birthday referrals
+              const existingNames = [
                 ...(data.referrals_no_own_home || []),
-                ...(data.referrals_own_home_long || [])
+                ...(data.referrals_own_home_long || []),
+                ...(data.birthday_family_names || []),
+                ...(data.birthday_friends_names || []),
+                ...(data.birthday_colleagues_names || [])
               ].filter(n => n && n.trim());
-              const isDuplicate = name && name.trim() && housingNames.some(h => h.toLowerCase().trim() === name.toLowerCase().trim());
+              const isDuplicate = name && name.trim() && existingNames.some(h => h.toLowerCase().trim() === name.toLowerCase().trim());
               
               return (
                 <div key={`savings_${index}`}>
@@ -608,12 +627,15 @@ export default function ReserveStep({ data, onChange }) {
           <div className="space-y-3">
             <Label className="text-slate-700">Инвестират редовно или се интересуват от инвестиции?</Label>
             {(data.referrals_invest_regularly || ['']).map((name, index) => {
-              // Check if name exists in housing referrals
-              const housingNames = [
+              // Check if name exists in housing or birthday referrals
+              const existingNames = [
                 ...(data.referrals_no_own_home || []),
-                ...(data.referrals_own_home_long || [])
+                ...(data.referrals_own_home_long || []),
+                ...(data.birthday_family_names || []),
+                ...(data.birthday_friends_names || []),
+                ...(data.birthday_colleagues_names || [])
               ].filter(n => n && n.trim());
-              const isDuplicate = name && name.trim() && housingNames.some(h => h.toLowerCase().trim() === name.toLowerCase().trim());
+              const isDuplicate = name && name.trim() && existingNames.some(h => h.toLowerCase().trim() === name.toLowerCase().trim());
               
               return (
                 <div key={`invest_${index}`}>

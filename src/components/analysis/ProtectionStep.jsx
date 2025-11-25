@@ -84,6 +84,23 @@ export default function ProtectionStep({ data, onChange }) {
     return Math.max(153, Math.min(511, compensation));
   };
 
+  // Calculate disability compensation (49% of gross, min 343, max 1730)
+  const calculateDisabilityCompensation = (grossIncome) => {
+    if (!grossIncome) return 0;
+    const compensation = Math.round(grossIncome * 0.49);
+    return Math.max(343, Math.min(1730, compensation));
+  };
+
+  // Get background color based on missing income severity
+  const getMissingIncomeColor = (missingIncome, netIncome) => {
+    if (!missingIncome || missingIncome <= 0) return 'bg-slate-100';
+    const ratio = netIncome > 0 ? missingIncome / netIncome : 0;
+    if (ratio >= 0.7) return 'bg-red-200';
+    if (ratio >= 0.5) return 'bg-red-100';
+    if (ratio >= 0.3) return 'bg-amber-100';
+    return 'bg-yellow-50';
+  };
+
   // Get income data
   const clientGrossIncome = data.client_gross_income_pension || 0;
   const partnerGrossIncome = data.partner_gross_income_pension || 0;
@@ -943,28 +960,32 @@ export default function ProtectionStep({ data, onChange }) {
                         onCheckedChange={(checked) => onChange('client_risk_layoff', checked)}
                       />
                     </div>
-                    {data.client_risk_layoff && (
-                      <div className="ml-4 p-3 bg-white rounded-lg border border-slate-200 grid grid-cols-2 gap-3">
-                        <div className="space-y-1">
-                          <Label className="text-xs text-slate-500">Обезщетение (€)</Label>
-                          <Input
-                            type="number"
-                            value={calculateLayoffCompensation(clientGrossIncome)}
-                            readOnly
-                            className="rounded-lg bg-slate-100 text-sm"
-                          />
+                    {data.client_risk_layoff && (() => {
+                      const compensation = calculateLayoffCompensation(clientGrossIncome);
+                      const missing = Math.max(0, clientNetIncome - compensation);
+                      return (
+                        <div className="ml-4 p-3 bg-white rounded-lg border border-slate-200 grid grid-cols-2 gap-3">
+                          <div className="space-y-1">
+                            <Label className="text-xs text-slate-500">Обезщетение (€)</Label>
+                            <Input
+                              type="number"
+                              value={compensation}
+                              readOnly
+                              className="rounded-lg bg-slate-100 text-sm"
+                            />
+                          </div>
+                          <div className="space-y-1">
+                            <Label className="text-xs text-slate-500">Липсващ доход (€)</Label>
+                            <Input
+                              type="number"
+                              value={missing}
+                              readOnly
+                              className={cn("rounded-lg text-sm", getMissingIncomeColor(missing, clientNetIncome))}
+                            />
+                          </div>
                         </div>
-                        <div className="space-y-1">
-                          <Label className="text-xs text-slate-500">Липсващ доход (€)</Label>
-                          <Input
-                            type="number"
-                            value={Math.max(0, clientNetIncome - calculateLayoffCompensation(clientGrossIncome))}
-                            readOnly
-                            className="rounded-lg bg-slate-100 text-sm"
-                          />
-                        </div>
-                      </div>
-                    )}
+                      );
+                    })()}
                   </div>
 
                   {/* Maternity */}
@@ -976,31 +997,32 @@ export default function ProtectionStep({ data, onChange }) {
                         onCheckedChange={(checked) => onChange('client_risk_maternity', checked)}
                       />
                     </div>
-                    {data.client_risk_maternity && (
-                      <div className="ml-4 p-3 bg-white rounded-lg border border-slate-200 space-y-3">
-                        <div className="grid grid-cols-2 gap-3">
+                    {data.client_risk_maternity && (() => {
+                      const compYear1 = calculateMaternityYear1(clientGrossIncome);
+                      const missingYear1 = Math.max(0, clientNetIncome - compYear1);
+                      const missingYear2 = Math.max(0, clientNetIncome - maternityYear2);
+                      return (
+                        <div className="ml-4 p-3 bg-white rounded-lg border border-slate-200 grid grid-cols-2 gap-3">
                           <div className="space-y-1">
-                            <Label className="text-xs text-slate-500">Обезщетение първа година (€)</Label>
+                            <Label className="text-xs text-slate-500 h-8 flex items-end">Обезщетение 1-ва год. (€)</Label>
                             <Input
                               type="number"
-                              value={calculateMaternityYear1(clientGrossIncome)}
+                              value={compYear1}
                               readOnly
                               className="rounded-lg bg-slate-100 text-sm"
                             />
                           </div>
                           <div className="space-y-1">
-                            <Label className="text-xs text-slate-500">Липсващ доход първа година (€)</Label>
+                            <Label className="text-xs text-slate-500 h-8 flex items-end">Липсващ доход 1-ва год. (€)</Label>
                             <Input
                               type="number"
-                              value={Math.max(0, clientNetIncome - calculateMaternityYear1(clientGrossIncome))}
+                              value={missingYear1}
                               readOnly
-                              className="rounded-lg bg-slate-100 text-sm"
+                              className={cn("rounded-lg text-sm", getMissingIncomeColor(missingYear1, clientNetIncome))}
                             />
                           </div>
-                        </div>
-                        <div className="grid grid-cols-2 gap-3">
                           <div className="space-y-1">
-                            <Label className="text-xs text-slate-500">Обезщетение втора година (€)</Label>
+                            <Label className="text-xs text-slate-500 h-8 flex items-end">Обезщетение 2-ра год. (€)</Label>
                             <Input
                               type="number"
                               value={maternityYear2}
@@ -1009,17 +1031,17 @@ export default function ProtectionStep({ data, onChange }) {
                             />
                           </div>
                           <div className="space-y-1">
-                            <Label className="text-xs text-slate-500">Липсващ доход втора година (€)</Label>
+                            <Label className="text-xs text-slate-500 h-8 flex items-end">Липсващ доход 2-ра год. (€)</Label>
                             <Input
                               type="number"
-                              value={Math.max(0, clientNetIncome - maternityYear2)}
+                              value={missingYear2}
                               readOnly
-                              className="rounded-lg bg-slate-100 text-sm"
+                              className={cn("rounded-lg text-sm", getMissingIncomeColor(missingYear2, clientNetIncome))}
                             />
                           </div>
                         </div>
-                      </div>
-                    )}
+                      );
+                    })()}
                   </div>
 
                   {/* Sick Leave */}
@@ -1031,37 +1053,69 @@ export default function ProtectionStep({ data, onChange }) {
                         onCheckedChange={(checked) => onChange('client_risk_sick_leave', checked)}
                       />
                     </div>
-                    {data.client_risk_sick_leave && (
-                      <div className="ml-4 p-3 bg-white rounded-lg border border-slate-200 grid grid-cols-2 gap-3">
-                        <div className="space-y-1">
-                          <Label className="text-xs text-slate-500">Обезщетение (€)</Label>
-                          <Input
-                            type="number"
-                            value={calculateSickLeaveCompensation(clientGrossIncome)}
-                            readOnly
-                            className="rounded-lg bg-slate-100 text-sm"
-                          />
+                    {data.client_risk_sick_leave && (() => {
+                      const compensation = calculateSickLeaveCompensation(clientGrossIncome);
+                      const missing = Math.max(0, clientNetIncome - compensation);
+                      return (
+                        <div className="ml-4 p-3 bg-white rounded-lg border border-slate-200 grid grid-cols-2 gap-3">
+                          <div className="space-y-1">
+                            <Label className="text-xs text-slate-500">Обезщетение (€)</Label>
+                            <Input
+                              type="number"
+                              value={compensation}
+                              readOnly
+                              className="rounded-lg bg-slate-100 text-sm"
+                            />
+                          </div>
+                          <div className="space-y-1">
+                            <Label className="text-xs text-slate-500">Липсващ доход (€)</Label>
+                            <Input
+                              type="number"
+                              value={missing}
+                              readOnly
+                              className={cn("rounded-lg text-sm", getMissingIncomeColor(missing, clientNetIncome))}
+                            />
+                          </div>
                         </div>
-                        <div className="space-y-1">
-                          <Label className="text-xs text-slate-500">Липсващ доход (€)</Label>
-                          <Input
-                            type="number"
-                            value={Math.max(0, clientNetIncome - calculateSickLeaveCompensation(clientGrossIncome))}
-                            readOnly
-                            className="rounded-lg bg-slate-100 text-sm"
-                          />
-                        </div>
-                      </div>
-                    )}
+                      );
+                    })()}
                   </div>
 
                   {/* Disability */}
-                  <div className="flex items-center justify-between">
-                    <Label className="cursor-pointer">Инвалидност</Label>
-                    <Switch
-                      checked={data.client_risk_disability || false}
-                      onCheckedChange={(checked) => onChange('client_risk_disability', checked)}
-                    />
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-between">
+                      <Label className="cursor-pointer">Инвалидност</Label>
+                      <Switch
+                        checked={data.client_risk_disability || false}
+                        onCheckedChange={(checked) => onChange('client_risk_disability', checked)}
+                      />
+                    </div>
+                    {data.client_risk_disability && (() => {
+                      const compensation = calculateDisabilityCompensation(clientGrossIncome);
+                      const missing = Math.max(0, clientNetIncome - compensation);
+                      return (
+                        <div className="ml-4 p-3 bg-white rounded-lg border border-slate-200 grid grid-cols-2 gap-3">
+                          <div className="space-y-1">
+                            <Label className="text-xs text-slate-500">Обезщетение (€)</Label>
+                            <Input
+                              type="number"
+                              value={compensation}
+                              readOnly
+                              className="rounded-lg bg-slate-100 text-sm"
+                            />
+                          </div>
+                          <div className="space-y-1">
+                            <Label className="text-xs text-slate-500">Липсващ доход (€)</Label>
+                            <Input
+                              type="number"
+                              value={missing}
+                              readOnly
+                              className={cn("rounded-lg text-sm", getMissingIncomeColor(missing, clientNetIncome))}
+                            />
+                          </div>
+                        </div>
+                      );
+                    })()}
                   </div>
 
                   {/* Death */}
@@ -1073,28 +1127,32 @@ export default function ProtectionStep({ data, onChange }) {
                         onCheckedChange={(checked) => onChange('client_risk_death', checked)}
                       />
                     </div>
-                    {data.client_risk_death && (
-                      <div className="ml-4 p-3 bg-white rounded-lg border border-slate-200 grid grid-cols-2 gap-3">
-                        <div className="space-y-1">
-                          <Label className="text-xs text-slate-500">Обезщетение (€)</Label>
-                          <Input
-                            type="number"
-                            value={calculateDeathCompensation(clientGrossIncome)}
-                            readOnly
-                            className="rounded-lg bg-slate-100 text-sm"
-                          />
+                    {data.client_risk_death && (() => {
+                      const compensation = calculateDeathCompensation(clientGrossIncome);
+                      const missing = Math.max(0, clientNetIncome - compensation);
+                      return (
+                        <div className="ml-4 p-3 bg-white rounded-lg border border-slate-200 grid grid-cols-2 gap-3">
+                          <div className="space-y-1">
+                            <Label className="text-xs text-slate-500">Обезщетение (€)</Label>
+                            <Input
+                              type="number"
+                              value={compensation}
+                              readOnly
+                              className="rounded-lg bg-slate-100 text-sm"
+                            />
+                          </div>
+                          <div className="space-y-1">
+                            <Label className="text-xs text-slate-500">Липсващ доход (€)</Label>
+                            <Input
+                              type="number"
+                              value={missing}
+                              readOnly
+                              className={cn("rounded-lg text-sm", getMissingIncomeColor(missing, clientNetIncome))}
+                            />
+                          </div>
                         </div>
-                        <div className="space-y-1">
-                          <Label className="text-xs text-slate-500">Липсващ доход (€)</Label>
-                          <Input
-                            type="number"
-                            value={Math.max(0, clientNetIncome - calculateDeathCompensation(clientGrossIncome))}
-                            readOnly
-                            className="rounded-lg bg-slate-100 text-sm"
-                          />
-                        </div>
-                      </div>
-                    )}
+                      );
+                    })()}
                   </div>
 
                   {/* Client Income Protection */}
@@ -1150,28 +1208,32 @@ export default function ProtectionStep({ data, onChange }) {
                           onCheckedChange={(checked) => onChange('partner_risk_layoff', checked)}
                         />
                       </div>
-                      {data.partner_risk_layoff && (
-                        <div className="ml-4 p-3 bg-white rounded-lg border border-slate-200 grid grid-cols-2 gap-3">
-                          <div className="space-y-1">
-                            <Label className="text-xs text-slate-500">Обезщетение (€)</Label>
-                            <Input
-                              type="number"
-                              value={calculateLayoffCompensation(partnerGrossIncome)}
-                              readOnly
-                              className="rounded-lg bg-slate-100 text-sm"
-                            />
+                      {data.partner_risk_layoff && (() => {
+                        const compensation = calculateLayoffCompensation(partnerGrossIncome);
+                        const missing = Math.max(0, partnerNetIncome - compensation);
+                        return (
+                          <div className="ml-4 p-3 bg-white rounded-lg border border-slate-200 grid grid-cols-2 gap-3">
+                            <div className="space-y-1">
+                              <Label className="text-xs text-slate-500">Обезщетение (€)</Label>
+                              <Input
+                                type="number"
+                                value={compensation}
+                                readOnly
+                                className="rounded-lg bg-slate-100 text-sm"
+                              />
+                            </div>
+                            <div className="space-y-1">
+                              <Label className="text-xs text-slate-500">Липсващ доход (€)</Label>
+                              <Input
+                                type="number"
+                                value={missing}
+                                readOnly
+                                className={cn("rounded-lg text-sm", getMissingIncomeColor(missing, partnerNetIncome))}
+                              />
+                            </div>
                           </div>
-                          <div className="space-y-1">
-                            <Label className="text-xs text-slate-500">Липсващ доход (€)</Label>
-                            <Input
-                              type="number"
-                              value={Math.max(0, partnerNetIncome - calculateLayoffCompensation(partnerGrossIncome))}
-                              readOnly
-                              className="rounded-lg bg-slate-100 text-sm"
-                            />
-                          </div>
-                        </div>
-                      )}
+                        );
+                      })()}
                     </div>
 
                     {/* Maternity */}
@@ -1183,31 +1245,32 @@ export default function ProtectionStep({ data, onChange }) {
                           onCheckedChange={(checked) => onChange('partner_risk_maternity', checked)}
                         />
                       </div>
-                      {data.partner_risk_maternity && (
-                        <div className="ml-4 p-3 bg-white rounded-lg border border-slate-200 space-y-3">
-                          <div className="grid grid-cols-2 gap-3">
+                      {data.partner_risk_maternity && (() => {
+                        const compYear1 = calculateMaternityYear1(partnerGrossIncome);
+                        const missingYear1 = Math.max(0, partnerNetIncome - compYear1);
+                        const missingYear2 = Math.max(0, partnerNetIncome - maternityYear2);
+                        return (
+                          <div className="ml-4 p-3 bg-white rounded-lg border border-slate-200 grid grid-cols-2 gap-3">
                             <div className="space-y-1">
-                              <Label className="text-xs text-slate-500">Обезщетение първа година (€)</Label>
+                              <Label className="text-xs text-slate-500 h-8 flex items-end">Обезщетение 1-ва год. (€)</Label>
                               <Input
                                 type="number"
-                                value={calculateMaternityYear1(partnerGrossIncome)}
+                                value={compYear1}
                                 readOnly
                                 className="rounded-lg bg-slate-100 text-sm"
                               />
                             </div>
                             <div className="space-y-1">
-                              <Label className="text-xs text-slate-500">Липсващ доход първа година (€)</Label>
+                              <Label className="text-xs text-slate-500 h-8 flex items-end">Липсващ доход 1-ва год. (€)</Label>
                               <Input
                                 type="number"
-                                value={Math.max(0, partnerNetIncome - calculateMaternityYear1(partnerGrossIncome))}
+                                value={missingYear1}
                                 readOnly
-                                className="rounded-lg bg-slate-100 text-sm"
+                                className={cn("rounded-lg text-sm", getMissingIncomeColor(missingYear1, partnerNetIncome))}
                               />
                             </div>
-                          </div>
-                          <div className="grid grid-cols-2 gap-3">
                             <div className="space-y-1">
-                              <Label className="text-xs text-slate-500">Обезщетение втора година (€)</Label>
+                              <Label className="text-xs text-slate-500 h-8 flex items-end">Обезщетение 2-ра год. (€)</Label>
                               <Input
                                 type="number"
                                 value={maternityYear2}
@@ -1216,17 +1279,17 @@ export default function ProtectionStep({ data, onChange }) {
                               />
                             </div>
                             <div className="space-y-1">
-                              <Label className="text-xs text-slate-500">Липсващ доход втора година (€)</Label>
+                              <Label className="text-xs text-slate-500 h-8 flex items-end">Липсващ доход 2-ра год. (€)</Label>
                               <Input
                                 type="number"
-                                value={Math.max(0, partnerNetIncome - maternityYear2)}
+                                value={missingYear2}
                                 readOnly
-                                className="rounded-lg bg-slate-100 text-sm"
+                                className={cn("rounded-lg text-sm", getMissingIncomeColor(missingYear2, partnerNetIncome))}
                               />
                             </div>
                           </div>
-                        </div>
-                      )}
+                        );
+                      })()}
                     </div>
 
                     {/* Sick Leave */}
@@ -1238,37 +1301,69 @@ export default function ProtectionStep({ data, onChange }) {
                           onCheckedChange={(checked) => onChange('partner_risk_sick_leave', checked)}
                         />
                       </div>
-                      {data.partner_risk_sick_leave && (
-                        <div className="ml-4 p-3 bg-white rounded-lg border border-slate-200 grid grid-cols-2 gap-3">
-                          <div className="space-y-1">
-                            <Label className="text-xs text-slate-500">Обезщетение (€)</Label>
-                            <Input
-                              type="number"
-                              value={calculateSickLeaveCompensation(partnerGrossIncome)}
-                              readOnly
-                              className="rounded-lg bg-slate-100 text-sm"
-                            />
+                      {data.partner_risk_sick_leave && (() => {
+                        const compensation = calculateSickLeaveCompensation(partnerGrossIncome);
+                        const missing = Math.max(0, partnerNetIncome - compensation);
+                        return (
+                          <div className="ml-4 p-3 bg-white rounded-lg border border-slate-200 grid grid-cols-2 gap-3">
+                            <div className="space-y-1">
+                              <Label className="text-xs text-slate-500">Обезщетение (€)</Label>
+                              <Input
+                                type="number"
+                                value={compensation}
+                                readOnly
+                                className="rounded-lg bg-slate-100 text-sm"
+                              />
+                            </div>
+                            <div className="space-y-1">
+                              <Label className="text-xs text-slate-500">Липсващ доход (€)</Label>
+                              <Input
+                                type="number"
+                                value={missing}
+                                readOnly
+                                className={cn("rounded-lg text-sm", getMissingIncomeColor(missing, partnerNetIncome))}
+                              />
+                            </div>
                           </div>
-                          <div className="space-y-1">
-                            <Label className="text-xs text-slate-500">Липсващ доход (€)</Label>
-                            <Input
-                              type="number"
-                              value={Math.max(0, partnerNetIncome - calculateSickLeaveCompensation(partnerGrossIncome))}
-                              readOnly
-                              className="rounded-lg bg-slate-100 text-sm"
-                            />
-                          </div>
-                        </div>
-                      )}
+                        );
+                      })()}
                     </div>
 
                     {/* Disability */}
-                    <div className="flex items-center justify-between">
-                      <Label className="cursor-pointer">Инвалидност</Label>
-                      <Switch
-                        checked={data.partner_risk_disability || false}
-                        onCheckedChange={(checked) => onChange('partner_risk_disability', checked)}
-                      />
+                    <div className="space-y-3">
+                      <div className="flex items-center justify-between">
+                        <Label className="cursor-pointer">Инвалидност</Label>
+                        <Switch
+                          checked={data.partner_risk_disability || false}
+                          onCheckedChange={(checked) => onChange('partner_risk_disability', checked)}
+                        />
+                      </div>
+                      {data.partner_risk_disability && (() => {
+                        const compensation = calculateDisabilityCompensation(partnerGrossIncome);
+                        const missing = Math.max(0, partnerNetIncome - compensation);
+                        return (
+                          <div className="ml-4 p-3 bg-white rounded-lg border border-slate-200 grid grid-cols-2 gap-3">
+                            <div className="space-y-1">
+                              <Label className="text-xs text-slate-500">Обезщетение (€)</Label>
+                              <Input
+                                type="number"
+                                value={compensation}
+                                readOnly
+                                className="rounded-lg bg-slate-100 text-sm"
+                              />
+                            </div>
+                            <div className="space-y-1">
+                              <Label className="text-xs text-slate-500">Липсващ доход (€)</Label>
+                              <Input
+                                type="number"
+                                value={missing}
+                                readOnly
+                                className={cn("rounded-lg text-sm", getMissingIncomeColor(missing, partnerNetIncome))}
+                              />
+                            </div>
+                          </div>
+                        );
+                      })()}
                     </div>
 
                     {/* Death */}
@@ -1280,28 +1375,32 @@ export default function ProtectionStep({ data, onChange }) {
                           onCheckedChange={(checked) => onChange('partner_risk_death', checked)}
                         />
                       </div>
-                      {data.partner_risk_death && (
-                        <div className="ml-4 p-3 bg-white rounded-lg border border-slate-200 grid grid-cols-2 gap-3">
-                          <div className="space-y-1">
-                            <Label className="text-xs text-slate-500">Обезщетение (€)</Label>
-                            <Input
-                              type="number"
-                              value={calculateDeathCompensation(partnerGrossIncome)}
-                              readOnly
-                              className="rounded-lg bg-slate-100 text-sm"
-                            />
+                      {data.partner_risk_death && (() => {
+                        const compensation = calculateDeathCompensation(partnerGrossIncome);
+                        const missing = Math.max(0, partnerNetIncome - compensation);
+                        return (
+                          <div className="ml-4 p-3 bg-white rounded-lg border border-slate-200 grid grid-cols-2 gap-3">
+                            <div className="space-y-1">
+                              <Label className="text-xs text-slate-500">Обезщетение (€)</Label>
+                              <Input
+                                type="number"
+                                value={compensation}
+                                readOnly
+                                className="rounded-lg bg-slate-100 text-sm"
+                              />
+                            </div>
+                            <div className="space-y-1">
+                              <Label className="text-xs text-slate-500">Липсващ доход (€)</Label>
+                              <Input
+                                type="number"
+                                value={missing}
+                                readOnly
+                                className={cn("rounded-lg text-sm", getMissingIncomeColor(missing, partnerNetIncome))}
+                              />
+                            </div>
                           </div>
-                          <div className="space-y-1">
-                            <Label className="text-xs text-slate-500">Липсващ доход (€)</Label>
-                            <Input
-                              type="number"
-                              value={Math.max(0, partnerNetIncome - calculateDeathCompensation(partnerGrossIncome))}
-                              readOnly
-                              className="rounded-lg bg-slate-100 text-sm"
-                            />
-                          </div>
-                        </div>
-                      )}
+                        );
+                      })()}
                     </div>
 
                     {/* Partner Income Protection */}

@@ -140,25 +140,23 @@ export default function FinancialAnalysis() {
   return (
     <div className="pt-20 min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
       <div className="max-w-5xl mx-auto px-6 py-12">
-        {/* Sticky Header and Progress */}
-        <div className="sticky top-20 z-40 bg-gradient-to-br from-slate-50 to-blue-50 pb-4">
-          {/* Header */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="text-center mb-4"
-          >
-            <span className="text-blue-600 font-medium text-sm tracking-widest uppercase mb-2 block">
-              Персонален финансов анализ
-            </span>
-            <h1 className="text-2xl md:text-3xl font-light text-slate-900">
-              Персонален <span className="font-semibold text-blue-600">Финансов</span> Анализ
-            </h1>
-          </motion.div>
+        {/* Header */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="text-center mb-8"
+        >
+          <span className="text-blue-600 font-medium text-sm tracking-widest uppercase mb-4 block">
+            Персонален финансов анализ
+          </span>
+          <h1 className="text-3xl md:text-4xl font-light text-slate-900 mb-4">
+            Персонален <span className="font-semibold text-blue-600">Финансов</span> Анализ
+          </h1>
+        </motion.div>
 
-          {/* Progress Steps */}
-          <div className="overflow-x-auto pb-2">
-            <div className="flex justify-between items-center min-w-max px-4">
+        {/* Progress Steps */}
+        <div className="mb-8 overflow-x-auto pb-2">
+          <div className="flex justify-between items-center min-w-max px-4">
             {steps.map((step, index) => (
               <React.Fragment key={step.id}>
                 <button
@@ -195,7 +193,6 @@ export default function FinancialAnalysis() {
                 )}
               </React.Fragment>
             ))}
-          </div>
           </div>
         </div>
 

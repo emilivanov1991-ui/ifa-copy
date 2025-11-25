@@ -6,11 +6,11 @@ import { Button } from "@/components/ui/button";
 import { motion, AnimatePresence } from 'framer-motion';
 
 const navLinks = [
-  { name: 'Home', page: 'Home' },
-  { name: 'About', page: 'About' },
-  { name: 'Services', page: 'Services' },
-  { name: 'Free Analysis', page: 'FinancialAnalysis' },
-  { name: 'Contact', page: 'Contact' },
+  { name: 'Начало', page: 'Home' },
+  { name: 'За нас', page: 'About' },
+  { name: 'Услуги', page: 'Services' },
+  { name: 'Безплатен анализ', page: 'FinancialAnalysis' },
+  { name: 'Контакти', page: 'Contact' },
 ];
 
 export default function Layout({ children, currentPageName }) {
@@ -77,7 +77,7 @@ export default function Layout({ children, currentPageName }) {
                   : 'bg-white/20 hover:bg-white/30 text-white backdrop-blur-sm border border-white/30'
               }`}
             >
-              Get Started
+              Започнете сега
             </Button>
           </nav>
 
@@ -117,7 +117,7 @@ export default function Layout({ children, currentPageName }) {
                   </Link>
                 ))}
                 <Button className="bg-blue-600 hover:bg-blue-700 text-white rounded-full mt-2">
-                  Get Started
+                  Започнете сега
                 </Button>
               </nav>
             </motion.div>
@@ -143,14 +143,14 @@ export default function Layout({ children, currentPageName }) {
                 <span className="font-semibold text-xl">APEX Financial</span>
               </div>
               <p className="text-slate-400 font-light leading-relaxed max-w-md">
-                Independent financial advisors dedicated to helping you achieve 
-                your financial goals with personalized strategies and expert guidance.
+                Независими финансови консултанти, посветени на постигането на вашите 
+                финансови цели с персонализирани стратегии и експертни насоки.
               </p>
             </div>
 
             {/* Quick Links */}
             <div>
-              <h4 className="font-semibold mb-4">Quick Links</h4>
+              <h4 className="font-semibold mb-4">Бързи връзки</h4>
               <ul className="space-y-3">
                 {navLinks.map((link) => (
                   <li key={link.name}>
@@ -167,23 +167,23 @@ export default function Layout({ children, currentPageName }) {
 
             {/* Contact */}
             <div>
-              <h4 className="font-semibold mb-4">Contact</h4>
+              <h4 className="font-semibold mb-4">Контакти</h4>
               <ul className="space-y-3 text-slate-400 font-light">
-                <li>1-800-APEX-FIN</li>
-                <li>info@apexfinancial.com</li>
-                <li>123 Financial District<br />New York, NY 10004</li>
+                <li>+359 2 123 4567</li>
+                <li>info@apexfinancial.bg</li>
+                <li>бул. Витоша 100<br />София 1000</li>
               </ul>
             </div>
           </div>
 
           <div className="border-t border-slate-800 pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
             <p className="text-slate-500 text-sm font-light">
-              © {new Date().getFullYear()} Apex Financial Advisors. All Rights Reserved.
+              © {new Date().getFullYear()} Apex Financial Advisors. Всички права запазени.
             </p>
             <div className="flex gap-6 text-sm text-slate-500">
-              <a href="#" className="hover:text-white transition-colors">Privacy Policy</a>
-              <a href="#" className="hover:text-white transition-colors">Terms of Service</a>
-              <a href="#" className="hover:text-white transition-colors">Disclosures</a>
+              <a href="#" className="hover:text-white transition-colors">Политика за поверителност</a>
+              <a href="#" className="hover:text-white transition-colors">Условия за ползване</a>
+              <a href="#" className="hover:text-white transition-colors">Разкрития</a>
             </div>
           </div>
         </div>

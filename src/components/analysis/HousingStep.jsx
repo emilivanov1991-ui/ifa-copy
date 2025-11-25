@@ -604,6 +604,14 @@ export default function HousingStep({ data, onChange }) {
                   </div>
                 </div>
 
+                {/* Warning if sum is less than total */}
+                {((data.birthday_guests_family || 0) + (data.birthday_guests_friends || 0) + (data.birthday_guests_colleagues || 0)) > 0 &&
+                 ((data.birthday_guests_family || 0) + (data.birthday_guests_friends || 0) + (data.birthday_guests_colleagues || 0)) < data.birthday_party_guests_total && (
+                  <div className="p-3 bg-amber-50 border border-amber-200 rounded-lg text-amber-700 text-sm">
+                    Общият сбор е по-малък от посоченото по-горе.
+                  </div>
+                )}
+
                 {/* Name fields for each category */}
                 {(data.birthday_guests_family > 0 || data.birthday_guests_friends > 0 || data.birthday_guests_colleagues > 0) && (
                   <div className="space-y-6 mt-6 pt-6 border-t border-slate-200">

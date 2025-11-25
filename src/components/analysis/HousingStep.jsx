@@ -41,6 +41,13 @@ export default function HousingStep({ data, onChange }) {
   const loanYears = data.loan_term_years || 0;
   const calculatedMonthlyPayment = calculateMonthlyPayment(calculatedLoanAmount, interestRate, loanYears);
 
+  // Calculate total overpayment (interest paid over loan lifetime)
+  const totalPayments = calculatedMonthlyPayment && loanYears ? calculatedMonthlyPayment * loanYears * 12 : 0;
+  const totalOverpayment = totalPayments > calculatedLoanAmount ? totalPayments - calculatedLoanAmount : 0;
+  
+  // Calculate potential savings (35% of overpayment - middle of 30-40% range)
+  const potentialSavings = Math.round(totalOverpayment * 0.35);
+
   return (
     <div className="space-y-8">
       {/* Current Situation */}
@@ -403,7 +410,30 @@ export default function HousingStep({ data, onChange }) {
                   className="rounded-lg bg-slate-100"
                 />
               </div>
+              <div className="space-y-2">
+                <Label>Общо надплащане (€) - автоматично</Label>
+                <Input
+                  type="number"
+                  min="0"
+                  value={totalOverpayment}
+                  readOnly
+                  className="rounded-lg bg-slate-100"
+                />
+              </div>
             </div>
+
+            {/* Savings highlight */}
+            {totalOverpayment > 0 && (
+              <div className="mt-4 p-4 bg-green-50 border border-green-200 rounded-lg">
+                <div className="flex items-center gap-2">
+                  <span className="text-green-700 font-medium">Можем да спестим:</span>
+                  <span className="text-green-800 font-bold text-lg">{potentialSavings.toLocaleString('bg-BG')} €</span>
+                </div>
+                <p className="text-green-600 text-sm mt-1">
+                  Това е между 30% и 40% от общото надплащане по кредита
+                </p>
+              </div>
+            )}
           </div>
         </div>
       )}

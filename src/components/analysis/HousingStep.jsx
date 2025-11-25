@@ -13,7 +13,42 @@ import {
 import { Home, Building2 } from 'lucide-react';
 import { cn } from "@/lib/utils";
 
+// Calculate monthly mortgage payment using amortization formula
+const calculateMonthlyPayment = (principal, annualRate, years) => {
+  if (!principal || !annualRate || !years) return '';
+  const monthlyRate = annualRate / 100 / 12;
+  const numberOfPayments = years * 12;
+  if (monthlyRate === 0) return Math.round(principal / numberOfPayments);
+  const payment = principal * (monthlyRate * Math.pow(1 + monthlyRate, numberOfPayments)) / (Math.pow(1 + monthlyRate, numberOfPayments) - 1);
+  return Math.round(payment);
+};
+
+// Generate interest rate options from 1% to 8% in 0.5% increments
+const interestRateOptions = [];
+for (let rate = 1; rate <= 8; rate += 0.5) {
+  interestRateOptions.push(rate);
+}
+
 export default function HousingStep({ data, onChange }) {
+  // Calculate loan amount automatically
+  const plannedValue = data.planned_housing_value || 0;
+  const extraCosts = data.planned_housing_extra_costs || 0;
+  const availableCash = data.available_cash || 0;
+  const calculatedLoanAmount = Math.max(0, plannedValue + extraCosts - availableCash);
+
+  // Calculate monthly payment automatically
+  const interestRate = data.loan_interest_rate || 3;
+  const loanYears = data.loan_term_years || 0;
+  const calculatedMonthlyPayment = calculateMonthlyPayment(calculatedLoanAmount, interestRate, loanYears);
+
+  // Calculate total overpayment (interest paid over loan lifetime)
+  const totalPayments = calculatedMonthlyPayment && loanYears ? calculatedMonthlyPayment * loanYears * 12 : 0;
+  const totalOverpayment = totalPayments > calculatedLoanAmount ? totalPayments - calculatedLoanAmount : 0;
+  
+  // Calculate potential savings range (30-40% of overpayment)
+  const potentialSavingsMin = Math.round(totalOverpayment * 0.30);
+  const potentialSavingsMax = Math.round(totalOverpayment * 0.40);
+
   return (
     <div className="space-y-8">
       {/* Current Situation */}
@@ -42,7 +77,33 @@ export default function HousingStep({ data, onChange }) {
             </Select>
           </div>
 
-          <div className="grid sm:grid-cols-3 gap-4">
+          {/* Location field for rented/subrented/with_parents */}
+          {(data.current_housing === 'rented' || data.current_housing === 'subrented' || data.current_housing === 'with_parents') && (
+            <div className="space-y-2">
+              <Label>Локация</Label>
+              <Input
+                placeholder="гр. София, кв. Лозенец"
+                value={data.current_housing_location || ''}
+                onChange={(e) => onChange('current_housing_location', e.target.value)}
+                className="rounded-lg"
+              />
+            </div>
+          )}
+
+          {/* Address field for owned housing */}
+          {data.current_housing === 'owned' && (
+            <div className="space-y-2">
+              <Label>Адрес</Label>
+              <Input
+                placeholder="гр. София, ул. Примерна 1, ап. 5"
+                value={data.current_housing_address || ''}
+                onChange={(e) => onChange('current_housing_address', e.target.value)}
+                className="rounded-lg"
+              />
+            </div>
+          )}
+
+          <div className={cn("grid gap-4", (data.current_housing === 'with_parents' || data.current_housing === 'rented' || data.current_housing === 'subrented') ? "sm:grid-cols-2" : "sm:grid-cols-2 lg:grid-cols-4")}>
             <div className="space-y-2">
               <Label>Брой стаи</Label>
               <Input
@@ -66,18 +127,106 @@ export default function HousingStep({ data, onChange }) {
                 className="rounded-lg"
               />
             </div>
-            <div className="space-y-2">
-              <Label>Стойност (лв)</Label>
-              <Input
-                type="number"
-                min="0"
-                placeholder="150000"
-                value={data.current_housing_value || ''}
-                onChange={(e) => onChange('current_housing_value', parseInt(e.target.value) || '')}
-                className="rounded-lg"
-              />
-            </div>
+            {data.current_housing === 'owned' && (
+              <>
+                <div className="space-y-2">
+                  <Label>Стойност (€)</Label>
+                  <Input
+                    type="number"
+                    min="0"
+                    placeholder="150000"
+                    value={data.current_housing_value || ''}
+                    onChange={(e) => onChange('current_housing_value', parseInt(e.target.value) || '')}
+                    className="rounded-lg"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label>Стойност на движимо имущество (€)</Label>
+                  <Input
+                    type="number"
+                    min="0"
+                    placeholder="10000"
+                    value={data.current_housing_movable_value || ''}
+                    onChange={(e) => onChange('current_housing_movable_value', parseInt(e.target.value) || '')}
+                    className="rounded-lg"
+                  />
+                </div>
+              </>
+            )}
           </div>
+
+          {/* Mortgage section for owned housing */}
+          {data.current_housing === 'owned' && (
+            <div className="border-t border-slate-200 pt-4 mt-4">
+              <div className="flex items-center justify-between mb-4">
+                <Label className="cursor-pointer">Има ли ипотека?</Label>
+                <Switch
+                  checked={data.current_housing_has_mortgage || false}
+                  onCheckedChange={(checked) => onChange('current_housing_has_mortgage', checked)}
+                />
+              </div>
+
+              {data.current_housing_has_mortgage && (
+                <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 p-4 bg-white rounded-lg border border-slate-200">
+                  <div className="space-y-2">
+                    <Label>Остатъчна сума (€)</Label>
+                    <Input
+                      type="number"
+                      min="0"
+                      placeholder="100000"
+                      value={data.current_mortgage_remaining || ''}
+                      onChange={(e) => onChange('current_mortgage_remaining', parseInt(e.target.value) || '')}
+                      className="rounded-lg"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Лихвен процент (%)</Label>
+                    <Input
+                      type="number"
+                      min="0"
+                      step="0.1"
+                      placeholder="3.5"
+                      value={data.current_mortgage_interest_rate || ''}
+                      onChange={(e) => onChange('current_mortgage_interest_rate', parseFloat(e.target.value) || '')}
+                      className="rounded-lg"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Банка</Label>
+                    <Input
+                      placeholder="УниКредит Булбанк"
+                      value={data.current_mortgage_bank || ''}
+                      onChange={(e) => onChange('current_mortgage_bank', e.target.value)}
+                      className="rounded-lg"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Оставащ период (години)</Label>
+                    <Input
+                      type="number"
+                      min="0"
+                      max="35"
+                      placeholder="15"
+                      value={data.current_mortgage_remaining_years || ''}
+                      onChange={(e) => onChange('current_mortgage_remaining_years', parseInt(e.target.value) || '')}
+                      className="rounded-lg"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Месечна вноска (€)</Label>
+                    <Input
+                      type="number"
+                      min="0"
+                      placeholder="800"
+                      value={data.current_mortgage_monthly_payment || ''}
+                      onChange={(e) => onChange('current_mortgage_monthly_payment', parseInt(e.target.value) || '')}
+                      className="rounded-lg"
+                    />
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
         </div>
       </div>
 
@@ -141,7 +290,7 @@ export default function HousingStep({ data, onChange }) {
                 />
               </div>
               <div className="space-y-2">
-                <Label>Стойност на имота (лв)</Label>
+                <Label>Стойност на имота (€)</Label>
                 <Input
                   type="number"
                   min="0"
@@ -164,7 +313,7 @@ export default function HousingStep({ data, onChange }) {
                 />
               </div>
               <div className="space-y-2">
-                <Label>Общи разходи (лв)</Label>
+                <Label>Общи разходи - ремонт и обзавеждане (€)</Label>
                 <Input
                   type="number"
                   min="0"
@@ -179,74 +328,180 @@ export default function HousingStep({ data, onChange }) {
         )}
       </div>
 
-      {/* Financing */}
+      {/* Financing - only show if planning change */}
+      {data.planning_housing_change && (
+        <div className="bg-slate-50 rounded-xl p-6">
+          <h3 className="font-semibold text-slate-900 mb-6">Начин на финансиране</h3>
+          
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <Label>Метод на финансиране</Label>
+              <Select 
+                value={data.financing_method || ''} 
+                onValueChange={(value) => onChange('financing_method', value)}
+              >
+                <SelectTrigger className="rounded-lg">
+                  <SelectValue placeholder="Изберете" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="cash">Пари в брой</SelectItem>
+                  <SelectItem value="cash_and_loan">Пари в брой + заем / кредит</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            {/* Show only cash field for cash method, full form for cash_and_loan */}
+            {data.financing_method === 'cash' ? (
+              <div className="space-y-2">
+                <Label>Наличност в брой (€)</Label>
+                <Input
+                  type="number"
+                  min="0"
+                  placeholder="50000"
+                  value={data.available_cash || ''}
+                  onChange={(e) => onChange('available_cash', parseInt(e.target.value) || '')}
+                  className="rounded-lg"
+                />
+              </div>
+            ) : data.financing_method === 'cash_and_loan' ? (
+              <>
+                <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                  <div className="space-y-2">
+                    <Label>Наличност в брой (€)</Label>
+                    <Input
+                      type="number"
+                      min="0"
+                      placeholder="50000"
+                      value={data.available_cash || ''}
+                      onChange={(e) => onChange('available_cash', parseInt(e.target.value) || '')}
+                      className="rounded-lg"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Размер на заема (€) - автоматично</Label>
+                    <Input
+                      type="number"
+                      min="0"
+                      value={calculatedLoanAmount}
+                      readOnly
+                      className="rounded-lg bg-slate-100"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Лихвен процент (%)</Label>
+                    <Select 
+                      value={(data.loan_interest_rate || 3).toString()} 
+                      onValueChange={(value) => onChange('loan_interest_rate', parseFloat(value))}
+                    >
+                      <SelectTrigger className="rounded-lg">
+                        <SelectValue placeholder="3%" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {interestRateOptions.map((rate) => (
+                          <SelectItem key={rate} value={rate.toString()}>{rate}%</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Срок на изплащане (години)</Label>
+                    <Input
+                      type="number"
+                      min="1"
+                      max="35"
+                      placeholder="25"
+                      value={data.loan_term_years || ''}
+                      onChange={(e) => onChange('loan_term_years', parseInt(e.target.value) || '')}
+                      className="rounded-lg"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Очаквана месечна вноска (€) - автоматично</Label>
+                    <Input
+                      type="number"
+                      min="0"
+                      value={calculatedMonthlyPayment}
+                      readOnly
+                      className="rounded-lg bg-slate-100"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Общо надплащане (€) - автоматично</Label>
+                    <Input
+                      type="number"
+                      min="0"
+                      value={totalOverpayment}
+                      readOnly
+                      className="rounded-lg bg-slate-100"
+                    />
+                  </div>
+                </div>
+
+                {/* Savings highlight */}
+                {totalOverpayment > 0 && (
+                  <div className="mt-4 p-4 bg-green-50 border border-green-200 rounded-lg">
+                    <div className="flex items-center gap-2">
+                      <span className="text-green-700 font-medium">Можем да спестим между:</span>
+                      <span className="text-green-800 font-bold text-lg">{potentialSavingsMin.toLocaleString('bg-BG')} € - {potentialSavingsMax.toLocaleString('bg-BG')} €</span>
+                    </div>
+                    <p className="text-green-600 text-sm mt-1">
+                      Това е между 30% и 40% от общото надплащане по кредита. Това постигаме, чрез преференциални кредитни условия, по-изгодно застраховане и ефективен Инвестиционно-погасителен план.
+                    </p>
+                  </div>
+                )}
+              </>
+            ) : null}
+          </div>
+        </div>
+      )}
+
+      {/* Referrals Section */}
       <div className="bg-slate-50 rounded-xl p-6">
-        <h3 className="font-semibold text-slate-900 mb-6">Начин на финансиране</h3>
+        <h3 className="font-semibold text-slate-900 mb-4">Кой от вашите познати:</h3>
         
-        <div className="space-y-4">
-          <div className="space-y-2">
-            <Label>Метод на финансиране</Label>
-            <Select 
-              value={data.financing_method || ''} 
-              onValueChange={(value) => onChange('financing_method', value)}
-            >
-              <SelectTrigger className="rounded-lg">
-                <SelectValue placeholder="Изберете" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="cash">Пари в брой</SelectItem>
-                <SelectItem value="loan">Заем / Кредит</SelectItem>
-                <SelectItem value="cash_and_loan">Пари в брой + заем / кредит</SelectItem>
-              </SelectContent>
-            </Select>
+        <div className="grid md:grid-cols-2 gap-6">
+          {/* Not living in own home */}
+          <div className="space-y-3">
+            <Label className="text-slate-700">Все още не живее в собствено жилище (живее при родителите си, под наем...)</Label>
+            {(data.referrals_no_own_home || ['']).map((name, index) => (
+              <Input
+                key={`no_home_${index}`}
+                placeholder="Име на познат"
+                value={name}
+                onChange={(e) => {
+                  const newList = [...(data.referrals_no_own_home || [''])];
+                  newList[index] = e.target.value;
+                  // Add new empty field if this is the last one and it has content
+                  if (index === newList.length - 1 && e.target.value) {
+                    newList.push('');
+                  }
+                  onChange('referrals_no_own_home', newList);
+                }}
+                className="rounded-lg"
+              />
+            ))}
           </div>
 
-          <div className="grid sm:grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label>Наличност в брой (лв)</Label>
+          {/* Living in own home for long time */}
+          <div className="space-y-3">
+            <Label className="text-slate-700">Вече дълго време живее в собствено жилище</Label>
+            {(data.referrals_own_home_long || ['']).map((name, index) => (
               <Input
-                type="number"
-                min="0"
-                placeholder="50000"
-                value={data.available_cash || ''}
-                onChange={(e) => onChange('available_cash', parseInt(e.target.value) || '')}
+                key={`own_home_${index}`}
+                placeholder="Име на познат"
+                value={name}
+                onChange={(e) => {
+                  const newList = [...(data.referrals_own_home_long || [''])];
+                  newList[index] = e.target.value;
+                  // Add new empty field if this is the last one and it has content
+                  if (index === newList.length - 1 && e.target.value) {
+                    newList.push('');
+                  }
+                  onChange('referrals_own_home_long', newList);
+                }}
                 className="rounded-lg"
               />
-            </div>
-            <div className="space-y-2">
-              <Label>Размер на заема (лв)</Label>
-              <Input
-                type="number"
-                min="0"
-                placeholder="150000"
-                value={data.loan_amount || ''}
-                onChange={(e) => onChange('loan_amount', parseInt(e.target.value) || '')}
-                className="rounded-lg"
-              />
-            </div>
-            <div className="space-y-2">
-              <Label>Срок на изплащане (години)</Label>
-              <Input
-                type="number"
-                min="1"
-                max="35"
-                placeholder="25"
-                value={data.loan_term_years || ''}
-                onChange={(e) => onChange('loan_term_years', parseInt(e.target.value) || '')}
-                className="rounded-lg"
-              />
-            </div>
-            <div className="space-y-2">
-              <Label>Очаквана месечна вноска (лв)</Label>
-              <Input
-                type="number"
-                min="0"
-                placeholder="800"
-                value={data.expected_monthly_payment || ''}
-                onChange={(e) => onChange('expected_monthly_payment', parseInt(e.target.value) || '')}
-                className="rounded-lg"
-              />
-            </div>
+            ))}
           </div>
         </div>
       </div>

@@ -342,46 +342,88 @@ export default function ChildrenGoalsStep({ data, onChange }) {
         </div>
 
         <div className="space-y-4">
-          <div className="flex items-center justify-between gap-4">
+          <div className="grid grid-cols-3 gap-4 items-end">
             <div className="flex items-center gap-2">
               <Car className="h-4 w-4 text-slate-500" />
               <Label className="font-medium">Кола</Label>
             </div>
-            <Input
-              type="number"
-              min="0"
-              placeholder="0"
-              value={data.other_goals_car || ''}
-              onChange={(e) => onChange('other_goals_car', parseInt(e.target.value) || '')}
-              className="rounded-lg w-32"
-            />
+            <div className="space-y-1">
+              <Label className="text-xs text-slate-500">Сума (€)</Label>
+              <Input
+                type="number"
+                min="0"
+                placeholder="0"
+                value={data.other_goals_car || ''}
+                onChange={(e) => onChange('other_goals_car', parseInt(e.target.value) || '')}
+                className="rounded-lg"
+              />
+            </div>
+            <div className="space-y-1">
+              <Label className="text-xs text-slate-500">Хоризонт (години)</Label>
+              <Input
+                type="number"
+                min="1"
+                placeholder="1"
+                value={data.other_goals_car_years || ''}
+                onChange={(e) => onChange('other_goals_car_years', parseInt(e.target.value) || '')}
+                className="rounded-lg"
+              />
+            </div>
           </div>
 
-          <div className="flex items-center justify-between gap-4">
+          <div className="grid grid-cols-3 gap-4 items-end">
             <div className="flex items-center gap-2">
               <Palmtree className="h-4 w-4 text-slate-500" />
               <Label className="font-medium">Почивка</Label>
             </div>
-            <Input
-              type="number"
-              min="0"
-              placeholder="0"
-              value={data.other_goals_vacation || ''}
-              onChange={(e) => onChange('other_goals_vacation', parseInt(e.target.value) || '')}
-              className="rounded-lg w-32"
-            />
+            <div className="space-y-1">
+              <Label className="text-xs text-slate-500">Сума (€)</Label>
+              <Input
+                type="number"
+                min="0"
+                placeholder="0"
+                value={data.other_goals_vacation || ''}
+                onChange={(e) => onChange('other_goals_vacation', parseInt(e.target.value) || '')}
+                className="rounded-lg"
+              />
+            </div>
+            <div className="space-y-1">
+              <Label className="text-xs text-slate-500">Хоризонт (години)</Label>
+              <Input
+                type="number"
+                min="1"
+                placeholder="1"
+                value={data.other_goals_vacation_years || ''}
+                onChange={(e) => onChange('other_goals_vacation_years', parseInt(e.target.value) || '')}
+                className="rounded-lg"
+              />
+            </div>
           </div>
 
-          <div className="flex items-center justify-between gap-4">
+          <div className="grid grid-cols-3 gap-4 items-end">
             <Label className="font-medium">Други</Label>
-            <Input
-              type="number"
-              min="0"
-              placeholder="0"
-              value={data.other_goals_other || ''}
-              onChange={(e) => onChange('other_goals_other', parseInt(e.target.value) || '')}
-              className="rounded-lg w-32"
-            />
+            <div className="space-y-1">
+              <Label className="text-xs text-slate-500">Сума (€)</Label>
+              <Input
+                type="number"
+                min="0"
+                placeholder="0"
+                value={data.other_goals_other || ''}
+                onChange={(e) => onChange('other_goals_other', parseInt(e.target.value) || '')}
+                className="rounded-lg"
+              />
+            </div>
+            <div className="space-y-1">
+              <Label className="text-xs text-slate-500">Хоризонт (години)</Label>
+              <Input
+                type="number"
+                min="1"
+                placeholder="1"
+                value={data.other_goals_other_years || ''}
+                onChange={(e) => onChange('other_goals_other_years', parseInt(e.target.value) || '')}
+                className="rounded-lg"
+              />
+            </div>
           </div>
         </div>
       </div>

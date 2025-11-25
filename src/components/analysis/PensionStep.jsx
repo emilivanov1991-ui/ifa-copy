@@ -20,7 +20,19 @@ const calculateStatePension = (category, retirementAge, grossIncome) => {
   return { amount: calculated > 0 ? amount : 0, isSocialPension: false };
 };
 
+// Calculate required monthly investment using compound interest formula
+const calculateMonthlyInvestment = (targetAmount, years, annualRate) => {
+  if (years <= 0 || targetAmount <= 0) return 0;
+  const monthlyRate = annualRate / 12;
+  const months = years * 12;
+  // Future Value of Annuity formula solved for PMT
+  const payment = targetAmount * monthlyRate / (Math.pow(1 + monthlyRate, months) - 1);
+  return Math.round(payment);
+};
+
 export default function PensionStep({ data, onChange }) {
+  const includePartner = data.include_partner || false;
+
   // Auto-calculate client expected pension
   useEffect(() => {
     const result = calculateStatePension(
@@ -36,6 +48,7 @@ export default function PensionStep({ data, onChange }) {
 
   // Auto-calculate partner expected pension
   useEffect(() => {
+    if (!includePartner) return;
     const result = calculateStatePension(
       data.partner_work_category || 'third',
       data.partner_retirement_age,
@@ -45,13 +58,45 @@ export default function PensionStep({ data, onChange }) {
       onChange('partner_expected_state_pension', result.amount);
       onChange('partner_pension_is_social', result.isSocialPension);
     }
-  }, [data.partner_work_category, data.partner_retirement_age, data.partner_gross_income_pension]);
+  }, [data.partner_work_category, data.partner_retirement_age, data.partner_gross_income_pension, includePartner]);
 
   const categoryOptions = [
     { value: 'third', label: 'Трета категория' },
     { value: 'second', label: 'Втора категория' },
     { value: 'first', label: 'Първа категория' },
   ];
+
+  // Calculate differences
+  const clientDiff = (data.client_desired_pension || 0) - (data.client_expected_state_pension || 0);
+  const partnerDiff = includePartner ? (data.partner_desired_pension || 0) - (data.partner_expected_state_pension || 0) : 0;
+  const totalMonthlyDiff = clientDiff + partnerDiff;
+
+  // Calculate average current age
+  const clientAge = data.client_age || 0;
+  const partnerAge = includePartner ? (data.partner_age || 0) : 0;
+  const avgCurrentAge = includePartner && partnerAge > 0 
+    ? (clientAge + partnerAge) / 2 
+    : clientAge;
+
+  // Calculate average retirement age
+  const clientRetirementAge = data.client_retirement_age || 0;
+  const partnerRetirementAge = includePartner ? (data.partner_retirement_age || 0) : 0;
+  const avgRetirementAge = includePartner && partnerRetirementAge > 0 
+    ? (clientRetirementAge + partnerRetirementAge) / 2 
+    : clientRetirementAge;
+
+  // Investment horizon = avg retirement age - avg current age
+  const investmentHorizon = Math.max(1, Math.round(avgRetirementAge - avgCurrentAge));
+
+  // Missing amount = monthly difference * 12 * years until 85
+  const yearsUntil85 = Math.max(1, 85 - avgRetirementAge);
+  const totalMissingAmount = totalMonthlyDiff * 12 * yearsUntil85;
+
+  // Calculate monthly investment needed
+  const monthlyInvestmentNeeded = calculateMonthlyInvestment(totalMissingAmount, investmentHorizon, 0.08);
+
+  // Show calculation message when we have all the data
+  const showCalculation = avgCurrentAge > 0 && avgRetirementAge > 0 && totalMonthlyDiff > 0;
 
   return (
     <div className="space-y-8">
@@ -62,7 +107,7 @@ export default function PensionStep({ data, onChange }) {
           <h3 className="font-semibold text-slate-900">По-добра пенсия</h3>
         </div>
 
-        <div className="grid lg:grid-cols-2 gap-8">
+        <div className={includePartner ? "grid lg:grid-cols-2 gap-8" : ""}>
           {/* Client */}
           <div>
             <div className="flex items-center gap-2 mb-4">
@@ -144,108 +189,122 @@ export default function PensionStep({ data, onChange }) {
               <div className="p-3 bg-blue-100 rounded-lg">
                 <p className="text-sm text-blue-800">
                   Разлика: <span className="font-semibold">
-                    {((data.client_desired_pension || 0) - (data.client_expected_state_pension || 0)).toLocaleString()} €
+                    {clientDiff.toLocaleString()} €
                   </span>
                 </p>
               </div>
             </div>
           </div>
 
-          {/* Partner */}
-          <div>
-            <div className="flex items-center gap-2 mb-4">
-              <Users className="h-4 w-4 text-slate-500" />
-              <span className="font-medium text-slate-700">Партньор</span>
-            </div>
-            <div className="space-y-4">
-              {/* Work Category */}
-              <div className="space-y-2">
-                <Label>Категория труд</Label>
-                <div className="flex gap-2">
-                  {categoryOptions.map((option) => (
-                    <button
-                      key={option.value}
-                      type="button"
-                      onClick={() => onChange('partner_work_category', option.value)}
-                      className={cn(
-                        "flex-1 py-2 px-3 rounded-lg border text-sm font-medium transition-all",
-                        (data.partner_work_category || 'third') === option.value
-                          ? "bg-blue-600 text-white border-blue-600"
-                          : "bg-white text-slate-600 border-slate-200 hover:border-blue-300"
-                      )}
-                    >
-                      {option.label}
-                    </button>
-                  ))}
+          {/* Partner - only show if included */}
+          {includePartner && (
+            <div>
+              <div className="flex items-center gap-2 mb-4">
+                <Users className="h-4 w-4 text-slate-500" />
+                <span className="font-medium text-slate-700">Партньор</span>
+              </div>
+              <div className="space-y-4">
+                {/* Work Category */}
+                <div className="space-y-2">
+                  <Label>Категория труд</Label>
+                  <div className="flex gap-2">
+                    {categoryOptions.map((option) => (
+                      <button
+                        key={option.value}
+                        type="button"
+                        onClick={() => onChange('partner_work_category', option.value)}
+                        className={cn(
+                          "flex-1 py-2 px-3 rounded-lg border text-sm font-medium transition-all",
+                          (data.partner_work_category || 'third') === option.value
+                            ? "bg-blue-600 text-white border-blue-600"
+                            : "bg-white text-slate-600 border-slate-200 hover:border-blue-300"
+                        )}
+                      >
+                        {option.label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+                {/* Gross Income */}
+                <div className="space-y-2">
+                  <Label>Брутен доход (€)</Label>
+                  <Input
+                    type="number"
+                    min="0"
+                    placeholder="2000"
+                    value={data.partner_gross_income_pension || ''}
+                    onChange={(e) => onChange('partner_gross_income_pension', parseInt(e.target.value) || '')}
+                    className="rounded-lg"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label>Кога искате да излезете в пенсия? (възраст)</Label>
+                  <Input
+                    type="number"
+                    min="50"
+                    max="75"
+                    placeholder="65"
+                    value={data.partner_retirement_age || ''}
+                    onChange={(e) => onChange('partner_retirement_age', parseInt(e.target.value) || '')}
+                    className="rounded-lg"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label>От каква месечна пенсия ще се нуждаете? (€)</Label>
+                  <Input
+                    type="number"
+                    min="0"
+                    placeholder="2000"
+                    value={data.partner_desired_pension || ''}
+                    onChange={(e) => onChange('partner_desired_pension', parseInt(e.target.value) || '')}
+                    className="rounded-lg"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label>Очаквана държавна пенсия (€) - автоматично</Label>
+                  <Input
+                    type="number"
+                    min="0"
+                    value={data.partner_expected_state_pension || ''}
+                    readOnly
+                    className="rounded-lg bg-slate-100"
+                  />
+                  {data.partner_pension_is_social && (
+                    <p className="text-amber-600 text-sm">
+                      Калкулирана е социалната пенсия за страната поради липса на необходима пенсионна възраст
+                    </p>
+                  )}
+                </div>
+                <div className="p-3 bg-blue-100 rounded-lg">
+                  <p className="text-sm text-blue-800">
+                    Разлика: <span className="font-semibold">
+                      {partnerDiff.toLocaleString()} €
+                    </span>
+                  </p>
                 </div>
               </div>
-              {/* Gross Income */}
-              <div className="space-y-2">
-                <Label>Брутен доход (€)</Label>
-                <Input
-                  type="number"
-                  min="0"
-                  placeholder="2000"
-                  value={data.partner_gross_income_pension || ''}
-                  onChange={(e) => onChange('partner_gross_income_pension', parseInt(e.target.value) || '')}
-                  className="rounded-lg"
-                />
-              </div>
-              <div className="space-y-2">
-                <Label>Кога искате да излезете в пенсия? (възраст)</Label>
-                <Input
-                  type="number"
-                  min="50"
-                  max="75"
-                  placeholder="65"
-                  value={data.partner_retirement_age || ''}
-                  onChange={(e) => onChange('partner_retirement_age', parseInt(e.target.value) || '')}
-                  className="rounded-lg"
-                />
-              </div>
-              <div className="space-y-2">
-                <Label>От каква месечна пенсия ще се нуждаете? (€)</Label>
-                <Input
-                  type="number"
-                  min="0"
-                  placeholder="2000"
-                  value={data.partner_desired_pension || ''}
-                  onChange={(e) => onChange('partner_desired_pension', parseInt(e.target.value) || '')}
-                  className="rounded-lg"
-                />
-              </div>
-              <div className="space-y-2">
-                <Label>Очаквана държавна пенсия (€) - автоматично</Label>
-                <Input
-                  type="number"
-                  min="0"
-                  value={data.partner_expected_state_pension || ''}
-                  readOnly
-                  className="rounded-lg bg-slate-100"
-                />
-                {data.partner_pension_is_social && (
-                  <p className="text-amber-600 text-sm">
-                    Калкулирана е социалната пенсия за страната поради липса на необходима пенсионна възраст
-                  </p>
-                )}
-              </div>
-              <div className="p-3 bg-blue-100 rounded-lg">
-                <p className="text-sm text-blue-800">
-                  Разлика: <span className="font-semibold">
-                    {((data.partner_desired_pension || 0) - (data.partner_expected_state_pension || 0)).toLocaleString()} €
-                  </span>
-                </p>
-              </div>
             </div>
-          </div>
+          )}
         </div>
+
+        {/* Investment calculation message */}
+        {showCalculation && (
+          <div className="mt-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+            <p className="text-blue-800">
+              За осигуряване на подобна сума са ви необходими инвестиции в размер на около <span className="font-bold">{monthlyInvestmentNeeded.toLocaleString()} €</span> месечно. Във финансовия план ще откриете по-подробни предложения и проекции.
+            </p>
+            <p className="text-xs text-blue-600 mt-2">
+              (Изчислено при {investmentHorizon} години инвестиционен хоризонт, {yearsUntil85} години пенсия до 85г. и 8% средна годишна доходност)
+            </p>
+          </div>
+        )}
       </div>
 
       {/* Pension Pillars */}
       <div className="bg-slate-50 rounded-xl p-6">
         <h3 className="font-semibold text-slate-900 mb-6">Какво сте направили до сега?</h3>
         
-        <div className="grid lg:grid-cols-2 gap-8">
+        <div className={includePartner ? "grid lg:grid-cols-2 gap-8" : ""}>
           {/* Client */}
           <div>
             <div className="flex items-center gap-2 mb-4">
@@ -277,36 +336,38 @@ export default function PensionStep({ data, onChange }) {
             </div>
           </div>
 
-          {/* Partner */}
-          <div>
-            <div className="flex items-center gap-2 mb-4">
-              <Users className="h-4 w-4 text-slate-500" />
-              <span className="font-medium text-slate-700">Партньор</span>
+          {/* Partner - only show if included */}
+          {includePartner && (
+            <div>
+              <div className="flex items-center gap-2 mb-4">
+                <Users className="h-4 w-4 text-slate-500" />
+                <span className="font-medium text-slate-700">Партньор</span>
+              </div>
+              <div className="space-y-3">
+                <div className="flex items-center justify-between">
+                  <Label className="cursor-pointer">I. Стълб (държавно осигуряване)</Label>
+                  <Switch
+                    checked={data.partner_pillar_1 || false}
+                    onCheckedChange={(checked) => onChange('partner_pillar_1', checked)}
+                  />
+                </div>
+                <div className="flex items-center justify-between">
+                  <Label className="cursor-pointer">II. Стълб (допълнително задължително)</Label>
+                  <Switch
+                    checked={data.partner_pillar_2 || false}
+                    onCheckedChange={(checked) => onChange('partner_pillar_2', checked)}
+                  />
+                </div>
+                <div className="flex items-center justify-between">
+                  <Label className="cursor-pointer">III. Стълб (доброволно осигуряване)</Label>
+                  <Switch
+                    checked={data.partner_pillar_3 || false}
+                    onCheckedChange={(checked) => onChange('partner_pillar_3', checked)}
+                  />
+                </div>
+              </div>
             </div>
-            <div className="space-y-3">
-              <div className="flex items-center justify-between">
-                <Label className="cursor-pointer">I. Стълб (държавно осигуряване)</Label>
-                <Switch
-                  checked={data.partner_pillar_1 || false}
-                  onCheckedChange={(checked) => onChange('partner_pillar_1', checked)}
-                />
-              </div>
-              <div className="flex items-center justify-between">
-                <Label className="cursor-pointer">II. Стълб (допълнително задължително)</Label>
-                <Switch
-                  checked={data.partner_pillar_2 || false}
-                  onCheckedChange={(checked) => onChange('partner_pillar_2', checked)}
-                />
-              </div>
-              <div className="flex items-center justify-between">
-                <Label className="cursor-pointer">III. Стълб (доброволно осигуряване)</Label>
-                <Switch
-                  checked={data.partner_pillar_3 || false}
-                  onCheckedChange={(checked) => onChange('partner_pillar_3', checked)}
-                />
-              </div>
-            </div>
-          </div>
+          )}
         </div>
       </div>
 

@@ -42,7 +42,20 @@ export default function HousingStep({ data, onChange }) {
             </Select>
           </div>
 
-          <div className="grid sm:grid-cols-3 gap-4">
+          {/* Location field for rented/subrented/with_parents */}
+          {(data.current_housing === 'rented' || data.current_housing === 'subrented' || data.current_housing === 'with_parents') && (
+            <div className="space-y-2">
+              <Label>Локация</Label>
+              <Input
+                placeholder="гр. София, кв. Лозенец"
+                value={data.current_housing_location || ''}
+                onChange={(e) => onChange('current_housing_location', e.target.value)}
+                className="rounded-lg"
+              />
+            </div>
+          )}
+
+          <div className={cn("grid gap-4", data.current_housing === 'with_parents' ? "sm:grid-cols-2" : "sm:grid-cols-3")}>
             <div className="space-y-2">
               <Label>Брой стаи</Label>
               <Input
@@ -66,18 +79,93 @@ export default function HousingStep({ data, onChange }) {
                 className="rounded-lg"
               />
             </div>
-            <div className="space-y-2">
-              <Label>Стойност (лв)</Label>
-              <Input
-                type="number"
-                min="0"
-                placeholder="150000"
-                value={data.current_housing_value || ''}
-                onChange={(e) => onChange('current_housing_value', parseInt(e.target.value) || '')}
-                className="rounded-lg"
-              />
-            </div>
+            {data.current_housing !== 'with_parents' && (
+              <div className="space-y-2">
+                <Label>Стойност (лв)</Label>
+                <Input
+                  type="number"
+                  min="0"
+                  placeholder="150000"
+                  value={data.current_housing_value || ''}
+                  onChange={(e) => onChange('current_housing_value', parseInt(e.target.value) || '')}
+                  className="rounded-lg"
+                />
+              </div>
+            )}
           </div>
+
+          {/* Mortgage section for owned housing */}
+          {data.current_housing === 'owned' && (
+            <div className="border-t border-slate-200 pt-4 mt-4">
+              <div className="flex items-center justify-between mb-4">
+                <Label className="cursor-pointer">Има ли ипотека?</Label>
+                <Switch
+                  checked={data.current_housing_has_mortgage || false}
+                  onCheckedChange={(checked) => onChange('current_housing_has_mortgage', checked)}
+                />
+              </div>
+
+              {data.current_housing_has_mortgage && (
+                <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 p-4 bg-white rounded-lg border border-slate-200">
+                  <div className="space-y-2">
+                    <Label>Остатъчна сума (лв)</Label>
+                    <Input
+                      type="number"
+                      min="0"
+                      placeholder="100000"
+                      value={data.current_mortgage_remaining || ''}
+                      onChange={(e) => onChange('current_mortgage_remaining', parseInt(e.target.value) || '')}
+                      className="rounded-lg"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Лихвен процент (%)</Label>
+                    <Input
+                      type="number"
+                      min="0"
+                      step="0.1"
+                      placeholder="3.5"
+                      value={data.current_mortgage_interest_rate || ''}
+                      onChange={(e) => onChange('current_mortgage_interest_rate', parseFloat(e.target.value) || '')}
+                      className="rounded-lg"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Банка</Label>
+                    <Input
+                      placeholder="УниКредит Булбанк"
+                      value={data.current_mortgage_bank || ''}
+                      onChange={(e) => onChange('current_mortgage_bank', e.target.value)}
+                      className="rounded-lg"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Оставащ период (години)</Label>
+                    <Input
+                      type="number"
+                      min="0"
+                      max="35"
+                      placeholder="15"
+                      value={data.current_mortgage_remaining_years || ''}
+                      onChange={(e) => onChange('current_mortgage_remaining_years', parseInt(e.target.value) || '')}
+                      className="rounded-lg"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Месечна вноска (лв)</Label>
+                    <Input
+                      type="number"
+                      min="0"
+                      placeholder="800"
+                      value={data.current_mortgage_monthly_payment || ''}
+                      onChange={(e) => onChange('current_mortgage_monthly_payment', parseInt(e.target.value) || '')}
+                      className="rounded-lg"
+                    />
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
         </div>
       </div>
 

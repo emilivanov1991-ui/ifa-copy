@@ -327,19 +327,6 @@ export default function ReserveStep({ data, onChange }) {
             />
           </div>
 
-          {data.desired_reserve_amount > 0 && totalMonthlyIncome > 0 && (
-            <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg">
-              <span className="text-blue-700 font-medium">Препоръчителният резерв за Вас е: </span>
-              <span className="text-blue-800 font-bold">
-                {recommendedMin === recommendedMax 
-                  ? `${recommendedMin.toLocaleString('bg-BG')} €`
-                  : `${recommendedMin.toLocaleString('bg-BG')} € - ${recommendedMax.toLocaleString('bg-BG')} €`
-                }
-              </span>
-            </div>
-          )}
-
-          {/* Warning messages based on liquid savings vs recommended reserve */}
           {totalMonthlyIncome > 0 && (() => {
             const clientLiquid = (data.client_checking_account || 0) + (data.client_savings_account || 0) + 
               (data.client_term_deposit || 0) + (data.client_cash || 0);
@@ -348,27 +335,35 @@ export default function ReserveStep({ data, onChange }) {
             const totalLiquid = clientLiquid + partnerLiquid;
             const recommendedReserve = recommendedMax;
 
-            if (totalLiquid > recommendedReserve) {
-              const excess = totalLiquid - recommendedReserve;
-              const inflationLoss = Math.round(excess * 0.05);
-              return (
-                <div className="p-4 bg-red-50 border border-red-200 rounded-lg">
-                  <p className="text-red-700">
-                    Спестяванията ви надвишават препоръчителния резерв и губите средно <span className="font-bold">{inflationLoss.toLocaleString('bg-BG')} €</span> годишно от инфлация. Ще ви помогнем да реализирате доходност на тези средства!
-                  </p>
+            return (
+              <>
+                <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                  <span className="text-blue-700 font-medium">Препоръчителният резерв за Вас е: </span>
+                  <span className="text-blue-800 font-bold">
+                    {recommendedMin === recommendedMax 
+                      ? `${recommendedMin.toLocaleString('bg-BG')} €`
+                      : `${recommendedMin.toLocaleString('bg-BG')} € - ${recommendedMax.toLocaleString('bg-BG')} €`
+                    }
+                  </span>
                 </div>
-              );
-            } else if (totalLiquid < recommendedReserve && totalLiquid > 0) {
-              const deficit = recommendedReserve - totalLiquid;
-              return (
-                <div className="p-4 bg-red-50 border border-red-200 rounded-lg">
-                  <p className="text-red-700">
-                    Спестяванията ви са по-малко от препоръчителния резерв с <span className="font-bold">{deficit.toLocaleString('bg-BG')} €</span>. Ще ви помогнем да достигнете до него чрез правилно финансово планиране!
-                  </p>
-                </div>
-              );
-            }
-            return null;
+
+                {totalLiquid > recommendedReserve && (
+                  <div className="p-4 bg-red-50 border border-red-200 rounded-lg">
+                    <p className="text-red-700">
+                      Спестяванията ви надвишават препоръчителния резерв и губите средно <span className="font-bold">{Math.round((totalLiquid - recommendedReserve) * 0.05).toLocaleString('bg-BG')} €</span> годишно от инфлация. Ще ви помогнем да реализирате доходност на тези средства!
+                    </p>
+                  </div>
+                )}
+
+                {totalLiquid < recommendedReserve && totalLiquid > 0 && (
+                  <div className="p-4 bg-red-50 border border-red-200 rounded-lg">
+                    <p className="text-red-700">
+                      Спестяванията ви са по-малко от препоръчителния резерв с <span className="font-bold">{(recommendedReserve - totalLiquid).toLocaleString('bg-BG')} €</span>. Ще ви помогнем да достигнете до него чрез правилно финансово планиране!
+                    </p>
+                  </div>
+                )}
+              </>
+            );
           })()}
         </div>
       </div>

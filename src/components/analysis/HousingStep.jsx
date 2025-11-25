@@ -45,8 +45,9 @@ export default function HousingStep({ data, onChange }) {
   const totalPayments = calculatedMonthlyPayment && loanYears ? calculatedMonthlyPayment * loanYears * 12 : 0;
   const totalOverpayment = totalPayments > calculatedLoanAmount ? totalPayments - calculatedLoanAmount : 0;
   
-  // Calculate potential savings (35% of overpayment - middle of 30-40% range)
-  const potentialSavings = Math.round(totalOverpayment * 0.35);
+  // Calculate potential savings range (30-40% of overpayment)
+  const potentialSavingsMin = Math.round(totalOverpayment * 0.30);
+  const potentialSavingsMax = Math.round(totalOverpayment * 0.40);
 
   return (
     <div className="space-y-8">
@@ -426,11 +427,11 @@ export default function HousingStep({ data, onChange }) {
             {totalOverpayment > 0 && (
               <div className="mt-4 p-4 bg-green-50 border border-green-200 rounded-lg">
                 <div className="flex items-center gap-2">
-                  <span className="text-green-700 font-medium">Можем да спестим:</span>
-                  <span className="text-green-800 font-bold text-lg">{potentialSavings.toLocaleString('bg-BG')} €</span>
+                  <span className="text-green-700 font-medium">Можем да спестим между:</span>
+                  <span className="text-green-800 font-bold text-lg">{potentialSavingsMin.toLocaleString('bg-BG')} € - {potentialSavingsMax.toLocaleString('bg-BG')} €</span>
                 </div>
                 <p className="text-green-600 text-sm mt-1">
-                  Това е между 30% и 40% от общото надплащане по кредита
+                  Това е между 30% и 40% от общото надплащане по кредита. Това постигаме, чрез преференциални кредитни условия, по-изгодно застраховане и ефективен Инвестиционно-погасителен план.
                 </p>
               </div>
             )}

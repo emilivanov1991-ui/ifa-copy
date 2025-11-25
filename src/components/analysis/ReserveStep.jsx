@@ -16,19 +16,57 @@ import { cn } from "@/lib/utils";
 export default function ReserveStep({ data, onChange }) {
   return (
     <div className="space-y-8">
-      {/* Current Savings */}
+      {/* Savings Method */}
       <div className="bg-slate-50 rounded-xl p-6">
         <div className="flex items-center gap-2 mb-6">
           <PiggyBank className="h-5 w-5 text-blue-600" />
           <h3 className="font-semibold text-slate-900">По какъв начин създавате своя финансов резерв?</h3>
         </div>
 
+        <div className="space-y-4">
+          <div className="space-y-2">
+            <Label>Метод на спестяване</Label>
+            <Select 
+              value={data.savings_method || ''} 
+              onValueChange={(value) => onChange('savings_method', value)}
+            >
+              <SelectTrigger className="rounded-lg">
+                <SelectValue placeholder="Изберете" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="none">Не спестявам</SelectItem>
+                <SelectItem value="leftover">Каквото остане след разходи</SelectItem>
+                <SelectItem value="fixed">Спестявам в началото на месеца фиксирана сума</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          {(data.savings_method === 'leftover' || data.savings_method === 'fixed') && (
+            <div className="space-y-2">
+              <Label>Приблизително спестяване месечно (€)</Label>
+              <Input
+                type="number"
+                min="0"
+                placeholder="0"
+                value={data.monthly_savings_amount || ''}
+                onChange={(e) => onChange('monthly_savings_amount', parseInt(e.target.value) || '')}
+                className="rounded-lg w-48"
+              />
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* Current Savings */}
+      <div className="bg-slate-50 rounded-xl p-6">
+        <h3 className="font-semibold text-slate-900 mb-6">Текущи спестявания</h3>
+
         <div className="grid lg:grid-cols-2 gap-8">
           {/* Client */}
           <div>
             <div className="flex items-center gap-2 mb-4">
               <User className="h-4 w-4 text-slate-500" />
-              <span className="font-medium text-slate-700">Клиент (лв)</span>
+              <span className="font-medium text-slate-700">Клиент (€)</span>
             </div>
             <div className="space-y-3">
               <div className="flex items-center justify-between gap-4">
@@ -104,7 +142,7 @@ export default function ReserveStep({ data, onChange }) {
           <div>
             <div className="flex items-center gap-2 mb-4">
               <Users className="h-4 w-4 text-slate-500" />
-              <span className="font-medium text-slate-700">Партньор (лв)</span>
+              <span className="font-medium text-slate-700">Партньор (€)</span>
             </div>
             <div className="space-y-3">
               <div className="flex items-center justify-between gap-4">

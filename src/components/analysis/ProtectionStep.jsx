@@ -17,10 +17,11 @@ export default function ProtectionStep({ data, onChange }) {
   // Helper to import data from housing section
   const importFromHousing = () => {
     if (data.current_housing === 'owned') {
-      onChange('property_1_address', data.client_address || '');
+      onChange('property_1_address', data.current_housing_address || data.client_address || '');
       onChange('property_1_rooms', data.current_housing_rooms || '');
       onChange('property_1_area', data.current_housing_area || '');
       onChange('property_1_value', data.current_housing_value || '');
+      onChange('property_1_movable_value', data.current_housing_movable_value || '');
     }
   };
 

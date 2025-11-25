@@ -455,6 +455,57 @@ export default function HousingStep({ data, onChange }) {
         </div>
       )}
 
+      {/* Referrals Section */}
+      <div className="bg-slate-50 rounded-xl p-6">
+        <h3 className="font-semibold text-slate-900 mb-4">Кой от вашите познати:</h3>
+        
+        <div className="grid md:grid-cols-2 gap-6">
+          {/* Not living in own home */}
+          <div className="space-y-3">
+            <Label className="text-slate-700">Все още не живее в собствено жилище (живее при родителите си, под наем...)</Label>
+            {(data.referrals_no_own_home || ['']).map((name, index) => (
+              <Input
+                key={`no_home_${index}`}
+                placeholder="Име на познат"
+                value={name}
+                onChange={(e) => {
+                  const newList = [...(data.referrals_no_own_home || [''])];
+                  newList[index] = e.target.value;
+                  // Add new empty field if this is the last one and it has content
+                  if (index === newList.length - 1 && e.target.value) {
+                    newList.push('');
+                  }
+                  onChange('referrals_no_own_home', newList);
+                }}
+                className="rounded-lg"
+              />
+            ))}
+          </div>
+
+          {/* Living in own home for long time */}
+          <div className="space-y-3">
+            <Label className="text-slate-700">Вече дълго време живее в собствено жилище</Label>
+            {(data.referrals_own_home_long || ['']).map((name, index) => (
+              <Input
+                key={`own_home_${index}`}
+                placeholder="Име на познат"
+                value={name}
+                onChange={(e) => {
+                  const newList = [...(data.referrals_own_home_long || [''])];
+                  newList[index] = e.target.value;
+                  // Add new empty field if this is the last one and it has content
+                  if (index === newList.length - 1 && e.target.value) {
+                    newList.push('');
+                  }
+                  onChange('referrals_own_home_long', newList);
+                }}
+                className="rounded-lg"
+              />
+            ))}
+          </div>
+        </div>
+      </div>
+
       {/* Include in plan */}
       <label className="flex items-center gap-3 p-4 rounded-xl border-2 border-blue-200 bg-blue-50 cursor-pointer">
         <Checkbox

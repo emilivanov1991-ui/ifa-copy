@@ -310,6 +310,173 @@ export default function PensionStep({ data, onChange }) {
         </div>
       </div>
 
+      {/* Pension Referrals */}
+      <div className="bg-slate-50 rounded-xl p-6">
+        <h3 className="font-semibold text-slate-900 mb-4">Кой от Вашите приятели и познати:</h3>
+        
+        <div className="grid md:grid-cols-2 gap-6">
+          {/* Works abroad */}
+          <div className="space-y-3">
+            <Label className="text-slate-700">Работи в чужбина?</Label>
+            {(data.pension_referrals_abroad || ['']).map((name, index) => {
+              const existingNames = [
+                ...(data.referrals_no_own_home || []),
+                ...(data.referrals_own_home_long || []),
+                ...(data.birthday_family_names || []),
+                ...(data.birthday_friends_names || []),
+                ...(data.birthday_colleagues_names || []),
+                ...(data.referrals_have_savings || []),
+                ...(data.referrals_invest_regularly || [])
+              ].filter(n => n && n.trim());
+              const isDuplicate = name && name.trim() && existingNames.some(h => h.toLowerCase().trim() === name.toLowerCase().trim());
+              
+              return (
+                <div key={`abroad_${index}`}>
+                  <Input
+                    placeholder="Име на познат"
+                    value={name}
+                    onChange={(e) => {
+                      const newList = [...(data.pension_referrals_abroad || [''])];
+                      newList[index] = e.target.value;
+                      if (index === newList.length - 1 && e.target.value) {
+                        newList.push('');
+                      }
+                      onChange('pension_referrals_abroad', newList);
+                    }}
+                    className={cn("rounded-lg", isDuplicate && "border-amber-500")}
+                  />
+                  {isDuplicate && (
+                    <p className="text-amber-600 text-sm mt-1">
+                      Това име бе предоставено на предходните теми. С кого бихме могли да го заменим?
+                    </p>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+
+          {/* High income */}
+          <div className="space-y-3">
+            <Label className="text-slate-700">Има доход над средния за страната?</Label>
+            {(data.pension_referrals_high_income || ['']).map((name, index) => {
+              const existingNames = [
+                ...(data.referrals_no_own_home || []),
+                ...(data.referrals_own_home_long || []),
+                ...(data.birthday_family_names || []),
+                ...(data.birthday_friends_names || []),
+                ...(data.birthday_colleagues_names || []),
+                ...(data.referrals_have_savings || []),
+                ...(data.referrals_invest_regularly || [])
+              ].filter(n => n && n.trim());
+              const isDuplicate = name && name.trim() && existingNames.some(h => h.toLowerCase().trim() === name.toLowerCase().trim());
+              
+              return (
+                <div key={`high_income_${index}`}>
+                  <Input
+                    placeholder="Име на познат"
+                    value={name}
+                    onChange={(e) => {
+                      const newList = [...(data.pension_referrals_high_income || [''])];
+                      newList[index] = e.target.value;
+                      if (index === newList.length - 1 && e.target.value) {
+                        newList.push('');
+                      }
+                      onChange('pension_referrals_high_income', newList);
+                    }}
+                    className={cn("rounded-lg", isDuplicate && "border-amber-500")}
+                  />
+                  {isDuplicate && (
+                    <p className="text-amber-600 text-sm mt-1">
+                      Това име бе предоставено на предходните теми. С кого бихме могли да го заменим?
+                    </p>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+
+          {/* Freelancer / Entrepreneur */}
+          <div className="space-y-3">
+            <Label className="text-slate-700">Има свободна професия или е предприемач с нисък осигурителен праг?</Label>
+            {(data.pension_referrals_entrepreneur || ['']).map((name, index) => {
+              const existingNames = [
+                ...(data.referrals_no_own_home || []),
+                ...(data.referrals_own_home_long || []),
+                ...(data.birthday_family_names || []),
+                ...(data.birthday_friends_names || []),
+                ...(data.birthday_colleagues_names || []),
+                ...(data.referrals_have_savings || []),
+                ...(data.referrals_invest_regularly || [])
+              ].filter(n => n && n.trim());
+              const isDuplicate = name && name.trim() && existingNames.some(h => h.toLowerCase().trim() === name.toLowerCase().trim());
+              
+              return (
+                <div key={`entrepreneur_${index}`}>
+                  <Input
+                    placeholder="Име на познат"
+                    value={name}
+                    onChange={(e) => {
+                      const newList = [...(data.pension_referrals_entrepreneur || [''])];
+                      newList[index] = e.target.value;
+                      if (index === newList.length - 1 && e.target.value) {
+                        newList.push('');
+                      }
+                      onChange('pension_referrals_entrepreneur', newList);
+                    }}
+                    className={cn("rounded-lg", isDuplicate && "border-amber-500")}
+                  />
+                  {isDuplicate && (
+                    <p className="text-amber-600 text-sm mt-1">
+                      Това име бе предоставено на предходните теми. С кого бихме могли да го заменим?
+                    </p>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+
+          {/* Young professional */}
+          <div className="space-y-3">
+            <Label className="text-slate-700">Е млад човек в началото на кариерата си?</Label>
+            {(data.pension_referrals_young || ['']).map((name, index) => {
+              const existingNames = [
+                ...(data.referrals_no_own_home || []),
+                ...(data.referrals_own_home_long || []),
+                ...(data.birthday_family_names || []),
+                ...(data.birthday_friends_names || []),
+                ...(data.birthday_colleagues_names || []),
+                ...(data.referrals_have_savings || []),
+                ...(data.referrals_invest_regularly || [])
+              ].filter(n => n && n.trim());
+              const isDuplicate = name && name.trim() && existingNames.some(h => h.toLowerCase().trim() === name.toLowerCase().trim());
+              
+              return (
+                <div key={`young_${index}`}>
+                  <Input
+                    placeholder="Име на познат"
+                    value={name}
+                    onChange={(e) => {
+                      const newList = [...(data.pension_referrals_young || [''])];
+                      newList[index] = e.target.value;
+                      if (index === newList.length - 1 && e.target.value) {
+                        newList.push('');
+                      }
+                      onChange('pension_referrals_young', newList);
+                    }}
+                    className={cn("rounded-lg", isDuplicate && "border-amber-500")}
+                  />
+                  {isDuplicate && (
+                    <p className="text-amber-600 text-sm mt-1">
+                      Това име бе предоставено на предходните теми. С кого бихме могли да го заменим?
+                    </p>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      </div>
+
       {/* Include in plan */}
       <label className="flex items-center gap-3 p-4 rounded-xl border-2 border-blue-200 bg-blue-50 cursor-pointer">
         <Checkbox

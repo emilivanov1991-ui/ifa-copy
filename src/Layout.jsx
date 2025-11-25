@@ -11,6 +11,7 @@ const navLinks = [
   { name: 'Услуги', page: 'Services' },
   { name: 'Безплатен анализ', page: 'FinancialAnalysis' },
   { name: 'Контакти', page: 'Contact' },
+  { name: 'Клиентски портал', page: 'ClientPortal' },
 ];
 
 export default function Layout({ children, currentPageName }) {

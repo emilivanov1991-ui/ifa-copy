@@ -4,6 +4,7 @@ import Services from './pages/Services';
 import Contact from './pages/Contact';
 import FinancialAnalysis from './pages/FinancialAnalysis';
 import CRM from './pages/CRM';
+import ClientPortal from './pages/ClientPortal';
 import __Layout from './Layout.jsx';
 
 
@@ -14,6 +15,7 @@ export const PAGES = {
     "Contact": Contact,
     "FinancialAnalysis": FinancialAnalysis,
     "CRM": CRM,
+    "ClientPortal": ClientPortal,
 }
 
 export const pagesConfig = {

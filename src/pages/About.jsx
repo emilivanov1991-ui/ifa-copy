@@ -4,32 +4,32 @@ import { Button } from "@/components/ui/button";
 import { ArrowRight, Award, Users, Target, TrendingUp, CheckCircle } from 'lucide-react';
 
 const stats = [
-  { value: '25+', label: 'Years Experience' },
-  { value: '$2B+', label: 'Assets Managed' },
-  { value: '5,000+', label: 'Happy Clients' },
-  { value: '98%', label: 'Client Retention' },
+  { value: '25+', label: 'Години опит' },
+  { value: '€500M+', label: 'Управлявани активи' },
+  { value: '5,000+', label: 'Доволни клиенти' },
+  { value: '98%', label: 'Задържане на клиенти' },
 ];
 
 const values = [
   {
     icon: Target,
-    title: 'Client-First Approach',
-    description: 'Your goals are our priority. We build strategies around your unique needs.'
+    title: 'Клиентът на първо място',
+    description: 'Вашите цели са наш приоритет. Изграждаме стратегии около вашите уникални нужди.'
   },
   {
     icon: Award,
-    title: 'Fiduciary Standard',
-    description: 'We are legally bound to act in your best interest at all times.'
+    title: 'Фидуциарен стандарт',
+    description: 'Ние сме законово задължени да действаме във ваш най-добър интерес.'
   },
   {
     icon: Users,
-    title: 'Independent Advice',
-    description: 'No conflicts of interest. We recommend what works best for you.'
+    title: 'Независими съвети',
+    description: 'Без конфликт на интереси. Препоръчваме това, което работи най-добре за вас.'
   },
   {
     icon: TrendingUp,
-    title: 'Proven Results',
-    description: 'Decades of experience delivering consistent, reliable returns.'
+    title: 'Доказани резултати',
+    description: 'Десетилетия опит в постигането на последователна, надеждна възвръщаемост.'
   },
 ];
 
@@ -46,14 +46,14 @@ export default function About() {
             className="text-center max-w-3xl mx-auto"
           >
             <span className="text-blue-600 font-medium text-sm tracking-widest uppercase mb-4 block">
-              About Us
+              За нас
             </span>
             <h1 className="text-4xl md:text-6xl font-light text-slate-900 mb-6">
-              Your Trusted <span className="font-semibold text-blue-600">Financial</span> Partner
+              Вашият доверен <span className="font-semibold text-blue-600">финансов</span> партньор
             </h1>
             <p className="text-lg text-slate-600 font-light leading-relaxed">
-              For over two decades, Apex Financial has been helping individuals and families 
-              achieve their financial dreams through personalized, independent advice.
+              Повече от две десетилетия Apex Financial помага на хора и семейства 
+              да постигнат финансовите си мечти чрез персонализирани, независими съвети.
             </p>
           </motion.div>
         </div>
@@ -93,25 +93,25 @@ export default function About() {
               transition={{ duration: 0.8 }}
             >
               <span className="text-blue-600 font-medium text-sm tracking-widest uppercase mb-4 block">
-                Our Story
+                Нашата история
               </span>
               <h2 className="text-3xl md:text-4xl font-light text-slate-900 mb-6">
-                Built on <span className="font-semibold">Trust</span> & <span className="font-semibold">Integrity</span>
+                Изградени върху <span className="font-semibold">доверие</span> и <span className="font-semibold">почтеност</span>
               </h2>
               <div className="space-y-4 text-slate-600 font-light leading-relaxed">
                 <p>
-                  Founded in 1998, Apex Financial Advisors was born from a simple belief: 
-                  everyone deserves access to honest, unbiased financial advice.
+                  Основана през 1998 г., Apex Financial Advisors се роди от проста вяра: 
+                  всеки заслужава достъп до честни, безпристрастни финансови съвети.
                 </p>
                 <p>
-                  Our founders, former Wall Street executives, witnessed firsthand how 
-                  conflicts of interest often led advisors to prioritize commissions over 
-                  client outcomes. They decided to build something different.
+                  Нашите основатели, бивши финансови директори, станаха свидетели на това как 
+                  конфликтите на интереси често водят консултантите да приоритизират комисионите 
+                  пред резултатите на клиентите. Те решиха да изградят нещо различно.
                 </p>
                 <p>
-                  Today, we remain fiercely independent, serving as true fiduciaries who 
-                  are legally obligated to put your interests first. No proprietary products, 
-                  no hidden fees—just transparent, client-centered advice.
+                  Днес ние оставаме категорично независими, служейки като истински фидуциари, 
+                  законово задължени да поставяме вашите интереси на първо място. Без скрити такси - 
+                  само прозрачни, ориентирани към клиента съвети.
                 </p>
               </div>
             </motion.div>
@@ -132,7 +132,7 @@ export default function About() {
               </div>
               <div className="absolute -bottom-6 -left-6 bg-blue-600 text-white p-6 rounded-xl shadow-xl">
                 <div className="text-3xl font-bold">25+</div>
-                <div className="text-blue-100 text-sm">Years of Excellence</div>
+                <div className="text-blue-100 text-sm">Години съвършенство</div>
               </div>
             </motion.div>
           </div>
@@ -150,10 +150,10 @@ export default function About() {
             className="text-center mb-16"
           >
             <span className="text-blue-600 font-medium text-sm tracking-widest uppercase mb-4 block">
-              Our Values
+              Нашите ценности
             </span>
             <h2 className="text-3xl md:text-4xl font-light text-slate-900">
-              What We <span className="font-semibold text-blue-600">Stand For</span>
+              Това, в което <span className="font-semibold text-blue-600">вярваме</span>
             </h2>
           </motion.div>
 
@@ -188,16 +188,16 @@ export default function About() {
             transition={{ duration: 0.8 }}
           >
             <h2 className="text-3xl md:text-4xl font-light text-white mb-6">
-              Ready to start your journey?
+              Готови ли сте да започнете пътуването си?
             </h2>
             <p className="text-xl text-blue-100 mb-10 font-light">
-              Schedule a complimentary consultation with one of our advisors today.
+              Запазете безплатна консултация с един от нашите консултанти днес.
             </p>
             <Button 
               size="lg" 
               className="bg-white text-blue-700 hover:bg-blue-50 px-10 py-6 text-lg rounded-full"
             >
-              Get Started
+              Започнете сега
               <ArrowRight className="ml-2 h-5 w-5" />
             </Button>
           </motion.div>

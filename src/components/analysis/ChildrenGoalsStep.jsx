@@ -400,8 +400,18 @@ export default function ChildrenGoalsStep({ data, onChange }) {
             </div>
           </div>
 
-          <div className="grid grid-cols-3 gap-4 items-end">
+          <div className="grid grid-cols-4 gap-4 items-end">
             <Label className="font-medium">Други</Label>
+            <div className="space-y-1">
+              <Label className="text-xs text-slate-500">Описание</Label>
+              <Input
+                type="text"
+                placeholder="Опишете целта..."
+                value={data.other_goals_other_description || ''}
+                onChange={(e) => onChange('other_goals_other_description', e.target.value)}
+                className="rounded-lg"
+              />
+            </div>
             <div className="space-y-1">
               <Label className="text-xs text-slate-500">Сума (€)</Label>
               <Input

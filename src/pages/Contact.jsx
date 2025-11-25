@@ -23,23 +23,23 @@ import {
 const contactInfo = [
   {
     icon: MapPin,
-    title: 'Visit Us',
-    details: ['123 Financial District', 'New York, NY 10004']
+    title: 'Посетете ни',
+    details: ['бул. Витоша 100', 'София 1000']
   },
   {
     icon: Phone,
-    title: 'Call Us',
-    details: ['1-800-APEX-FIN', '+1 (212) 555-0100']
+    title: 'Обадете ни се',
+    details: ['+359 2 123 4567', '+359 888 123 456']
   },
   {
     icon: Mail,
-    title: 'Email Us',
-    details: ['info@apexfinancial.com', 'support@apexfinancial.com']
+    title: 'Пишете ни',
+    details: ['info@apexfinancial.bg', 'support@apexfinancial.bg']
   },
   {
     icon: Clock,
-    title: 'Office Hours',
-    details: ['Mon - Fri: 9AM - 6PM', 'Sat: 10AM - 2PM']
+    title: 'Работно време',
+    details: ['Пон - Пет: 9:00 - 18:00', 'Съб: 10:00 - 14:00']
   },
 ];
 
@@ -72,14 +72,14 @@ export default function Contact() {
             className="text-center max-w-3xl mx-auto"
           >
             <span className="text-blue-600 font-medium text-sm tracking-widest uppercase mb-4 block">
-              Contact Us
+              Свържете се с нас
             </span>
             <h1 className="text-4xl md:text-6xl font-light text-slate-900 mb-6">
-              Let's Start a <span className="font-semibold text-blue-600">Conversation</span>
+              Нека започнем <span className="font-semibold text-blue-600">разговор</span>
             </h1>
             <p className="text-lg text-slate-600 font-light leading-relaxed">
-              Ready to take control of your financial future? We're here to help. 
-              Reach out today for a complimentary consultation.
+              Готови ли сте да поемете контрол над финансовото си бъдеще? Ние сме тук да помогнем. 
+              Свържете се днес за безплатна консултация.
             </p>
           </motion.div>
         </div>
@@ -123,10 +123,10 @@ export default function Contact() {
               transition={{ duration: 0.8 }}
             >
               <h2 className="text-3xl font-light text-slate-900 mb-2">
-                Send us a <span className="font-semibold">message</span>
+                Изпратете ни <span className="font-semibold">съобщение</span>
               </h2>
               <p className="text-slate-600 font-light mb-8">
-                Fill out the form below and we'll get back to you within 24 hours.
+                Попълнете формуляра по-долу и ние ще се свържем с вас в рамките на 24 часа.
               </p>
 
               {submitted ? (
@@ -137,20 +137,20 @@ export default function Contact() {
                 >
                   <CheckCircle className="h-12 w-12 text-green-500 mx-auto mb-4" />
                   <h3 className="text-xl font-semibold text-slate-900 mb-2">
-                    Message Sent Successfully!
+                    Съобщението е изпратено успешно!
                   </h3>
                   <p className="text-slate-600 font-light">
-                    Thank you for reaching out. One of our advisors will contact you shortly.
+                    Благодарим ви, че се свързахте. Един от нашите консултанти ще се свърже с вас скоро.
                   </p>
                 </motion.div>
               ) : (
                 <form onSubmit={handleSubmit} className="space-y-6">
                   <div className="grid sm:grid-cols-2 gap-4">
                     <div className="space-y-2">
-                      <Label htmlFor="firstName">First Name</Label>
+                      <Label htmlFor="firstName">Име</Label>
                       <Input
                         id="firstName"
-                        placeholder="John"
+                        placeholder="Иван"
                         value={formData.firstName}
                         onChange={(e) => setFormData({...formData, firstName: e.target.value})}
                         required
@@ -158,10 +158,10 @@ export default function Contact() {
                       />
                     </div>
                     <div className="space-y-2">
-                      <Label htmlFor="lastName">Last Name</Label>
+                      <Label htmlFor="lastName">Фамилия</Label>
                       <Input
                         id="lastName"
-                        placeholder="Doe"
+                        placeholder="Петров"
                         value={formData.lastName}
                         onChange={(e) => setFormData({...formData, lastName: e.target.value})}
                         required
@@ -172,11 +172,11 @@ export default function Contact() {
 
                   <div className="grid sm:grid-cols-2 gap-4">
                     <div className="space-y-2">
-                      <Label htmlFor="email">Email</Label>
+                      <Label htmlFor="email">Имейл</Label>
                       <Input
                         id="email"
                         type="email"
-                        placeholder="john@example.com"
+                        placeholder="ivan@example.com"
                         value={formData.email}
                         onChange={(e) => setFormData({...formData, email: e.target.value})}
                         required
@@ -184,11 +184,11 @@ export default function Contact() {
                       />
                     </div>
                     <div className="space-y-2">
-                      <Label htmlFor="phone">Phone</Label>
+                      <Label htmlFor="phone">Телефон</Label>
                       <Input
                         id="phone"
                         type="tel"
-                        placeholder="(123) 456-7890"
+                        placeholder="+359 888 123 456"
                         value={formData.phone}
                         onChange={(e) => setFormData({...formData, phone: e.target.value})}
                         className="rounded-lg"
@@ -197,31 +197,31 @@ export default function Contact() {
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="service">Interested In</Label>
+                    <Label htmlFor="service">Интересувам се от</Label>
                     <Select 
                       value={formData.service} 
                       onValueChange={(value) => setFormData({...formData, service: value})}
                     >
                       <SelectTrigger className="rounded-lg">
-                        <SelectValue placeholder="Select a service" />
+                        <SelectValue placeholder="Изберете услуга" />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="investment">Investment Management</SelectItem>
-                        <SelectItem value="retirement">Retirement Planning</SelectItem>
-                        <SelectItem value="wealth">Wealth Protection</SelectItem>
-                        <SelectItem value="tax">Tax Planning</SelectItem>
-                        <SelectItem value="education">Education Funding</SelectItem>
-                        <SelectItem value="business">Business Planning</SelectItem>
-                        <SelectItem value="other">Other</SelectItem>
+                        <SelectItem value="investment">Управление на инвестиции</SelectItem>
+                        <SelectItem value="retirement">Пенсионно планиране</SelectItem>
+                        <SelectItem value="wealth">Защита на богатството</SelectItem>
+                        <SelectItem value="tax">Данъчно планиране</SelectItem>
+                        <SelectItem value="education">Финансиране на образование</SelectItem>
+                        <SelectItem value="business">Бизнес планиране</SelectItem>
+                        <SelectItem value="other">Друго</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="message">Message</Label>
+                    <Label htmlFor="message">Съобщение</Label>
                     <Textarea
                       id="message"
-                      placeholder="Tell us about your financial goals..."
+                      placeholder="Разкажете ни за вашите финансови цели..."
                       value={formData.message}
                       onChange={(e) => setFormData({...formData, message: e.target.value})}
                       rows={5}
@@ -234,7 +234,7 @@ export default function Contact() {
                     size="lg" 
                     className="w-full bg-blue-600 hover:bg-blue-700 rounded-full"
                   >
-                    Send Message
+                    Изпрати съобщение
                     <Send className="ml-2 h-5 w-5" />
                   </Button>
                 </form>
@@ -257,9 +257,9 @@ export default function Contact() {
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-slate-900/80 via-transparent to-transparent" />
                 <div className="absolute bottom-0 left-0 right-0 p-8 text-white">
-                  <h3 className="text-2xl font-semibold mb-2">Visit Our Office</h3>
+                  <h3 className="text-2xl font-semibold mb-2">Посетете офиса ни</h3>
                   <p className="text-blue-100 font-light">
-                    123 Financial District, New York, NY 10004
+                    бул. Витоша 100, София 1000
                   </p>
                 </div>
               </div>

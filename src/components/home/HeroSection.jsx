@@ -37,9 +37,9 @@ export default function HeroSection() {
           transition={{ duration: 0.8 }}
         >
           <h1 className="text-4xl md:text-6xl lg:text-7xl font-light text-white leading-tight mb-6">
-            Your Path to{' '}
+            Вашият път към{' '}
             <span className="font-semibold bg-gradient-to-r from-blue-400 to-cyan-300 bg-clip-text text-transparent">
-              Financial Freedom
+              Финансова свобода
             </span>
           </h1>
         </motion.div>
@@ -64,7 +64,7 @@ export default function HeroSection() {
             size="lg" 
             className="bg-blue-500 hover:bg-blue-600 text-white px-8 py-6 text-lg rounded-full transition-all duration-300 hover:scale-105 hover:shadow-xl hover:shadow-blue-500/25"
           >
-            Get Started
+            Започнете сега
             <ArrowRight className="ml-2 h-5 w-5" />
           </Button>
           <Button 
@@ -73,7 +73,7 @@ export default function HeroSection() {
             className="border-white/30 text-white hover:bg-white/10 px-8 py-6 text-lg rounded-full transition-all duration-300"
             onClick={scrollToServices}
           >
-            Learn More
+            Научете повече
           </Button>
         </motion.div>
       </div>

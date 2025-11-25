@@ -3,11 +3,11 @@ import { motion } from 'framer-motion';
 import { Shield, Award, Building2, CheckCircle2, BadgeCheck } from 'lucide-react';
 
 const logos = [
-  { name: 'SEC Registered', icon: Shield },
-  { name: 'FINRA Member', icon: Award },
-  { name: 'CFP Certified', icon: BadgeCheck },
-  { name: 'BBB Accredited', icon: CheckCircle2 },
-  { name: 'Fiduciary Standard', icon: Building2 },
+  { name: 'КФН лиценз', icon: Shield },
+  { name: 'ISO сертификат', icon: Award },
+  { name: 'CFP сертифициран', icon: BadgeCheck },
+  { name: 'Доверен партньор', icon: CheckCircle2 },
+  { name: 'Фидуциарен стандарт', icon: Building2 },
 ];
 
 export default function TrustLogos() {

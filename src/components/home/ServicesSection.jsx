@@ -6,20 +6,20 @@ import { Button } from "@/components/ui/button";
 const services = [
   {
     icon: Shield,
-    title: 'Security',
-    description: 'Your assets are protected with industry-leading security measures and regulatory compliance.',
+    title: 'Сигурност',
+    description: 'Вашите активи са защитени с водещи мерки за сигурност и регулаторно съответствие.',
     color: 'blue'
   },
   {
     icon: Sliders,
-    title: 'Control',
-    description: 'Full transparency and control over your investments. Access your portfolio anytime, anywhere.',
+    title: 'Контрол',
+    description: 'Пълна прозрачност и контрол върху вашите инвестиции. Достъп до портфолиото по всяко време.',
     color: 'cyan'
   },
   {
     icon: Heart,
-    title: 'Caring',
-    description: 'Your dedicated advisor ensures personalized service and unlimited support for all your needs.',
+    title: 'Грижа',
+    description: 'Вашият личен консултант осигурява персонализирано обслужване и неограничена подкрепа.',
     color: 'indigo'
   }
 ];
@@ -37,15 +37,15 @@ export default function ServicesSection() {
           className="text-center mb-16"
         >
           <span className="text-blue-600 font-medium text-sm tracking-widest uppercase mb-4 block">
-            Why Choose Us
+            Защо да изберете нас
           </span>
           <h2 className="text-3xl md:text-5xl font-light text-slate-900 mb-6">
-            Independent{' '}
-            <span className="font-semibold text-blue-600">Financial</span> Advisory
+            Независимо{' '}
+            <span className="font-semibold text-blue-600">Финансово</span> консултиране
           </h2>
           <p className="text-lg text-slate-600 max-w-2xl mx-auto font-light">
-            Using our broad capital markets expertise, along with innovative strategies 
-            and personalized planning, we ensure your financial success.
+            Използвайки нашия богат опит на капиталовите пазари, заедно с иновативни стратегии 
+            и персонализирано планиране, осигуряваме вашия финансов успех.
           </p>
         </motion.div>
 
@@ -87,14 +87,14 @@ export default function ServicesSection() {
             size="lg" 
             className="bg-blue-600 hover:bg-blue-700 text-white px-8 rounded-full"
           >
-            Get Started
+            Започнете сега
           </Button>
           <Button 
             variant="outline" 
             size="lg"
             className="border-slate-300 text-slate-700 hover:bg-slate-50 px-8 rounded-full"
           >
-            Learn More
+            Научете повече
           </Button>
         </motion.div>
       </div>

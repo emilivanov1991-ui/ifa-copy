@@ -1,9 +1,12 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
-import { Shield } from 'lucide-react';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
+import { Shield, ChevronDown } from 'lucide-react';
 
 export default function ConsentStep({ data, onChange }) {
+  const [isOpen, setIsOpen] = useState(false);
+
   return (
     <div className="space-y-6">
       <div className="bg-blue-50 border border-blue-200 rounded-xl p-6">
@@ -17,6 +20,44 @@ export default function ConsentStep({ data, onChange }) {
           </div>
         </div>
       </div>
+
+      <Collapsible open={isOpen} onOpenChange={setIsOpen} className="border border-slate-200 rounded-xl">
+        <CollapsibleTrigger className="flex items-center justify-between w-full p-4 text-left hover:bg-slate-50 transition-colors rounded-xl">
+          <span className="font-medium text-slate-700">Пълен текст на съгласието за лични данни</span>
+          <ChevronDown className={`h-5 w-5 text-slate-500 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
+        </CollapsibleTrigger>
+        <CollapsibleContent className="px-4 pb-4">
+          <div className="bg-slate-50 rounded-lg p-4 text-sm text-slate-600 space-y-3 max-h-96 overflow-y-auto">
+            <p>
+              С настоящото по смисъла на Закона за личните данни и на Регламент (ЕС) 2016/679 на Европейския парламент и на Съвета от 27 април 2016 година относно защитата на физическите лица във връзка с обработването на лични данни и относно свободното движение на такива данни и за отмяна на Директива 95/46/EО (Общ регламент относно защитата на данните) (по-долу наричан само „Приложимо законодателство") Давам съгласието си на „Партнърс Груп БГ" ООД, с ЕИК: 204779330, със седалище и адрес на управление в град София, ул. Иван Денкоглу 2, ет. 1, офис 1 ("Компанията") да обработва личните ми данни, посочени в този анализ.
+            </p>
+            <p>
+              Данните включват: академична титла, име, презиме, фамилия, постоянен адрес, друг адрес, адрес на електронна поща, дата на раждане, ЕГН или друг номер за идентификация, националност, телефон и друг начин за връзка, копие на документ за самоличност, паспортни данни, финансово-икономическо състояние, данни за личен лекар, данни за общ или детайлен здравен статус, спортна активност, месторабота, работодател, данни на низходящи (деца), брой деца, кредитна информация, доходи.
+            </p>
+            <p>
+              Декларирам, че съм взел предвид и съм съгласен/а, че Компанията има право, на основание на даденото с настоящото от мен изрично съгласие, да обработва личните ми данни в съответствие с Приложимото законодателство, най-вече използвайки автоматизирани и не автоматизирани средства.
+            </p>
+            <p>
+              Своето съгласие за обработване на личните ми данни по смисъла на Приложимото право давам за определен срок, а именно за срока, необходим за обработването на предоставените от мен лични данни, но за не повече от 2 години.
+            </p>
+            <p>
+              С настоящото декларирам, че съм информиран и разбирам, че Компанията има основание да обработва моите лични данни и на база сключения с мен писмен договор.
+            </p>
+            <p className="font-medium text-slate-700">
+              Имам право с писмена молба от Компанията да изисквам:
+            </p>
+            <ul className="list-disc pl-5 space-y-1">
+              <li>удостоверение дали личните ми данни са обработени или не</li>
+              <li>информация за състоянието на обработката на личните ми данни</li>
+              <li>точна информация за източника, от който са били получени данните</li>
+              <li>списък на личните ми данни, които са обработвани</li>
+              <li>поправка или заличаване на неправилните, непълните или неактуалните ми лични данни</li>
+              <li>заличаване на личните ми данни, които са изпълнили своята цел</li>
+              <li>блокиране на личните ми данни поради оттегляне на съгласието ми</li>
+            </ul>
+          </div>
+        </CollapsibleContent>
+      </Collapsible>
 
       <div className="space-y-4">
         <label className="flex items-start gap-4 p-4 rounded-xl border-2 border-slate-200 hover:border-blue-300 cursor-pointer transition-colors">

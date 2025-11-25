@@ -85,11 +85,31 @@ export default function PersonalDataStep({ data, onChange }) {
           </div>
 
           <div className="space-y-2">
-            <Label>Дата на раждане</Label>
+            <Label>Дата на раждане (дд.мм.гггг)</Label>
             <Input
-              type="date"
-              value={data.client_birthdate || ''}
-              onChange={(e) => onChange('client_birthdate', e.target.value)}
+              type="text"
+              placeholder="дд.мм.гггг"
+              value={data.client_birthdate ? new Date(data.client_birthdate).toLocaleDateString('bg-BG') : ''}
+              onChange={(e) => {
+                const val = e.target.value;
+                const parts = val.split('.');
+                if (parts.length === 3 && parts[0].length <= 2 && parts[1].length <= 2 && parts[2].length === 4) {
+                  const date = new Date(`${parts[2]}-${parts[1].padStart(2, '0')}-${parts[0].padStart(2, '0')}`);
+                  if (!isNaN(date.getTime())) {
+                    onChange('client_birthdate', `${parts[2]}-${parts[1].padStart(2, '0')}-${parts[0].padStart(2, '0')}`);
+                  }
+                }
+              }}
+              onBlur={(e) => {
+                const val = e.target.value;
+                const parts = val.split('.');
+                if (parts.length === 3) {
+                  const date = new Date(`${parts[2]}-${parts[1].padStart(2, '0')}-${parts[0].padStart(2, '0')}`);
+                  if (!isNaN(date.getTime())) {
+                    onChange('client_birthdate', `${parts[2]}-${parts[1].padStart(2, '0')}-${parts[0].padStart(2, '0')}`);
+                  }
+                }
+              }}
               className="rounded-lg"
             />
           </div>
@@ -147,11 +167,21 @@ export default function PersonalDataStep({ data, onChange }) {
           </div>
 
           <div className="space-y-2">
-            <Label>Лична карта валидна до</Label>
+            <Label>Лична карта валидна до (дд.мм.гггг)</Label>
             <Input
-              type="date"
-              value={data.client_id_valid_until || ''}
-              onChange={(e) => onChange('client_id_valid_until', e.target.value)}
+              type="text"
+              placeholder="дд.мм.гггг"
+              value={data.client_id_valid_until ? new Date(data.client_id_valid_until).toLocaleDateString('bg-BG') : ''}
+              onChange={(e) => {
+                const val = e.target.value;
+                const parts = val.split('.');
+                if (parts.length === 3 && parts[0].length <= 2 && parts[1].length <= 2 && parts[2].length === 4) {
+                  const date = new Date(`${parts[2]}-${parts[1].padStart(2, '0')}-${parts[0].padStart(2, '0')}`);
+                  if (!isNaN(date.getTime())) {
+                    onChange('client_id_valid_until', `${parts[2]}-${parts[1].padStart(2, '0')}-${parts[0].padStart(2, '0')}`);
+                  }
+                }
+              }}
               className="rounded-lg"
             />
           </div>
@@ -404,11 +434,21 @@ export default function PersonalDataStep({ data, onChange }) {
               </div>
 
               <div className="space-y-2">
-                <Label>Дата на раждане</Label>
+                <Label>Дата на раждане (дд.мм.гггг)</Label>
                 <Input
-                  type="date"
-                  value={data.partner_birthdate || ''}
-                  onChange={(e) => onChange('partner_birthdate', e.target.value)}
+                  type="text"
+                  placeholder="дд.мм.гггг"
+                  value={data.partner_birthdate ? new Date(data.partner_birthdate).toLocaleDateString('bg-BG') : ''}
+                  onChange={(e) => {
+                    const val = e.target.value;
+                    const parts = val.split('.');
+                    if (parts.length === 3 && parts[0].length <= 2 && parts[1].length <= 2 && parts[2].length === 4) {
+                      const date = new Date(`${parts[2]}-${parts[1].padStart(2, '0')}-${parts[0].padStart(2, '0')}`);
+                      if (!isNaN(date.getTime())) {
+                        onChange('partner_birthdate', `${parts[2]}-${parts[1].padStart(2, '0')}-${parts[0].padStart(2, '0')}`);
+                      }
+                    }
+                  }}
                   className="rounded-lg"
                 />
               </div>
@@ -466,11 +506,21 @@ export default function PersonalDataStep({ data, onChange }) {
               </div>
 
               <div className="space-y-2">
-                <Label>Лична карта валидна до</Label>
+                <Label>Лична карта валидна до (дд.мм.гггг)</Label>
                 <Input
-                  type="date"
-                  value={data.partner_id_valid_until || ''}
-                  onChange={(e) => onChange('partner_id_valid_until', e.target.value)}
+                  type="text"
+                  placeholder="дд.мм.гггг"
+                  value={data.partner_id_valid_until ? new Date(data.partner_id_valid_until).toLocaleDateString('bg-BG') : ''}
+                  onChange={(e) => {
+                    const val = e.target.value;
+                    const parts = val.split('.');
+                    if (parts.length === 3 && parts[0].length <= 2 && parts[1].length <= 2 && parts[2].length === 4) {
+                      const date = new Date(`${parts[2]}-${parts[1].padStart(2, '0')}-${parts[0].padStart(2, '0')}`);
+                      if (!isNaN(date.getTime())) {
+                        onChange('partner_id_valid_until', `${parts[2]}-${parts[1].padStart(2, '0')}-${parts[0].padStart(2, '0')}`);
+                      }
+                    }
+                  }}
                   className="rounded-lg"
                 />
               </div>
@@ -713,11 +763,21 @@ export default function PersonalDataStep({ data, onChange }) {
                     />
                   </div>
                   <div className="space-y-1">
-                    <Label className="text-xs">Дата на раждане</Label>
+                    <Label className="text-xs">Дата на раждане (дд.мм.гггг)</Label>
                     <Input
-                      type="date"
-                      value={data[`child_${index + 1}_birthdate`] || ''}
-                      onChange={(e) => onChange(`child_${index + 1}_birthdate`, e.target.value)}
+                      type="text"
+                      placeholder="дд.мм.гггг"
+                      value={data[`child_${index + 1}_birthdate`] ? new Date(data[`child_${index + 1}_birthdate`]).toLocaleDateString('bg-BG') : ''}
+                      onChange={(e) => {
+                        const val = e.target.value;
+                        const parts = val.split('.');
+                        if (parts.length === 3 && parts[0].length <= 2 && parts[1].length <= 2 && parts[2].length === 4) {
+                          const date = new Date(`${parts[2]}-${parts[1].padStart(2, '0')}-${parts[0].padStart(2, '0')}`);
+                          if (!isNaN(date.getTime())) {
+                            onChange(`child_${index + 1}_birthdate`, `${parts[2]}-${parts[1].padStart(2, '0')}-${parts[0].padStart(2, '0')}`);
+                          }
+                        }
+                      }}
                       className="rounded-lg"
                     />
                   </div>

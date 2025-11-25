@@ -10,6 +10,7 @@ import {
   SelectValue 
 } from "@/components/ui/select";
 import { User, Users, Baby } from 'lucide-react';
+import HealthQuestionnaire from './HealthQuestionnaire';
 
 // Helper function to calculate age from birthdate
 const calculateAge = (birthdate) => {
@@ -376,13 +377,8 @@ export default function PersonalDataStep({ data, onChange }) {
           )}
         </div>
 
-        <div className="flex items-center justify-between mt-4 pt-4 border-t border-slate-200">
-          <Label className="cursor-pointer">Пушач</Label>
-          <Switch
-            checked={data.client_is_smoker || false}
-            onCheckedChange={(checked) => onChange('client_is_smoker', checked)}
-          />
-        </div>
+        {/* Health Questionnaire */}
+        <HealthQuestionnaire data={data} onChange={onChange} prefix="client" />
       </div>
 
       {/* Partner Section */}
@@ -698,13 +694,8 @@ export default function PersonalDataStep({ data, onChange }) {
               )}
             </div>
 
-            <div className="flex items-center justify-between mt-4 pt-4 border-t border-slate-200">
-              <Label className="cursor-pointer">Пушач</Label>
-              <Switch
-                checked={data.partner_is_smoker || false}
-                onCheckedChange={(checked) => onChange('partner_is_smoker', checked)}
-              />
-            </div>
+            {/* Health Questionnaire */}
+            <HealthQuestionnaire data={data} onChange={onChange} prefix="partner" />
           </>
         )}
 

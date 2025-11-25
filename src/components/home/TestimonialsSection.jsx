@@ -5,21 +5,21 @@ import { Button } from "@/components/ui/button";
 
 const testimonials = [
   {
-    quote: "I am running a small business and I really don't have much free time on my hands. With Apex Financial, I can focus on my business while expert advisors take care of my wealth. Definitely a great choice!",
-    name: "Sarah Mitchell",
-    role: "Business Owner",
+    quote: "Управлявам малък бизнес и наистина нямам много свободно време. С Apex Financial мога да се съсредоточа върху бизнеса си, докато експерти се грижат за богатството ми. Определено страхотен избор!",
+    name: "Мария Петрова",
+    role: "Собственик на бизнес",
     image: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150&h=150&fit=crop&crop=face"
   },
   {
-    quote: "I have a full-time job and managing investments myself is not an option. Having a reliable and trustworthy company managing my finances is of great importance! I couldn't hope for more professional and honest approach.",
-    name: "David Chen",
-    role: "Healthcare Executive",
+    quote: "Имам работа на пълен работен ден и управлението на инвестициите сама не е вариант. Наличието на надеждна компания, която управлява финансите ми, е от голямо значение! Не бих могла да се надявам на по-професионален подход.",
+    name: "Георги Димитров",
+    role: "Здравен мениджър",
     image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face"
   },
   {
-    quote: "I'm new to investing, and having a Personal Financial Advisor helping me every step of the way - looking for the best opportunities - is simply fantastic. Couldn't be more satisfied with the results!",
-    name: "Emily Rodriguez",
-    role: "Marketing Director",
+    quote: "Нова съм в инвестирането и наличието на личен финансов консултант, който ми помага на всяка стъпка - търсейки най-добрите възможности - е просто фантастично. Не бих могла да съм по-доволна от резултатите!",
+    name: "Елена Иванова",
+    role: "Маркетинг директор",
     image: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=150&h=150&fit=crop&crop=face"
   }
 ];
@@ -41,10 +41,10 @@ export default function TestimonialsSection() {
           className="text-center mb-16"
         >
           <span className="text-blue-600 font-medium text-sm tracking-widest uppercase mb-4 block">
-            Testimonials
+            Отзиви
           </span>
           <h2 className="text-3xl md:text-5xl font-light text-slate-900">
-            What our <span className="font-semibold text-blue-600">clients</span> say
+            Какво казват нашите <span className="font-semibold text-blue-600">клиенти</span>
           </h2>
         </motion.div>
 

@@ -17,16 +17,16 @@ export default function MissionSection() {
           className="text-center"
         >
           <span className="text-blue-400 font-medium text-sm tracking-widest uppercase mb-4 block">
-            Our Mission
+            Нашата мисия
           </span>
           <h2 className="text-3xl md:text-5xl font-light text-white mb-8">
-            Our <span className="font-semibold text-blue-400">Mission</span>
+            Нашата <span className="font-semibold text-blue-400">мисия</span>
           </h2>
           <p className="text-xl md:text-2xl text-blue-100/80 leading-relaxed font-light">
-            At <span className="text-white font-medium">Apex Financial Advisors</span>, we are dedicated 
-            to providing you with well-balanced and sustainable financial growth through intelligent 
-            decisions and personalized strategies. We help you navigate the complexities of wealth 
-            management to achieve your life goals.
+            В <span className="text-white font-medium">Apex Financial Advisors</span> сме посветени 
+            на осигуряването на балансиран и устойчив финансов растеж чрез интелигентни 
+            решения и персонализирани стратегии. Помагаме ви да се ориентирате в сложността на 
+            управлението на богатството, за да постигнете житейските си цели.
           </p>
         </motion.div>
       </div>

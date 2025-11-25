@@ -4,10 +4,10 @@ import { Button } from "@/components/ui/button";
 import { ArrowRight, Shield, Award, CheckCircle, BadgeCheck } from 'lucide-react';
 
 const badges = [
-  { icon: Shield, label: 'SEC Registered' },
-  { icon: Award, label: 'CFP Certified' },
-  { icon: CheckCircle, label: 'Fiduciary' },
-  { icon: BadgeCheck, label: 'FINRA Member' },
+  { icon: Shield, label: 'КФН лиценз' },
+  { icon: Award, label: 'CFP сертификат' },
+  { icon: CheckCircle, label: 'Фидуциар' },
+  { icon: BadgeCheck, label: 'ISO сертификат' },
 ];
 
 export default function InvestmentCTA() {
@@ -34,19 +34,19 @@ export default function InvestmentCTA() {
           className="text-center"
         >
           <h2 className="text-3xl md:text-5xl font-light text-white mb-6">
-            <span className="font-semibold">Invest</span> in your future
+            <span className="font-semibold">Инвестирайте</span> в бъдещето си
           </h2>
           <p className="text-lg md:text-xl text-blue-100/90 max-w-2xl mx-auto mb-10 font-light leading-relaxed">
-            In a world of financial uncertainty, we offer the ultimate solution. Let us help you 
-            reach your long-term goals and secure your financial freedom. Take care of your 
-            family while we take care of your investments.
+            В свят на финансова несигурност, ние предлагаме крайното решение. Нека ви помогнем 
+            да постигнете дългосрочните си цели и да осигурите финансовата си свобода. Грижете се за 
+            семейството си, докато ние се грижим за инвестициите ви.
           </p>
 
           <Button 
             size="lg" 
             className="bg-white text-blue-700 hover:bg-blue-50 px-10 py-6 text-lg rounded-full transition-all duration-300 hover:scale-105 hover:shadow-xl shadow-lg"
           >
-            Schedule Free Consultation
+            Запазете безплатна консултация
             <ArrowRight className="ml-2 h-5 w-5" />
           </Button>
         </motion.div>

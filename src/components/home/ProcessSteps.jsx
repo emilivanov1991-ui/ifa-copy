@@ -5,26 +5,26 @@ import { UserPlus, Target, TrendingUp, Sparkles } from 'lucide-react';
 const steps = [
   {
     number: '01',
-    title: 'Schedule Consultation',
-    description: 'Book a free consultation with our expert advisors',
+    title: 'Запазете консултация',
+    description: 'Резервирайте безплатна консултация с нашите експерти',
     icon: UserPlus
   },
   {
     number: '02',
-    title: 'Define Your Goals',
-    description: 'We create a personalized financial roadmap',
+    title: 'Определете целите си',
+    description: 'Създаваме персонализирана финансова пътна карта',
     icon: Target
   },
   {
     number: '03',
-    title: 'Invest Wisely',
-    description: 'Implement your tailored investment strategy',
+    title: 'Инвестирайте разумно',
+    description: 'Прилагаме вашата инвестиционна стратегия',
     icon: TrendingUp
   },
   {
     number: '04',
-    title: 'Achieve Success',
-    description: 'Watch your wealth grow with ongoing guidance',
+    title: 'Постигнете успех',
+    description: 'Наблюдавайте растежа на богатството си с постоянни насоки',
     icon: Sparkles
   }
 ];
@@ -41,11 +41,11 @@ export default function ProcessSteps() {
           className="text-center mb-16"
         >
           <span className="text-blue-600 font-medium text-sm tracking-widest uppercase mb-4 block">
-            How It Works
+            Как работи
           </span>
           <h2 className="text-3xl md:text-5xl font-light text-slate-900">
-            Getting started is really{' '}
-            <span className="font-semibold text-blue-600">simple!</span>
+            Започването е наистина{' '}
+            <span className="font-semibold text-blue-600">лесно!</span>
           </h2>
         </motion.div>
 

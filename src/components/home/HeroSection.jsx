@@ -50,8 +50,8 @@ export default function HeroSection() {
           transition={{ duration: 0.8, delay: 0.2 }}
           className="text-lg md:text-xl text-blue-100/80 max-w-3xl mx-auto mb-10 font-light leading-relaxed"
         >
-          Independent financial advice tailored to your unique goals. We help you build wealth, 
-          protect your assets, and secure your family's future with personalized strategies.
+          Независими финансови съвети, съобразени с вашите уникални цели. Помагаме ви да изградите 
+          богатство, да защитите активите си и да осигурите бъдещето на семейството си.
         </motion.p>
 
         <motion.div

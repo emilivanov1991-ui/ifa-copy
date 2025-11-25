@@ -54,19 +54,6 @@ export default function PersonalDataStep({ data, onChange }) {
           </div>
 
           <div className="space-y-2">
-            <Label>Брой деца</Label>
-            <Input
-              type="number"
-              min="0"
-              max="20"
-              placeholder="0"
-              value={data.client_dependents || ''}
-              onChange={(e) => onChange('client_dependents', parseInt(e.target.value) || '')}
-              className="rounded-lg"
-            />
-          </div>
-
-          <div className="space-y-2">
             <Label>Националност</Label>
             <Select 
               value={data.client_nationality || ''} 
@@ -209,26 +196,60 @@ export default function PersonalDataStep({ data, onChange }) {
       {/* Children Section */}
       <div className="bg-slate-50 rounded-xl p-6">
         <h3 className="font-semibold text-slate-900 mb-4">Деца</h3>
-        <div className="grid sm:grid-cols-2 gap-4">
-          <div className="space-y-2">
-            <Label>Брой деца</Label>
-            <Input
-              type="number"
-              min="0"
-              max="20"
-              placeholder="0"
-              value={data.children_count || ''}
-              onChange={(e) => onChange('children_count', parseInt(e.target.value) || '')}
-              className="rounded-lg"
-            />
+        <div className="space-y-4">
+          <div className="grid sm:grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label>Брой деца</Label>
+              <Select 
+                value={data.children_count?.toString() || ''} 
+                onValueChange={(value) => onChange('children_count', parseInt(value))}
+              >
+                <SelectTrigger className="rounded-lg">
+                  <SelectValue placeholder="Изберете" />
+                </SelectTrigger>
+                <SelectContent>
+                  {[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(num => (
+                    <SelectItem key={num} value={num.toString()}>{num}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="flex items-center justify-between">
+              <Label className="cursor-pointer">Икономическа зависимост</Label>
+              <Switch
+                checked={data.children_economically_dependent || false}
+                onCheckedChange={(checked) => onChange('children_economically_dependent', checked)}
+              />
+            </div>
           </div>
-          <div className="flex items-center justify-between">
-            <Label className="cursor-pointer">Икономическа зависимост</Label>
-            <Switch
-              checked={data.children_economically_dependent || false}
-              onCheckedChange={(checked) => onChange('children_economically_dependent', checked)}
-            />
-          </div>
+
+          {(data.children_count || 0) > 0 && (
+            <div className="space-y-3 pt-4 border-t border-slate-200">
+              <Label className="text-sm text-slate-600">Данни за децата</Label>
+              {Array.from({ length: data.children_count || 0 }).map((_, index) => (
+                <div key={index} className="grid sm:grid-cols-2 gap-3 p-3 bg-white rounded-lg border border-slate-200">
+                  <div className="space-y-1">
+                    <Label className="text-xs">Дете {index + 1} - Име</Label>
+                    <Input
+                      placeholder="Име на детето"
+                      value={data[`child_${index + 1}_name`] || ''}
+                      onChange={(e) => onChange(`child_${index + 1}_name`, e.target.value)}
+                      className="rounded-lg"
+                    />
+                  </div>
+                  <div className="space-y-1">
+                    <Label className="text-xs">Дата на раждане</Label>
+                    <Input
+                      type="date"
+                      value={data[`child_${index + 1}_birthdate`] || ''}
+                      onChange={(e) => onChange(`child_${index + 1}_birthdate`, e.target.value)}
+                      className="rounded-lg"
+                    />
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       </div>
     </div>

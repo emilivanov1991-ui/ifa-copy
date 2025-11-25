@@ -336,11 +336,25 @@ export default function ChildrenGoalsStep({ data, onChange }) {
 
       {/* Other Goals */}
       <div className="bg-slate-50 rounded-xl p-6">
-        <div className="flex items-center gap-2 mb-6">
-          <Palmtree className="h-5 w-5 text-blue-600" />
-          <h3 className="font-semibold text-slate-900">Други цели (кола, почивка...)</h3>
+        <div className="flex items-center justify-between mb-6">
+          <div className="flex items-center gap-2">
+            <Palmtree className="h-5 w-5 text-blue-600" />
+            <h3 className="font-semibold text-slate-900">Други цели (кола, почивка...)</h3>
+          </div>
+          <Button 
+            variant="outline" 
+            size="sm"
+            onClick={() => onChange('skip_other_goals_section', !data.skip_other_goals_section)}
+            className="rounded-full text-slate-600"
+          >
+            <SkipForward className="h-4 w-4 mr-2" />
+            {data.skip_other_goals_section ? 'Върни темата' : 'Пропусни темата'}
+          </Button>
         </div>
 
+        {data.skip_other_goals_section ? (
+          <p className="text-slate-500 text-center py-4">Тази секция е пропусната.</p>
+        ) : (
         <div className="space-y-4">
           <div className="grid grid-cols-3 gap-4 items-end">
             <div className="flex items-center gap-2">
@@ -436,6 +450,7 @@ export default function ChildrenGoalsStep({ data, onChange }) {
             </div>
           </div>
         </div>
+        )}
       </div>
 
       {/* Include other goals in plan */}

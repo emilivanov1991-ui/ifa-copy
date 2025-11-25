@@ -117,28 +117,6 @@ export default function ReserveStep({ data, onChange }) {
                 />
               </div>
               <div className="flex items-center justify-between gap-4">
-                <Label className="text-sm">Срочен депозит</Label>
-                <Input
-                  type="number"
-                  min="0"
-                  placeholder="0"
-                  value={data.client_term_deposit || ''}
-                  onChange={(e) => onChange('client_term_deposit', parseInt(e.target.value) || '')}
-                  className="rounded-lg w-32"
-                />
-              </div>
-              <div className="flex items-center justify-between gap-4">
-                <Label className="text-sm">Взаимни фондове, акции, облигации и др.</Label>
-                <Input
-                  type="number"
-                  min="0"
-                  placeholder="0"
-                  value={data.client_mutual_funds || ''}
-                  onChange={(e) => onChange('client_mutual_funds', parseInt(e.target.value) || '')}
-                  className="rounded-lg w-32"
-                />
-              </div>
-              <div className="flex items-center justify-between gap-4">
                 <Label className="text-sm">Спестовна сметка</Label>
                 <Input
                   type="number"
@@ -146,6 +124,17 @@ export default function ReserveStep({ data, onChange }) {
                   placeholder="0"
                   value={data.client_savings_account || ''}
                   onChange={(e) => onChange('client_savings_account', parseInt(e.target.value) || '')}
+                  className="rounded-lg w-32"
+                />
+              </div>
+              <div className="flex items-center justify-between gap-4">
+                <Label className="text-sm">Срочен депозит</Label>
+                <Input
+                  type="number"
+                  min="0"
+                  placeholder="0"
+                  value={data.client_term_deposit || ''}
+                  onChange={(e) => onChange('client_term_deposit', parseInt(e.target.value) || '')}
                   className="rounded-lg w-32"
                 />
               </div>
@@ -161,13 +150,13 @@ export default function ReserveStep({ data, onChange }) {
                 />
               </div>
               <div className="flex items-center justify-between gap-4">
-                <Label className="text-sm">Криптовалути</Label>
+                <Label className="text-sm">Взаимни фондове, акции, облигации и др.</Label>
                 <Input
                   type="number"
                   min="0"
                   placeholder="0"
-                  value={data.client_crypto || ''}
-                  onChange={(e) => onChange('client_crypto', parseInt(e.target.value) || '')}
+                  value={data.client_mutual_funds || ''}
+                  onChange={(e) => onChange('client_mutual_funds', parseInt(e.target.value) || '')}
                   className="rounded-lg w-32"
                 />
               </div>
@@ -179,6 +168,17 @@ export default function ReserveStep({ data, onChange }) {
                   placeholder="0"
                   value={data.client_gold || ''}
                   onChange={(e) => onChange('client_gold', parseInt(e.target.value) || '')}
+                  className="rounded-lg w-32"
+                />
+              </div>
+              <div className="flex items-center justify-between gap-4">
+                <Label className="text-sm">Криптовалути</Label>
+                <Input
+                  type="number"
+                  min="0"
+                  placeholder="0"
+                  value={data.client_crypto || ''}
+                  onChange={(e) => onChange('client_crypto', parseInt(e.target.value) || '')}
                   className="rounded-lg w-32"
                 />
               </div>
@@ -205,28 +205,6 @@ export default function ReserveStep({ data, onChange }) {
                   />
                 </div>
                 <div className="flex items-center justify-between gap-4">
-                  <Label className="text-sm">Срочен депозит</Label>
-                  <Input
-                    type="number"
-                    min="0"
-                    placeholder="0"
-                    value={data.partner_term_deposit || ''}
-                    onChange={(e) => onChange('partner_term_deposit', parseInt(e.target.value) || '')}
-                    className="rounded-lg w-32"
-                  />
-                </div>
-                <div className="flex items-center justify-between gap-4">
-                  <Label className="text-sm">Взаимни фондове, акции, облигации и др.</Label>
-                  <Input
-                    type="number"
-                    min="0"
-                    placeholder="0"
-                    value={data.partner_mutual_funds || ''}
-                    onChange={(e) => onChange('partner_mutual_funds', parseInt(e.target.value) || '')}
-                    className="rounded-lg w-32"
-                  />
-                </div>
-                <div className="flex items-center justify-between gap-4">
                   <Label className="text-sm">Спестовна сметка</Label>
                   <Input
                     type="number"
@@ -234,6 +212,17 @@ export default function ReserveStep({ data, onChange }) {
                     placeholder="0"
                     value={data.partner_savings_account || ''}
                     onChange={(e) => onChange('partner_savings_account', parseInt(e.target.value) || '')}
+                    className="rounded-lg w-32"
+                  />
+                </div>
+                <div className="flex items-center justify-between gap-4">
+                  <Label className="text-sm">Срочен депозит</Label>
+                  <Input
+                    type="number"
+                    min="0"
+                    placeholder="0"
+                    value={data.partner_term_deposit || ''}
+                    onChange={(e) => onChange('partner_term_deposit', parseInt(e.target.value) || '')}
                     className="rounded-lg w-32"
                   />
                 </div>
@@ -249,13 +238,13 @@ export default function ReserveStep({ data, onChange }) {
                   />
                 </div>
                 <div className="flex items-center justify-between gap-4">
-                  <Label className="text-sm">Криптовалути</Label>
+                  <Label className="text-sm">Взаимни фондове, акции, облигации и др.</Label>
                   <Input
                     type="number"
                     min="0"
                     placeholder="0"
-                    value={data.partner_crypto || ''}
-                    onChange={(e) => onChange('partner_crypto', parseInt(e.target.value) || '')}
+                    value={data.partner_mutual_funds || ''}
+                    onChange={(e) => onChange('partner_mutual_funds', parseInt(e.target.value) || '')}
                     className="rounded-lg w-32"
                   />
                 </div>
@@ -267,6 +256,17 @@ export default function ReserveStep({ data, onChange }) {
                     placeholder="0"
                     value={data.partner_gold || ''}
                     onChange={(e) => onChange('partner_gold', parseInt(e.target.value) || '')}
+                    className="rounded-lg w-32"
+                  />
+                </div>
+                <div className="flex items-center justify-between gap-4">
+                  <Label className="text-sm">Криптовалути</Label>
+                  <Input
+                    type="number"
+                    min="0"
+                    placeholder="0"
+                    value={data.partner_crypto || ''}
+                    onChange={(e) => onChange('partner_crypto', parseInt(e.target.value) || '')}
                     className="rounded-lg w-32"
                   />
                 </div>
@@ -304,13 +304,45 @@ export default function ReserveStep({ data, onChange }) {
             <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg">
               <span className="text-blue-700 font-medium">Препоръчителният резерв за Вас е: </span>
               <span className="text-blue-800 font-bold">
-                {recommendedMin.toLocaleString('bg-BG')} € - {recommendedMax.toLocaleString('bg-BG')} €
+                {recommendedMin === recommendedMax 
+                  ? `${recommendedMin.toLocaleString('bg-BG')} €`
+                  : `${recommendedMin.toLocaleString('bg-BG')} € - ${recommendedMax.toLocaleString('bg-BG')} €`
+                }
               </span>
-              <p className="text-blue-600 text-sm mt-1">
-                (между 6 месечни разходи и 6 месечни доходи)
-              </p>
             </div>
           )}
+
+          {/* Warning messages based on liquid savings vs recommended reserve */}
+          {totalMonthlyIncome > 0 && (() => {
+            const clientLiquid = (data.client_checking_account || 0) + (data.client_savings_account || 0) + 
+              (data.client_term_deposit || 0) + (data.client_cash || 0);
+            const partnerLiquid = data.include_partner ? ((data.partner_checking_account || 0) + (data.partner_savings_account || 0) + 
+              (data.partner_term_deposit || 0) + (data.partner_cash || 0)) : 0;
+            const totalLiquid = clientLiquid + partnerLiquid;
+            const recommendedReserve = recommendedMax;
+
+            if (totalLiquid > recommendedReserve) {
+              const excess = totalLiquid - recommendedReserve;
+              const inflationLoss = Math.round(excess * 0.05);
+              return (
+                <div className="p-4 bg-red-50 border border-red-200 rounded-lg">
+                  <p className="text-red-700">
+                    Спестяванията ви надвишават препоръчителния резерв и губите средно <span className="font-bold">{inflationLoss.toLocaleString('bg-BG')} €</span> годишно от инфлация. Ще ви помогнем да реализирате доходност на тези средства!
+                  </p>
+                </div>
+              );
+            } else if (totalLiquid < recommendedReserve && totalLiquid > 0) {
+              const deficit = recommendedReserve - totalLiquid;
+              return (
+                <div className="p-4 bg-red-50 border border-red-200 rounded-lg">
+                  <p className="text-red-700">
+                    Спестяванията ви са по-малко от препоръчителния резерв с <span className="font-bold">{deficit.toLocaleString('bg-BG')} €</span>. Ще ви помогнем да достигнете до него чрез правилно финансово планиране!
+                  </p>
+                </div>
+              );
+            }
+            return null;
+          })()}
         </div>
       </div>
 

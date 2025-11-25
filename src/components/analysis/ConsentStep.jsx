@@ -9,24 +9,20 @@ export default function ConsentStep({ data, onChange }) {
 
   return (
     <div className="space-y-6">
-      <div className="bg-blue-50 border border-blue-200 rounded-xl p-6">
-        <div className="flex items-start gap-3">
-          <Shield className="h-6 w-6 text-blue-600 mt-1 flex-shrink-0" />
-          <div>
-            <h3 className="font-semibold text-slate-900 mb-2">Съгласие за използване на лични данни</h3>
-            <p className="text-sm text-slate-600">
-              Съгласно Закона за личните данни и Регламент (ЕС) 2016/679 (GDPR)
-            </p>
+      <Collapsible open={isOpen} onOpenChange={setIsOpen} className="border border-blue-200 rounded-xl bg-blue-50">
+        <CollapsibleTrigger className="flex items-center justify-between w-full p-6 text-left hover:bg-blue-100/50 transition-colors rounded-xl">
+          <div className="flex items-start gap-3">
+            <Shield className="h-6 w-6 text-blue-600 mt-0.5 flex-shrink-0" />
+            <div>
+              <h3 className="font-semibold text-slate-900">Съгласие за използване на лични данни</h3>
+              <p className="text-sm text-slate-600">
+                Съгласно Закона за личните данни и Регламент (ЕС) 2016/679 (GDPR)
+              </p>
+            </div>
           </div>
-        </div>
-      </div>
-
-      <Collapsible open={isOpen} onOpenChange={setIsOpen} className="border border-slate-200 rounded-xl">
-        <CollapsibleTrigger className="flex items-center justify-between w-full p-4 text-left hover:bg-slate-50 transition-colors rounded-xl">
-          <span className="font-medium text-slate-700">Пълен текст на съгласието за лични данни</span>
-          <ChevronDown className={`h-5 w-5 text-slate-500 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
+          <ChevronDown className={`h-5 w-5 text-slate-500 transition-transform flex-shrink-0 ${isOpen ? 'rotate-180' : ''}`} />
         </CollapsibleTrigger>
-        <CollapsibleContent className="px-4 pb-4">
+        <CollapsibleContent className="px-6 pb-6">
           <div className="bg-slate-50 rounded-lg p-4 text-sm text-slate-600 space-y-3 max-h-96 overflow-y-auto">
             <p>
               С настоящото по смисъла на Закона за личните данни и на Регламент (ЕС) 2016/679 на Европейския парламент и на Съвета от 27 април 2016 година относно защитата на физическите лица във връзка с обработването на лични данни и относно свободното движение на такива данни и за отмяна на Директива 95/46/EО (Общ регламент относно защитата на данните) (по-долу наричан само „Приложимо законодателство") Давам съгласието си на „Партнърс Груп БГ" ООД, с ЕИК: 204779330, със седалище и адрес на управление в град София, ул. Иван Денкоглу 2, ет. 1, офис 1 ("Компанията") да обработва личните ми данни, посочени в този анализ.

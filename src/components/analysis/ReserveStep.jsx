@@ -10,7 +10,7 @@ import {
   SelectTrigger, 
   SelectValue 
 } from "@/components/ui/select";
-import { PiggyBank, User, Users, TrendingUp } from 'lucide-react';
+import { PiggyBank, User, Users, TrendingUp, Shield, Scale, Zap, Flame } from 'lucide-react';
 import { cn } from "@/lib/utils";
 
 export default function ReserveStep({ data, onChange }) {
@@ -354,11 +354,24 @@ export default function ReserveStep({ data, onChange }) {
         </div>
 
         <div className="space-y-6">
-          <div className="space-y-2">
+          <div className="space-y-4">
             <Label>Разпределете инвестицията в % според отделните инструменти (общо 100%)</Label>
-            <div className="grid sm:grid-cols-2 gap-4 mt-3">
-              <div className="flex items-center justify-between gap-4">
-                <Label className="text-sm">Консервативен (+2%)</Label>
+            
+            {/* Visual Risk Profile Cards */}
+            <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 mt-3">
+              {/* Conservative */}
+              <div className="p-4 rounded-xl border-2 border-blue-200 bg-blue-50">
+                <div className="flex items-center gap-2 mb-3">
+                  <Shield className="h-5 w-5 text-blue-600" />
+                  <span className="font-medium text-blue-800">Консервативен</span>
+                </div>
+                <div className="text-xs text-blue-600 mb-2">+2% годишно</div>
+                <div className="h-2 bg-blue-200 rounded-full mb-3">
+                  <div 
+                    className="h-full bg-blue-600 rounded-full transition-all"
+                    style={{ width: `${Math.min(data.conservative_percent || 0, 100)}%` }}
+                  />
+                </div>
                 <Input
                   type="number"
                   min="0"
@@ -366,11 +379,23 @@ export default function ReserveStep({ data, onChange }) {
                   placeholder="0"
                   value={data.conservative_percent || ''}
                   onChange={(e) => onChange('conservative_percent', parseInt(e.target.value) || '')}
-                  className="rounded-lg w-24"
+                  className="rounded-lg w-full text-center"
                 />
               </div>
-              <div className="flex items-center justify-between gap-4">
-                <Label className="text-sm">Смел (+7%/-3%)</Label>
+
+              {/* Balanced */}
+              <div className="p-4 rounded-xl border-2 border-green-200 bg-green-50">
+                <div className="flex items-center gap-2 mb-3">
+                  <Scale className="h-5 w-5 text-green-600" />
+                  <span className="font-medium text-green-800">Балансиран</span>
+                </div>
+                <div className="text-xs text-green-600 mb-2">+7% / -3%</div>
+                <div className="h-2 bg-green-200 rounded-full mb-3">
+                  <div 
+                    className="h-full bg-green-600 rounded-full transition-all"
+                    style={{ width: `${Math.min(data.moderate_percent || 0, 100)}%` }}
+                  />
+                </div>
                 <Input
                   type="number"
                   min="0"
@@ -378,11 +403,23 @@ export default function ReserveStep({ data, onChange }) {
                   placeholder="0"
                   value={data.moderate_percent || ''}
                   onChange={(e) => onChange('moderate_percent', parseInt(e.target.value) || '')}
-                  className="rounded-lg w-24"
+                  className="rounded-lg w-full text-center"
                 />
               </div>
-              <div className="flex items-center justify-between gap-4">
-                <Label className="text-sm">Динамичен (+12%/-5%)</Label>
+
+              {/* Dynamic */}
+              <div className="p-4 rounded-xl border-2 border-amber-200 bg-amber-50">
+                <div className="flex items-center gap-2 mb-3">
+                  <Zap className="h-5 w-5 text-amber-600" />
+                  <span className="font-medium text-amber-800">Динамичен</span>
+                </div>
+                <div className="text-xs text-amber-600 mb-2">+12% / -5%</div>
+                <div className="h-2 bg-amber-200 rounded-full mb-3">
+                  <div 
+                    className="h-full bg-amber-600 rounded-full transition-all"
+                    style={{ width: `${Math.min(data.dynamic_percent || 0, 100)}%` }}
+                  />
+                </div>
                 <Input
                   type="number"
                   min="0"
@@ -390,11 +427,23 @@ export default function ReserveStep({ data, onChange }) {
                   placeholder="0"
                   value={data.dynamic_percent || ''}
                   onChange={(e) => onChange('dynamic_percent', parseInt(e.target.value) || '')}
-                  className="rounded-lg w-24"
+                  className="rounded-lg w-full text-center"
                 />
               </div>
-              <div className="flex items-center justify-between gap-4">
-                <Label className="text-sm">Агресивен (+25%/-15%)</Label>
+
+              {/* Aggressive */}
+              <div className="p-4 rounded-xl border-2 border-red-200 bg-red-50">
+                <div className="flex items-center gap-2 mb-3">
+                  <Flame className="h-5 w-5 text-red-600" />
+                  <span className="font-medium text-red-800">Агресивен</span>
+                </div>
+                <div className="text-xs text-red-600 mb-2">+25% / -15%</div>
+                <div className="h-2 bg-red-200 rounded-full mb-3">
+                  <div 
+                    className="h-full bg-red-600 rounded-full transition-all"
+                    style={{ width: `${Math.min(data.aggressive_percent || 0, 100)}%` }}
+                  />
+                </div>
                 <Input
                   type="number"
                   min="0"
@@ -402,10 +451,42 @@ export default function ReserveStep({ data, onChange }) {
                   placeholder="0"
                   value={data.aggressive_percent || ''}
                   onChange={(e) => onChange('aggressive_percent', parseInt(e.target.value) || '')}
-                  className="rounded-lg w-24"
+                  className="rounded-lg w-full text-center"
                 />
               </div>
             </div>
+
+            {/* Diversification Messages */}
+            {(() => {
+              const cons = data.conservative_percent || 0;
+              const mod = data.moderate_percent || 0;
+              const dyn = data.dynamic_percent || 0;
+              const agg = data.aggressive_percent || 0;
+              const total = cons + mod + dyn + agg;
+              
+              if (total > 0) {
+                const hasOver80 = cons > 80 || mod > 80 || dyn > 80 || agg > 80;
+                
+                if (hasOver80) {
+                  return (
+                    <div className="p-4 bg-red-50 border border-red-200 rounded-lg">
+                      <p className="text-red-700">
+                        Прекалената концентрация в един вид активи води до по-голяма волатилност и риск! Препоръчваме Ви по-широка диверсификация!
+                      </p>
+                    </div>
+                  );
+                } else {
+                  return (
+                    <div className="p-4 bg-green-50 border border-green-200 rounded-lg">
+                      <p className="text-green-700">
+                        Поздравления! Явно правилно разбирате идеята за диверсификация на Вашите активи!
+                      </p>
+                    </div>
+                  );
+                }
+              }
+              return null;
+            })()}
           </div>
 
           <div className="space-y-2">
@@ -478,6 +559,85 @@ export default function ReserveStep({ data, onChange }) {
                 <SelectItem value="buy_more">Купувам още</SelectItem>
               </SelectContent>
             </Select>
+          </div>
+        </div>
+      </div>
+
+      {/* Investment Referrals */}
+      <div className="bg-slate-50 rounded-xl p-6">
+        <h3 className="font-semibold text-slate-900 mb-4">Кои от Вашите близки или познати:</h3>
+        
+        <div className="grid md:grid-cols-2 gap-6">
+          {/* Have savings but no investments */}
+          <div className="space-y-3">
+            <Label className="text-slate-700">Имат спестявания, но не са предприели инвестиционни решения?</Label>
+            {(data.referrals_have_savings || ['']).map((name, index) => {
+              // Check if name exists in housing referrals
+              const housingNames = [
+                ...(data.referrals_no_own_home || []),
+                ...(data.referrals_own_home_long || [])
+              ].filter(n => n && n.trim());
+              const isDuplicate = name && name.trim() && housingNames.some(h => h.toLowerCase().trim() === name.toLowerCase().trim());
+              
+              return (
+                <div key={`savings_${index}`}>
+                  <Input
+                    placeholder="Име на познат"
+                    value={name}
+                    onChange={(e) => {
+                      const newList = [...(data.referrals_have_savings || [''])];
+                      newList[index] = e.target.value;
+                      if (index === newList.length - 1 && e.target.value) {
+                        newList.push('');
+                      }
+                      onChange('referrals_have_savings', newList);
+                    }}
+                    className={cn("rounded-lg", isDuplicate && "border-amber-500")}
+                  />
+                  {isDuplicate && (
+                    <p className="text-amber-600 text-sm mt-1">
+                      Това име бе предоставено на предходната тема. С кого бихме могли да го заменим?
+                    </p>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+
+          {/* Invest regularly or interested */}
+          <div className="space-y-3">
+            <Label className="text-slate-700">Инвестират редовно или се интересуват от инвестиции?</Label>
+            {(data.referrals_invest_regularly || ['']).map((name, index) => {
+              // Check if name exists in housing referrals
+              const housingNames = [
+                ...(data.referrals_no_own_home || []),
+                ...(data.referrals_own_home_long || [])
+              ].filter(n => n && n.trim());
+              const isDuplicate = name && name.trim() && housingNames.some(h => h.toLowerCase().trim() === name.toLowerCase().trim());
+              
+              return (
+                <div key={`invest_${index}`}>
+                  <Input
+                    placeholder="Име на познат"
+                    value={name}
+                    onChange={(e) => {
+                      const newList = [...(data.referrals_invest_regularly || [''])];
+                      newList[index] = e.target.value;
+                      if (index === newList.length - 1 && e.target.value) {
+                        newList.push('');
+                      }
+                      onChange('referrals_invest_regularly', newList);
+                    }}
+                    className={cn("rounded-lg", isDuplicate && "border-amber-500")}
+                  />
+                  {isDuplicate && (
+                    <p className="text-amber-600 text-sm mt-1">
+                      Това име бе предоставено на предходната тема. С кого бихме могли да го заменим?
+                    </p>
+                  )}
+                </div>
+              );
+            })}
           </div>
         </div>
       </div>

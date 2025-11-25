@@ -36,27 +36,54 @@ export default function ReserveStep({ data, onChange }) {
 
   return (
     <div className="space-y-8">
-      {/* Total Monthly Income */}
-      <div className="bg-slate-50 rounded-xl p-6">
-        <h3 className="font-semibold text-slate-900 mb-4">Общи средни месечни доходи:</h3>
-        <div className="space-y-2">
-          <Input
-            type="number"
-            min="0"
-            placeholder="0"
-            value={data.total_monthly_income || ''}
-            onChange={(e) => onChange('total_monthly_income', parseInt(e.target.value) || '')}
-            className="rounded-lg w-48 text-lg font-semibold"
-          />
-          <span className="text-slate-500 ml-2">€</span>
-        </div>
-      </div>
-
       {/* Savings Method */}
       <div className="bg-slate-50 rounded-xl p-6">
         <div className="flex items-center gap-2 mb-6">
           <PiggyBank className="h-5 w-5 text-blue-600" />
           <h3 className="font-semibold text-slate-900">По какъв начин създавате своя финансов резерв?</h3>
+        </div>
+
+        {/* Monthly Net Income */}
+        <div className="mb-6 p-4 bg-white rounded-lg border border-slate-200">
+          <h4 className="font-medium text-slate-700 mb-4">Месечен среден нетен доход</h4>
+          <div className={data.include_partner ? "grid sm:grid-cols-2 gap-4" : ""}>
+            <div className="space-y-2">
+              <Label className="text-sm">Клиент (€)</Label>
+              <Input
+                type="number"
+                min="0"
+                placeholder="0"
+                value={data.client_monthly_net_income || ''}
+                onChange={(e) => {
+                  const clientIncome = parseInt(e.target.value) || 0;
+                  onChange('client_monthly_net_income', clientIncome);
+                  onChange('total_monthly_income', clientIncome + (data.partner_monthly_net_income || 0));
+                }}
+                className="rounded-lg"
+              />
+            </div>
+            {data.include_partner && (
+              <div className="space-y-2">
+                <Label className="text-sm">Партньор (€)</Label>
+                <Input
+                  type="number"
+                  min="0"
+                  placeholder="0"
+                  value={data.partner_monthly_net_income || ''}
+                  onChange={(e) => {
+                    const partnerIncome = parseInt(e.target.value) || 0;
+                    onChange('partner_monthly_net_income', partnerIncome);
+                    onChange('total_monthly_income', (data.client_monthly_net_income || 0) + partnerIncome);
+                  }}
+                  className="rounded-lg"
+                />
+              </div>
+            )}
+          </div>
+          <div className="mt-3 pt-3 border-t border-slate-200 flex justify-between items-center">
+            <span className="text-sm text-slate-600">Общо:</span>
+            <span className="font-semibold text-blue-600">{(data.total_monthly_income || 0).toLocaleString('bg-BG')} €</span>
+          </div>
         </div>
 
         <div className="space-y-4">

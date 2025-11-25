@@ -35,7 +35,7 @@ export default function FinancialFlowStep({ data, onChange }) {
       <div className="bg-slate-50 rounded-xl p-6">
         <div className="flex items-center gap-2 mb-6">
           <Banknote className="h-5 w-5 text-green-600" />
-          <h3 className="font-semibold text-slate-900">Доходи (месечни, в лв)</h3>
+          <h3 className="font-semibold text-slate-900">Доходи (месечни, в €)</h3>
         </div>
 
         <div className="grid lg:grid-cols-2 gap-8">
@@ -87,7 +87,7 @@ export default function FinancialFlowStep({ data, onChange }) {
         <div className="mt-4 pt-4 border-t border-slate-200">
           <div className="flex justify-between items-center">
             <span className="font-semibold">Общо месечни доходи:</span>
-            <span className="font-bold text-lg text-green-600">{totalMonthlyIncome.toLocaleString()} лв</span>
+            <span className="font-bold text-lg text-green-600">{totalMonthlyIncome.toLocaleString()} €</span>
           </div>
         </div>
       </div>
@@ -96,7 +96,7 @@ export default function FinancialFlowStep({ data, onChange }) {
       <div className="bg-slate-50 rounded-xl p-6">
         <div className="flex items-center gap-2 mb-4">
           <Home className="h-5 w-5 text-red-500" />
-          <h3 className="font-semibold text-slate-900">Разходи за жилище (месечни, в лв)</h3>
+          <h3 className="font-semibold text-slate-900">Разходи за жилище (месечни, в €)</h3>
         </div>
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
           <div className="flex items-center justify-between gap-2">
@@ -132,7 +132,7 @@ export default function FinancialFlowStep({ data, onChange }) {
         </div>
         <div className="mt-3 pt-3 border-t border-slate-200 flex justify-between">
           <span className="text-sm font-medium">Общо жилище:</span>
-          <span className="font-semibold text-red-600">{totalHousingExpenses.toLocaleString()} лв</span>
+          <span className="font-semibold text-red-600">{totalHousingExpenses.toLocaleString()} €</span>
         </div>
       </div>
 
@@ -140,7 +140,7 @@ export default function FinancialFlowStep({ data, onChange }) {
       <div className="bg-slate-50 rounded-xl p-6">
         <div className="flex items-center gap-2 mb-4">
           <Car className="h-5 w-5 text-red-500" />
-          <h3 className="font-semibold text-slate-900">Разходи за автомобил (месечни, в лв)</h3>
+          <h3 className="font-semibold text-slate-900">Разходи за автомобил (месечни, в €)</h3>
         </div>
         <div className="grid sm:grid-cols-3 gap-3">
           <div className="flex items-center justify-between gap-2">
@@ -161,7 +161,7 @@ export default function FinancialFlowStep({ data, onChange }) {
         </div>
         <div className="mt-3 pt-3 border-t border-slate-200 flex justify-between">
           <span className="text-sm font-medium">Общо автомобил:</span>
-          <span className="font-semibold text-red-600">{totalCarExpenses.toLocaleString()} лв</span>
+          <span className="font-semibold text-red-600">{totalCarExpenses.toLocaleString()} €</span>
         </div>
       </div>
 
@@ -169,7 +169,7 @@ export default function FinancialFlowStep({ data, onChange }) {
       <div className="bg-slate-50 rounded-xl p-6">
         <div className="flex items-center gap-2 mb-4">
           <ShoppingBag className="h-5 w-5 text-red-500" />
-          <h3 className="font-semibold text-slate-900">Променливи разходи (месечни, в лв)</h3>
+          <h3 className="font-semibold text-slate-900">Променливи разходи (месечни, в €)</h3>
         </div>
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
           {[
@@ -193,7 +193,7 @@ export default function FinancialFlowStep({ data, onChange }) {
         </div>
         <div className="mt-3 pt-3 border-t border-slate-200 flex justify-between">
           <span className="text-sm font-medium">Общо променливи:</span>
-          <span className="font-semibold text-red-600">{totalVariableExpenses.toLocaleString()} лв</span>
+          <span className="font-semibold text-red-600">{totalVariableExpenses.toLocaleString()} €</span>
         </div>
       </div>
 
@@ -201,7 +201,7 @@ export default function FinancialFlowStep({ data, onChange }) {
       <div className="bg-slate-50 rounded-xl p-6">
         <div className="flex items-center gap-2 mb-4">
           <PiggyBank className="h-5 w-5 text-blue-600" />
-          <h3 className="font-semibold text-slate-900">Активи (в лв)</h3>
+          <h3 className="font-semibold text-slate-900">Активи (в €)</h3>
         </div>
         <div className="grid sm:grid-cols-2 gap-3">
           {[
@@ -219,7 +219,7 @@ export default function FinancialFlowStep({ data, onChange }) {
         </div>
         <div className="mt-3 pt-3 border-t border-slate-200 flex justify-between">
           <span className="text-sm font-medium">Общо активи:</span>
-          <span className="font-semibold text-blue-600">{totalAssets.toLocaleString()} лв</span>
+          <span className="font-semibold text-blue-600">{totalAssets.toLocaleString()} €</span>
         </div>
       </div>
 
@@ -227,7 +227,7 @@ export default function FinancialFlowStep({ data, onChange }) {
       <div className="bg-slate-50 rounded-xl p-6">
         <div className="flex items-center gap-2 mb-4">
           <CreditCard className="h-5 w-5 text-orange-500" />
-          <h3 className="font-semibold text-slate-900">Пасиви / Задължения (кредитно салдо, в лв)</h3>
+          <h3 className="font-semibold text-slate-900">Пасиви / Задължения (кредитно салдо, в €)</h3>
         </div>
         <div className="grid sm:grid-cols-2 gap-3">
           {[
@@ -246,7 +246,7 @@ export default function FinancialFlowStep({ data, onChange }) {
         </div>
         <div className="mt-3 pt-3 border-t border-slate-200 flex justify-between">
           <span className="text-sm font-medium">Общо задължения:</span>
-          <span className="font-semibold text-orange-600">{totalLiabilities.toLocaleString()} лв</span>
+          <span className="font-semibold text-orange-600">{totalLiabilities.toLocaleString()} €</span>
         </div>
       </div>
 
@@ -254,7 +254,7 @@ export default function FinancialFlowStep({ data, onChange }) {
       <div className="bg-slate-50 rounded-xl p-6">
         <div className="flex items-center gap-2 mb-4">
           <Shield className="h-5 w-5 text-purple-600" />
-          <h3 className="font-semibold text-slate-900">Застраховки (месечни вноски, в лв)</h3>
+          <h3 className="font-semibold text-slate-900">Застраховки (месечни вноски, в €)</h3>
         </div>
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
           {[
@@ -274,7 +274,7 @@ export default function FinancialFlowStep({ data, onChange }) {
         </div>
         <div className="mt-3 pt-3 border-t border-slate-200 flex justify-between">
           <span className="text-sm font-medium">Общо застраховки:</span>
-          <span className="font-semibold text-purple-600">{totalInsurance.toLocaleString()} лв</span>
+          <span className="font-semibold text-purple-600">{totalInsurance.toLocaleString()} €</span>
         </div>
       </div>
 
@@ -284,25 +284,25 @@ export default function FinancialFlowStep({ data, onChange }) {
         <div className="grid sm:grid-cols-2 gap-4">
           <div className="flex justify-between">
             <span>Общо доходи:</span>
-            <span className="font-semibold text-green-600">{totalMonthlyIncome.toLocaleString()} лв</span>
+            <span className="font-semibold text-green-600">{totalMonthlyIncome.toLocaleString()} €</span>
           </div>
           <div className="flex justify-between">
             <span>Общо разходи:</span>
-            <span className="font-semibold text-red-600">{totalExpenses.toLocaleString()} лв</span>
+            <span className="font-semibold text-red-600">{totalExpenses.toLocaleString()} €</span>
           </div>
           <div className="flex justify-between">
             <span>Имущество (активи):</span>
-            <span className="font-semibold text-blue-600">{totalAssets.toLocaleString()} лв</span>
+            <span className="font-semibold text-blue-600">{totalAssets.toLocaleString()} €</span>
           </div>
           <div className="flex justify-between">
             <span>Задължения:</span>
-            <span className="font-semibold text-orange-600">{totalLiabilities.toLocaleString()} лв</span>
+            <span className="font-semibold text-orange-600">{totalLiabilities.toLocaleString()} €</span>
           </div>
         </div>
         <div className="mt-4 pt-4 border-t border-blue-200 flex justify-between">
           <span className="font-semibold">Месечен баланс:</span>
           <span className={`font-bold text-lg ${(totalMonthlyIncome - totalExpenses - totalInsurance) >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-            {(totalMonthlyIncome - totalExpenses - totalInsurance).toLocaleString()} лв
+            {(totalMonthlyIncome - totalExpenses - totalInsurance).toLocaleString()} €
           </span>
         </div>
       </div>

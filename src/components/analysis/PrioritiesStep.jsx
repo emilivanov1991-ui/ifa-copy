@@ -65,7 +65,7 @@ export default function PrioritiesStep({ data, onChange }) {
 
         <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
           <div className="space-y-2">
-            <Label>Месечно фиксирани (лв)</Label>
+            <Label>Месечно фиксирани (€)</Label>
             <Input
               type="number"
               min="0"
@@ -76,7 +76,7 @@ export default function PrioritiesStep({ data, onChange }) {
             />
           </div>
           <div className="space-y-2">
-            <Label>Месечно променливи (лв)</Label>
+            <Label>Месечно променливи (€)</Label>
             <Input
               type="number"
               min="0"
@@ -87,7 +87,7 @@ export default function PrioritiesStep({ data, onChange }) {
             />
           </div>
           <div className="space-y-2">
-            <Label>Общо на месец (лв)</Label>
+            <Label>Общо на месец (€)</Label>
             <div className="h-10 px-3 py-2 bg-blue-100 border border-blue-200 rounded-lg flex items-center">
               <span className="font-semibold text-blue-700">
                 {((data.monthly_fixed_investment || 0) + (data.monthly_variable_investment || 0)).toLocaleString()}
@@ -95,7 +95,7 @@ export default function PrioritiesStep({ data, onChange }) {
             </div>
           </div>
           <div className="space-y-2">
-            <Label>Еднократно (лв)</Label>
+            <Label>Еднократно (€)</Label>
             <Input
               type="number"
               min="0"

@@ -27,7 +27,7 @@ export default function ProtectionStep({ data, onChange }) {
           <div className="flex items-center justify-between gap-4">
             <div className="flex items-center gap-2">
               <Building2 className="h-4 w-4 text-slate-500" />
-              <Label>Апартамент (стойност в лв)</Label>
+              <Label>Апартамент (стойност в €)</Label>
             </div>
             <Input
               type="number"
@@ -42,7 +42,7 @@ export default function ProtectionStep({ data, onChange }) {
           <div className="flex items-center justify-between gap-4">
             <div className="flex items-center gap-2">
               <Building2 className="h-4 w-4 text-slate-500" />
-              <Label>Къща (стойност в лв)</Label>
+              <Label>Къща (стойност в €)</Label>
             </div>
             <Input
               type="number"
@@ -57,7 +57,7 @@ export default function ProtectionStep({ data, onChange }) {
           <div className="flex items-center justify-between gap-4">
             <div className="flex items-center gap-2">
               <Car className="h-4 w-4 text-slate-500" />
-              <Label>Автомобил (стойност в лв)</Label>
+              <Label>Автомобил (стойност в €)</Label>
             </div>
             <Input
               type="number"
@@ -70,7 +70,7 @@ export default function ProtectionStep({ data, onChange }) {
           </div>
 
           <div className="flex items-center justify-between gap-4">
-            <Label>Друго имущество (лв)</Label>
+            <Label>Друго имущество (€)</Label>
             <Input
               type="number"
               min="0"

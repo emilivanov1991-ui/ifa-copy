@@ -119,7 +119,7 @@ export default function ChildrenGoalsStep({ data, onChange }) {
           <div className="pt-4 border-t border-slate-200">
             <div className="flex items-center justify-between">
               <span className="font-semibold text-slate-900">Общо:</span>
-              <span className="font-bold text-lg text-blue-600">{totalChildrenCosts.toLocaleString()} лв</span>
+              <span className="font-bold text-lg text-blue-600">{totalChildrenCosts.toLocaleString()} €</span>
             </div>
           </div>
         </div>

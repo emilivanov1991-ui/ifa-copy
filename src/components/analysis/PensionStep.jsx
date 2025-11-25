@@ -36,7 +36,7 @@ export default function PensionStep({ data, onChange }) {
                 />
               </div>
               <div className="space-y-2">
-                <Label>От каква месечна пенсия ще се нуждаете? (лв)</Label>
+                <Label>От каква месечна пенсия ще се нуждаете? (€)</Label>
                 <Input
                   type="number"
                   min="0"
@@ -47,7 +47,7 @@ export default function PensionStep({ data, onChange }) {
                 />
               </div>
               <div className="space-y-2">
-                <Label>Очаквана държавна пенсия (лв)</Label>
+                <Label>Очаквана държавна пенсия (€)</Label>
                 <Input
                   type="number"
                   min="0"
@@ -60,7 +60,7 @@ export default function PensionStep({ data, onChange }) {
               <div className="p-3 bg-blue-100 rounded-lg">
                 <p className="text-sm text-blue-800">
                   Разлика: <span className="font-semibold">
-                    {((data.client_desired_pension || 0) - (data.client_expected_state_pension || 0)).toLocaleString()} лв
+                    {((data.client_desired_pension || 0) - (data.client_expected_state_pension || 0)).toLocaleString()} €
                   </span>
                 </p>
               </div>
@@ -87,7 +87,7 @@ export default function PensionStep({ data, onChange }) {
                 />
               </div>
               <div className="space-y-2">
-                <Label>От каква месечна пенсия ще се нуждаете? (лв)</Label>
+                <Label>От каква месечна пенсия ще се нуждаете? (€)</Label>
                 <Input
                   type="number"
                   min="0"
@@ -98,7 +98,7 @@ export default function PensionStep({ data, onChange }) {
                 />
               </div>
               <div className="space-y-2">
-                <Label>Очаквана държавна пенсия (лв)</Label>
+                <Label>Очаквана държавна пенсия (€)</Label>
                 <Input
                   type="number"
                   min="0"
@@ -111,7 +111,7 @@ export default function PensionStep({ data, onChange }) {
               <div className="p-3 bg-blue-100 rounded-lg">
                 <p className="text-sm text-blue-800">
                   Разлика: <span className="font-semibold">
-                    {((data.partner_desired_pension || 0) - (data.partner_expected_state_pension || 0)).toLocaleString()} лв
+                    {((data.partner_desired_pension || 0) - (data.partner_expected_state_pension || 0)).toLocaleString()} €
                   </span>
                 </p>
               </div>

@@ -36,7 +36,7 @@ const steps = [
   { id: 3, title: 'Ново жилище', icon: Home },
   { id: 4, title: 'Резерв', icon: PiggyBank },
   { id: 5, title: 'Пенсия', icon: Umbrella },
-  { id: 6, title: 'Деца и цели', icon: Baby },
+  { id: 6, title: 'Деца и Други цели', icon: Baby },
   { id: 7, title: 'Защита', icon: Wallet },
   { id: 8, title: 'Финансов поток', icon: BarChart3 },
   { id: 9, title: 'Приоритети', icon: ListOrdered },

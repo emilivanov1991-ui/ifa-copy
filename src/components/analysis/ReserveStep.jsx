@@ -14,8 +14,41 @@ import { PiggyBank, User, Users, TrendingUp } from 'lucide-react';
 import { cn } from "@/lib/utils";
 
 export default function ReserveStep({ data, onChange }) {
+  // Calculate total monthly income
+  const clientMonthlyIncome = (data.client_net_income || 0) + (data.client_other_monthly_income || 0);
+  const partnerMonthlyIncome = data.include_partner ? ((data.partner_net_income || 0) + (data.partner_other_monthly_income || 0)) : 0;
+  const totalMonthlyIncome = clientMonthlyIncome + partnerMonthlyIncome;
+
+  // Calculate monthly expenses (income - savings)
+  const monthlySavings = data.monthly_savings_amount || 0;
+  const monthlyExpenses = totalMonthlyIncome - monthlySavings;
+
+  // Calculate total savings
+  const clientTotal = (data.client_checking_account || 0) + (data.client_term_deposit || 0) + 
+    (data.client_mutual_funds || 0) + (data.client_savings_account || 0) + (data.client_cash || 0) +
+    (data.client_crypto || 0) + (data.client_gold || 0);
+  const partnerTotal = data.include_partner ? ((data.partner_checking_account || 0) + (data.partner_term_deposit || 0) + 
+    (data.partner_mutual_funds || 0) + (data.partner_savings_account || 0) + (data.partner_cash || 0) +
+    (data.partner_crypto || 0) + (data.partner_gold || 0)) : 0;
+  const grandTotal = clientTotal + partnerTotal;
+
+  // Recommended reserve range (6 months expenses to 6 months income)
+  const recommendedMin = Math.round(monthlyExpenses * 6);
+  const recommendedMax = Math.round(totalMonthlyIncome * 6);
+
   return (
     <div className="space-y-8">
+      {/* Total Monthly Income */}
+      <div className="bg-slate-50 rounded-xl p-6">
+        <h3 className="font-semibold text-slate-900 mb-4">Общи средни месечни доходи:</h3>
+        <div className="text-2xl font-bold text-blue-600">
+          {totalMonthlyIncome.toLocaleString('bg-BG')} €
+        </div>
+        <div className="text-sm text-slate-500 mt-1">
+          {data.include_partner ? `Клиент: ${clientMonthlyIncome.toLocaleString('bg-BG')} € + Партньор: ${partnerMonthlyIncome.toLocaleString('bg-BG')} €` : `Клиент: ${clientMonthlyIncome.toLocaleString('bg-BG')} €`}
+        </div>
+      </div>
+
       {/* Savings Method */}
       <div className="bg-slate-50 rounded-xl p-6">
         <div className="flex items-center gap-2 mb-6">
@@ -57,11 +90,11 @@ export default function ReserveStep({ data, onChange }) {
         </div>
       </div>
 
-      {/* Current Savings */}
+      {/* Current Savings and Investments */}
       <div className="bg-slate-50 rounded-xl p-6">
-        <h3 className="font-semibold text-slate-900 mb-6">Текущи спестявания</h3>
+        <h3 className="font-semibold text-slate-900 mb-6">Текущи спестявания и инвестиции</h3>
 
-        <div className="grid lg:grid-cols-2 gap-8">
+        <div className={data.include_partner ? "grid lg:grid-cols-2 gap-8" : ""}>
           {/* Client */}
           <div>
             <div className="flex items-center gap-2 mb-4">
@@ -81,17 +114,6 @@ export default function ReserveStep({ data, onChange }) {
                 />
               </div>
               <div className="flex items-center justify-between gap-4">
-                <Label className="text-sm">Спестовна книжка</Label>
-                <Input
-                  type="number"
-                  min="0"
-                  placeholder="0"
-                  value={data.client_savings_book || ''}
-                  onChange={(e) => onChange('client_savings_book', parseInt(e.target.value) || '')}
-                  className="rounded-lg w-32"
-                />
-              </div>
-              <div className="flex items-center justify-between gap-4">
                 <Label className="text-sm">Срочен депозит</Label>
                 <Input
                   type="number"
@@ -103,7 +125,7 @@ export default function ReserveStep({ data, onChange }) {
                 />
               </div>
               <div className="flex items-center justify-between gap-4">
-                <Label className="text-sm">Взаимни фондове</Label>
+                <Label className="text-sm">Взаимни фондове, акции, облигации и др.</Label>
                 <Input
                   type="number"
                   min="0"
@@ -135,83 +157,126 @@ export default function ReserveStep({ data, onChange }) {
                   className="rounded-lg w-32"
                 />
               </div>
+              <div className="flex items-center justify-between gap-4">
+                <Label className="text-sm">Криптовалути</Label>
+                <Input
+                  type="number"
+                  min="0"
+                  placeholder="0"
+                  value={data.client_crypto || ''}
+                  onChange={(e) => onChange('client_crypto', parseInt(e.target.value) || '')}
+                  className="rounded-lg w-32"
+                />
+              </div>
+              <div className="flex items-center justify-between gap-4">
+                <Label className="text-sm">Злато и др.</Label>
+                <Input
+                  type="number"
+                  min="0"
+                  placeholder="0"
+                  value={data.client_gold || ''}
+                  onChange={(e) => onChange('client_gold', parseInt(e.target.value) || '')}
+                  className="rounded-lg w-32"
+                />
+              </div>
             </div>
           </div>
 
-          {/* Partner */}
-          <div>
-            <div className="flex items-center gap-2 mb-4">
-              <Users className="h-4 w-4 text-slate-500" />
-              <span className="font-medium text-slate-700">Партньор (€)</span>
+          {/* Partner - only show if included */}
+          {data.include_partner && (
+            <div>
+              <div className="flex items-center gap-2 mb-4">
+                <Users className="h-4 w-4 text-slate-500" />
+                <span className="font-medium text-slate-700">Партньор (€)</span>
+              </div>
+              <div className="space-y-3">
+                <div className="flex items-center justify-between gap-4">
+                  <Label className="text-sm">Разплащателна сметка</Label>
+                  <Input
+                    type="number"
+                    min="0"
+                    placeholder="0"
+                    value={data.partner_checking_account || ''}
+                    onChange={(e) => onChange('partner_checking_account', parseInt(e.target.value) || '')}
+                    className="rounded-lg w-32"
+                  />
+                </div>
+                <div className="flex items-center justify-between gap-4">
+                  <Label className="text-sm">Срочен депозит</Label>
+                  <Input
+                    type="number"
+                    min="0"
+                    placeholder="0"
+                    value={data.partner_term_deposit || ''}
+                    onChange={(e) => onChange('partner_term_deposit', parseInt(e.target.value) || '')}
+                    className="rounded-lg w-32"
+                  />
+                </div>
+                <div className="flex items-center justify-between gap-4">
+                  <Label className="text-sm">Взаимни фондове, акции, облигации и др.</Label>
+                  <Input
+                    type="number"
+                    min="0"
+                    placeholder="0"
+                    value={data.partner_mutual_funds || ''}
+                    onChange={(e) => onChange('partner_mutual_funds', parseInt(e.target.value) || '')}
+                    className="rounded-lg w-32"
+                  />
+                </div>
+                <div className="flex items-center justify-between gap-4">
+                  <Label className="text-sm">Спестовна сметка</Label>
+                  <Input
+                    type="number"
+                    min="0"
+                    placeholder="0"
+                    value={data.partner_savings_account || ''}
+                    onChange={(e) => onChange('partner_savings_account', parseInt(e.target.value) || '')}
+                    className="rounded-lg w-32"
+                  />
+                </div>
+                <div className="flex items-center justify-between gap-4">
+                  <Label className="text-sm">Пари в брой</Label>
+                  <Input
+                    type="number"
+                    min="0"
+                    placeholder="0"
+                    value={data.partner_cash || ''}
+                    onChange={(e) => onChange('partner_cash', parseInt(e.target.value) || '')}
+                    className="rounded-lg w-32"
+                  />
+                </div>
+                <div className="flex items-center justify-between gap-4">
+                  <Label className="text-sm">Криптовалути</Label>
+                  <Input
+                    type="number"
+                    min="0"
+                    placeholder="0"
+                    value={data.partner_crypto || ''}
+                    onChange={(e) => onChange('partner_crypto', parseInt(e.target.value) || '')}
+                    className="rounded-lg w-32"
+                  />
+                </div>
+                <div className="flex items-center justify-between gap-4">
+                  <Label className="text-sm">Злато и др.</Label>
+                  <Input
+                    type="number"
+                    min="0"
+                    placeholder="0"
+                    value={data.partner_gold || ''}
+                    onChange={(e) => onChange('partner_gold', parseInt(e.target.value) || '')}
+                    className="rounded-lg w-32"
+                  />
+                </div>
+              </div>
             </div>
-            <div className="space-y-3">
-              <div className="flex items-center justify-between gap-4">
-                <Label className="text-sm">Разплащателна сметка</Label>
-                <Input
-                  type="number"
-                  min="0"
-                  placeholder="0"
-                  value={data.partner_checking_account || ''}
-                  onChange={(e) => onChange('partner_checking_account', parseInt(e.target.value) || '')}
-                  className="rounded-lg w-32"
-                />
-              </div>
-              <div className="flex items-center justify-between gap-4">
-                <Label className="text-sm">Спестовна книжка</Label>
-                <Input
-                  type="number"
-                  min="0"
-                  placeholder="0"
-                  value={data.partner_savings_book || ''}
-                  onChange={(e) => onChange('partner_savings_book', parseInt(e.target.value) || '')}
-                  className="rounded-lg w-32"
-                />
-              </div>
-              <div className="flex items-center justify-between gap-4">
-                <Label className="text-sm">Срочен депозит</Label>
-                <Input
-                  type="number"
-                  min="0"
-                  placeholder="0"
-                  value={data.partner_term_deposit || ''}
-                  onChange={(e) => onChange('partner_term_deposit', parseInt(e.target.value) || '')}
-                  className="rounded-lg w-32"
-                />
-              </div>
-              <div className="flex items-center justify-between gap-4">
-                <Label className="text-sm">Взаимни фондове</Label>
-                <Input
-                  type="number"
-                  min="0"
-                  placeholder="0"
-                  value={data.partner_mutual_funds || ''}
-                  onChange={(e) => onChange('partner_mutual_funds', parseInt(e.target.value) || '')}
-                  className="rounded-lg w-32"
-                />
-              </div>
-              <div className="flex items-center justify-between gap-4">
-                <Label className="text-sm">Спестовна сметка</Label>
-                <Input
-                  type="number"
-                  min="0"
-                  placeholder="0"
-                  value={data.partner_savings_account || ''}
-                  onChange={(e) => onChange('partner_savings_account', parseInt(e.target.value) || '')}
-                  className="rounded-lg w-32"
-                />
-              </div>
-              <div className="flex items-center justify-between gap-4">
-                <Label className="text-sm">Пари в брой</Label>
-                <Input
-                  type="number"
-                  min="0"
-                  placeholder="0"
-                  value={data.partner_cash || ''}
-                  onChange={(e) => onChange('partner_cash', parseInt(e.target.value) || '')}
-                  className="rounded-lg w-32"
-                />
-              </div>
-            </div>
+          )}
+        </div>
+
+        {/* Grand Total */}
+        <div className="mt-6 pt-6 border-t border-slate-200">
+          <div className="flex items-center justify-between">
+            <span className="font-semibold text-slate-900">Общ сбор на спестявания и инвестиции:</span>
+            <span className="text-2xl font-bold text-blue-600">{grandTotal.toLocaleString('bg-BG')} €</span>
           </div>
         </div>
       </div>
@@ -221,30 +286,28 @@ export default function ReserveStep({ data, onChange }) {
         <h3 className="font-semibold text-slate-900 mb-4">Какъв размер на резерва е достатъчен според Вас?</h3>
         <div className="space-y-4">
           <div className="space-y-2">
-            <Label>Защитен резерв (брой месечни доходи)</Label>
-            <Select 
-              value={data.desired_reserve_months?.toString() || ''} 
-              onValueChange={(value) => onChange('desired_reserve_months', parseInt(value))}
-            >
-              <SelectTrigger className="rounded-lg">
-                <SelectValue placeholder="Изберете" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="3">3 месеца</SelectItem>
-                <SelectItem value="6">6 месеца (препоръчително)</SelectItem>
-                <SelectItem value="9">9 месеца</SelectItem>
-                <SelectItem value="12">12 месеца</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-
-          <div className="flex items-center justify-between">
-            <Label className="cursor-pointer">Интересувате ли се от по-добра възможност за създаване на резерв?</Label>
-            <Switch
-              checked={data.interest_in_better_savings || false}
-              onCheckedChange={(checked) => onChange('interest_in_better_savings', checked)}
+            <Label>Желан размер на резерва (€)</Label>
+            <Input
+              type="number"
+              min="0"
+              placeholder="0"
+              value={data.desired_reserve_amount || ''}
+              onChange={(e) => onChange('desired_reserve_amount', parseInt(e.target.value) || '')}
+              className="rounded-lg w-48"
             />
           </div>
+
+          {data.desired_reserve_amount > 0 && totalMonthlyIncome > 0 && (
+            <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg">
+              <span className="text-blue-700 font-medium">Препоръчителният резерв за Вас е: </span>
+              <span className="text-blue-800 font-bold">
+                {recommendedMin.toLocaleString('bg-BG')} € - {recommendedMax.toLocaleString('bg-BG')} €
+              </span>
+              <p className="text-blue-600 text-sm mt-1">
+                (между 6 месечни разходи и 6 месечни доходи)
+              </p>
+            </div>
+          )}
         </div>
       </div>
 

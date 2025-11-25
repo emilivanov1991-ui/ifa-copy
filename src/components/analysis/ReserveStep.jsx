@@ -458,17 +458,17 @@ export default function ReserveStep({ data, onChange }) {
 
             {/* Diversification Messages */}
             {(() => {
-              const cons = data.conservative_percent ?? 0;
-              const mod = data.moderate_percent ?? 0;
-              const dyn = data.dynamic_percent ?? 0;
-              const agg = data.aggressive_percent ?? 0;
+              const cons = data.conservative_percent || 0;
+              const mod = data.moderate_percent || 0;
+              const dyn = data.dynamic_percent || 0;
+              const agg = data.aggressive_percent || 0;
               const total = cons + mod + dyn + agg;
               
-              // Only show messages if all 4 fields are filled (including 0)
-              const allFilled = (data.conservative_percent !== undefined && data.conservative_percent !== '') &&
-                               (data.moderate_percent !== undefined && data.moderate_percent !== '') &&
-                               (data.dynamic_percent !== undefined && data.dynamic_percent !== '') &&
-                               (data.aggressive_percent !== undefined && data.aggressive_percent !== '');
+              // Only show messages if all 4 fields are filled
+              const allFilled = data.conservative_percent !== undefined && data.conservative_percent !== '' &&
+                               data.moderate_percent !== undefined && data.moderate_percent !== '' &&
+                               data.dynamic_percent !== undefined && data.dynamic_percent !== '' &&
+                               data.aggressive_percent !== undefined && data.aggressive_percent !== '';
               
               if (allFilled) {
                 if (total !== 100) {

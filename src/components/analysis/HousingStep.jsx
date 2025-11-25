@@ -506,6 +506,180 @@ export default function HousingStep({ data, onChange }) {
         </div>
       </div>
 
+      {/* Birthday Example Section */}
+      <div className="bg-slate-50 rounded-xl p-6">
+        <div className="flex items-center justify-between mb-4">
+          <h3 className="font-semibold text-slate-900">Пример с Рожден Ден</h3>
+          <Switch
+            checked={data.birthday_example_enabled || false}
+            onCheckedChange={(checked) => onChange('birthday_example_enabled', checked)}
+          />
+        </div>
+
+        {data.birthday_example_enabled && (
+          <div className="space-y-6">
+            {/* Display birthdays */}
+            <div className="p-4 bg-white rounded-lg border border-slate-200">
+              <Label className="text-slate-700 mb-2 block">Рожден ден:</Label>
+              <div className="flex flex-wrap gap-4 text-slate-600">
+                {data.client_birthdate && (
+                  <span>Клиент: {new Date(data.client_birthdate).toLocaleDateString('bg-BG', { day: 'numeric', month: 'long' })}</span>
+                )}
+                {data.include_partner && data.partner_birthdate && (
+                  <span>Партньор: {new Date(data.partner_birthdate).toLocaleDateString('bg-BG', { day: 'numeric', month: 'long' })}</span>
+                )}
+              </div>
+            </div>
+
+            {/* Question 1: Where would you celebrate */}
+            <div className="space-y-3">
+              <Label className="text-slate-700">
+                Представете си, че днес е {data.client_birthdate ? new Date(data.client_birthdate).toLocaleDateString('bg-BG', { day: 'numeric', month: 'long' }) : '(вашият рожден ден)'}{data.include_partner && data.partner_birthdate ? ` / ${new Date(data.partner_birthdate).toLocaleDateString('bg-BG', { day: 'numeric', month: 'long' })}` : ''} и <span className="font-bold">имате неограничен бюджет</span>! Къде бихте празнували своя рожен ден?
+              </Label>
+              <Input
+                placeholder="Опишете мястото..."
+                value={data.birthday_celebration_place || ''}
+                onChange={(e) => onChange('birthday_celebration_place', e.target.value)}
+                className="rounded-lg"
+              />
+            </div>
+
+            {/* Question 2: How many people - only show if place is filled */}
+            {data.birthday_celebration_place && (
+              <div className="space-y-3">
+                <Label className="text-slate-700">
+                  Представете си, че е {data.client_birthdate ? new Date(data.client_birthdate).toLocaleDateString('bg-BG', { day: 'numeric', month: 'long' }) : '(вашият рожден ден)'}{data.include_partner && data.partner_birthdate ? ` / ${new Date(data.partner_birthdate).toLocaleDateString('bg-BG', { day: 'numeric', month: 'long' })}` : ''}, <span className="font-bold">имате неограничен бюджет и организирате едно голямо парти. Колко човека бихте поканили на едно такова голямо парти?</span>
+                </Label>
+                <Input
+                  type="number"
+                  min="0"
+                  placeholder="Брой гости"
+                  value={data.birthday_party_guests_total || ''}
+                  onChange={(e) => onChange('birthday_party_guests_total', parseInt(e.target.value) || '')}
+                  className="rounded-lg w-48"
+                />
+              </div>
+            )}
+
+            {/* Question 3: Categories breakdown - only show if total guests is filled */}
+            {data.birthday_party_guests_total > 0 && (
+              <div className="space-y-4">
+                <Label className="text-slate-700">
+                  Колко от тези {data.birthday_party_guests_total} биха били Семейство, Приятели, Колеги?
+                </Label>
+                
+                <div className="grid sm:grid-cols-3 gap-4">
+                  <div className="space-y-2">
+                    <Label className="text-sm">Семейство</Label>
+                    <Input
+                      type="number"
+                      min="0"
+                      placeholder="0"
+                      value={data.birthday_guests_family || ''}
+                      onChange={(e) => onChange('birthday_guests_family', parseInt(e.target.value) || '')}
+                      className="rounded-lg"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label className="text-sm">Приятели</Label>
+                    <Input
+                      type="number"
+                      min="0"
+                      placeholder="0"
+                      value={data.birthday_guests_friends || ''}
+                      onChange={(e) => onChange('birthday_guests_friends', parseInt(e.target.value) || '')}
+                      className="rounded-lg"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label className="text-sm">Колеги</Label>
+                    <Input
+                      type="number"
+                      min="0"
+                      placeholder="0"
+                      value={data.birthday_guests_colleagues || ''}
+                      onChange={(e) => onChange('birthday_guests_colleagues', parseInt(e.target.value) || '')}
+                      className="rounded-lg"
+                    />
+                  </div>
+                </div>
+
+                {/* Name fields for each category */}
+                {(data.birthday_guests_family > 0 || data.birthday_guests_friends > 0 || data.birthday_guests_colleagues > 0) && (
+                  <div className="space-y-6 mt-6 pt-6 border-t border-slate-200">
+                    {/* Family names */}
+                    {data.birthday_guests_family > 0 && (
+                      <div className="space-y-3">
+                        <Label className="text-slate-700 font-medium">Имена на Семейство ({data.birthday_guests_family})</Label>
+                        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                          {Array.from({ length: data.birthday_guests_family }).map((_, index) => (
+                            <Input
+                              key={`family_${index}`}
+                              placeholder={`Семейство ${index + 1}`}
+                              value={(data.birthday_family_names || [])[index] || ''}
+                              onChange={(e) => {
+                                const newNames = [...(data.birthday_family_names || [])];
+                                newNames[index] = e.target.value;
+                                onChange('birthday_family_names', newNames);
+                              }}
+                              className="rounded-lg"
+                            />
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Friends names */}
+                    {data.birthday_guests_friends > 0 && (
+                      <div className="space-y-3">
+                        <Label className="text-slate-700 font-medium">Имена на Приятели ({data.birthday_guests_friends})</Label>
+                        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                          {Array.from({ length: data.birthday_guests_friends }).map((_, index) => (
+                            <Input
+                              key={`friends_${index}`}
+                              placeholder={`Приятел ${index + 1}`}
+                              value={(data.birthday_friends_names || [])[index] || ''}
+                              onChange={(e) => {
+                                const newNames = [...(data.birthday_friends_names || [])];
+                                newNames[index] = e.target.value;
+                                onChange('birthday_friends_names', newNames);
+                              }}
+                              className="rounded-lg"
+                            />
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Colleagues names */}
+                    {data.birthday_guests_colleagues > 0 && (
+                      <div className="space-y-3">
+                        <Label className="text-slate-700 font-medium">Имена на Колеги ({data.birthday_guests_colleagues})</Label>
+                        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                          {Array.from({ length: data.birthday_guests_colleagues }).map((_, index) => (
+                            <Input
+                              key={`colleagues_${index}`}
+                              placeholder={`Колега ${index + 1}`}
+                              value={(data.birthday_colleagues_names || [])[index] || ''}
+                              onChange={(e) => {
+                                const newNames = [...(data.birthday_colleagues_names || [])];
+                                newNames[index] = e.target.value;
+                                onChange('birthday_colleagues_names', newNames);
+                              }}
+                              className="rounded-lg"
+                            />
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+        )}
+      </div>
+
       {/* Include in plan */}
       <label className="flex items-center gap-3 p-4 rounded-xl border-2 border-blue-200 bg-blue-50 cursor-pointer">
         <Checkbox

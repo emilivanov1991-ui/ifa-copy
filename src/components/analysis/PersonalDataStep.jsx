@@ -90,24 +90,16 @@ export default function PersonalDataStep({ data, onChange }) {
             <Input
               type="text"
               placeholder="дд.мм.гггг"
-              value={data.client_birthdate ? new Date(data.client_birthdate).toLocaleDateString('bg-BG') : ''}
-              onChange={(e) => {
-                const val = e.target.value;
-                const parts = val.split('.');
-                if (parts.length === 3 && parts[0].length <= 2 && parts[1].length <= 2 && parts[2].length === 4) {
-                  const date = new Date(`${parts[2]}-${parts[1].padStart(2, '0')}-${parts[0].padStart(2, '0')}`);
-                  if (!isNaN(date.getTime())) {
-                    onChange('client_birthdate', `${parts[2]}-${parts[1].padStart(2, '0')}-${parts[0].padStart(2, '0')}`);
-                  }
-                }
-              }}
+              value={data.client_birthdate_input !== undefined ? data.client_birthdate_input : (data.client_birthdate ? new Date(data.client_birthdate).toLocaleDateString('bg-BG') : '')}
+              onChange={(e) => onChange('client_birthdate_input', e.target.value)}
               onBlur={(e) => {
                 const val = e.target.value;
                 const parts = val.split('.');
-                if (parts.length === 3) {
+                if (parts.length === 3 && parts[0] && parts[1] && parts[2]) {
                   const date = new Date(`${parts[2]}-${parts[1].padStart(2, '0')}-${parts[0].padStart(2, '0')}`);
                   if (!isNaN(date.getTime())) {
                     onChange('client_birthdate', `${parts[2]}-${parts[1].padStart(2, '0')}-${parts[0].padStart(2, '0')}`);
+                    onChange('client_birthdate_input', undefined);
                   }
                 }
               }}
@@ -434,14 +426,16 @@ export default function PersonalDataStep({ data, onChange }) {
                 <Input
                   type="text"
                   placeholder="дд.мм.гггг"
-                  value={data.partner_birthdate ? new Date(data.partner_birthdate).toLocaleDateString('bg-BG') : ''}
-                  onChange={(e) => {
+                  value={data.partner_birthdate_input !== undefined ? data.partner_birthdate_input : (data.partner_birthdate ? new Date(data.partner_birthdate).toLocaleDateString('bg-BG') : '')}
+                  onChange={(e) => onChange('partner_birthdate_input', e.target.value)}
+                  onBlur={(e) => {
                     const val = e.target.value;
                     const parts = val.split('.');
-                    if (parts.length === 3 && parts[0].length <= 2 && parts[1].length <= 2 && parts[2].length === 4) {
+                    if (parts.length === 3 && parts[0] && parts[1] && parts[2]) {
                       const date = new Date(`${parts[2]}-${parts[1].padStart(2, '0')}-${parts[0].padStart(2, '0')}`);
                       if (!isNaN(date.getTime())) {
                         onChange('partner_birthdate', `${parts[2]}-${parts[1].padStart(2, '0')}-${parts[0].padStart(2, '0')}`);
+                        onChange('partner_birthdate_input', undefined);
                       }
                     }
                   }}
@@ -758,14 +752,16 @@ export default function PersonalDataStep({ data, onChange }) {
                     <Input
                       type="text"
                       placeholder="дд.мм.гггг"
-                      value={data[`child_${index + 1}_birthdate`] ? new Date(data[`child_${index + 1}_birthdate`]).toLocaleDateString('bg-BG') : ''}
-                      onChange={(e) => {
+                      value={data[`child_${index + 1}_birthdate_input`] !== undefined ? data[`child_${index + 1}_birthdate_input`] : (data[`child_${index + 1}_birthdate`] ? new Date(data[`child_${index + 1}_birthdate`]).toLocaleDateString('bg-BG') : '')}
+                      onChange={(e) => onChange(`child_${index + 1}_birthdate_input`, e.target.value)}
+                      onBlur={(e) => {
                         const val = e.target.value;
                         const parts = val.split('.');
-                        if (parts.length === 3 && parts[0].length <= 2 && parts[1].length <= 2 && parts[2].length === 4) {
+                        if (parts.length === 3 && parts[0] && parts[1] && parts[2]) {
                           const date = new Date(`${parts[2]}-${parts[1].padStart(2, '0')}-${parts[0].padStart(2, '0')}`);
                           if (!isNaN(date.getTime())) {
                             onChange(`child_${index + 1}_birthdate`, `${parts[2]}-${parts[1].padStart(2, '0')}-${parts[0].padStart(2, '0')}`);
+                            onChange(`child_${index + 1}_birthdate_input`, undefined);
                           }
                         }
                       }}

@@ -14,10 +14,8 @@ import { PiggyBank, User, Users, TrendingUp } from 'lucide-react';
 import { cn } from "@/lib/utils";
 
 export default function ReserveStep({ data, onChange }) {
-  // Calculate total monthly income
-  const clientMonthlyIncome = (data.client_net_income || 0) + (data.client_other_monthly_income || 0);
-  const partnerMonthlyIncome = data.include_partner ? ((data.partner_net_income || 0) + (data.partner_other_monthly_income || 0)) : 0;
-  const totalMonthlyIncome = clientMonthlyIncome + partnerMonthlyIncome;
+  // Get total monthly income from input
+  const totalMonthlyIncome = data.total_monthly_income || 0;
 
   // Calculate monthly expenses (income - savings)
   const monthlySavings = data.monthly_savings_amount || 0;
@@ -41,11 +39,16 @@ export default function ReserveStep({ data, onChange }) {
       {/* Total Monthly Income */}
       <div className="bg-slate-50 rounded-xl p-6">
         <h3 className="font-semibold text-slate-900 mb-4">Общи средни месечни доходи:</h3>
-        <div className="text-2xl font-bold text-blue-600">
-          {totalMonthlyIncome.toLocaleString('bg-BG')} €
-        </div>
-        <div className="text-sm text-slate-500 mt-1">
-          {data.include_partner ? `Клиент: ${clientMonthlyIncome.toLocaleString('bg-BG')} € + Партньор: ${partnerMonthlyIncome.toLocaleString('bg-BG')} €` : `Клиент: ${clientMonthlyIncome.toLocaleString('bg-BG')} €`}
+        <div className="space-y-2">
+          <Input
+            type="number"
+            min="0"
+            placeholder="0"
+            value={data.total_monthly_income || ''}
+            onChange={(e) => onChange('total_monthly_income', parseInt(e.target.value) || '')}
+            className="rounded-lg w-48 text-lg font-semibold"
+          />
+          <span className="text-slate-500 ml-2">€</span>
         </div>
       </div>
 

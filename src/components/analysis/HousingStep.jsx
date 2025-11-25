@@ -345,13 +345,13 @@ export default function HousingStep({ data, onChange }) {
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="cash">Пари в брой</SelectItem>
-                  <SelectItem value="loan">Заем / Кредит</SelectItem>
                   <SelectItem value="cash_and_loan">Пари в брой + заем / кредит</SelectItem>
                 </SelectContent>
               </Select>
             </div>
 
-            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            {/* Show only cash field for cash method, full form for cash_and_loan */}
+            {data.financing_method === 'cash' ? (
               <div className="space-y-2">
                 <Label>Наличност в брой (€)</Label>
                 <Input
@@ -363,78 +363,94 @@ export default function HousingStep({ data, onChange }) {
                   className="rounded-lg"
                 />
               </div>
-              <div className="space-y-2">
-                <Label>Размер на заема (€) - автоматично</Label>
-                <Input
-                  type="number"
-                  min="0"
-                  value={calculatedLoanAmount}
-                  readOnly
-                  className="rounded-lg bg-slate-100"
-                />
-              </div>
-              <div className="space-y-2">
-                <Label>Лихвен процент (%)</Label>
-                <Select 
-                  value={(data.loan_interest_rate || 3).toString()} 
-                  onValueChange={(value) => onChange('loan_interest_rate', parseFloat(value))}
-                >
-                  <SelectTrigger className="rounded-lg">
-                    <SelectValue placeholder="3%" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {interestRateOptions.map((rate) => (
-                      <SelectItem key={rate} value={rate.toString()}>{rate}%</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-              <div className="space-y-2">
-                <Label>Срок на изплащане (години)</Label>
-                <Input
-                  type="number"
-                  min="1"
-                  max="35"
-                  placeholder="25"
-                  value={data.loan_term_years || ''}
-                  onChange={(e) => onChange('loan_term_years', parseInt(e.target.value) || '')}
-                  className="rounded-lg"
-                />
-              </div>
-              <div className="space-y-2">
-                <Label>Очаквана месечна вноска (€) - автоматично</Label>
-                <Input
-                  type="number"
-                  min="0"
-                  value={calculatedMonthlyPayment}
-                  readOnly
-                  className="rounded-lg bg-slate-100"
-                />
-              </div>
-              <div className="space-y-2">
-                <Label>Общо надплащане (€) - автоматично</Label>
-                <Input
-                  type="number"
-                  min="0"
-                  value={totalOverpayment}
-                  readOnly
-                  className="rounded-lg bg-slate-100"
-                />
-              </div>
-            </div>
-
-            {/* Savings highlight */}
-            {totalOverpayment > 0 && (
-              <div className="mt-4 p-4 bg-green-50 border border-green-200 rounded-lg">
-                <div className="flex items-center gap-2">
-                  <span className="text-green-700 font-medium">Можем да спестим между:</span>
-                  <span className="text-green-800 font-bold text-lg">{potentialSavingsMin.toLocaleString('bg-BG')} € - {potentialSavingsMax.toLocaleString('bg-BG')} €</span>
+            ) : data.financing_method === 'cash_and_loan' ? (
+              <>
+                <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                  <div className="space-y-2">
+                    <Label>Наличност в брой (€)</Label>
+                    <Input
+                      type="number"
+                      min="0"
+                      placeholder="50000"
+                      value={data.available_cash || ''}
+                      onChange={(e) => onChange('available_cash', parseInt(e.target.value) || '')}
+                      className="rounded-lg"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Размер на заема (€) - автоматично</Label>
+                    <Input
+                      type="number"
+                      min="0"
+                      value={calculatedLoanAmount}
+                      readOnly
+                      className="rounded-lg bg-slate-100"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Лихвен процент (%)</Label>
+                    <Select 
+                      value={(data.loan_interest_rate || 3).toString()} 
+                      onValueChange={(value) => onChange('loan_interest_rate', parseFloat(value))}
+                    >
+                      <SelectTrigger className="rounded-lg">
+                        <SelectValue placeholder="3%" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {interestRateOptions.map((rate) => (
+                          <SelectItem key={rate} value={rate.toString()}>{rate}%</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Срок на изплащане (години)</Label>
+                    <Input
+                      type="number"
+                      min="1"
+                      max="35"
+                      placeholder="25"
+                      value={data.loan_term_years || ''}
+                      onChange={(e) => onChange('loan_term_years', parseInt(e.target.value) || '')}
+                      className="rounded-lg"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Очаквана месечна вноска (€) - автоматично</Label>
+                    <Input
+                      type="number"
+                      min="0"
+                      value={calculatedMonthlyPayment}
+                      readOnly
+                      className="rounded-lg bg-slate-100"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Общо надплащане (€) - автоматично</Label>
+                    <Input
+                      type="number"
+                      min="0"
+                      value={totalOverpayment}
+                      readOnly
+                      className="rounded-lg bg-slate-100"
+                    />
+                  </div>
                 </div>
-                <p className="text-green-600 text-sm mt-1">
-                  Това е между 30% и 40% от общото надплащане по кредита. Това постигаме, чрез преференциални кредитни условия, по-изгодно застраховане и ефективен Инвестиционно-погасителен план.
-                </p>
-              </div>
-            )}
+
+                {/* Savings highlight */}
+                {totalOverpayment > 0 && (
+                  <div className="mt-4 p-4 bg-green-50 border border-green-200 rounded-lg">
+                    <div className="flex items-center gap-2">
+                      <span className="text-green-700 font-medium">Можем да спестим между:</span>
+                      <span className="text-green-800 font-bold text-lg">{potentialSavingsMin.toLocaleString('bg-BG')} € - {potentialSavingsMax.toLocaleString('bg-BG')} €</span>
+                    </div>
+                    <p className="text-green-600 text-sm mt-1">
+                      Това е между 30% и 40% от общото надплащане по кредита. Това постигаме, чрез преференциални кредитни условия, по-изгодно застраховане и ефективен Инвестиционно-погасителен план.
+                    </p>
+                  </div>
+                )}
+              </>
+            ) : null}
           </div>
         </div>
       )}

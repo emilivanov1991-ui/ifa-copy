@@ -25,10 +25,10 @@ import { Link } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
 
 import ConsultantDashboard from '@/components/consultant/ConsultantDashboard';
-import ConsultantCRM from '@/components/consultant/ConsultantCRM';
+import ConsultantCRMAdvanced from '@/components/consultant/ConsultantCRMAdvanced';
 import ConsultantStatistics from '@/components/consultant/ConsultantStatistics';
-import ConsultantCommissions from '@/components/consultant/ConsultantCommissions';
-import ConsultantElearning from '@/components/consultant/ConsultantElearning';
+import ConsultantReports from '@/components/consultant/ConsultantReports';
+import ConsultantElearningAdvanced from '@/components/consultant/ConsultantElearningAdvanced';
 import ConsultantCalendar from '@/components/consultant/ConsultantCalendar';
 import ConsultantMail from '@/components/consultant/ConsultantMail';
 
@@ -37,7 +37,7 @@ const menuItems = [
   { id: 'crm', label: 'CRM / Клиенти', icon: Users },
   { id: 'analysis', label: 'Финансов анализ', icon: FileText },
   { id: 'statistics', label: 'Статистики', icon: BarChart3 },
-  { id: 'commissions', label: 'Комисионни', icon: DollarSign },
+  { id: 'reports', label: 'Отчети', icon: DollarSign },
   { id: 'elearning', label: 'E-Learning', icon: GraduationCap },
   { id: 'calendar', label: 'Календар', icon: Calendar },
   { id: 'mail', label: 'Съобщения', icon: Mail },
@@ -104,7 +104,7 @@ export default function ConsultantPortal() {
         {/* Content */}
         <div className="space-y-6">
           {activeTab === 'dashboard' && <ConsultantDashboard onNavigate={setActiveTab} />}
-          {activeTab === 'crm' && <ConsultantCRM />}
+          {activeTab === 'crm' && <ConsultantCRMAdvanced />}
           {activeTab === 'analysis' && (
             <Card>
               <CardHeader>
@@ -131,8 +131,8 @@ export default function ConsultantPortal() {
             </Card>
           )}
           {activeTab === 'statistics' && <ConsultantStatistics />}
-          {activeTab === 'commissions' && <ConsultantCommissions />}
-          {activeTab === 'elearning' && <ConsultantElearning />}
+          {activeTab === 'reports' && <ConsultantReports />}
+          {activeTab === 'elearning' && <ConsultantElearningAdvanced />}
           {activeTab === 'calendar' && <ConsultantCalendar />}
           {activeTab === 'mail' && <ConsultantMail />}
         </div>

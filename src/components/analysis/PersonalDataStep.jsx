@@ -110,8 +110,6 @@ const validateIDNumber = (idNumber) => {
 
 // Toggle button component with yes/no indicator
 const ToggleWithLabel = ({ checked, onChange, defaultYes = false }) => {
-  // For defaultYes=true (like employment): Yes=green, No=red
-  // For defaultYes=false (like PEP): No=green, Yes=red
   if (defaultYes) {
     return (
       <div className="flex items-center gap-3">
@@ -125,7 +123,6 @@ const ToggleWithLabel = ({ checked, onChange, defaultYes = false }) => {
       </div>
     );
   }
-  // defaultYes=false (like PEP): No=green, Yes=red
   return (
     <div className="flex items-center gap-3">
       <span className={`text-sm font-medium ${!checked ? 'text-green-600' : 'text-slate-400'}`}>Не</span>
@@ -140,8 +137,7 @@ const ToggleWithLabel = ({ checked, onChange, defaultYes = false }) => {
 };
 
 export default function PersonalDataStep({ data, onChange, showErrors }) {
-  // Helper to check if a field is invalid - only show errors when showErrors is true
-  const isFieldInvalid = (value) => showErrors && (value === undefined || value === '' || value === null);
+  const isInv = (value) => showErrors && (value === undefined || value === '' || value === null);
   const [showDisclaimer, setShowDisclaimer] = useState(true);
 
   // Initialize defaults
@@ -210,61 +206,31 @@ export default function PersonalDataStep({ data, onChange, showErrors }) {
         
         {/* Personal Info */}
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
-          <div className="space-y-2" data-invalid={isFieldInvalid(data.client_first_name) ? "true" : undefined}>
+          <div className="space-y-2" data-invalid={isInv(data.client_first_name) ? "true" : undefined}>
             <Label>Име <span className="text-red-500">*</span></Label>
-            <Input
-              value={data.client_first_name || ''}
-              onChange={(e) => onChange('client_first_name', e.target.value)}
-              className={`rounded-lg ${isFieldInvalid(data.client_first_name) ? 'border-red-500 bg-red-50' : ''}`}
-              required
-            />
+            <Input value={data.client_first_name || ''} onChange={(e) => onChange('client_first_name', e.target.value)} className={`rounded-lg ${isInv(data.client_first_name) ? 'border-red-500 bg-red-50' : ''}`} required />
           </div>
-          <div className="space-y-2" data-invalid={isFieldInvalid(data.client_middle_name) ? "true" : undefined}>
+          <div className="space-y-2" data-invalid={isInv(data.client_middle_name) ? "true" : undefined}>
             <Label>Презиме <span className="text-red-500">*</span></Label>
-            <Input
-              value={data.client_middle_name || ''}
-              onChange={(e) => onChange('client_middle_name', e.target.value)}
-              className={`rounded-lg ${isFieldInvalid(data.client_middle_name) ? 'border-red-500 bg-red-50' : ''}`}
-              required
-            />
+            <Input value={data.client_middle_name || ''} onChange={(e) => onChange('client_middle_name', e.target.value)} className={`rounded-lg ${isInv(data.client_middle_name) ? 'border-red-500 bg-red-50' : ''}`} required />
           </div>
-          <div className="space-y-2" data-invalid={isFieldInvalid(data.client_last_name) ? "true" : undefined}>
+          <div className="space-y-2" data-invalid={isInv(data.client_last_name) ? "true" : undefined}>
             <Label>Фамилия <span className="text-red-500">*</span></Label>
-            <Input
-              value={data.client_last_name || ''}
-              onChange={(e) => onChange('client_last_name', e.target.value)}
-              className={`rounded-lg ${isFieldInvalid(data.client_last_name) ? 'border-red-500 bg-red-50' : ''}`}
-              required
-            />
+            <Input value={data.client_last_name || ''} onChange={(e) => onChange('client_last_name', e.target.value)} className={`rounded-lg ${isInv(data.client_last_name) ? 'border-red-500 bg-red-50' : ''}`} required />
           </div>
 
-          <div className="space-y-2" data-invalid={isFieldInvalid(data.client_birthdate) ? "true" : undefined}>
+          <div className="space-y-2" data-invalid={isInv(data.client_birthdate) ? "true" : undefined}>
             <Label>Дата на раждане <span className="text-red-500">*</span></Label>
-            <BulgarianDateInput
-              value={data.client_birthdate || ''}
-              onChange={(value) => onChange('client_birthdate', value)}
-              className={`rounded-lg ${isFieldInvalid(data.client_birthdate) ? 'border-red-500 bg-red-50' : ''}`}
-              required
-            />
+            <BulgarianDateInput value={data.client_birthdate || ''} onChange={(value) => onChange('client_birthdate', value)} className={`rounded-lg ${isInv(data.client_birthdate) ? 'border-red-500 bg-red-50' : ''}`} required />
           </div>
           <div className="space-y-2">
             <Label>Възраст</Label>
-            <Input
-              type="number"
-              value={data.client_age || ''}
-              readOnly
-              className="rounded-lg bg-slate-100"
-            />
+            <Input type="number" value={data.client_age || ''} readOnly className="rounded-lg bg-slate-100" />
           </div>
-          <div className="space-y-2" data-invalid={isFieldInvalid(data.client_gender) ? "true" : undefined}>
+          <div className="space-y-2" data-invalid={isInv(data.client_gender) ? "true" : undefined}>
             <Label>Пол <span className="text-red-500">*</span></Label>
-            <Select 
-              value={data.client_gender || ''} 
-              onValueChange={(value) => onChange('client_gender', value)}
-            >
-              <SelectTrigger className={`rounded-lg ${isFieldInvalid(data.client_gender) ? 'border-red-500 bg-red-50' : ''}`}>
-                <SelectValue placeholder="Изберете" />
-              </SelectTrigger>
+            <Select value={data.client_gender || ''} onValueChange={(value) => onChange('client_gender', value)}>
+              <SelectTrigger className={`rounded-lg ${isInv(data.client_gender) ? 'border-red-500 bg-red-50' : ''}`}><SelectValue placeholder="Изберете" /></SelectTrigger>
               <SelectContent>
                 <SelectItem value="male">Мъж</SelectItem>
                 <SelectItem value="female">Жена</SelectItem>
@@ -272,97 +238,44 @@ export default function PersonalDataStep({ data, onChange, showErrors }) {
             </Select>
           </div>
 
-          <div className="space-y-2" data-invalid={isFieldInvalid(data.client_birthplace) ? "true" : undefined}>
+          <div className="space-y-2" data-invalid={isInv(data.client_birthplace) ? "true" : undefined}>
             <Label>Място на раждане <span className="text-red-500">*</span></Label>
-            <Input
-              value={data.client_birthplace || ''}
-              onChange={(e) => onChange('client_birthplace', e.target.value)}
-              className={`rounded-lg ${isFieldInvalid(data.client_birthplace) ? 'border-red-500 bg-red-50' : ''}`}
-              required
-            />
+            <Input value={data.client_birthplace || ''} onChange={(e) => onChange('client_birthplace', e.target.value)} className={`rounded-lg ${isInv(data.client_birthplace) ? 'border-red-500 bg-red-50' : ''}`} required />
           </div>
-          <div className="space-y-2">
+          <div className="space-y-2" data-invalid={isInv(data.client_egn) ? "true" : undefined}>
             <Label>ЕГН <span className="text-red-500">*</span></Label>
-            <Input
-                                placeholder="0000000000"
-                                value={data.client_egn || ''}
-                                onChange={(e) => onChange('client_egn', e.target.value)}
-                                className={`rounded-lg ${data.client_egn?.length === 10 && !validateEGN(data.client_egn).valid ? 'border-red-500' : data.client_egn?.length === 10 && validateEGN(data.client_egn).valid ? 'border-green-500' : ''}`}
-                                required
-                              />
-                              {data.client_egn?.length === 10 && !validateEGN(data.client_egn).valid && (
-                                <p className="text-red-500 text-xs">{validateEGN(data.client_egn).error}</p>
-                              )}
-                              {data.client_egn?.length === 10 && validateEGN(data.client_egn).valid && (
-                                <p className="text-green-500 text-xs">✓ Валидно ЕГН</p>
-                              )}
+            <Input placeholder="0000000000" value={data.client_egn || ''} onChange={(e) => onChange('client_egn', e.target.value)} className={`rounded-lg ${isInv(data.client_egn) ? 'border-red-500 bg-red-50' : data.client_egn?.length === 10 && !validateEGN(data.client_egn).valid ? 'border-red-500' : data.client_egn?.length === 10 && validateEGN(data.client_egn).valid ? 'border-green-500' : ''}`} required />
+            {data.client_egn?.length === 10 && !validateEGN(data.client_egn).valid && (<p className="text-red-500 text-xs">{validateEGN(data.client_egn).error}</p>)}
+            {data.client_egn?.length === 10 && validateEGN(data.client_egn).valid && (<p className="text-green-500 text-xs">✓ Валидно ЕГН</p>)}
           </div>
-          <div className="space-y-2">
+          <div className="space-y-2" data-invalid={isInv(data.client_id_number) ? "true" : undefined}>
             <Label>Номер на лична карта <span className="text-red-500">*</span></Label>
-            <Input
-                                placeholder="000000000"
-                                value={data.client_id_number || ''}
-                                onChange={(e) => onChange('client_id_number', e.target.value)}
-                                className={`rounded-lg ${data.client_id_number?.length >= 9 && !validateIDNumber(data.client_id_number).valid ? 'border-red-500' : data.client_id_number?.length >= 9 && validateIDNumber(data.client_id_number).valid ? 'border-green-500' : ''}`}
-                                required
-                              />
-                              {data.client_id_number?.length >= 9 && !validateIDNumber(data.client_id_number).valid && (
-                                <p className="text-red-500 text-xs">{validateIDNumber(data.client_id_number).error}</p>
-                              )}
-                              {data.client_id_number?.length >= 9 && validateIDNumber(data.client_id_number).valid && (
-                                <p className="text-green-500 text-xs">✓ Валиден номер</p>
-                              )}
+            <Input placeholder="000000000" value={data.client_id_number || ''} onChange={(e) => onChange('client_id_number', e.target.value)} className={`rounded-lg ${isInv(data.client_id_number) ? 'border-red-500 bg-red-50' : data.client_id_number?.length >= 9 && !validateIDNumber(data.client_id_number).valid ? 'border-red-500' : data.client_id_number?.length >= 9 && validateIDNumber(data.client_id_number).valid ? 'border-green-500' : ''}`} required />
+            {data.client_id_number?.length >= 9 && !validateIDNumber(data.client_id_number).valid && (<p className="text-red-500 text-xs">{validateIDNumber(data.client_id_number).error}</p>)}
+            {data.client_id_number?.length >= 9 && validateIDNumber(data.client_id_number).valid && (<p className="text-green-500 text-xs">✓ Валиден номер</p>)}
           </div>
 
-          <div className="space-y-2">
+          <div className="space-y-2" data-invalid={isInv(data.client_id_valid_until) ? "true" : undefined}>
             <Label>Лична карта валидна до <span className="text-red-500">*</span></Label>
-            <BulgarianDateInput
-              value={data.client_id_valid_until || ''}
-              onChange={(value) => onChange('client_id_valid_until', value)}
-              className="rounded-lg"
-              required
-            />
+            <BulgarianDateInput value={data.client_id_valid_until || ''} onChange={(value) => onChange('client_id_valid_until', value)} className={`rounded-lg ${isInv(data.client_id_valid_until) ? 'border-red-500 bg-red-50' : ''}`} required />
           </div>
-          <div className="space-y-2 sm:col-span-2">
+          <div className="space-y-2 sm:col-span-2" data-invalid={isInv(data.client_address) ? "true" : undefined}>
             <Label>Постоянен адрес <span className="text-red-500">*</span></Label>
-            <Input
-              value={data.client_address || ''}
-              onChange={(e) => onChange('client_address', e.target.value)}
-              className="rounded-lg"
-              required
-            />
+            <Input value={data.client_address || ''} onChange={(e) => onChange('client_address', e.target.value)} className={`rounded-lg ${isInv(data.client_address) ? 'border-red-500 bg-red-50' : ''}`} required />
           </div>
 
-          <div className="space-y-2">
+          <div className="space-y-2" data-invalid={isInv(data.client_phone) ? "true" : undefined}>
             <Label>Телефонен номер <span className="text-red-500">*</span></Label>
-            <Input
-              placeholder="+359 888 000 000"
-              value={data.client_phone || ''}
-              onChange={(e) => onChange('client_phone', e.target.value)}
-              className="rounded-lg"
-              required
-            />
+            <Input placeholder="+359 888 000 000" value={data.client_phone || ''} onChange={(e) => onChange('client_phone', e.target.value)} className={`rounded-lg ${isInv(data.client_phone) ? 'border-red-500 bg-red-50' : ''}`} required />
           </div>
-          <div className="space-y-2">
+          <div className="space-y-2" data-invalid={isInv(data.client_email) ? "true" : undefined}>
             <Label>Email <span className="text-red-500">*</span></Label>
-            <Input
-              type="email"
-              placeholder="email@example.com"
-              value={data.client_email || ''}
-              onChange={(e) => onChange('client_email', e.target.value)}
-              className="rounded-lg"
-              required
-            />
+            <Input type="email" placeholder="email@example.com" value={data.client_email || ''} onChange={(e) => onChange('client_email', e.target.value)} className={`rounded-lg ${isInv(data.client_email) ? 'border-red-500 bg-red-50' : ''}`} required />
           </div>
-          <div className="space-y-2">
+          <div className="space-y-2" data-invalid={isInv(data.client_marital_status) ? "true" : undefined}>
             <Label>Семейно положение <span className="text-red-500">*</span></Label>
-            <Select 
-              value={data.client_marital_status || ''} 
-              onValueChange={(value) => onChange('client_marital_status', value)}
-            >
-              <SelectTrigger className="rounded-lg">
-                <SelectValue placeholder="Изберете" />
-              </SelectTrigger>
+            <Select value={data.client_marital_status || ''} onValueChange={(value) => onChange('client_marital_status', value)}>
+              <SelectTrigger className={`rounded-lg ${isInv(data.client_marital_status) ? 'border-red-500 bg-red-50' : ''}`}><SelectValue placeholder="Изберете" /></SelectTrigger>
               <SelectContent>
                 <SelectItem value="single">Неженен/Неомъжена</SelectItem>
                 <SelectItem value="married">Женен/Омъжена</SelectItem>
@@ -372,15 +285,10 @@ export default function PersonalDataStep({ data, onChange, showErrors }) {
             </Select>
           </div>
 
-          <div className="space-y-2">
+          <div className="space-y-2" data-invalid={isInv(data.client_nationality) ? "true" : undefined}>
             <Label>Националност <span className="text-red-500">*</span></Label>
-            <Select 
-              value={data.client_nationality || ''} 
-              onValueChange={(value) => onChange('client_nationality', value)}
-            >
-              <SelectTrigger className="rounded-lg">
-                <SelectValue placeholder="Изберете" />
-              </SelectTrigger>
+            <Select value={data.client_nationality || ''} onValueChange={(value) => onChange('client_nationality', value)}>
+              <SelectTrigger className={`rounded-lg ${isInv(data.client_nationality) ? 'border-red-500 bg-red-50' : ''}`}><SelectValue placeholder="Изберете" /></SelectTrigger>
               <SelectContent>
                 <SelectItem value="bulgarian">Българска</SelectItem>
                 <SelectItem value="other_eu">Друга от ЕС</SelectItem>
@@ -388,19 +296,12 @@ export default function PersonalDataStep({ data, onChange, showErrors }) {
               </SelectContent>
             </Select>
           </div>
-          <div className="space-y-2">
+          <div className="space-y-2" data-invalid={isInv(data.client_bank) ? "true" : undefined}>
             <Label>Банка <span className="text-red-500">*</span></Label>
-            <Select 
-              value={data.client_bank || ''} 
-              onValueChange={(value) => onChange('client_bank', value)}
-            >
-              <SelectTrigger className="rounded-lg">
-                <SelectValue placeholder="Изберете" />
-              </SelectTrigger>
+            <Select value={data.client_bank || ''} onValueChange={(value) => onChange('client_bank', value)}>
+              <SelectTrigger className={`rounded-lg ${isInv(data.client_bank) ? 'border-red-500 bg-red-50' : ''}`}><SelectValue placeholder="Изберете" /></SelectTrigger>
               <SelectContent>
-                {BANK_OPTIONS.map(bank => (
-                  <SelectItem key={bank.value} value={bank.value}>{bank.label}</SelectItem>
-                ))}
+                {BANK_OPTIONS.map(bank => (<SelectItem key={bank.value} value={bank.value}>{bank.label}</SelectItem>))}
               </SelectContent>
             </Select>
           </div>
@@ -411,11 +312,7 @@ export default function PersonalDataStep({ data, onChange, showErrors }) {
           <h4 className="font-medium text-slate-700 mb-3">Декларация по член 36 от ЗМИП</h4>
           <div className={`flex items-center justify-between p-3 rounded-lg border ${data.client_is_pep ? 'bg-red-50 border-red-200' : 'bg-green-50 border-green-200'}`}>
             <Label className="cursor-pointer text-sm">Вие или член на Вашето семейство лице ли сте по член 36 от ЗМИП?</Label>
-            <ToggleWithLabel 
-              checked={data.client_is_pep || false}
-              onChange={(checked) => onChange('client_is_pep', checked)}
-              defaultYes={false}
-            />
+            <ToggleWithLabel checked={data.client_is_pep || false} onChange={(checked) => onChange('client_is_pep', checked)} defaultYes={false} />
           </div>
         </div>
 
@@ -425,82 +322,45 @@ export default function PersonalDataStep({ data, onChange, showErrors }) {
           
           <div className={`flex items-center justify-between p-3 rounded-lg border mb-4 ${data.client_is_employed ? 'bg-green-50 border-green-200' : 'bg-red-50 border-red-200'}`}>
             <Label className="cursor-pointer">Трудова заетост</Label>
-            <ToggleWithLabel 
-              checked={data.client_is_employed ?? true}
-              onChange={(checked) => onChange('client_is_employed', checked)}
-              defaultYes={true}
-            />
+            <ToggleWithLabel checked={data.client_is_employed ?? true} onChange={(checked) => onChange('client_is_employed', checked)} defaultYes={true} />
           </div>
 
           {data.client_is_employed ? (
             <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
-              <div className="space-y-2 sm:col-span-2 lg:col-span-3">
+              <div className="space-y-2 sm:col-span-2 lg:col-span-3" data-invalid={isInv(data.client_job_description) ? "true" : undefined}>
                 <Label>Описание на месторабота и трудови задължения <span className="text-red-500">*</span></Label>
-                <Input
-                  placeholder="Описание на длъжността..."
-                  value={data.client_job_description || ''}
-                  onChange={(e) => onChange('client_job_description', e.target.value)}
-                  className="rounded-lg"
-                  required
-                />
+                <Input placeholder="Описание на длъжността..." value={data.client_job_description || ''} onChange={(e) => onChange('client_job_description', e.target.value)} className={`rounded-lg ${isInv(data.client_job_description) ? 'border-red-500 bg-red-50' : ''}`} required />
               </div>
-              <div className="space-y-2">
+              <div className="space-y-2" data-invalid={isInv(data.client_employer_name) ? "true" : undefined}>
                 <Label>Име на работодател <span className="text-red-500">*</span></Label>
-                <Input
-                  value={data.client_employer_name || ''}
-                  onChange={(e) => onChange('client_employer_name', e.target.value)}
-                  className="rounded-lg"
-                  required
-                />
+                <Input value={data.client_employer_name || ''} onChange={(e) => onChange('client_employer_name', e.target.value)} className={`rounded-lg ${isInv(data.client_employer_name) ? 'border-red-500 bg-red-50' : ''}`} required />
               </div>
               <div className="space-y-2">
                 <Label>Град</Label>
-                <Input
-                  value={data.client_employer_city || ''}
-                  onChange={(e) => onChange('client_employer_city', e.target.value)}
-                  className="rounded-lg"
-                />
+                <Input value={data.client_employer_city || ''} onChange={(e) => onChange('client_employer_city', e.target.value)} className="rounded-lg" />
               </div>
               <div className="space-y-2">
                 <Label>Улица</Label>
-                <Input
-                  value={data.client_employer_street || ''}
-                  onChange={(e) => onChange('client_employer_street', e.target.value)}
-                  className="rounded-lg"
-                />
+                <Input value={data.client_employer_street || ''} onChange={(e) => onChange('client_employer_street', e.target.value)} className="rounded-lg" />
               </div>
               <div className="space-y-2">
                 <Label>Пощенски код</Label>
-                <Input
-                  value={data.client_employer_postal_code || ''}
-                  onChange={(e) => onChange('client_employer_postal_code', e.target.value)}
-                  className="rounded-lg"
-                />
+                <Input value={data.client_employer_postal_code || ''} onChange={(e) => onChange('client_employer_postal_code', e.target.value)} className="rounded-lg" />
               </div>
-              <div className="space-y-2">
+              <div className="space-y-2" data-invalid={isInv(data.client_contract_type) ? "true" : undefined}>
                 <Label>Вид договор <span className="text-red-500">*</span></Label>
-                <Select 
-                  value={data.client_contract_type || ''} 
-                  onValueChange={(value) => onChange('client_contract_type', value)}
-                >
-                  <SelectTrigger className="rounded-lg">
-                    <SelectValue placeholder="Изберете" />
-                  </SelectTrigger>
+                <Select value={data.client_contract_type || ''} onValueChange={(value) => onChange('client_contract_type', value)}>
+                  <SelectTrigger className={`rounded-lg ${isInv(data.client_contract_type) ? 'border-red-500 bg-red-50' : ''}`}><SelectValue placeholder="Изберете" /></SelectTrigger>
                   <SelectContent>
                     <SelectItem value="labor">Трудов договор</SelectItem>
                     <SelectItem value="civil">Граждански договор</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
-              <div className="space-y-2">
+              <div className="space-y-2" data-invalid={isInv(data.client_contract_term) ? "true" : undefined}>
                 <Label>Срок на договора <span className="text-red-500">*</span></Label>
-                <Select 
-                  value={data.client_contract_term || ''} 
-                  onValueChange={(value) => onChange('client_contract_term', value)}
-                >
-                  <SelectTrigger className="rounded-lg">
-                    <SelectValue placeholder="Изберете" />
-                  </SelectTrigger>
+                <Select value={data.client_contract_term || ''} onValueChange={(value) => onChange('client_contract_term', value)}>
+                  <SelectTrigger className={`rounded-lg ${isInv(data.client_contract_term) ? 'border-red-500 bg-red-50' : ''}`}><SelectValue placeholder="Изберете" /></SelectTrigger>
                   <SelectContent>
                     <SelectItem value="fixed">Срочен договор</SelectItem>
                     <SelectItem value="permanent">Постоянен договор</SelectItem>
@@ -510,25 +370,13 @@ export default function PersonalDataStep({ data, onChange, showErrors }) {
             </div>
           ) : (
             <div className="grid sm:grid-cols-2 gap-4">
-              <div className="space-y-2">
+              <div className="space-y-2" data-invalid={isInv(data.client_income_source) ? "true" : undefined}>
                 <Label>Източник на доход <span className="text-red-500">*</span></Label>
-                <Input
-                  placeholder="Например: Наеми, Дивиденти..."
-                  value={data.client_income_source || ''}
-                  onChange={(e) => onChange('client_income_source', e.target.value)}
-                  className="rounded-lg"
-                  required
-                />
+                <Input placeholder="Например: Наеми, Дивиденти..." value={data.client_income_source || ''} onChange={(e) => onChange('client_income_source', e.target.value)} className={`rounded-lg ${isInv(data.client_income_source) ? 'border-red-500 bg-red-50' : ''}`} required />
               </div>
-              <div className="space-y-2">
+              <div className="space-y-2" data-invalid={isInv(data.client_activity) ? "true" : undefined}>
                 <Label>Дейност <span className="text-red-500">*</span></Label>
-                <Input
-                  placeholder="Описание на дейността..."
-                  value={data.client_activity || ''}
-                  onChange={(e) => onChange('client_activity', e.target.value)}
-                  className="rounded-lg"
-                  required
-                />
+                <Input placeholder="Описание на дейността..." value={data.client_activity || ''} onChange={(e) => onChange('client_activity', e.target.value)} className={`rounded-lg ${isInv(data.client_activity) ? 'border-red-500 bg-red-50' : ''}`} required />
               </div>
             </div>
           )}
@@ -547,10 +395,7 @@ export default function PersonalDataStep({ data, onChange, showErrors }) {
           </div>
           <div className="flex items-center gap-2">
             <Label className="text-sm cursor-pointer">Включи партньор</Label>
-            <Switch
-              checked={data.include_partner || false}
-              onCheckedChange={(checked) => onChange('include_partner', checked)}
-            />
+            <Switch checked={data.include_partner || false} onCheckedChange={(checked) => onChange('include_partner', checked)} />
           </div>
         </div>
         
@@ -558,61 +403,31 @@ export default function PersonalDataStep({ data, onChange, showErrors }) {
           <>
             {/* Personal Info */}
             <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
-              <div className="space-y-2">
+              <div className="space-y-2" data-invalid={isInv(data.partner_first_name) ? "true" : undefined}>
                 <Label>Име <span className="text-red-500">*</span></Label>
-                <Input
-                  value={data.partner_first_name || ''}
-                  onChange={(e) => onChange('partner_first_name', e.target.value)}
-                  className="rounded-lg"
-                  required
-                />
+                <Input value={data.partner_first_name || ''} onChange={(e) => onChange('partner_first_name', e.target.value)} className={`rounded-lg ${isInv(data.partner_first_name) ? 'border-red-500 bg-red-50' : ''}`} required />
               </div>
-              <div className="space-y-2">
+              <div className="space-y-2" data-invalid={isInv(data.partner_middle_name) ? "true" : undefined}>
                 <Label>Презиме <span className="text-red-500">*</span></Label>
-                <Input
-                  value={data.partner_middle_name || ''}
-                  onChange={(e) => onChange('partner_middle_name', e.target.value)}
-                  className="rounded-lg"
-                  required
-                />
+                <Input value={data.partner_middle_name || ''} onChange={(e) => onChange('partner_middle_name', e.target.value)} className={`rounded-lg ${isInv(data.partner_middle_name) ? 'border-red-500 bg-red-50' : ''}`} required />
               </div>
-              <div className="space-y-2">
+              <div className="space-y-2" data-invalid={isInv(data.partner_last_name) ? "true" : undefined}>
                 <Label>Фамилия <span className="text-red-500">*</span></Label>
-                <Input
-                  value={data.partner_last_name || ''}
-                  onChange={(e) => onChange('partner_last_name', e.target.value)}
-                  className="rounded-lg"
-                  required
-                />
+                <Input value={data.partner_last_name || ''} onChange={(e) => onChange('partner_last_name', e.target.value)} className={`rounded-lg ${isInv(data.partner_last_name) ? 'border-red-500 bg-red-50' : ''}`} required />
               </div>
 
-              <div className="space-y-2">
+              <div className="space-y-2" data-invalid={isInv(data.partner_birthdate) ? "true" : undefined}>
                 <Label>Дата на раждане <span className="text-red-500">*</span></Label>
-                <BulgarianDateInput
-                  value={data.partner_birthdate || ''}
-                  onChange={(value) => onChange('partner_birthdate', value)}
-                  className="rounded-lg"
-                  required
-                />
+                <BulgarianDateInput value={data.partner_birthdate || ''} onChange={(value) => onChange('partner_birthdate', value)} className={`rounded-lg ${isInv(data.partner_birthdate) ? 'border-red-500 bg-red-50' : ''}`} required />
               </div>
               <div className="space-y-2">
                 <Label>Възраст</Label>
-                <Input
-                  type="number"
-                  value={data.partner_age || ''}
-                  readOnly
-                  className="rounded-lg bg-slate-100"
-                />
+                <Input type="number" value={data.partner_age || ''} readOnly className="rounded-lg bg-slate-100" />
               </div>
-              <div className="space-y-2">
+              <div className="space-y-2" data-invalid={isInv(data.partner_gender) ? "true" : undefined}>
                 <Label>Пол <span className="text-red-500">*</span></Label>
-                <Select 
-                  value={data.partner_gender || ''} 
-                  onValueChange={(value) => onChange('partner_gender', value)}
-                >
-                  <SelectTrigger className="rounded-lg">
-                    <SelectValue placeholder="Изберете" />
-                  </SelectTrigger>
+                <Select value={data.partner_gender || ''} onValueChange={(value) => onChange('partner_gender', value)}>
+                  <SelectTrigger className={`rounded-lg ${isInv(data.partner_gender) ? 'border-red-500 bg-red-50' : ''}`}><SelectValue placeholder="Изберете" /></SelectTrigger>
                   <SelectContent>
                     <SelectItem value="male">Мъж</SelectItem>
                     <SelectItem value="female">Жена</SelectItem>
@@ -620,97 +435,44 @@ export default function PersonalDataStep({ data, onChange, showErrors }) {
                 </Select>
               </div>
 
-              <div className="space-y-2">
+              <div className="space-y-2" data-invalid={isInv(data.partner_birthplace) ? "true" : undefined}>
                 <Label>Място на раждане <span className="text-red-500">*</span></Label>
-                <Input
-                  value={data.partner_birthplace || ''}
-                  onChange={(e) => onChange('partner_birthplace', e.target.value)}
-                  className="rounded-lg"
-                  required
-                />
+                <Input value={data.partner_birthplace || ''} onChange={(e) => onChange('partner_birthplace', e.target.value)} className={`rounded-lg ${isInv(data.partner_birthplace) ? 'border-red-500 bg-red-50' : ''}`} required />
               </div>
-              <div className="space-y-2">
+              <div className="space-y-2" data-invalid={isInv(data.partner_egn) ? "true" : undefined}>
                 <Label>ЕГН <span className="text-red-500">*</span></Label>
-                <Input
-                                    placeholder="0000000000"
-                                    value={data.partner_egn || ''}
-                                    onChange={(e) => onChange('partner_egn', e.target.value)}
-                                    className={`rounded-lg ${data.partner_egn?.length === 10 && !validateEGN(data.partner_egn).valid ? 'border-red-500' : data.partner_egn?.length === 10 && validateEGN(data.partner_egn).valid ? 'border-green-500' : ''}`}
-                                    required
-                                  />
-                                  {data.partner_egn?.length === 10 && !validateEGN(data.partner_egn).valid && (
-                                    <p className="text-red-500 text-xs">{validateEGN(data.partner_egn).error}</p>
-                                  )}
-                                  {data.partner_egn?.length === 10 && validateEGN(data.partner_egn).valid && (
-                                    <p className="text-green-500 text-xs">✓ Валидно ЕГН</p>
-                                  )}
+                <Input placeholder="0000000000" value={data.partner_egn || ''} onChange={(e) => onChange('partner_egn', e.target.value)} className={`rounded-lg ${isInv(data.partner_egn) ? 'border-red-500 bg-red-50' : data.partner_egn?.length === 10 && !validateEGN(data.partner_egn).valid ? 'border-red-500' : data.partner_egn?.length === 10 && validateEGN(data.partner_egn).valid ? 'border-green-500' : ''}`} required />
+                {data.partner_egn?.length === 10 && !validateEGN(data.partner_egn).valid && (<p className="text-red-500 text-xs">{validateEGN(data.partner_egn).error}</p>)}
+                {data.partner_egn?.length === 10 && validateEGN(data.partner_egn).valid && (<p className="text-green-500 text-xs">✓ Валидно ЕГН</p>)}
               </div>
-              <div className="space-y-2">
+              <div className="space-y-2" data-invalid={isInv(data.partner_id_number) ? "true" : undefined}>
                 <Label>Номер на лична карта <span className="text-red-500">*</span></Label>
-                <Input
-                                    placeholder="000000000"
-                                    value={data.partner_id_number || ''}
-                                    onChange={(e) => onChange('partner_id_number', e.target.value)}
-                                    className={`rounded-lg ${data.partner_id_number?.length >= 9 && !validateIDNumber(data.partner_id_number).valid ? 'border-red-500' : data.partner_id_number?.length >= 9 && validateIDNumber(data.partner_id_number).valid ? 'border-green-500' : ''}`}
-                                    required
-                                  />
-                                  {data.partner_id_number?.length >= 9 && !validateIDNumber(data.partner_id_number).valid && (
-                                    <p className="text-red-500 text-xs">{validateIDNumber(data.partner_id_number).error}</p>
-                                  )}
-                                  {data.partner_id_number?.length >= 9 && validateIDNumber(data.partner_id_number).valid && (
-                                    <p className="text-green-500 text-xs">✓ Валиден номер</p>
-                                  )}
+                <Input placeholder="000000000" value={data.partner_id_number || ''} onChange={(e) => onChange('partner_id_number', e.target.value)} className={`rounded-lg ${isInv(data.partner_id_number) ? 'border-red-500 bg-red-50' : data.partner_id_number?.length >= 9 && !validateIDNumber(data.partner_id_number).valid ? 'border-red-500' : data.partner_id_number?.length >= 9 && validateIDNumber(data.partner_id_number).valid ? 'border-green-500' : ''}`} required />
+                {data.partner_id_number?.length >= 9 && !validateIDNumber(data.partner_id_number).valid && (<p className="text-red-500 text-xs">{validateIDNumber(data.partner_id_number).error}</p>)}
+                {data.partner_id_number?.length >= 9 && validateIDNumber(data.partner_id_number).valid && (<p className="text-green-500 text-xs">✓ Валиден номер</p>)}
               </div>
 
-              <div className="space-y-2">
+              <div className="space-y-2" data-invalid={isInv(data.partner_id_valid_until) ? "true" : undefined}>
                 <Label>Лична карта валидна до <span className="text-red-500">*</span></Label>
-                <BulgarianDateInput
-                  value={data.partner_id_valid_until || ''}
-                  onChange={(value) => onChange('partner_id_valid_until', value)}
-                  className="rounded-lg"
-                  required
-                />
+                <BulgarianDateInput value={data.partner_id_valid_until || ''} onChange={(value) => onChange('partner_id_valid_until', value)} className={`rounded-lg ${isInv(data.partner_id_valid_until) ? 'border-red-500 bg-red-50' : ''}`} required />
               </div>
-              <div className="space-y-2 sm:col-span-2">
+              <div className="space-y-2 sm:col-span-2" data-invalid={isInv(data.partner_address) ? "true" : undefined}>
                 <Label>Постоянен адрес <span className="text-red-500">*</span></Label>
-                <Input
-                  value={data.partner_address || ''}
-                  onChange={(e) => onChange('partner_address', e.target.value)}
-                  className="rounded-lg"
-                  required
-                />
+                <Input value={data.partner_address || ''} onChange={(e) => onChange('partner_address', e.target.value)} className={`rounded-lg ${isInv(data.partner_address) ? 'border-red-500 bg-red-50' : ''}`} required />
               </div>
 
-              <div className="space-y-2">
+              <div className="space-y-2" data-invalid={isInv(data.partner_phone) ? "true" : undefined}>
                 <Label>Телефонен номер <span className="text-red-500">*</span></Label>
-                <Input
-                  placeholder="+359 888 000 000"
-                  value={data.partner_phone || ''}
-                  onChange={(e) => onChange('partner_phone', e.target.value)}
-                  className="rounded-lg"
-                  required
-                />
+                <Input placeholder="+359 888 000 000" value={data.partner_phone || ''} onChange={(e) => onChange('partner_phone', e.target.value)} className={`rounded-lg ${isInv(data.partner_phone) ? 'border-red-500 bg-red-50' : ''}`} required />
               </div>
-              <div className="space-y-2">
+              <div className="space-y-2" data-invalid={isInv(data.partner_email) ? "true" : undefined}>
                 <Label>Email <span className="text-red-500">*</span></Label>
-                <Input
-                  type="email"
-                  placeholder="email@example.com"
-                  value={data.partner_email || ''}
-                  onChange={(e) => onChange('partner_email', e.target.value)}
-                  className="rounded-lg"
-                  required
-                />
+                <Input type="email" placeholder="email@example.com" value={data.partner_email || ''} onChange={(e) => onChange('partner_email', e.target.value)} className={`rounded-lg ${isInv(data.partner_email) ? 'border-red-500 bg-red-50' : ''}`} required />
               </div>
-              <div className="space-y-2">
+              <div className="space-y-2" data-invalid={isInv(data.partner_marital_status) ? "true" : undefined}>
                 <Label>Семейно положение <span className="text-red-500">*</span></Label>
-                <Select 
-                  value={data.partner_marital_status || ''} 
-                  onValueChange={(value) => onChange('partner_marital_status', value)}
-                >
-                  <SelectTrigger className="rounded-lg">
-                    <SelectValue placeholder="Изберете" />
-                  </SelectTrigger>
+                <Select value={data.partner_marital_status || ''} onValueChange={(value) => onChange('partner_marital_status', value)}>
+                  <SelectTrigger className={`rounded-lg ${isInv(data.partner_marital_status) ? 'border-red-500 bg-red-50' : ''}`}><SelectValue placeholder="Изберете" /></SelectTrigger>
                   <SelectContent>
                     <SelectItem value="single">Неженен/Неомъжена</SelectItem>
                     <SelectItem value="married">Женен/Омъжена</SelectItem>
@@ -720,15 +482,10 @@ export default function PersonalDataStep({ data, onChange, showErrors }) {
                 </Select>
               </div>
 
-              <div className="space-y-2">
+              <div className="space-y-2" data-invalid={isInv(data.partner_nationality) ? "true" : undefined}>
                 <Label>Националност <span className="text-red-500">*</span></Label>
-                <Select 
-                  value={data.partner_nationality || ''} 
-                  onValueChange={(value) => onChange('partner_nationality', value)}
-                >
-                  <SelectTrigger className="rounded-lg">
-                    <SelectValue placeholder="Изберете" />
-                  </SelectTrigger>
+                <Select value={data.partner_nationality || ''} onValueChange={(value) => onChange('partner_nationality', value)}>
+                  <SelectTrigger className={`rounded-lg ${isInv(data.partner_nationality) ? 'border-red-500 bg-red-50' : ''}`}><SelectValue placeholder="Изберете" /></SelectTrigger>
                   <SelectContent>
                     <SelectItem value="bulgarian">Българска</SelectItem>
                     <SelectItem value="other_eu">Друга от ЕС</SelectItem>
@@ -736,19 +493,12 @@ export default function PersonalDataStep({ data, onChange, showErrors }) {
                   </SelectContent>
                 </Select>
               </div>
-              <div className="space-y-2">
+              <div className="space-y-2" data-invalid={isInv(data.partner_bank) ? "true" : undefined}>
                 <Label>Банка <span className="text-red-500">*</span></Label>
-                <Select 
-                  value={data.partner_bank || ''} 
-                  onValueChange={(value) => onChange('partner_bank', value)}
-                >
-                  <SelectTrigger className="rounded-lg">
-                    <SelectValue placeholder="Изберете" />
-                  </SelectTrigger>
+                <Select value={data.partner_bank || ''} onValueChange={(value) => onChange('partner_bank', value)}>
+                  <SelectTrigger className={`rounded-lg ${isInv(data.partner_bank) ? 'border-red-500 bg-red-50' : ''}`}><SelectValue placeholder="Изберете" /></SelectTrigger>
                   <SelectContent>
-                    {BANK_OPTIONS.map(bank => (
-                      <SelectItem key={bank.value} value={bank.value}>{bank.label}</SelectItem>
-                    ))}
+                    {BANK_OPTIONS.map(bank => (<SelectItem key={bank.value} value={bank.value}>{bank.label}</SelectItem>))}
                   </SelectContent>
                 </Select>
               </div>
@@ -759,11 +509,7 @@ export default function PersonalDataStep({ data, onChange, showErrors }) {
               <h4 className="font-medium text-slate-700 mb-3">Декларация по член 36 от ЗМИП</h4>
               <div className={`flex items-center justify-between p-3 rounded-lg border ${data.partner_is_pep ? 'bg-red-50 border-red-200' : 'bg-green-50 border-green-200'}`}>
                 <Label className="cursor-pointer text-sm">Вие или член на Вашето семейство лице ли сте по член 36 от ЗМИП?</Label>
-                <ToggleWithLabel 
-                  checked={data.partner_is_pep || false}
-                  onChange={(checked) => onChange('partner_is_pep', checked)}
-                  defaultYes={false}
-                />
+                <ToggleWithLabel checked={data.partner_is_pep || false} onChange={(checked) => onChange('partner_is_pep', checked)} defaultYes={false} />
               </div>
             </div>
 
@@ -773,82 +519,45 @@ export default function PersonalDataStep({ data, onChange, showErrors }) {
               
               <div className={`flex items-center justify-between p-3 rounded-lg border mb-4 ${data.partner_is_employed ?? true ? 'bg-green-50 border-green-200' : 'bg-red-50 border-red-200'}`}>
                 <Label className="cursor-pointer">Трудова заетост</Label>
-                <ToggleWithLabel 
-                  checked={data.partner_is_employed ?? true}
-                  onChange={(checked) => onChange('partner_is_employed', checked)}
-                  defaultYes={true}
-                />
+                <ToggleWithLabel checked={data.partner_is_employed ?? true} onChange={(checked) => onChange('partner_is_employed', checked)} defaultYes={true} />
               </div>
 
               {(data.partner_is_employed ?? true) ? (
                 <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                  <div className="space-y-2 sm:col-span-2 lg:col-span-3">
+                  <div className="space-y-2 sm:col-span-2 lg:col-span-3" data-invalid={isInv(data.partner_job_description) ? "true" : undefined}>
                     <Label>Описание на месторабота и трудови задължения <span className="text-red-500">*</span></Label>
-                    <Input
-                      placeholder="Описание на длъжността..."
-                      value={data.partner_job_description || ''}
-                      onChange={(e) => onChange('partner_job_description', e.target.value)}
-                      className="rounded-lg"
-                      required
-                    />
+                    <Input placeholder="Описание на длъжността..." value={data.partner_job_description || ''} onChange={(e) => onChange('partner_job_description', e.target.value)} className={`rounded-lg ${isInv(data.partner_job_description) ? 'border-red-500 bg-red-50' : ''}`} required />
                   </div>
-                  <div className="space-y-2">
+                  <div className="space-y-2" data-invalid={isInv(data.partner_employer_name) ? "true" : undefined}>
                     <Label>Име на работодател <span className="text-red-500">*</span></Label>
-                    <Input
-                      value={data.partner_employer_name || ''}
-                      onChange={(e) => onChange('partner_employer_name', e.target.value)}
-                      className="rounded-lg"
-                      required
-                    />
+                    <Input value={data.partner_employer_name || ''} onChange={(e) => onChange('partner_employer_name', e.target.value)} className={`rounded-lg ${isInv(data.partner_employer_name) ? 'border-red-500 bg-red-50' : ''}`} required />
                   </div>
                   <div className="space-y-2">
                     <Label>Град</Label>
-                    <Input
-                      value={data.partner_employer_city || ''}
-                      onChange={(e) => onChange('partner_employer_city', e.target.value)}
-                      className="rounded-lg"
-                    />
+                    <Input value={data.partner_employer_city || ''} onChange={(e) => onChange('partner_employer_city', e.target.value)} className="rounded-lg" />
                   </div>
                   <div className="space-y-2">
                     <Label>Улица</Label>
-                    <Input
-                      value={data.partner_employer_street || ''}
-                      onChange={(e) => onChange('partner_employer_street', e.target.value)}
-                      className="rounded-lg"
-                    />
+                    <Input value={data.partner_employer_street || ''} onChange={(e) => onChange('partner_employer_street', e.target.value)} className="rounded-lg" />
                   </div>
                   <div className="space-y-2">
                     <Label>Пощенски код</Label>
-                    <Input
-                      value={data.partner_employer_postal_code || ''}
-                      onChange={(e) => onChange('partner_employer_postal_code', e.target.value)}
-                      className="rounded-lg"
-                    />
+                    <Input value={data.partner_employer_postal_code || ''} onChange={(e) => onChange('partner_employer_postal_code', e.target.value)} className="rounded-lg" />
                   </div>
-                  <div className="space-y-2">
+                  <div className="space-y-2" data-invalid={isInv(data.partner_contract_type) ? "true" : undefined}>
                     <Label>Вид договор <span className="text-red-500">*</span></Label>
-                    <Select 
-                      value={data.partner_contract_type || ''} 
-                      onValueChange={(value) => onChange('partner_contract_type', value)}
-                    >
-                      <SelectTrigger className="rounded-lg">
-                        <SelectValue placeholder="Изберете" />
-                      </SelectTrigger>
+                    <Select value={data.partner_contract_type || ''} onValueChange={(value) => onChange('partner_contract_type', value)}>
+                      <SelectTrigger className={`rounded-lg ${isInv(data.partner_contract_type) ? 'border-red-500 bg-red-50' : ''}`}><SelectValue placeholder="Изберете" /></SelectTrigger>
                       <SelectContent>
                         <SelectItem value="labor">Трудов договор</SelectItem>
                         <SelectItem value="civil">Граждански договор</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
-                  <div className="space-y-2">
+                  <div className="space-y-2" data-invalid={isInv(data.partner_contract_term) ? "true" : undefined}>
                     <Label>Срок на договора <span className="text-red-500">*</span></Label>
-                    <Select 
-                      value={data.partner_contract_term || ''} 
-                      onValueChange={(value) => onChange('partner_contract_term', value)}
-                    >
-                      <SelectTrigger className="rounded-lg">
-                        <SelectValue placeholder="Изберете" />
-                      </SelectTrigger>
+                    <Select value={data.partner_contract_term || ''} onValueChange={(value) => onChange('partner_contract_term', value)}>
+                      <SelectTrigger className={`rounded-lg ${isInv(data.partner_contract_term) ? 'border-red-500 bg-red-50' : ''}`}><SelectValue placeholder="Изберете" /></SelectTrigger>
                       <SelectContent>
                         <SelectItem value="fixed">Срочен договор</SelectItem>
                         <SelectItem value="permanent">Постоянен договор</SelectItem>
@@ -858,25 +567,13 @@ export default function PersonalDataStep({ data, onChange, showErrors }) {
                 </div>
               ) : (
                 <div className="grid sm:grid-cols-2 gap-4">
-                  <div className="space-y-2">
+                  <div className="space-y-2" data-invalid={isInv(data.partner_income_source) ? "true" : undefined}>
                     <Label>Източник на доход <span className="text-red-500">*</span></Label>
-                    <Input
-                      placeholder="Например: Наеми, Дивиденти..."
-                      value={data.partner_income_source || ''}
-                      onChange={(e) => onChange('partner_income_source', e.target.value)}
-                      className="rounded-lg"
-                      required
-                    />
+                    <Input placeholder="Например: Наеми, Дивиденти..." value={data.partner_income_source || ''} onChange={(e) => onChange('partner_income_source', e.target.value)} className={`rounded-lg ${isInv(data.partner_income_source) ? 'border-red-500 bg-red-50' : ''}`} required />
                   </div>
-                  <div className="space-y-2">
+                  <div className="space-y-2" data-invalid={isInv(data.partner_activity) ? "true" : undefined}>
                     <Label>Дейност <span className="text-red-500">*</span></Label>
-                    <Input
-                      placeholder="Описание на дейността..."
-                      value={data.partner_activity || ''}
-                      onChange={(e) => onChange('partner_activity', e.target.value)}
-                      className="rounded-lg"
-                      required
-                    />
+                    <Input placeholder="Описание на дейността..." value={data.partner_activity || ''} onChange={(e) => onChange('partner_activity', e.target.value)} className={`rounded-lg ${isInv(data.partner_activity) ? 'border-red-500 bg-red-50' : ''}`} required />
                   </div>
                 </div>
               )}
@@ -902,30 +599,19 @@ export default function PersonalDataStep({ data, onChange, showErrors }) {
         </div>
         <div className="space-y-4">
           <div className="grid sm:grid-cols-2 gap-4">
-            <div className="space-y-2">
+            <div className="space-y-2" data-invalid={isInv(data.children_count) ? "true" : undefined}>
               <Label>Брой деца <span className="text-red-500">*</span></Label>
-              <Select 
-                value={data.children_count?.toString() || ''} 
-                onValueChange={(value) => onChange('children_count', parseInt(value))}
-              >
-                <SelectTrigger className="rounded-lg">
-                  <SelectValue placeholder="Изберете" />
-                </SelectTrigger>
+              <Select value={data.children_count?.toString() || ''} onValueChange={(value) => onChange('children_count', parseInt(value))}>
+                <SelectTrigger className={`rounded-lg ${isInv(data.children_count) ? 'border-red-500 bg-red-50' : ''}`}><SelectValue placeholder="Изберете" /></SelectTrigger>
                 <SelectContent>
                   <SelectItem value="0">Няма</SelectItem>
-                  {[1, 2, 3, 4, 5].map(num => (
-                    <SelectItem key={num} value={num.toString()}>{num}</SelectItem>
-                  ))}
+                  {[1, 2, 3, 4, 5].map(num => (<SelectItem key={num} value={num.toString()}>{num}</SelectItem>))}
                 </SelectContent>
               </Select>
             </div>
             <div className={`flex items-center justify-between p-3 rounded-lg border ${data.children_economically_dependent ?? true ? 'bg-green-50 border-green-200' : 'bg-red-50 border-red-200'}`}>
               <Label className="cursor-pointer">Икономическа зависимост</Label>
-              <ToggleWithLabel 
-                checked={data.children_economically_dependent ?? true}
-                onChange={(checked) => onChange('children_economically_dependent', checked)}
-                defaultYes={true}
-              />
+              <ToggleWithLabel checked={data.children_economically_dependent ?? true} onChange={(checked) => onChange('children_economically_dependent', checked)} defaultYes={true} />
             </div>
           </div>
 
@@ -934,24 +620,14 @@ export default function PersonalDataStep({ data, onChange, showErrors }) {
               <Label className="text-sm text-slate-600">Данни за децата</Label>
               {Array.from({ length: data.children_count || 0 }).map((_, index) => (
                 <div key={index} className="grid sm:grid-cols-2 gap-3 p-3 bg-white rounded-lg border border-slate-200">
-                  <div className="space-y-1">
+                  <div className="space-y-1" data-invalid={isInv(data[`child_${index + 1}_name`]) ? "true" : undefined}>
                     <Label className="text-xs">Дете {index + 1} - Име <span className="text-red-500">*</span></Label>
-                    <Input
-                      value={data[`child_${index + 1}_name`] || ''}
-                      onChange={(e) => onChange(`child_${index + 1}_name`, e.target.value)}
-                      className="rounded-lg"
-                      required
-                    />
+                    <Input value={data[`child_${index + 1}_name`] || ''} onChange={(e) => onChange(`child_${index + 1}_name`, e.target.value)} className={`rounded-lg ${isInv(data[`child_${index + 1}_name`]) ? 'border-red-500 bg-red-50' : ''}`} required />
                   </div>
-                  <div className="space-y-1">
-                      <Label className="text-xs">Дата на раждане <span className="text-red-500">*</span></Label>
-                      <BulgarianDateInput
-                        value={data[`child_${index + 1}_birthdate`] || ''}
-                        onChange={(value) => onChange(`child_${index + 1}_birthdate`, value)}
-                        className="rounded-lg"
-                        required
-                      />
-                    </div>
+                  <div className="space-y-1" data-invalid={isInv(data[`child_${index + 1}_birthdate`]) ? "true" : undefined}>
+                    <Label className="text-xs">Дата на раждане <span className="text-red-500">*</span></Label>
+                    <BulgarianDateInput value={data[`child_${index + 1}_birthdate`] || ''} onChange={(value) => onChange(`child_${index + 1}_birthdate`, value)} className={`rounded-lg ${isInv(data[`child_${index + 1}_birthdate`]) ? 'border-red-500 bg-red-50' : ''}`} required />
+                  </div>
                 </div>
               ))}
             </div>

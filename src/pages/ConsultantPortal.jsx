@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { base44 } from '@/api/base44Client';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -57,6 +58,11 @@ const menuItems = [
 
 export default function ConsultantPortal() {
   const [activeTab, setActiveTab] = useState('dashboard');
+  const [currentUser, setCurrentUser] = useState(null);
+
+  useEffect(() => {
+    base44.auth.me().then(setCurrentUser).catch(() => {});
+  }, []);
 
   return (
     <div className="min-h-screen bg-slate-100 flex pt-0">
@@ -140,7 +146,7 @@ export default function ConsultantPortal() {
         <div className="p-6">
           <div className="space-y-6">
           {activeTab === 'dashboard' && <ConsultantDashboard onNavigate={setActiveTab} />}
-          {activeTab === 'crm' && <ConsultantCRMAdvanced />}
+          {activeTab === 'crm' && <ConsultantCRMAdvanced isAdmin={currentUser?.role === 'admin'} />}
           {activeTab === 'analysis' && (
             <Card>
               <CardHeader>

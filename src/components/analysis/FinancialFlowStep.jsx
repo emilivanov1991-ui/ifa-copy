@@ -537,8 +537,16 @@ export default function FinancialFlowStep({ data, onChange, showErrors }) {
           
           {/* Liabilities */}
           <div className="flex justify-between pt-2 border-t border-blue-200">
-            <span>Задължения (оставаща сума):</span>
+            <span className="font-semibold">Общо задължения:</span>
             <span className="font-semibold text-orange-600">{totalLiabilitiesRemaining.toLocaleString()} €</span>
+          </div>
+          
+          {/* Net Worth */}
+          <div className="flex justify-between">
+            <span className="font-semibold">Нетно имущество:</span>
+            <span className={`font-semibold ${(totalAssets - totalLiabilitiesRemaining) >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+              {(totalAssets - totalLiabilitiesRemaining).toLocaleString()} €
+            </span>
           </div>
         </div>
         <div className="mt-4 pt-4 border-t border-blue-200 flex justify-between">

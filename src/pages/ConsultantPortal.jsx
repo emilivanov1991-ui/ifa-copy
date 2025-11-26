@@ -21,7 +21,8 @@ import {
   Plus,
   Eye,
   Brain,
-  Shield
+  Shield,
+  LogOut
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
@@ -58,7 +59,7 @@ export default function ConsultantPortal() {
   const [activeTab, setActiveTab] = useState('dashboard');
 
   return (
-    <div className="min-h-screen bg-slate-100 flex">
+    <div className="min-h-screen bg-slate-100 flex pt-0">
       {/* Sidebar */}
       <aside className="w-64 bg-white border-r border-slate-200 fixed left-0 top-0 bottom-0 z-40 flex flex-col">
         {/* Logo */}
@@ -99,7 +100,7 @@ export default function ConsultantPortal() {
 
         {/* User */}
         <div className="p-4 border-t border-slate-200">
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-3 mb-3">
             <div className="w-9 h-9 rounded-full bg-blue-100 flex items-center justify-center">
               <span className="text-sm font-medium text-blue-600">ИП</span>
             </div>
@@ -108,6 +109,12 @@ export default function ConsultantPortal() {
               <p className="text-xs text-slate-500">Консултант</p>
             </div>
           </div>
+          <Link to={createPageUrl('Home')}>
+            <Button variant="outline" className="w-full text-slate-600 hover:text-red-600 hover:border-red-300">
+              <LogOut className="h-4 w-4 mr-2" />
+              Изход
+            </Button>
+          </Link>
         </div>
       </aside>
 

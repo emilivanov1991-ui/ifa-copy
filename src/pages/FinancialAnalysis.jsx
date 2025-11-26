@@ -262,6 +262,11 @@ export default function FinancialAnalysis() {
         if (!formData.client_retirement_age) return false;
         if (formData.client_desired_pension === undefined || formData.client_desired_pension === '') return false;
         
+        // II. Pillar fund required if enabled
+        if (formData.client_pillar_2 ?? true) {
+          if (!formData.client_pension_fund) return false;
+        }
+        
         // III. Pillar fields if enabled
         if (formData.client_pillar_3) {
           if (!formData.client_voluntary_pension_fund) return false;
@@ -274,6 +279,11 @@ export default function FinancialAnalysis() {
           if (formData.partner_gross_income_pension === undefined || formData.partner_gross_income_pension === '') return false;
           if (!formData.partner_retirement_age) return false;
           if (formData.partner_desired_pension === undefined || formData.partner_desired_pension === '') return false;
+          
+          // Partner II. Pillar fund required if enabled
+          if (formData.partner_pillar_2 ?? true) {
+            if (!formData.partner_pension_fund) return false;
+          }
           
           // Partner III. Pillar fields if enabled
           if (formData.partner_pillar_3) {

@@ -399,7 +399,7 @@ export default function PensionStep({ data, onChange }) {
                 </div>
                 {(data.client_pillar_2 ?? true) && (
                   <div className="ml-4 space-y-2">
-                    <Label className="text-sm">Име на частен пенсионен фонд?</Label>
+                    <Label className="text-sm">Име на частен пенсионен фонд? <span className="text-red-500">*</span></Label>
                     <Select 
                       value={data.client_pension_fund || ''} 
                       onValueChange={(value) => onChange('client_pension_fund', value)}
@@ -544,7 +544,7 @@ export default function PensionStep({ data, onChange }) {
                   </div>
                   {(data.partner_pillar_2 ?? true) && (
                     <div className="ml-4 space-y-2">
-                      <Label className="text-sm">Име на частен пенсионен фонд?</Label>
+                      <Label className="text-sm">Име на частен пенсионен фонд? <span className="text-red-500">*</span></Label>
                       <Select 
                         value={data.partner_pension_fund || ''} 
                         onValueChange={(value) => onChange('partner_pension_fund', value)}

@@ -54,6 +54,7 @@ const daysOfWeekFull = ['Понеделник', 'Вторник', 'Сряда', 
 
 // Hours from 6:00 to 22:00
 const hours = Array.from({ length: 17 }, (_, i) => i + 6);
+const HOUR_HEIGHT = 35; // pixels per hour
 
 export default function ConsultantCalendar() {
   const [currentDate, setCurrentDate] = useState(new Date());
@@ -148,10 +149,10 @@ export default function ConsultantCalendar() {
   };
 
   const getEventPosition = (event) => {
-    const [hours, minutes] = event.time.split(':').map(Number);
-    const startMinutes = (hours - 6) * 60 + minutes;
-    const top = (startMinutes / 60) * 60; // 60px per hour
-    const height = (event.duration / 60) * 60;
+    const [h, minutes] = event.time.split(':').map(Number);
+    const startMinutes = (h - 6) * 60 + minutes;
+    const top = (startMinutes / 60) * HOUR_HEIGHT;
+    const height = (event.duration / 60) * HOUR_HEIGHT;
     return { top, height };
   };
 
@@ -339,63 +340,58 @@ export default function ConsultantCalendar() {
                   </div>
                   
                   {/* Week Grid with Hours */}
-                  <div className="relative overflow-y-auto" style={{ height: '600px' }}>
-                    <div className="grid grid-cols-8">
-                      {/* Time Column */}
-                      <div className="border-r border-slate-200 bg-slate-50">
-                        {hours.map((hour) => (
-                          <div key={hour} className="h-[60px] border-b border-slate-100 px-2 py-1">
-                            <span className="text-xs text-slate-500">
-                              {hour.toString().padStart(2, '0')}:00
-                            </span>
-                          </div>
-                        ))}
-                      </div>
-                      
-                      {/* Day Columns */}
-                      {weekDates.map((date, dayIndex) => {
-                        const dayEvents = getEventsForDate(date);
-                        const isToday = formatDateStr(date) === todayStr;
-                        
-                        return (
-                          <div 
-                            key={dayIndex} 
-                            className={`relative border-r last:border-r-0 ${isToday ? 'bg-blue-50/30' : ''}`}
-                          >
-                            {/* Hour cells */}
-                            {hours.map((hour) => (
-                              <div 
-                                key={hour} 
-                                className="h-[60px] border-b border-slate-100 cursor-pointer hover:bg-slate-100/50"
-                                onClick={() => handleCellClick(date, hour)}
-                              />
-                            ))}
-                            
-                            {/* Events */}
-                            {dayEvents.map((event) => {
-                              const { top, height } = getEventPosition(event);
-                              const TypeIcon = typeConfig[event.type]?.icon || CalendarIcon;
-                              return (
-                                <div
-                                  key={event.id}
-                                  className={`absolute left-1 right-1 rounded-lg px-2 py-1 cursor-pointer hover:opacity-90 transition-opacity border-l-4 ${typeConfig[event.type]?.color || 'bg-slate-500 text-white'} ${typeConfig[event.type]?.borderColor || ''}`}
-                                  style={{ top: `${top}px`, height: `${Math.max(height, 30)}px` }}
-                                  onClick={(e) => handleEventClick(event, e)}
-                                >
-                                  <div className="flex items-center gap-1">
-                                    <TypeIcon className="h-3 w-3 flex-shrink-0" />
-                                    <span className="text-xs font-medium">{event.time}</span>
-                                  </div>
-                                  {height >= 40 && (
-                                    <p className="text-xs truncate mt-0.5">{event.title}</p>
-                                  )}
-                                </div>
-                              );
-                            })}
-                          </div>
-                        );
-                      })}
+                  <div className="grid grid-cols-8">
+                    {/* Time Column */}
+                    <div className="border-r border-slate-200 bg-slate-50">
+                      {hours.map((hour) => (
+                        <div key={hour} className="border-b border-slate-100 px-1 flex items-start justify-end pr-2" style={{ height: `${HOUR_HEIGHT}px` }}>
+                          <span className="text-[10px] text-slate-400 -mt-1.5">
+                            {hour.toString().padStart(2, '0')}:00
+                          </span>
+                        </div>
+                      ))}
                     </div>
+                    
+                    {/* Day Columns */}
+                    {weekDates.map((date, dayIndex) => {
+                      const dayEvents = getEventsForDate(date);
+                      const isToday = formatDateStr(date) === todayStr;
+                      
+                      return (
+                        <div 
+                          key={dayIndex} 
+                          className={`relative border-r last:border-r-0 ${isToday ? 'bg-blue-50/30' : ''}`}
+                        >
+                          {/* Hour cells */}
+                          {hours.map((hour) => (
+                            <div 
+                              key={hour} 
+                              className="border-b border-slate-100 cursor-pointer hover:bg-slate-100/50"
+                              style={{ height: `${HOUR_HEIGHT}px` }}
+                              onClick={() => handleCellClick(date, hour)}
+                            />
+                          ))}
+                          
+                          {/* Events */}
+                          {dayEvents.map((event) => {
+                            const { top, height } = getEventPosition(event);
+                            const TypeIcon = typeConfig[event.type]?.icon || CalendarIcon;
+                            return (
+                              <div
+                                key={event.id}
+                                className={`absolute left-0.5 right-0.5 rounded px-1 py-0.5 cursor-pointer hover:opacity-90 transition-opacity border-l-2 overflow-hidden ${typeConfig[event.type]?.color || 'bg-slate-500 text-white'} ${typeConfig[event.type]?.borderColor || ''}`}
+                                style={{ top: `${top}px`, height: `${Math.max(height, 18)}px` }}
+                                onClick={(e) => handleEventClick(event, e)}
+                              >
+                                <div className="flex items-center gap-0.5">
+                                  <span className="text-[10px] font-medium truncate">{event.time} {event.title}</span>
+                                </div>
+                              </div>
+                            );
+                          })}
+                        </div>
+                      );
+                    })}
                   </div>
                 </>
               ) : (

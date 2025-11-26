@@ -365,7 +365,63 @@ export default function FinancialAnalysis() {
 
         return true;
       
-      case 8: // Financial Flow - no strict required fields
+      case 8: // Financial Flow - all fields required
+        // Client income fields
+        if (formData.client_gross_income === undefined || formData.client_gross_income === '') return false;
+        if (formData.client_net_income === undefined || formData.client_net_income === '') return false;
+        if (formData.client_annual_bonus === undefined || formData.client_annual_bonus === '') return false;
+        if (formData.client_other_monthly_income === undefined || formData.client_other_monthly_income === '') return false;
+        
+        // Partner income fields (if included)
+        if (formData.include_partner) {
+          if (formData.partner_gross_income === undefined || formData.partner_gross_income === '') return false;
+          if (formData.partner_net_income === undefined || formData.partner_net_income === '') return false;
+          if (formData.partner_annual_bonus === undefined || formData.partner_annual_bonus === '') return false;
+          if (formData.partner_other_monthly_income === undefined || formData.partner_other_monthly_income === '') return false;
+        }
+        
+        // Housing expenses
+        const housingFields = ['expense_rent', 'expense_utilities', 'expense_phone', 'expense_internet', 'expense_tv', 'expense_other_housing'];
+        for (const field of housingFields) {
+          if (formData[field] === undefined || formData[field] === '') return false;
+        }
+        
+        // Car expenses
+        const carFields = ['expense_fuel', 'expense_car_maintenance', 'expense_car_other'];
+        for (const field of carFields) {
+          if (formData[field] === undefined || formData[field] === '') return false;
+        }
+        
+        // Variable expenses
+        const variableFields = ['expense_food', 'expense_clothing', 'expense_culture', 'expense_travel', 'expense_children', 
+          'expense_cigarettes', 'expense_pets', 'expense_vacation', 'expense_business', 'expense_other',
+          'expense_education', 'expense_health', 'expense_cosmetics', 'expense_hobbies', 'expense_electronics', 'expense_taxes'];
+        for (const field of variableFields) {
+          if (formData[field] === undefined || formData[field] === '') return false;
+        }
+        
+        // Assets
+        const assetFields = ['asset_checking_account', 'asset_short_term_savings', 'asset_medium_term_savings', 'asset_long_term_savings'];
+        for (const field of assetFields) {
+          if (formData[field] === undefined || formData[field] === '') return false;
+        }
+        
+        // Liabilities
+        const liabilityFields = ['liability_mortgage_monthly', 'liability_mortgage_remaining', 
+          'liability_consumer_loans_monthly', 'liability_consumer_loans_remaining',
+          'liability_credit_cards_monthly', 'liability_credit_cards_remaining',
+          'liability_leasing_monthly', 'liability_leasing_remaining',
+          'liability_overdraft_monthly', 'liability_overdraft_remaining'];
+        for (const field of liabilityFields) {
+          if (formData[field] === undefined || formData[field] === '') return false;
+        }
+        
+        // Insurance
+        const insuranceFields = ['insurance_life', 'insurance_property', 'insurance_movable', 'insurance_civil', 'insurance_casco', 'insurance_other'];
+        for (const field of insuranceFields) {
+          if (formData[field] === undefined || formData[field] === '') return false;
+        }
+        
         return true;
       
       case 9: // Priorities - no strict required fields

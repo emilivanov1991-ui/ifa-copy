@@ -241,10 +241,23 @@ export default function ProtectionStep({ data, onChange }) {
                 <div className="pt-4 border-t border-slate-200 space-y-3">
                   <div className="flex items-center justify-between">
                     <Label className="cursor-pointer">Имате ли защита на имуществото?</Label>
-                    <Switch
-                      checked={data.property_1_has_insurance || false}
-                      onCheckedChange={(checked) => onChange('property_1_has_insurance', checked)}
-                    />
+                    <div className="flex items-center gap-2">
+                      <span className={cn("text-sm font-medium", !(data.property_1_has_insurance ?? false) ? "text-red-600" : "text-slate-400")}>не</span>
+                      <button
+                        type="button"
+                        onClick={() => onChange('property_1_has_insurance', !(data.property_1_has_insurance ?? false))}
+                        className={cn(
+                          "w-12 h-6 rounded-full transition-colors relative",
+                          (data.property_1_has_insurance ?? false) ? "bg-green-500" : "bg-red-500"
+                        )}
+                      >
+                        <div className={cn(
+                          "w-5 h-5 bg-white rounded-full absolute top-0.5 transition-all",
+                          (data.property_1_has_insurance ?? false) ? "left-6" : "left-0.5"
+                        )} />
+                      </button>
+                      <span className={cn("text-sm font-medium", (data.property_1_has_insurance ?? false) ? "text-green-600" : "text-slate-400")}>да</span>
+                    </div>
                   </div>
                   {data.property_1_has_insurance && (
                     <div className="grid sm:grid-cols-2 gap-4">
@@ -618,10 +631,23 @@ export default function ProtectionStep({ data, onChange }) {
                 <div className="pt-4 border-t border-slate-200 space-y-3">
                   <div className="flex items-center justify-between">
                     <Label className="cursor-pointer">Имате ли Каско?</Label>
-                    <Switch
-                      checked={data.car_1_has_casco || false}
-                      onCheckedChange={(checked) => onChange('car_1_has_casco', checked)}
-                    />
+                    <div className="flex items-center gap-2">
+                      <span className={cn("text-sm font-medium", !(data.car_1_has_casco ?? false) ? "text-red-600" : "text-slate-400")}>не</span>
+                      <button
+                        type="button"
+                        onClick={() => onChange('car_1_has_casco', !(data.car_1_has_casco ?? false))}
+                        className={cn(
+                          "w-12 h-6 rounded-full transition-colors relative",
+                          (data.car_1_has_casco ?? false) ? "bg-green-500" : "bg-red-500"
+                        )}
+                      >
+                        <div className={cn(
+                          "w-5 h-5 bg-white rounded-full absolute top-0.5 transition-all",
+                          (data.car_1_has_casco ?? false) ? "left-6" : "left-0.5"
+                        )} />
+                      </button>
+                      <span className={cn("text-sm font-medium", (data.car_1_has_casco ?? false) ? "text-green-600" : "text-slate-400")}>да</span>
+                    </div>
                   </div>
                   {data.car_1_has_casco && (
                     <div className="grid sm:grid-cols-2 gap-4">

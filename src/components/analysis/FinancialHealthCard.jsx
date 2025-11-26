@@ -32,6 +32,113 @@ const STATUS_CONFIG = {
 };
 
 export default function FinancialHealthCard({ data }) {
+  const [aiAnalysis, setAiAnalysis] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [hasGenerated, setHasGenerated] = useState(false);
+
+  // Generate AI analysis
+  const generateAnalysis = async () => {
+    setIsLoading(true);
+    
+    const analysisContext = {
+      clientAge: data.client_age,
+      partnerAge: data.include_partner ? data.partner_age : null,
+      childrenCount: data.children_count || 0,
+      currentHousing: data.current_housing,
+      planningHousingChange: data.planning_housing_change,
+      financingMethod: data.financing_method,
+      hasMortgage: data.current_housing_has_mortgage,
+      clientNetIncome: data.client_net_income || data.client_monthly_net_income,
+      partnerNetIncome: data.include_partner ? (data.partner_net_income || data.partner_monthly_net_income) : 0,
+      totalSavings: (data.client_checking_account || 0) + (data.client_cash || 0) + (data.client_savings_account || 0) + 
+        (data.include_partner ? ((data.partner_checking_account || 0) + (data.partner_cash || 0)) : 0),
+      desiredReserve: data.desired_reserve_amount,
+      clientRetirementAge: data.client_retirement_age,
+      clientDesiredPension: data.client_desired_pension,
+      clientExpectedPension: data.client_expected_state_pension,
+      hasVoluntaryPension: data.client_pillar_3,
+      hasProperty: data.has_property_1 || data.has_property_2 || data.has_property_3,
+      hasCar: data.has_car_1 || data.has_car_2 || data.has_car_3,
+      propertyInsured: data.property_1_has_insurance || data.property_2_has_insurance || data.property_3_has_insurance,
+      carInsured: data.car_1_has_casco || data.car_2_has_casco || data.car_3_has_casco,
+      hasIncomeProtection: data.client_has_income_protection,
+      incomeRisks: {
+        layoff: data.client_risk_layoff,
+        maternity: data.client_risk_maternity,
+        sickLeave: data.client_risk_sick_leave,
+        disability: data.client_risk_disability,
+        death: data.client_risk_death
+      },
+      childrenEducationCosts: data.children_education_costs,
+      skipChildrenSection: data.skip_children_section,
+      totalDebt: (data.liability_mortgage_remaining || 0) + (data.liability_consumer_loans_remaining || 0) + 
+        (data.liability_credit_cards_remaining || 0),
+      monthlyDebtPayments: (data.liability_mortgage_monthly || 0) + (data.liability_consumer_loans_monthly || 0)
+    };
+
+    try {
+      const result = await base44.integrations.Core.InvokeLLM({
+        prompt: `Ти си опитен финансов консултант в България. Анализирай следните данни за клиент и дай ТОЧНО 7 препоръки, разделени в 3 категории.
+
+ДАННИ ЗА КЛИЕНТА:
+${JSON.stringify(analysisContext, null, 2)}
+
+ВАЖНО: Бъди много sales-ориентиран! Използвай тактики като:
+- Sense of urgency (спешност) - "всеки изгубен месец струва X лева"
+- Fear of missing out - "87% от успешните хора вече правят това"
+- Social proof - "клиенти като Вас обикновено..."
+- Loss aversion - фокусирай се на загубите, не на печалбите
+- Емоционални trigger-и за семейство и сигурност
+
+АКЦЕНТИ (ако са приложими):
+1. ЗАСТРАХОВАНЕ - подчертай рисковете от липса на защита
+2. ПЕНСИОННО ОСИГУРЯВАНЕ - покажи разликата между желана и очаквана пенсия
+3. ПОДСИГУРЯВАНЕ НА ДЕЦА - емоционален апел за бъдещето им
+4. ИПОТЕЧНО КРЕДИТИРАНЕ - важността на правилна подготовка
+
+Отговори САМО с JSON в следния формат:
+{
+  "positives": [
+    {"title": "кратко заглавие", "text": "похвала и насърчение, max 2 изречения"}
+  ],
+  "attention": [
+    {"title": "заглавие", "text": "какво трябва да се обмисли, без да е критично, max 2 изречения"}
+  ],
+  "critical": [
+    {"title": "СПЕШНО заглавие", "text": "силен sales message с urgency, max 3 изречения", "potential_loss": число в евро ако е приложимо}
+  ],
+  "pension_gap_yearly": число (разлика между желана и очаквана пенсия годишно),
+  "years_to_retirement": число,
+  "missed_savings_10_years": число (пропуснати спестявания за 10 години ако не се действа)
+}
+
+Дай точно 2 positive, 2 attention, 3 critical точки. Бъди конкретен с числа и проценти.`,
+        response_json_schema: {
+          type: "object",
+          properties: {
+            positives: { type: "array", items: { type: "object", properties: { title: { type: "string" }, text: { type: "string" } } } },
+            attention: { type: "array", items: { type: "object", properties: { title: { type: "string" }, text: { type: "string" } } } },
+            critical: { type: "array", items: { type: "object", properties: { title: { type: "string" }, text: { type: "string" }, potential_loss: { type: "number" } } } },
+            pension_gap_yearly: { type: "number" },
+            years_to_retirement: { type: "number" },
+            missed_savings_10_years: { type: "number" }
+          }
+        }
+      });
+      
+      setAiAnalysis(result);
+      setHasGenerated(true);
+    } catch (error) {
+      console.error('AI Analysis error:', error);
+    }
+    setIsLoading(false);
+  };
+
+  useEffect(() => {
+    if (!hasGenerated) {
+      generateAnalysis();
+    }
+  }, []);
   // Calculate status for each category
   const getHousingStatus = () => {
     if (data.planning_housing_change === false && !data.current_housing_has_mortgage) {

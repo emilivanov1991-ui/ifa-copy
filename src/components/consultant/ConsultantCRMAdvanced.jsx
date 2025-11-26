@@ -23,7 +23,7 @@ import {
 import { 
   Search, Plus, Phone, Mail, Calendar, CheckCircle2, Clock, User,
   Video, Bell, AlertCircle, PhoneCall, Upload, Filter, UserPlus,
-  Users, MapPin, CalendarCheck
+  Users, MapPin, CalendarCheck, LayoutGrid, List
 } from 'lucide-react';
 import { toast } from 'sonner';
 
@@ -33,6 +33,7 @@ import MeetingOutcomeDialog from './crm/MeetingOutcomeDialog';
 import LeadImportDialog from './crm/LeadImportDialog';
 import CallOutcomeDialog from './CallOutcomeDialog';
 import AICRMAssistant from './AICRMAssistant';
+import KanbanBoard from './crm/KanbanBoard';
 
 const mockClients = [
   { 
@@ -84,6 +85,8 @@ export default function ConsultantCRMAdvanced() {
   const [clients, setClients] = useState(mockClients);
   const [typeFilter, setTypeFilter] = useState('all');
   const [statusFilter, setStatusFilter] = useState('all');
+  const [viewMode, setViewMode] = useState('list'); // 'list' or 'kanban'
+  const [periodFilter, setPeriodFilter] = useState('all'); // 'all', '1m', '3m', '6m', '1y'
   
   const [isImportOpen, setIsImportOpen] = useState(false);
   const [isAddLeadOpen, setIsAddLeadOpen] = useState(false);
@@ -231,13 +234,36 @@ export default function ConsultantCRMAdvanced() {
     toast.success('Lead добавен успешно');
   };
 
+  // Period filter helper
+  const getFilterDate = (period) => {
+    const now = new Date();
+    switch (period) {
+      case '1m': return new Date(now.setMonth(now.getMonth() - 1));
+      case '3m': return new Date(now.setMonth(now.getMonth() - 3));
+      case '6m': return new Date(now.setMonth(now.getMonth() - 6));
+      case '1y': return new Date(now.setFullYear(now.getFullYear() - 1));
+      default: return null;
+    }
+  };
+
   // Filters
   const filteredClients = clients.filter(client => {
     const matchesSearch = client.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       client.email?.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesType = typeFilter === 'all' || client.type === typeFilter;
     const matchesStatus = statusFilter === 'all' || client.status === statusFilter;
-    return matchesSearch && matchesType && matchesStatus;
+    
+    // Period filter
+    let matchesPeriod = true;
+    if (periodFilter !== 'all') {
+      const filterDate = getFilterDate(periodFilter);
+      const clientDate = client.lastContact ? new Date(client.lastContact) : (client.createdAt ? new Date(client.createdAt) : null);
+      if (filterDate && clientDate) {
+        matchesPeriod = clientDate >= filterDate;
+      }
+    }
+    
+    return matchesSearch && matchesType && matchesStatus && matchesPeriod;
   });
 
   // Pending meetings that need action
@@ -334,31 +360,68 @@ export default function ConsultantCRMAdvanced() {
           </div>
         </div>
 
-        {/* Filters */}
-        <div className="flex flex-wrap gap-2">
-          <Select value={typeFilter} onValueChange={setTypeFilter}>
-            <SelectTrigger className="w-40">
-              <Filter className="h-4 w-4 mr-2" />
-              <SelectValue placeholder="Тип" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">Всички типове</SelectItem>
-              <SelectItem value="lead">Lead</SelectItem>
-              <SelectItem value="opportunity">Opportunity</SelectItem>
-              <SelectItem value="customer">Customer</SelectItem>
-            </SelectContent>
-          </Select>
-          <Select value={statusFilter} onValueChange={setStatusFilter}>
-            <SelectTrigger className="w-56">
-              <SelectValue placeholder="Статус" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">Всички статуси</SelectItem>
-              {Object.entries(allStatuses).map(([key, val]) => (
-                <SelectItem key={key} value={key}>{val.label}</SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+        {/* Filters and View Toggle */}
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <div className="flex flex-wrap gap-2">
+            <Select value={typeFilter} onValueChange={setTypeFilter}>
+              <SelectTrigger className="w-40">
+                <Filter className="h-4 w-4 mr-2" />
+                <SelectValue placeholder="Тип" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">Всички типове</SelectItem>
+                <SelectItem value="lead">Lead</SelectItem>
+                <SelectItem value="opportunity">Opportunity</SelectItem>
+                <SelectItem value="customer">Customer</SelectItem>
+              </SelectContent>
+            </Select>
+            <Select value={statusFilter} onValueChange={setStatusFilter}>
+              <SelectTrigger className="w-56">
+                <SelectValue placeholder="Статус" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">Всички статуси</SelectItem>
+                {Object.entries(allStatuses).map(([key, val]) => (
+                  <SelectItem key={key} value={key}>{val.label}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            <Select value={periodFilter} onValueChange={setPeriodFilter}>
+              <SelectTrigger className="w-36">
+                <Calendar className="h-4 w-4 mr-2" />
+                <SelectValue placeholder="Период" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">Всички</SelectItem>
+                <SelectItem value="1m">1 месец</SelectItem>
+                <SelectItem value="3m">3 месеца</SelectItem>
+                <SelectItem value="6m">6 месеца</SelectItem>
+                <SelectItem value="1y">1 година</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+          
+          {/* View Toggle */}
+          <div className="flex border rounded-lg overflow-hidden">
+            <Button
+              variant={viewMode === 'list' ? 'default' : 'ghost'}
+              size="sm"
+              className={`rounded-none ${viewMode === 'list' ? 'bg-blue-600' : ''}`}
+              onClick={() => setViewMode('list')}
+            >
+              <List className="h-4 w-4 mr-1" />
+              Списък
+            </Button>
+            <Button
+              variant={viewMode === 'kanban' ? 'default' : 'ghost'}
+              size="sm"
+              className={`rounded-none ${viewMode === 'kanban' ? 'bg-blue-600' : ''}`}
+              onClick={() => setViewMode('kanban')}
+            >
+              <LayoutGrid className="h-4 w-4 mr-1" />
+              Табло
+            </Button>
+          </div>
         </div>
       </div>
 
@@ -384,26 +447,38 @@ export default function ConsultantCRMAdvanced() {
         </Card>
       )}
 
-      <div className="grid lg:grid-cols-3 gap-6">
-        {/* Clients List */}
-        <div className="lg:col-span-1 space-y-3">
-          <h3 className="font-semibold text-slate-900">
-            {typeFilter !== 'all' ? CLIENT_TYPES[typeFilter]?.label : 'Всички'} ({filteredClients.length})
-          </h3>
-          {filteredClients.map((client) => (
-            <ClientCard
-              key={client.id}
-              client={client}
-              isSelected={selectedClient?.id === client.id}
-              onSelect={setSelectedClient}
-              onCall={handleCallClick}
-              onMeetingOutcome={handleMeetingClick}
-            />
-          ))}
-        </div>
+      {/* Kanban View */}
+      {viewMode === 'kanban' && (
+        <KanbanBoard
+          clients={filteredClients}
+          onSelectClient={setSelectedClient}
+          onCall={handleCallClick}
+          selectedClient={selectedClient}
+        />
+      )}
+
+      <div className={`grid lg:grid-cols-3 gap-6 ${viewMode === 'kanban' ? 'mt-6' : ''}`}>
+        {/* Clients List - Only show in list view */}
+        {viewMode === 'list' && (
+          <div className="lg:col-span-1 space-y-3">
+            <h3 className="font-semibold text-slate-900">
+              {typeFilter !== 'all' ? CLIENT_TYPES[typeFilter]?.label : 'Всички'} ({filteredClients.length})
+            </h3>
+            {filteredClients.map((client) => (
+              <ClientCard
+                key={client.id}
+                client={client}
+                isSelected={selectedClient?.id === client.id}
+                onSelect={setSelectedClient}
+                onCall={handleCallClick}
+                onMeetingOutcome={handleMeetingClick}
+              />
+            ))}
+          </div>
+        )}
 
         {/* Client Detail */}
-        <div className="lg:col-span-2">
+        <div className={viewMode === 'list' ? 'lg:col-span-2' : 'lg:col-span-3'}
           {selectedClient ? (
             <Card>
               <CardHeader className="pb-3">

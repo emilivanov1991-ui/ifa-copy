@@ -180,8 +180,8 @@ export default function PensionStep({ data, onChange, showErrors }) {
                   type="number"
                   min="0"
                   placeholder=""
-                  value={data.client_gross_income_pension || ''}
-                  onChange={(e) => onChange('client_gross_income_pension', parseInt(e.target.value) || '')}
+                  value={data.client_gross_income_pension ?? ''}
+                  onChange={(e) => onChange('client_gross_income_pension', e.target.value === '' ? '' : parseInt(e.target.value))}
                   className={`rounded-lg ${isFieldInvalid(data.client_gross_income_pension) ? 'border-red-500 bg-red-50' : ''}`}
                   required
                 />
@@ -193,8 +193,8 @@ export default function PensionStep({ data, onChange, showErrors }) {
                   min="50"
                   max="75"
                   placeholder=""
-                  value={data.client_retirement_age || ''}
-                  onChange={(e) => onChange('client_retirement_age', parseInt(e.target.value) || '')}
+                  value={data.client_retirement_age ?? ''}
+                  onChange={(e) => onChange('client_retirement_age', e.target.value === '' ? '' : parseInt(e.target.value))}
                   className={`rounded-lg ${isFieldInvalid(data.client_retirement_age) ? 'border-red-500 bg-red-50' : ''}`}
                   required
                 />
@@ -205,8 +205,8 @@ export default function PensionStep({ data, onChange, showErrors }) {
                   type="number"
                   min="0"
                   placeholder=""
-                  value={data.client_desired_pension || ''}
-                  onChange={(e) => onChange('client_desired_pension', parseInt(e.target.value) || '')}
+                  value={data.client_desired_pension ?? ''}
+                  onChange={(e) => onChange('client_desired_pension', e.target.value === '' ? '' : parseInt(e.target.value))}
                   className={`rounded-lg ${isFieldInvalid(data.client_desired_pension) ? 'border-red-500 bg-red-50' : ''}`}
                   required
                 />
@@ -266,40 +266,40 @@ export default function PensionStep({ data, onChange, showErrors }) {
                   </div>
                 </div>
                 {/* Gross Income */}
-                <div className="space-y-2">
+                <div className="space-y-2" data-invalid={isFieldInvalid(data.partner_gross_income_pension) ? "true" : undefined}>
                   <Label>Брутен доход (€) <span className="text-red-500">*</span></Label>
                   <Input
                     type="number"
                     min="0"
                     placeholder=""
-                    value={data.partner_gross_income_pension || ''}
-                    onChange={(e) => onChange('partner_gross_income_pension', parseInt(e.target.value) || '')}
-                    className="rounded-lg"
+                    value={data.partner_gross_income_pension ?? ''}
+                    onChange={(e) => onChange('partner_gross_income_pension', e.target.value === '' ? '' : parseInt(e.target.value))}
+                    className={`rounded-lg ${isFieldInvalid(data.partner_gross_income_pension) ? 'border-red-500 bg-red-50' : ''}`}
                     required
                   />
                 </div>
-                <div className="space-y-2">
+                <div className="space-y-2" data-invalid={isFieldInvalid(data.partner_retirement_age) ? "true" : undefined}>
                   <Label>Кога искате да излезете в пенсия? (възраст) <span className="text-red-500">*</span></Label>
                   <Input
                     type="number"
                     min="50"
                     max="75"
                     placeholder=""
-                    value={data.partner_retirement_age || ''}
-                    onChange={(e) => onChange('partner_retirement_age', parseInt(e.target.value) || '')}
-                    className="rounded-lg"
+                    value={data.partner_retirement_age ?? ''}
+                    onChange={(e) => onChange('partner_retirement_age', e.target.value === '' ? '' : parseInt(e.target.value))}
+                    className={`rounded-lg ${isFieldInvalid(data.partner_retirement_age) ? 'border-red-500 bg-red-50' : ''}`}
                     required
                   />
                 </div>
-                <div className="space-y-2">
+                <div className="space-y-2" data-invalid={isFieldInvalid(data.partner_desired_pension) ? "true" : undefined}>
                   <Label>От каква месечна пенсия ще се нуждаете? (€) <span className="text-red-500">*</span></Label>
                   <Input
                     type="number"
                     min="0"
                     placeholder=""
-                    value={data.partner_desired_pension || ''}
-                    onChange={(e) => onChange('partner_desired_pension', parseInt(e.target.value) || '')}
-                    className="rounded-lg"
+                    value={data.partner_desired_pension ?? ''}
+                    onChange={(e) => onChange('partner_desired_pension', e.target.value === '' ? '' : parseInt(e.target.value))}
+                    className={`rounded-lg ${isFieldInvalid(data.partner_desired_pension) ? 'border-red-500 bg-red-50' : ''}`}
                     required
                   />
                 </div>

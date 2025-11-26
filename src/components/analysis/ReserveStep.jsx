@@ -738,13 +738,13 @@ export default function ReserveStep({ data, onChange, showErrors }) {
             )}
           </div>
 
-          <div className="space-y-2">
+          <div className="space-y-2" data-invalid={isFieldInvalid(data.investment_horizon) ? "true" : undefined}>
             <Label>Инвестиционен хоризонт <span className="text-red-500">*</span></Label>
             <Select 
               value={data.investment_horizon || ''} 
               onValueChange={(value) => onChange('investment_horizon', value)}
             >
-              <SelectTrigger className="rounded-lg">
+              <SelectTrigger className={`rounded-lg ${isFieldInvalid(data.investment_horizon) ? 'border-red-500 bg-red-50' : ''}`}>
                 <SelectValue placeholder="Изберете" />
               </SelectTrigger>
               <SelectContent>
@@ -756,13 +756,13 @@ export default function ReserveStep({ data, onChange, showErrors }) {
             </Select>
           </div>
 
-          <div className="space-y-2">
+          <div className="space-y-2" data-invalid={isFieldInvalid(data.investment_experience) ? "true" : undefined}>
             <Label>Какъв е Вашият опит с инвестирането? <span className="text-red-500">*</span></Label>
             <Select 
               value={data.investment_experience || ''} 
               onValueChange={(value) => onChange('investment_experience', value)}
             >
-              <SelectTrigger className="rounded-lg">
+              <SelectTrigger className={`rounded-lg ${isFieldInvalid(data.investment_experience) ? 'border-red-500 bg-red-50' : ''}`}>
                 <SelectValue placeholder="Изберете" />
               </SelectTrigger>
               <SelectContent>
@@ -774,13 +774,13 @@ export default function ReserveStep({ data, onChange, showErrors }) {
             </Select>
           </div>
 
-          <div className="space-y-2">
+          <div className="space-y-2" data-invalid={isFieldInvalid(data.reaction_to_10_percent_drop) ? "true" : undefined}>
             <Label>Какво бихте направили, ако стойността на инвестицията падне с 10%? <span className="text-red-500">*</span></Label>
             <Select 
               value={data.reaction_to_10_percent_drop || ''} 
               onValueChange={(value) => onChange('reaction_to_10_percent_drop', value)}
             >
-              <SelectTrigger className="rounded-lg">
+              <SelectTrigger className={`rounded-lg ${isFieldInvalid(data.reaction_to_10_percent_drop) ? 'border-red-500 bg-red-50' : ''}`}>
                 <SelectValue placeholder="Изберете" />
               </SelectTrigger>
               <SelectContent>
@@ -792,13 +792,13 @@ export default function ReserveStep({ data, onChange, showErrors }) {
             </Select>
           </div>
 
-          <div className="space-y-2">
+          <div className="space-y-2" data-invalid={isFieldInvalid(data.reaction_to_20_percent_gain) ? "true" : undefined}>
             <Label>Какво бихте направили, ако инвестицията нарасне с 20%? <span className="text-red-500">*</span></Label>
             <Select 
               value={data.reaction_to_20_percent_gain || ''} 
               onValueChange={(value) => onChange('reaction_to_20_percent_gain', value)}
             >
-              <SelectTrigger className="rounded-lg">
+              <SelectTrigger className={`rounded-lg ${isFieldInvalid(data.reaction_to_20_percent_gain) ? 'border-red-500 bg-red-50' : ''}`}>
                 <SelectValue placeholder="Изберете" />
               </SelectTrigger>
               <SelectContent>

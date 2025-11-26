@@ -324,57 +324,57 @@ export default function ProtectionStep({ data, onChange, showErrors }) {
 
               <div className="ml-6 p-4 bg-white rounded-lg border border-slate-200 space-y-4">
                 <div className="grid sm:grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label className="text-sm">Адрес</Label>
+                  <div className="space-y-2" data-invalid={data.has_property_2 && isFieldInvalid(data.property_2_address) ? "true" : undefined}>
+                    <Label className="text-sm">Адрес <span className="text-red-500">*</span></Label>
                     <Input
-                      placeholder="гр. София, ул. ..."
                       value={data.property_2_address || ''}
                       onChange={(e) => onChange('property_2_address', e.target.value)}
-                      className="rounded-lg"
+                      className={`rounded-lg ${data.has_property_2 && isFieldInvalid(data.property_2_address) ? 'border-red-500 bg-red-50' : ''}`}
+                      required
                     />
                   </div>
-                  <div className="space-y-2">
-                    <Label className="text-sm">Брой стаи</Label>
+                  <div className="space-y-2" data-invalid={data.has_property_2 && isFieldInvalid(data.property_2_rooms) ? "true" : undefined}>
+                    <Label className="text-sm">Брой стаи <span className="text-red-500">*</span></Label>
                     <Input
                       type="number"
                       min="1"
-                      placeholder="3"
-                      value={data.property_2_rooms || ''}
-                      onChange={(e) => onChange('property_2_rooms', parseInt(e.target.value) || '')}
-                      className="rounded-lg"
+                      value={data.property_2_rooms ?? ''}
+                      onChange={(e) => onChange('property_2_rooms', e.target.value === '' ? '' : parseInt(e.target.value))}
+                      className={`rounded-lg ${data.has_property_2 && isFieldInvalid(data.property_2_rooms) ? 'border-red-500 bg-red-50' : ''}`}
+                      required
                     />
                   </div>
-                  <div className="space-y-2">
-                    <Label className="text-sm">Застроена площ (кв.м)</Label>
+                  <div className="space-y-2" data-invalid={data.has_property_2 && isFieldInvalid(data.property_2_area) ? "true" : undefined}>
+                    <Label className="text-sm">Застроена площ (кв.м) <span className="text-red-500">*</span></Label>
                     <Input
                       type="number"
                       min="0"
-                      placeholder="80"
-                      value={data.property_2_area || ''}
-                      onChange={(e) => onChange('property_2_area', parseInt(e.target.value) || '')}
-                      className="rounded-lg"
+                      value={data.property_2_area ?? ''}
+                      onChange={(e) => onChange('property_2_area', e.target.value === '' ? '' : parseInt(e.target.value))}
+                      className={`rounded-lg ${data.has_property_2 && isFieldInvalid(data.property_2_area) ? 'border-red-500 bg-red-50' : ''}`}
+                      required
                     />
                   </div>
-                  <div className="space-y-2">
-                    <Label className="text-sm">Стойност (€)</Label>
+                  <div className="space-y-2" data-invalid={data.has_property_2 && isFieldInvalid(data.property_2_value) ? "true" : undefined}>
+                    <Label className="text-sm">Стойност (€) <span className="text-red-500">*</span></Label>
                     <Input
                       type="number"
                       min="0"
-                      placeholder="100000"
-                      value={data.property_2_value || ''}
-                      onChange={(e) => onChange('property_2_value', parseInt(e.target.value) || '')}
-                      className="rounded-lg"
+                      value={data.property_2_value ?? ''}
+                      onChange={(e) => onChange('property_2_value', e.target.value === '' ? '' : parseInt(e.target.value))}
+                      className={`rounded-lg ${data.has_property_2 && isFieldInvalid(data.property_2_value) ? 'border-red-500 bg-red-50' : ''}`}
+                      required
                     />
                   </div>
-                  <div className="space-y-2 sm:col-span-2">
-                    <Label className="text-sm">Стойност на движимото имущество (€)</Label>
+                  <div className="space-y-2 sm:col-span-2" data-invalid={data.has_property_2 && isFieldInvalid(data.property_2_movable_value) ? "true" : undefined}>
+                    <Label className="text-sm">Стойност на движимото имущество (€) <span className="text-red-500">*</span></Label>
                     <Input
                       type="number"
                       min="0"
-                      placeholder="10000"
-                      value={data.property_2_movable_value || ''}
-                      onChange={(e) => onChange('property_2_movable_value', parseInt(e.target.value) || '')}
-                      className="rounded-lg"
+                      value={data.property_2_movable_value ?? ''}
+                      onChange={(e) => onChange('property_2_movable_value', e.target.value === '' ? '' : parseInt(e.target.value))}
+                      className={`rounded-lg ${data.has_property_2 && isFieldInvalid(data.property_2_movable_value) ? 'border-red-500 bg-red-50' : ''}`}
+                      required
                     />
                   </div>
                 </div>
@@ -383,30 +383,49 @@ export default function ProtectionStep({ data, onChange, showErrors }) {
                 <div className="pt-4 border-t border-slate-200 space-y-3">
                   <div className="flex items-center justify-between">
                     <Label className="cursor-pointer">Имате ли защита на имуществото?</Label>
-                    <Switch
-                      checked={data.property_2_has_insurance || false}
-                      onCheckedChange={(checked) => onChange('property_2_has_insurance', checked)}
-                    />
+                    <div className="flex items-center gap-2">
+                      <span className={cn("text-sm font-medium", !(data.property_2_has_insurance ?? false) ? "text-red-600" : "text-slate-400")}>не</span>
+                      <button
+                        type="button"
+                        onClick={() => onChange('property_2_has_insurance', !(data.property_2_has_insurance ?? false))}
+                        className={cn(
+                          "w-12 h-6 rounded-full transition-colors relative",
+                          (data.property_2_has_insurance ?? false) ? "bg-green-500" : "bg-red-500"
+                        )}
+                      >
+                        <div className={cn(
+                          "w-5 h-5 bg-white rounded-full absolute top-0.5 transition-all",
+                          (data.property_2_has_insurance ?? false) ? "left-6" : "left-0.5"
+                        )} />
+                      </button>
+                      <span className={cn("text-sm font-medium", (data.property_2_has_insurance ?? false) ? "text-green-600" : "text-slate-400")}>да</span>
+                    </div>
                   </div>
                   {data.property_2_has_insurance && (
                     <div className="grid sm:grid-cols-2 gap-4">
-                      <div className="space-y-2">
-                        <Label className="text-sm">Застраховател</Label>
-                        <Input
-                          placeholder="Име на застраховател"
-                          value={data.property_2_insurer || ''}
-                          onChange={(e) => onChange('property_2_insurer', e.target.value)}
-                          className="rounded-lg"
-                        />
+                      <div className="space-y-2" data-invalid={data.property_2_has_insurance && isFieldInvalid(data.property_2_insurer) ? "true" : undefined}>
+                        <Label className="text-sm">Застраховател <span className="text-red-500">*</span></Label>
+                        <Select 
+                          value={data.property_2_insurer || ''} 
+                          onValueChange={(value) => onChange('property_2_insurer', value)}
+                        >
+                          <SelectTrigger className={`rounded-lg ${data.property_2_has_insurance && isFieldInvalid(data.property_2_insurer) ? 'border-red-500 bg-red-50' : ''}`}>
+                            <SelectValue placeholder="Изберете" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {INSURANCE_COMPANIES.map(ins => (
+                              <SelectItem key={ins.value} value={ins.value}>{ins.label}</SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
                       </div>
-                      <div className="space-y-2">
-                        <Label className="text-sm">Срок на полицата (дд/мм/гггг)</Label>
-                        <Input
-                          type="text"
-                          placeholder="дд/мм/гггг"
+                      <div className="space-y-2" data-invalid={data.property_2_has_insurance && isFieldInvalid(data.property_2_insurance_expiry) ? "true" : undefined}>
+                        <Label className="text-sm">Срок на полицата (дд.мм.гггг) <span className="text-red-500">*</span></Label>
+                        <BulgarianDateInput
                           value={data.property_2_insurance_expiry || ''}
-                          onChange={(e) => onChange('property_2_insurance_expiry', e.target.value)}
-                          className="rounded-lg"
+                          onChange={(value) => onChange('property_2_insurance_expiry', value)}
+                          className={`rounded-lg ${data.property_2_has_insurance && isFieldInvalid(data.property_2_insurance_expiry) ? 'border-red-500 bg-red-50' : ''}`}
+                          required
                         />
                       </div>
                     </div>
@@ -445,57 +464,57 @@ export default function ProtectionStep({ data, onChange, showErrors }) {
 
               <div className="ml-6 p-4 bg-white rounded-lg border border-slate-200 space-y-4">
                 <div className="grid sm:grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label className="text-sm">Адрес</Label>
+                  <div className="space-y-2" data-invalid={data.has_property_3 && isFieldInvalid(data.property_3_address) ? "true" : undefined}>
+                    <Label className="text-sm">Адрес <span className="text-red-500">*</span></Label>
                     <Input
-                      placeholder="гр. София, ул. ..."
                       value={data.property_3_address || ''}
                       onChange={(e) => onChange('property_3_address', e.target.value)}
-                      className="rounded-lg"
+                      className={`rounded-lg ${data.has_property_3 && isFieldInvalid(data.property_3_address) ? 'border-red-500 bg-red-50' : ''}`}
+                      required
                     />
                   </div>
-                  <div className="space-y-2">
-                    <Label className="text-sm">Брой стаи</Label>
+                  <div className="space-y-2" data-invalid={data.has_property_3 && isFieldInvalid(data.property_3_rooms) ? "true" : undefined}>
+                    <Label className="text-sm">Брой стаи <span className="text-red-500">*</span></Label>
                     <Input
                       type="number"
                       min="1"
-                      placeholder="3"
-                      value={data.property_3_rooms || ''}
-                      onChange={(e) => onChange('property_3_rooms', parseInt(e.target.value) || '')}
-                      className="rounded-lg"
+                      value={data.property_3_rooms ?? ''}
+                      onChange={(e) => onChange('property_3_rooms', e.target.value === '' ? '' : parseInt(e.target.value))}
+                      className={`rounded-lg ${data.has_property_3 && isFieldInvalid(data.property_3_rooms) ? 'border-red-500 bg-red-50' : ''}`}
+                      required
                     />
                   </div>
-                  <div className="space-y-2">
-                    <Label className="text-sm">Застроена площ (кв.м)</Label>
+                  <div className="space-y-2" data-invalid={data.has_property_3 && isFieldInvalid(data.property_3_area) ? "true" : undefined}>
+                    <Label className="text-sm">Застроена площ (кв.м) <span className="text-red-500">*</span></Label>
                     <Input
                       type="number"
                       min="0"
-                      placeholder="80"
-                      value={data.property_3_area || ''}
-                      onChange={(e) => onChange('property_3_area', parseInt(e.target.value) || '')}
-                      className="rounded-lg"
+                      value={data.property_3_area ?? ''}
+                      onChange={(e) => onChange('property_3_area', e.target.value === '' ? '' : parseInt(e.target.value))}
+                      className={`rounded-lg ${data.has_property_3 && isFieldInvalid(data.property_3_area) ? 'border-red-500 bg-red-50' : ''}`}
+                      required
                     />
                   </div>
-                  <div className="space-y-2">
-                    <Label className="text-sm">Стойност (€)</Label>
+                  <div className="space-y-2" data-invalid={data.has_property_3 && isFieldInvalid(data.property_3_value) ? "true" : undefined}>
+                    <Label className="text-sm">Стойност (€) <span className="text-red-500">*</span></Label>
                     <Input
                       type="number"
                       min="0"
-                      placeholder="100000"
-                      value={data.property_3_value || ''}
-                      onChange={(e) => onChange('property_3_value', parseInt(e.target.value) || '')}
-                      className="rounded-lg"
+                      value={data.property_3_value ?? ''}
+                      onChange={(e) => onChange('property_3_value', e.target.value === '' ? '' : parseInt(e.target.value))}
+                      className={`rounded-lg ${data.has_property_3 && isFieldInvalid(data.property_3_value) ? 'border-red-500 bg-red-50' : ''}`}
+                      required
                     />
                   </div>
-                  <div className="space-y-2 sm:col-span-2">
-                    <Label className="text-sm">Стойност на движимото имущество (€)</Label>
+                  <div className="space-y-2 sm:col-span-2" data-invalid={data.has_property_3 && isFieldInvalid(data.property_3_movable_value) ? "true" : undefined}>
+                    <Label className="text-sm">Стойност на движимото имущество (€) <span className="text-red-500">*</span></Label>
                     <Input
                       type="number"
                       min="0"
-                      placeholder="10000"
-                      value={data.property_3_movable_value || ''}
-                      onChange={(e) => onChange('property_3_movable_value', parseInt(e.target.value) || '')}
-                      className="rounded-lg"
+                      value={data.property_3_movable_value ?? ''}
+                      onChange={(e) => onChange('property_3_movable_value', e.target.value === '' ? '' : parseInt(e.target.value))}
+                      className={`rounded-lg ${data.has_property_3 && isFieldInvalid(data.property_3_movable_value) ? 'border-red-500 bg-red-50' : ''}`}
+                      required
                     />
                   </div>
                 </div>
@@ -504,30 +523,49 @@ export default function ProtectionStep({ data, onChange, showErrors }) {
                 <div className="pt-4 border-t border-slate-200 space-y-3">
                   <div className="flex items-center justify-between">
                     <Label className="cursor-pointer">Имате ли защита на имуществото?</Label>
-                    <Switch
-                      checked={data.property_3_has_insurance || false}
-                      onCheckedChange={(checked) => onChange('property_3_has_insurance', checked)}
-                    />
+                    <div className="flex items-center gap-2">
+                      <span className={cn("text-sm font-medium", !(data.property_3_has_insurance ?? false) ? "text-red-600" : "text-slate-400")}>не</span>
+                      <button
+                        type="button"
+                        onClick={() => onChange('property_3_has_insurance', !(data.property_3_has_insurance ?? false))}
+                        className={cn(
+                          "w-12 h-6 rounded-full transition-colors relative",
+                          (data.property_3_has_insurance ?? false) ? "bg-green-500" : "bg-red-500"
+                        )}
+                      >
+                        <div className={cn(
+                          "w-5 h-5 bg-white rounded-full absolute top-0.5 transition-all",
+                          (data.property_3_has_insurance ?? false) ? "left-6" : "left-0.5"
+                        )} />
+                      </button>
+                      <span className={cn("text-sm font-medium", (data.property_3_has_insurance ?? false) ? "text-green-600" : "text-slate-400")}>да</span>
+                    </div>
                   </div>
                   {data.property_3_has_insurance && (
                     <div className="grid sm:grid-cols-2 gap-4">
-                      <div className="space-y-2">
-                        <Label className="text-sm">Застраховател</Label>
-                        <Input
-                          placeholder="Име на застраховател"
-                          value={data.property_3_insurer || ''}
-                          onChange={(e) => onChange('property_3_insurer', e.target.value)}
-                          className="rounded-lg"
-                        />
+                      <div className="space-y-2" data-invalid={data.property_3_has_insurance && isFieldInvalid(data.property_3_insurer) ? "true" : undefined}>
+                        <Label className="text-sm">Застраховател <span className="text-red-500">*</span></Label>
+                        <Select 
+                          value={data.property_3_insurer || ''} 
+                          onValueChange={(value) => onChange('property_3_insurer', value)}
+                        >
+                          <SelectTrigger className={`rounded-lg ${data.property_3_has_insurance && isFieldInvalid(data.property_3_insurer) ? 'border-red-500 bg-red-50' : ''}`}>
+                            <SelectValue placeholder="Изберете" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {INSURANCE_COMPANIES.map(ins => (
+                              <SelectItem key={ins.value} value={ins.value}>{ins.label}</SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
                       </div>
-                      <div className="space-y-2">
-                        <Label className="text-sm">Срок на полицата (дд/мм/гггг)</Label>
-                        <Input
-                          type="text"
-                          placeholder="дд/мм/гггг"
+                      <div className="space-y-2" data-invalid={data.property_3_has_insurance && isFieldInvalid(data.property_3_insurance_expiry) ? "true" : undefined}>
+                        <Label className="text-sm">Срок на полицата (дд.мм.гггг) <span className="text-red-500">*</span></Label>
+                        <BulgarianDateInput
                           value={data.property_3_insurance_expiry || ''}
-                          onChange={(e) => onChange('property_3_insurance_expiry', e.target.value)}
-                          className="rounded-lg"
+                          onChange={(value) => onChange('property_3_insurance_expiry', value)}
+                          className={`rounded-lg ${data.property_3_has_insurance && isFieldInvalid(data.property_3_insurance_expiry) ? 'border-red-500 bg-red-50' : ''}`}
+                          required
                         />
                       </div>
                     </div>
@@ -714,59 +752,66 @@ export default function ProtectionStep({ data, onChange, showErrors }) {
 
               <div className="ml-6 p-4 bg-white rounded-lg border border-slate-200 space-y-4">
                 <div className="grid sm:grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label className="text-sm">Марка</Label>
+                  <div className="space-y-2" data-invalid={data.has_car_2 && isFieldInvalid(data.car_2_brand) ? "true" : undefined}>
+                    <Label className="text-sm">Марка <span className="text-red-500">*</span></Label>
                     <Input
-                      placeholder="Toyota"
                       value={data.car_2_brand || ''}
                       onChange={(e) => onChange('car_2_brand', e.target.value)}
-                      className="rounded-lg"
+                      className={`rounded-lg ${data.has_car_2 && isFieldInvalid(data.car_2_brand) ? 'border-red-500 bg-red-50' : ''}`}
+                      required
                     />
                   </div>
-                  <div className="space-y-2">
-                    <Label className="text-sm">Модел</Label>
+                  <div className="space-y-2" data-invalid={data.has_car_2 && isFieldInvalid(data.car_2_model) ? "true" : undefined}>
+                    <Label className="text-sm">Модел <span className="text-red-500">*</span></Label>
                     <Input
-                      placeholder="Corolla"
                       value={data.car_2_model || ''}
                       onChange={(e) => onChange('car_2_model', e.target.value)}
-                      className="rounded-lg"
+                      className={`rounded-lg ${data.has_car_2 && isFieldInvalid(data.car_2_model) ? 'border-red-500 bg-red-50' : ''}`}
+                      required
                     />
                   </div>
-                  <div className="space-y-2">
-                    <Label className="text-sm">Година на производство</Label>
+                  <div className="space-y-2" data-invalid={data.has_car_2 && isFieldInvalid(data.car_2_year) ? "true" : undefined}>
+                    <Label className="text-sm">Година на производство <span className="text-red-500">*</span></Label>
                     <Input
                       type="number"
                       min="1900"
                       max="2025"
-                      placeholder="2020"
-                      value={data.car_2_year || ''}
-                      onChange={(e) => onChange('car_2_year', parseInt(e.target.value) || '')}
-                      className="rounded-lg"
+                      value={data.car_2_year ?? ''}
+                      onChange={(e) => onChange('car_2_year', e.target.value === '' ? '' : parseInt(e.target.value))}
+                      className={`rounded-lg ${data.has_car_2 && isFieldInvalid(data.car_2_year) ? 'border-red-500 bg-red-50' : ''}`}
+                      required
                     />
                   </div>
-                  <div className="space-y-2">
-                    <Label className="text-sm">Стойност (€)</Label>
+                  <div className="space-y-2" data-invalid={data.has_car_2 && isFieldInvalid(data.car_2_value) ? "true" : undefined}>
+                    <Label className="text-sm">Стойност (€) <span className="text-red-500">*</span></Label>
                     <Input
                       type="number"
                       min="0"
-                      placeholder="15000"
-                      value={data.car_2_value || ''}
-                      onChange={(e) => onChange('car_2_value', parseInt(e.target.value) || '')}
-                      className="rounded-lg"
+                      value={data.car_2_value ?? ''}
+                      onChange={(e) => onChange('car_2_value', e.target.value === '' ? '' : parseInt(e.target.value))}
+                      className={`rounded-lg ${data.has_car_2 && isFieldInvalid(data.car_2_value) ? 'border-red-500 bg-red-50' : ''}`}
+                      required
                     />
                   </div>
                 </div>
 
                 {/* Car 2 GO Insurance */}
                 <div className="pt-4 border-t border-slate-200 space-y-3">
-                  <div className="space-y-2">
-                    <Label className="text-sm">ГО-Застраховател</Label>
-                    <Input
-                      placeholder="Име на застраховател"
-                      value={data.car_2_go_insurer || ''}
-                      onChange={(e) => onChange('car_2_go_insurer', e.target.value)}
-                      className="rounded-lg"
-                    />
+                  <div className="space-y-2" data-invalid={data.has_car_2 && isFieldInvalid(data.car_2_go_insurer) ? "true" : undefined}>
+                    <Label className="text-sm">ГО-Застраховател <span className="text-red-500">*</span></Label>
+                    <Select 
+                      value={data.car_2_go_insurer || ''} 
+                      onValueChange={(value) => onChange('car_2_go_insurer', value)}
+                    >
+                      <SelectTrigger className={`rounded-lg ${data.has_car_2 && isFieldInvalid(data.car_2_go_insurer) ? 'border-red-500 bg-red-50' : ''}`}>
+                        <SelectValue placeholder="Изберете" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {INSURANCE_COMPANIES.map(ins => (
+                          <SelectItem key={ins.value} value={ins.value}>{ins.label}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
                   </div>
                 </div>
 
@@ -774,30 +819,49 @@ export default function ProtectionStep({ data, onChange, showErrors }) {
                 <div className="pt-4 border-t border-slate-200 space-y-3">
                   <div className="flex items-center justify-between">
                     <Label className="cursor-pointer">Имате ли Каско?</Label>
-                    <Switch
-                      checked={data.car_2_has_casco || false}
-                      onCheckedChange={(checked) => onChange('car_2_has_casco', checked)}
-                    />
+                    <div className="flex items-center gap-2">
+                      <span className={cn("text-sm font-medium", !(data.car_2_has_casco ?? false) ? "text-red-600" : "text-slate-400")}>не</span>
+                      <button
+                        type="button"
+                        onClick={() => onChange('car_2_has_casco', !(data.car_2_has_casco ?? false))}
+                        className={cn(
+                          "w-12 h-6 rounded-full transition-colors relative",
+                          (data.car_2_has_casco ?? false) ? "bg-green-500" : "bg-red-500"
+                        )}
+                      >
+                        <div className={cn(
+                          "w-5 h-5 bg-white rounded-full absolute top-0.5 transition-all",
+                          (data.car_2_has_casco ?? false) ? "left-6" : "left-0.5"
+                        )} />
+                      </button>
+                      <span className={cn("text-sm font-medium", (data.car_2_has_casco ?? false) ? "text-green-600" : "text-slate-400")}>да</span>
+                    </div>
                   </div>
                   {data.car_2_has_casco && (
                     <div className="grid sm:grid-cols-2 gap-4">
-                      <div className="space-y-2">
-                        <Label className="text-sm">Застраховател</Label>
-                        <Input
-                          placeholder="Име на застраховател"
-                          value={data.car_2_casco_insurer || ''}
-                          onChange={(e) => onChange('car_2_casco_insurer', e.target.value)}
-                          className="rounded-lg"
-                        />
+                      <div className="space-y-2" data-invalid={data.car_2_has_casco && isFieldInvalid(data.car_2_casco_insurer) ? "true" : undefined}>
+                        <Label className="text-sm">Застраховател <span className="text-red-500">*</span></Label>
+                        <Select 
+                          value={data.car_2_casco_insurer || ''} 
+                          onValueChange={(value) => onChange('car_2_casco_insurer', value)}
+                        >
+                          <SelectTrigger className={`rounded-lg ${data.car_2_has_casco && isFieldInvalid(data.car_2_casco_insurer) ? 'border-red-500 bg-red-50' : ''}`}>
+                            <SelectValue placeholder="Изберете" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {INSURANCE_COMPANIES.map(ins => (
+                              <SelectItem key={ins.value} value={ins.value}>{ins.label}</SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
                       </div>
-                      <div className="space-y-2">
-                        <Label className="text-sm">Срок на полицата (дд/мм/гггг)</Label>
-                        <Input
-                          type="text"
-                          placeholder="дд/мм/гггг"
+                      <div className="space-y-2" data-invalid={data.car_2_has_casco && isFieldInvalid(data.car_2_casco_expiry) ? "true" : undefined}>
+                        <Label className="text-sm">Срок на полицата (дд.мм.гггг) <span className="text-red-500">*</span></Label>
+                        <BulgarianDateInput
                           value={data.car_2_casco_expiry || ''}
-                          onChange={(e) => onChange('car_2_casco_expiry', e.target.value)}
-                          className="rounded-lg"
+                          onChange={(value) => onChange('car_2_casco_expiry', value)}
+                          className={`rounded-lg ${data.car_2_has_casco && isFieldInvalid(data.car_2_casco_expiry) ? 'border-red-500 bg-red-50' : ''}`}
+                          required
                         />
                       </div>
                     </div>
@@ -836,59 +900,66 @@ export default function ProtectionStep({ data, onChange, showErrors }) {
 
               <div className="ml-6 p-4 bg-white rounded-lg border border-slate-200 space-y-4">
                 <div className="grid sm:grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label className="text-sm">Марка</Label>
+                  <div className="space-y-2" data-invalid={data.has_car_3 && isFieldInvalid(data.car_3_brand) ? "true" : undefined}>
+                    <Label className="text-sm">Марка <span className="text-red-500">*</span></Label>
                     <Input
-                      placeholder="Toyota"
                       value={data.car_3_brand || ''}
                       onChange={(e) => onChange('car_3_brand', e.target.value)}
-                      className="rounded-lg"
+                      className={`rounded-lg ${data.has_car_3 && isFieldInvalid(data.car_3_brand) ? 'border-red-500 bg-red-50' : ''}`}
+                      required
                     />
                   </div>
-                  <div className="space-y-2">
-                    <Label className="text-sm">Модел</Label>
+                  <div className="space-y-2" data-invalid={data.has_car_3 && isFieldInvalid(data.car_3_model) ? "true" : undefined}>
+                    <Label className="text-sm">Модел <span className="text-red-500">*</span></Label>
                     <Input
-                      placeholder="Corolla"
                       value={data.car_3_model || ''}
                       onChange={(e) => onChange('car_3_model', e.target.value)}
-                      className="rounded-lg"
+                      className={`rounded-lg ${data.has_car_3 && isFieldInvalid(data.car_3_model) ? 'border-red-500 bg-red-50' : ''}`}
+                      required
                     />
                   </div>
-                  <div className="space-y-2">
-                    <Label className="text-sm">Година на производство</Label>
+                  <div className="space-y-2" data-invalid={data.has_car_3 && isFieldInvalid(data.car_3_year) ? "true" : undefined}>
+                    <Label className="text-sm">Година на производство <span className="text-red-500">*</span></Label>
                     <Input
                       type="number"
                       min="1900"
                       max="2025"
-                      placeholder="2020"
-                      value={data.car_3_year || ''}
-                      onChange={(e) => onChange('car_3_year', parseInt(e.target.value) || '')}
-                      className="rounded-lg"
+                      value={data.car_3_year ?? ''}
+                      onChange={(e) => onChange('car_3_year', e.target.value === '' ? '' : parseInt(e.target.value))}
+                      className={`rounded-lg ${data.has_car_3 && isFieldInvalid(data.car_3_year) ? 'border-red-500 bg-red-50' : ''}`}
+                      required
                     />
                   </div>
-                  <div className="space-y-2">
-                    <Label className="text-sm">Стойност (€)</Label>
+                  <div className="space-y-2" data-invalid={data.has_car_3 && isFieldInvalid(data.car_3_value) ? "true" : undefined}>
+                    <Label className="text-sm">Стойност (€) <span className="text-red-500">*</span></Label>
                     <Input
                       type="number"
                       min="0"
-                      placeholder="15000"
-                      value={data.car_3_value || ''}
-                      onChange={(e) => onChange('car_3_value', parseInt(e.target.value) || '')}
-                      className="rounded-lg"
+                      value={data.car_3_value ?? ''}
+                      onChange={(e) => onChange('car_3_value', e.target.value === '' ? '' : parseInt(e.target.value))}
+                      className={`rounded-lg ${data.has_car_3 && isFieldInvalid(data.car_3_value) ? 'border-red-500 bg-red-50' : ''}`}
+                      required
                     />
                   </div>
                 </div>
 
                 {/* Car 3 GO Insurance */}
                 <div className="pt-4 border-t border-slate-200 space-y-3">
-                  <div className="space-y-2">
-                    <Label className="text-sm">ГО-Застраховател</Label>
-                    <Input
-                      placeholder="Име на застраховател"
-                      value={data.car_3_go_insurer || ''}
-                      onChange={(e) => onChange('car_3_go_insurer', e.target.value)}
-                      className="rounded-lg"
-                    />
+                  <div className="space-y-2" data-invalid={data.has_car_3 && isFieldInvalid(data.car_3_go_insurer) ? "true" : undefined}>
+                    <Label className="text-sm">ГО-Застраховател <span className="text-red-500">*</span></Label>
+                    <Select 
+                      value={data.car_3_go_insurer || ''} 
+                      onValueChange={(value) => onChange('car_3_go_insurer', value)}
+                    >
+                      <SelectTrigger className={`rounded-lg ${data.has_car_3 && isFieldInvalid(data.car_3_go_insurer) ? 'border-red-500 bg-red-50' : ''}`}>
+                        <SelectValue placeholder="Изберете" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {INSURANCE_COMPANIES.map(ins => (
+                          <SelectItem key={ins.value} value={ins.value}>{ins.label}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
                   </div>
                 </div>
 
@@ -896,30 +967,49 @@ export default function ProtectionStep({ data, onChange, showErrors }) {
                 <div className="pt-4 border-t border-slate-200 space-y-3">
                   <div className="flex items-center justify-between">
                     <Label className="cursor-pointer">Имате ли Каско?</Label>
-                    <Switch
-                      checked={data.car_3_has_casco || false}
-                      onCheckedChange={(checked) => onChange('car_3_has_casco', checked)}
-                    />
+                    <div className="flex items-center gap-2">
+                      <span className={cn("text-sm font-medium", !(data.car_3_has_casco ?? false) ? "text-red-600" : "text-slate-400")}>не</span>
+                      <button
+                        type="button"
+                        onClick={() => onChange('car_3_has_casco', !(data.car_3_has_casco ?? false))}
+                        className={cn(
+                          "w-12 h-6 rounded-full transition-colors relative",
+                          (data.car_3_has_casco ?? false) ? "bg-green-500" : "bg-red-500"
+                        )}
+                      >
+                        <div className={cn(
+                          "w-5 h-5 bg-white rounded-full absolute top-0.5 transition-all",
+                          (data.car_3_has_casco ?? false) ? "left-6" : "left-0.5"
+                        )} />
+                      </button>
+                      <span className={cn("text-sm font-medium", (data.car_3_has_casco ?? false) ? "text-green-600" : "text-slate-400")}>да</span>
+                    </div>
                   </div>
                   {data.car_3_has_casco && (
                     <div className="grid sm:grid-cols-2 gap-4">
-                      <div className="space-y-2">
-                        <Label className="text-sm">Застраховател</Label>
-                        <Input
-                          placeholder="Име на застраховател"
-                          value={data.car_3_casco_insurer || ''}
-                          onChange={(e) => onChange('car_3_casco_insurer', e.target.value)}
-                          className="rounded-lg"
-                        />
+                      <div className="space-y-2" data-invalid={data.car_3_has_casco && isFieldInvalid(data.car_3_casco_insurer) ? "true" : undefined}>
+                        <Label className="text-sm">Застраховател <span className="text-red-500">*</span></Label>
+                        <Select 
+                          value={data.car_3_casco_insurer || ''} 
+                          onValueChange={(value) => onChange('car_3_casco_insurer', value)}
+                        >
+                          <SelectTrigger className={`rounded-lg ${data.car_3_has_casco && isFieldInvalid(data.car_3_casco_insurer) ? 'border-red-500 bg-red-50' : ''}`}>
+                            <SelectValue placeholder="Изберете" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {INSURANCE_COMPANIES.map(ins => (
+                              <SelectItem key={ins.value} value={ins.value}>{ins.label}</SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
                       </div>
-                      <div className="space-y-2">
-                        <Label className="text-sm">Срок на полицата (дд/мм/гггг)</Label>
-                        <Input
-                          type="text"
-                          placeholder="дд/мм/гггг"
+                      <div className="space-y-2" data-invalid={data.car_3_has_casco && isFieldInvalid(data.car_3_casco_expiry) ? "true" : undefined}>
+                        <Label className="text-sm">Срок на полицата (дд.мм.гггг) <span className="text-red-500">*</span></Label>
+                        <BulgarianDateInput
                           value={data.car_3_casco_expiry || ''}
-                          onChange={(e) => onChange('car_3_casco_expiry', e.target.value)}
-                          className="rounded-lg"
+                          onChange={(value) => onChange('car_3_casco_expiry', value)}
+                          className={`rounded-lg ${data.car_3_has_casco && isFieldInvalid(data.car_3_casco_expiry) ? 'border-red-500 bg-red-50' : ''}`}
+                          required
                         />
                       </div>
                     </div>

@@ -91,12 +91,21 @@ const validateEGN = (egn) => {
   return { valid: true, error: null };
 };
 
-// Bulgarian ID card number validation
+// Bulgarian ID card number validation (old format: 9 digits, new format: 2 letters + 7 digits)
 const validateIDNumber = (idNumber) => {
   if (!idNumber) return { valid: false, error: 'Номерът на личната карта е задължителен' };
-  if (idNumber.length !== 9) return { valid: false, error: 'Номерът на личната карта трябва да е 9 цифри' };
-  if (!/^\d{9}$/.test(idNumber)) return { valid: false, error: 'Номерът трябва да съдържа само цифри' };
-  return { valid: true, error: null };
+  
+  // Old format: 9 digits
+  if (/^\d{9}$/.test(idNumber)) {
+    return { valid: true, error: null };
+  }
+  
+  // New format: 2 uppercase letters + 7 digits (e.g., AA1234567)
+  if (/^[A-Za-z]{2}\d{7}$/.test(idNumber)) {
+    return { valid: true, error: null };
+  }
+  
+  return { valid: false, error: 'Невалиден формат (стар: 9 цифри, нов: 2 букви + 7 цифри)' };
 };
 
 // Toggle button component with yes/no indicator

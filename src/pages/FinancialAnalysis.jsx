@@ -208,7 +208,52 @@ export default function FinancialAnalysis() {
         
         return true;
       
-      case 4: // Reserve - no strict required fields
+      case 4: // Reserve
+        // Client monthly net income required
+        if (formData.client_monthly_net_income === undefined || formData.client_monthly_net_income === '') return false;
+
+        // Partner monthly net income required if partner included
+        if (formData.include_partner && (formData.partner_monthly_net_income === undefined || formData.partner_monthly_net_income === '')) return false;
+
+        // Savings method required
+        if (!formData.savings_method) return false;
+
+        // If savings method requires amount
+        if ((formData.savings_method === 'leftover' || formData.savings_method === 'fixed') && 
+            (formData.monthly_savings_amount === undefined || formData.monthly_savings_amount === '')) return false;
+
+        // Required savings fields - client
+        if (formData.client_checking_account === undefined || formData.client_checking_account === '') return false;
+        if (formData.client_cash === undefined || formData.client_cash === '') return false;
+
+        // Required savings fields - partner (if included)
+        if (formData.include_partner) {
+          if (formData.partner_checking_account === undefined || formData.partner_checking_account === '') return false;
+          if (formData.partner_cash === undefined || formData.partner_cash === '') return false;
+        }
+
+        // Desired reserve amount required
+        if (formData.desired_reserve_amount === undefined || formData.desired_reserve_amount === '') return false;
+
+        // Risk profile percentages required (allow 0)
+        if (formData.conservative_percent === undefined || formData.conservative_percent === '') return false;
+        if (formData.moderate_percent === undefined || formData.moderate_percent === '') return false;
+        if (formData.dynamic_percent === undefined || formData.dynamic_percent === '') return false;
+        if (formData.aggressive_percent === undefined || formData.aggressive_percent === '') return false;
+
+        // Check percentages sum to 100
+        const cons = parseInt(formData.conservative_percent) || 0;
+        const mod = parseInt(formData.moderate_percent) || 0;
+        const dyn = parseInt(formData.dynamic_percent) || 0;
+        const agg = parseInt(formData.aggressive_percent) || 0;
+        if (cons + mod + dyn + agg !== 100) return false;
+
+        // Investment questions required
+        if (!formData.investment_horizon) return false;
+        if (!formData.investment_experience) return false;
+        if (!formData.reaction_to_10_percent_drop) return false;
+        if (!formData.reaction_to_20_percent_gain) return false;
+
         return true;
       
       case 5: // Pension - no strict required fields  

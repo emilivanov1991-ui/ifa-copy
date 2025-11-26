@@ -4,7 +4,7 @@ import { Label } from "@/components/ui/label";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { Shield, ChevronDown } from 'lucide-react';
 
-export default function ConsentStep({ data, onChange }) {
+export default function ConsentStep({ data, onChange, showErrors }) {
   const [isOpen, setIsOpen] = useState(false);
 
   return (

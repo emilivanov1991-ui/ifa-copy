@@ -565,25 +565,71 @@ export default function PensionStep({ data, onChange }) {
                   </div>
 
                   {/* III. Pillar */}
-                <div className="flex items-center gap-3">
-                  <Label className="flex-1">III. Стълб (доброволно осигуряване)</Label>
-                  <div className="flex items-center gap-2">
-                    <span className={cn("text-sm font-medium", (data.partner_pillar_3 ?? false) ? "text-green-600" : "text-slate-400")}>Да</span>
-                    <button
-                      type="button"
-                      onClick={() => onChange('partner_pillar_3', !(data.partner_pillar_3 ?? false))}
-                      className={cn(
-                        "w-12 h-6 rounded-full transition-colors relative",
-                        (data.partner_pillar_3 ?? false) ? "bg-green-500" : "bg-red-500"
-                      )}
-                    >
-                      <div className={cn(
-                        "w-5 h-5 bg-white rounded-full absolute top-0.5 transition-all",
-                        (data.partner_pillar_3 ?? false) ? "left-0.5" : "left-6"
-                      )} />
-                    </button>
-                    <span className={cn("text-sm font-medium", !(data.partner_pillar_3 ?? false) ? "text-red-600" : "text-slate-400")}>Не</span>
+                <div className="space-y-3">
+                  <div className="flex items-center gap-3">
+                    <Label className="flex-1">III. Стълб (доброволно осигуряване)</Label>
+                    <div className="flex items-center gap-2">
+                      <span className={cn("text-sm font-medium", (data.partner_pillar_3 ?? false) ? "text-green-600" : "text-slate-400")}>Да</span>
+                      <button
+                        type="button"
+                        onClick={() => onChange('partner_pillar_3', !(data.partner_pillar_3 ?? false))}
+                        className={cn(
+                          "w-12 h-6 rounded-full transition-colors relative",
+                          (data.partner_pillar_3 ?? false) ? "bg-green-500" : "bg-red-500"
+                        )}
+                      >
+                        <div className={cn(
+                          "w-5 h-5 bg-white rounded-full absolute top-0.5 transition-all",
+                          (data.partner_pillar_3 ?? false) ? "left-0.5" : "left-6"
+                        )} />
+                      </button>
+                      <span className={cn("text-sm font-medium", !(data.partner_pillar_3 ?? false) ? "text-red-600" : "text-slate-400")}>Не</span>
+                    </div>
                   </div>
+                  {(data.partner_pillar_3 ?? false) && (
+                    <div className="ml-4 space-y-3">
+                      <div className="space-y-2">
+                        <Label className="text-sm">Име на частен пенсионен фонд <span className="text-red-500">*</span></Label>
+                        <Select 
+                          value={data.partner_voluntary_pension_fund || ''} 
+                          onValueChange={(value) => onChange('partner_voluntary_pension_fund', value)}
+                        >
+                          <SelectTrigger className="rounded-lg">
+                            <SelectValue placeholder="Изберете" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {VOLUNTARY_PENSION_FUND_OPTIONS.map(fund => (
+                              <SelectItem key={fund.value} value={fund.value}>{fund.label}</SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      <div className="space-y-2">
+                        <Label className="text-sm">Месечна вноска (€) <span className="text-red-500">*</span></Label>
+                        <Input
+                          type="number"
+                          min="0"
+                          placeholder=""
+                          value={data.partner_voluntary_pension_monthly || ''}
+                          onChange={(e) => onChange('partner_voluntary_pension_monthly', parseInt(e.target.value) || '')}
+                          className="rounded-lg"
+                          required
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label className="text-sm">Обща стойност на партидата (ориентировъчна стойност) (€) <span className="text-red-500">*</span></Label>
+                        <Input
+                          type="number"
+                          min="0"
+                          placeholder=""
+                          value={data.partner_voluntary_pension_total || ''}
+                          onChange={(e) => onChange('partner_voluntary_pension_total', parseInt(e.target.value) || '')}
+                          className="rounded-lg"
+                          required
+                        />
+                      </div>
+                    </div>
+                  )}
                 </div>
               </div>
             </div>

@@ -100,8 +100,8 @@ const validateIDNumber = (idNumber) => {
     return { valid: true, error: null };
   }
   
-  // New format: 2 uppercase letters + 7 digits (e.g., AA1234567)
-  if (/^[A-Za-z]{2}\d{7}$/.test(idNumber)) {
+  // New format: 2 letters (Latin or Cyrillic) + 7 digits (e.g., AA1234567 or АА1234567)
+  if (/^[A-Za-zА-Яа-я]{2}\d{7}$/.test(idNumber)) {
     return { valid: true, error: null };
   }
   

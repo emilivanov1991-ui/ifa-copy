@@ -47,6 +47,7 @@ export default function FinancialAnalysis() {
   const [currentStep, setCurrentStep] = useState(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const [showValidationErrors, setShowValidationErrors] = useState(false);
   const [formData, setFormData] = useState({
     gdpr_consent_a: false,
     gdpr_consent_b: false,
@@ -56,6 +57,24 @@ export default function FinancialAnalysis() {
 
   const handleChange = (field, value) => {
     setFormData(prev => ({ ...prev, [field]: value }));
+    // Clear validation errors when user starts filling
+    if (showValidationErrors) {
+      setShowValidationErrors(false);
+    }
+  };
+
+  // Scroll to first invalid field and highlight it
+  const scrollToFirstInvalidField = () => {
+    setShowValidationErrors(true);
+    
+    // Wait for DOM to update with error styles
+    setTimeout(() => {
+      const invalidField = document.querySelector('[data-invalid="true"]');
+      if (invalidField) {
+        invalidField.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        invalidField.focus?.();
+      }
+    }, 100);
   };
 
   const validateStep = (step) => {
@@ -406,8 +425,11 @@ export default function FinancialAnalysis() {
 
   const nextStep = () => {
     if (validateStep(currentStep) && currentStep < 9) {
+      setShowValidationErrors(false);
       setCurrentStep(prev => prev + 1);
       window.scrollTo({ top: 0, behavior: 'smooth' });
+    } else if (!validateStep(currentStep)) {
+      scrollToFirstInvalidField();
     }
   };
 
@@ -561,15 +583,15 @@ export default function FinancialAnalysis() {
               exit={{ opacity: 0, x: -20 }}
               transition={{ duration: 0.3 }}
             >
-              {currentStep === 1 && <ConsentStep data={formData} onChange={handleChange} />}
-              {currentStep === 2 && <PersonalDataStep data={formData} onChange={handleChange} />}
-              {currentStep === 3 && <HousingStep data={formData} onChange={handleChange} />}
-              {currentStep === 4 && <ReserveStep data={formData} onChange={handleChange} />}
-              {currentStep === 5 && <PensionStep data={formData} onChange={handleChange} />}
-              {currentStep === 6 && <ChildrenGoalsStep data={formData} onChange={handleChange} />}
-              {currentStep === 7 && <ProtectionStep data={formData} onChange={handleChange} />}
-              {currentStep === 8 && <FinancialFlowStep data={formData} onChange={handleChange} />}
-              {currentStep === 9 && <PrioritiesStep data={formData} onChange={handleChange} />}
+              {currentStep === 1 && <ConsentStep data={formData} onChange={handleChange} showErrors={showValidationErrors} />}
+              {currentStep === 2 && <PersonalDataStep data={formData} onChange={handleChange} showErrors={showValidationErrors} />}
+              {currentStep === 3 && <HousingStep data={formData} onChange={handleChange} showErrors={showValidationErrors} />}
+              {currentStep === 4 && <ReserveStep data={formData} onChange={handleChange} showErrors={showValidationErrors} />}
+              {currentStep === 5 && <PensionStep data={formData} onChange={handleChange} showErrors={showValidationErrors} />}
+              {currentStep === 6 && <ChildrenGoalsStep data={formData} onChange={handleChange} showErrors={showValidationErrors} />}
+              {currentStep === 7 && <ProtectionStep data={formData} onChange={handleChange} showErrors={showValidationErrors} />}
+              {currentStep === 8 && <FinancialFlowStep data={formData} onChange={handleChange} showErrors={showValidationErrors} />}
+              {currentStep === 9 && <PrioritiesStep data={formData} onChange={handleChange} showErrors={showValidationErrors} />}
             </motion.div>
           </AnimatePresence>
 

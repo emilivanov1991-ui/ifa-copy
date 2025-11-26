@@ -34,7 +34,7 @@ const INSURANCE_COMPANIES = [
 
 export default function ProtectionStep({ data, onChange, showErrors }) {
   // Helper to check if a field is invalid
-  const isInvalid = (value) => showErrors && (value === undefined || value === '' || value === null);
+  const isFieldInvalid = (value) => showErrors && (value === undefined || value === '' || value === null);
   const includePartner = data.include_partner || false;
   
   // Check if any property or car exists

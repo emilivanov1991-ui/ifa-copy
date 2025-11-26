@@ -61,7 +61,7 @@ export default function FinancialAnalysis() {
   const validateStep = (step) => {
     switch (step) {
       case 1:
-        return formData.gdpr_consent_a;
+        return formData.gdpr_consent_a && formData.gdpr_consent_c;
       case 2:
         // Client required fields
         const clientValid = !!(
@@ -359,7 +359,8 @@ export default function FinancialAnalysis() {
               <Button
                 type="button"
                 onClick={nextStep}
-                className="bg-blue-600 hover:bg-blue-700 rounded-full px-6"
+                disabled={!validateStep(currentStep)}
+                className="bg-blue-600 hover:bg-blue-700 rounded-full px-6 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 Напред
                 <ArrowRight className="ml-2 h-4 w-4" />

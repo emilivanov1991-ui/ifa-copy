@@ -164,6 +164,68 @@ export default function FinancialAnalysis() {
         }
         
         return clientValid && clientEmploymentValid && clientHealthValid && childrenValid && partnerValid;
+      
+      case 3: // Housing
+        // Current housing is required
+        if (!formData.current_housing) return false;
+        
+        // Location/Address based on type
+        if ((formData.current_housing === 'rented' || formData.current_housing === 'with_parents') && !formData.current_housing_location) return false;
+        if (formData.current_housing === 'owned' && !formData.current_housing_address) return false;
+        
+        // Basic fields
+        if (!formData.current_housing_rooms || !formData.current_housing_area) return false;
+        
+        // Owned housing fields
+        if (formData.current_housing === 'owned') {
+          if (!formData.current_housing_value || !formData.current_housing_movable_value) return false;
+          
+          // Mortgage fields if has mortgage
+          if (formData.current_housing_has_mortgage) {
+            if (!formData.current_mortgage_remaining || !formData.current_mortgage_interest_rate || 
+                !formData.current_mortgage_bank || !formData.current_mortgage_remaining_years || 
+                !formData.current_mortgage_monthly_payment) return false;
+          }
+        }
+        
+        // Planning change validation
+        if (formData.planning_housing_change ?? true) {
+          if (!formData.planned_housing_type) return false;
+          
+          if (formData.planned_housing_type === 'apartment' || formData.planned_housing_type === 'house') {
+            if (!formData.planned_housing_rooms || !formData.planned_housing_area || 
+                !formData.planned_housing_value || !formData.planned_housing_timeline_years || 
+                !formData.planned_housing_extra_costs) return false;
+          } else if (formData.planned_housing_type === 'reconstruction') {
+            if (!formData.planned_housing_timeline_years || !formData.planned_housing_extra_costs) return false;
+          }
+          
+          // Financing method
+          if (!formData.financing_method) return false;
+          if (formData.financing_method === 'cash' && !formData.available_cash) return false;
+          if (formData.financing_method === 'cash_and_loan' && (!formData.available_cash || !formData.loan_term_years)) return false;
+        }
+        
+        return true;
+      
+      case 4: // Reserve - no strict required fields
+        return true;
+      
+      case 5: // Pension - no strict required fields  
+        return true;
+      
+      case 6: // Children & Goals - no strict required fields
+        return true;
+      
+      case 7: // Protection - no strict required fields
+        return true;
+      
+      case 8: // Financial Flow - no strict required fields
+        return true;
+      
+      case 9: // Priorities - no strict required fields
+        return true;
+      
       default:
         return true;
     }

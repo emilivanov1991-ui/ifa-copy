@@ -26,17 +26,32 @@ const calculateAge = (birthdate) => {
 };
 
 // Toggle button component with yes/no indicator
-const ToggleWithLabel = ({ checked, onChange, defaultYes = false, label }) => {
-  const isYes = defaultYes ? checked : !checked;
+const ToggleWithLabel = ({ checked, onChange, defaultYes = false }) => {
+  // For defaultYes=true (like employment): Yes=green, No=red
+  // For defaultYes=false (like PEP): No=green, Yes=red
+  if (defaultYes) {
+    return (
+      <div className="flex items-center gap-3">
+        <span className={`text-sm font-medium ${!checked ? 'text-red-600' : 'text-slate-400'}`}>Не</span>
+        <Switch
+          checked={checked}
+          onCheckedChange={onChange}
+          className={checked ? 'data-[state=checked]:bg-green-500' : 'data-[state=unchecked]:bg-red-500'}
+        />
+        <span className={`text-sm font-medium ${checked ? 'text-green-600' : 'text-slate-400'}`}>Да</span>
+      </div>
+    );
+  }
+  // defaultYes=false (like PEP): No=green, Yes=red
   return (
     <div className="flex items-center gap-3">
-      <span className={`text-sm font-medium ${!isYes ? 'text-green-600' : 'text-slate-400'}`}>Не</span>
+      <span className={`text-sm font-medium ${!checked ? 'text-green-600' : 'text-slate-400'}`}>Не</span>
       <Switch
         checked={checked}
         onCheckedChange={onChange}
-        className={checked === defaultYes ? 'data-[state=checked]:bg-green-500' : checked ? 'data-[state=checked]:bg-red-500' : ''}
+        className={checked ? 'data-[state=checked]:bg-red-500' : 'data-[state=unchecked]:bg-green-500'}
       />
-      <span className={`text-sm font-medium ${isYes ? 'text-green-600' : 'text-slate-400'}`}>Да</span>
+      <span className={`text-sm font-medium ${checked ? 'text-red-600' : 'text-slate-400'}`}>Да</span>
     </div>
   );
 };
@@ -320,7 +335,6 @@ export default function PersonalDataStep({ data, onChange }) {
               <div className="space-y-2">
                 <Label>Име на работодател</Label>
                 <Input
-                  placeholder="Фирма ЕООД"
                   value={data.client_employer_name || ''}
                   onChange={(e) => onChange('client_employer_name', e.target.value)}
                   className="rounded-lg"
@@ -329,7 +343,6 @@ export default function PersonalDataStep({ data, onChange }) {
               <div className="space-y-2">
                 <Label>Град</Label>
                 <Input
-                  placeholder="София"
                   value={data.client_employer_city || ''}
                   onChange={(e) => onChange('client_employer_city', e.target.value)}
                   className="rounded-lg"
@@ -338,7 +351,6 @@ export default function PersonalDataStep({ data, onChange }) {
               <div className="space-y-2">
                 <Label>Улица</Label>
                 <Input
-                  placeholder="ул. Примерна 1"
                   value={data.client_employer_street || ''}
                   onChange={(e) => onChange('client_employer_street', e.target.value)}
                   className="rounded-lg"
@@ -347,7 +359,6 @@ export default function PersonalDataStep({ data, onChange }) {
               <div className="space-y-2">
                 <Label>Пощенски код</Label>
                 <Input
-                  placeholder="1000"
                   value={data.client_employer_postal_code || ''}
                   onChange={(e) => onChange('client_employer_postal_code', e.target.value)}
                   className="rounded-lg"
@@ -642,7 +653,6 @@ export default function PersonalDataStep({ data, onChange }) {
                   <div className="space-y-2">
                     <Label>Име на работодател</Label>
                     <Input
-                      placeholder="Фирма ЕООД"
                       value={data.partner_employer_name || ''}
                       onChange={(e) => onChange('partner_employer_name', e.target.value)}
                       className="rounded-lg"
@@ -651,7 +661,6 @@ export default function PersonalDataStep({ data, onChange }) {
                   <div className="space-y-2">
                     <Label>Град</Label>
                     <Input
-                      placeholder="София"
                       value={data.partner_employer_city || ''}
                       onChange={(e) => onChange('partner_employer_city', e.target.value)}
                       className="rounded-lg"
@@ -660,7 +669,6 @@ export default function PersonalDataStep({ data, onChange }) {
                   <div className="space-y-2">
                     <Label>Улица</Label>
                     <Input
-                      placeholder="ул. Примерна 1"
                       value={data.partner_employer_street || ''}
                       onChange={(e) => onChange('partner_employer_street', e.target.value)}
                       className="rounded-lg"
@@ -669,7 +677,6 @@ export default function PersonalDataStep({ data, onChange }) {
                   <div className="space-y-2">
                     <Label>Пощенски код</Label>
                     <Input
-                      placeholder="1000"
                       value={data.partner_employer_postal_code || ''}
                       onChange={(e) => onChange('partner_employer_postal_code', e.target.value)}
                       className="rounded-lg"

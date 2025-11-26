@@ -98,13 +98,14 @@ export default function HealthQuestionnaire({ data, onChange, prefix }) {
       {isGoodHealth === false && (
         <div className="space-y-4 p-4 bg-red-50 rounded-lg border border-red-200">
           <div className="space-y-2">
-            <Label>Пояснение</Label>
+            <Label>Пояснение <span className="text-red-500">*</span></Label>
             <Textarea
               placeholder="Моля, опишете здравословните си проблеми..."
               value={data[`${prefix}_health_explanation`] || ''}
               onChange={(e) => onChange(`${prefix}_health_explanation`, e.target.value)}
               className="rounded-lg bg-white"
               rows={3}
+              required
             />
           </div>
 
@@ -199,23 +200,25 @@ export default function HealthQuestionnaire({ data, onChange, prefix }) {
 
           <div className="border-t border-red-200 pt-4 grid sm:grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label>9. Ръст в сантиметри</Label>
+              <Label>9. Ръст в сантиметри <span className="text-red-500">*</span></Label>
               <Input
                 type="number"
                 placeholder="170"
                 value={data[`${prefix}_height_cm`] || ''}
                 onChange={(e) => onChange(`${prefix}_height_cm`, e.target.value)}
                 className="rounded-lg bg-white"
+                required
               />
             </div>
             <div className="space-y-2">
-              <Label>10. Тегло в килограми</Label>
+              <Label>10. Тегло в килограми <span className="text-red-500">*</span></Label>
               <Input
                 type="number"
                 placeholder="70"
                 value={data[`${prefix}_weight_kg`] || ''}
                 onChange={(e) => onChange(`${prefix}_weight_kg`, e.target.value)}
                 className="rounded-lg bg-white"
+                required
               />
             </div>
           </div>

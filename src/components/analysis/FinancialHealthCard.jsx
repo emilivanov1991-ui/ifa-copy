@@ -420,6 +420,164 @@ ${JSON.stringify(analysisContext, null, 2)}
           <span className="text-slate-600">Критично</span>
         </div>
       </div>
+
+      {/* AI Analysis Section */}
+      <div className="mt-8 pt-6 border-t-2 border-slate-200">
+        <div className="flex items-center justify-center gap-2 mb-6">
+          <Sparkles className="w-5 h-5 text-blue-600" />
+          <h3 className="font-bold text-slate-900 text-lg">ПЕРСОНАЛИЗИРАН ФИНАНСОВ АНАЛИЗ</h3>
+        </div>
+
+        {isLoading ? (
+          <div className="flex flex-col items-center justify-center py-12">
+            <Loader2 className="w-8 h-8 text-blue-600 animate-spin mb-3" />
+            <p className="text-slate-500 text-sm">Анализираме Вашите данни...</p>
+          </div>
+        ) : aiAnalysis ? (
+          <div className="space-y-6">
+            {/* Positive Points */}
+            {aiAnalysis.positives?.length > 0 && (
+              <div className="bg-green-50 rounded-xl p-4 border border-green-200">
+                <div className="flex items-center gap-2 mb-3">
+                  <CheckCircle className="w-5 h-5 text-green-600" />
+                  <h4 className="font-semibold text-green-800">Поздравления! Правите нещата правилно:</h4>
+                </div>
+                <div className="space-y-3">
+                  {aiAnalysis.positives.map((item, idx) => (
+                    <div key={idx} className="bg-white rounded-lg p-3 border border-green-100">
+                      <p className="font-medium text-green-700">{item.title}</p>
+                      <p className="text-sm text-green-600 mt-1">{item.text}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Attention Points */}
+            {aiAnalysis.attention?.length > 0 && (
+              <div className="bg-amber-50 rounded-xl p-4 border border-amber-200">
+                <div className="flex items-center gap-2 mb-3">
+                  <AlertTriangle className="w-5 h-5 text-amber-600" />
+                  <h4 className="font-semibold text-amber-800">Области за подобрение:</h4>
+                </div>
+                <div className="space-y-3">
+                  {aiAnalysis.attention.map((item, idx) => (
+                    <div key={idx} className="bg-white rounded-lg p-3 border border-amber-100">
+                      <p className="font-medium text-amber-700">{item.title}</p>
+                      <p className="text-sm text-amber-600 mt-1">{item.text}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Critical Points - Sales focused */}
+            {aiAnalysis.critical?.length > 0 && (
+              <div className="bg-gradient-to-br from-red-50 to-orange-50 rounded-xl p-4 border-2 border-red-300 shadow-lg">
+                <div className="flex items-center gap-2 mb-3">
+                  <AlertCircle className="w-6 h-6 text-red-600 animate-pulse" />
+                  <h4 className="font-bold text-red-800 text-lg">⚠️ ИЗИСКВА НЕЗАБАВНО ВНИМАНИЕ:</h4>
+                </div>
+                <div className="space-y-4">
+                  {aiAnalysis.critical.map((item, idx) => (
+                    <div key={idx} className="bg-white rounded-lg p-4 border-l-4 border-red-500 shadow">
+                      <p className="font-bold text-red-700 text-lg">{item.title}</p>
+                      <p className="text-red-600 mt-2">{item.text}</p>
+                      {item.potential_loss > 0 && (
+                        <div className="mt-3 bg-red-100 rounded-lg p-2 inline-block">
+                          <span className="text-red-800 font-bold">
+                            Потенциална загуба: €{item.potential_loss.toLocaleString()}
+                          </span>
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Visualization Charts */}
+            {(aiAnalysis.pension_gap_yearly > 0 || aiAnalysis.missed_savings_10_years > 0) && (
+              <div className="grid md:grid-cols-2 gap-4 mt-6">
+                {/* Pension Gap Chart */}
+                {aiAnalysis.pension_gap_yearly > 0 && aiAnalysis.years_to_retirement > 0 && (
+                  <div className="bg-slate-50 rounded-xl p-4 border border-slate-200">
+                    <h5 className="font-semibold text-slate-700 mb-2 text-sm">📉 Пенсионен дефицит през годините</h5>
+                    <p className="text-xs text-slate-500 mb-3">Ако НЕ предприемете действия сега:</p>
+                    <ResponsiveContainer width="100%" height={150}>
+                      <AreaChart data={Array.from({ length: Math.min(aiAnalysis.years_to_retirement, 30) }, (_, i) => ({
+                        year: `Год ${i + 1}`,
+                        loss: aiAnalysis.pension_gap_yearly * (i + 1)
+                      }))}>
+                        <XAxis dataKey="year" tick={{ fontSize: 10 }} interval={4} />
+                        <YAxis tick={{ fontSize: 10 }} tickFormatter={(v) => `€${(v/1000).toFixed(0)}k`} />
+                        <Tooltip formatter={(v) => [`€${v.toLocaleString()}`, 'Натрупана загуба']} />
+                        <Area type="monotone" dataKey="loss" stroke="#ef4444" fill="#fecaca" />
+                      </AreaChart>
+                    </ResponsiveContainer>
+                    <p className="text-center text-red-600 font-bold mt-2">
+                      Общо: €{(aiAnalysis.pension_gap_yearly * aiAnalysis.years_to_retirement).toLocaleString()} пропуснати!
+                    </p>
+                  </div>
+                )}
+
+                {/* Missed Savings Comparison */}
+                {aiAnalysis.missed_savings_10_years > 0 && (
+                  <div className="bg-slate-50 rounded-xl p-4 border border-slate-200">
+                    <h5 className="font-semibold text-slate-700 mb-2 text-sm">💰 Сценарий: С план vs. Без план (10 години)</h5>
+                    <ResponsiveContainer width="100%" height={150}>
+                      <BarChart data={[
+                        { name: 'Без план', value: 0, fill: '#fca5a5' },
+                        { name: 'С план', value: aiAnalysis.missed_savings_10_years, fill: '#86efac' }
+                      ]}>
+                        <XAxis dataKey="name" tick={{ fontSize: 11 }} />
+                        <YAxis tick={{ fontSize: 10 }} tickFormatter={(v) => `€${(v/1000).toFixed(0)}k`} />
+                        <Tooltip formatter={(v) => [`€${v.toLocaleString()}`, 'Стойност']} />
+                        <Bar dataKey="value" radius={[4, 4, 0, 0]}>
+                          {[
+                            { name: 'Без план', value: 0, fill: '#fca5a5' },
+                            { name: 'С план', value: aiAnalysis.missed_savings_10_years, fill: '#86efac' }
+                          ].map((entry, index) => (
+                            <Cell key={`cell-${index}`} fill={entry.fill} />
+                          ))}
+                        </Bar>
+                      </BarChart>
+                    </ResponsiveContainer>
+                    <p className="text-center text-green-600 font-bold mt-2">
+                      Разлика: €{aiAnalysis.missed_savings_10_years.toLocaleString()}
+                    </p>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* Urgency CTA */}
+            <div className="bg-gradient-to-r from-blue-600 to-blue-700 rounded-xl p-6 text-white text-center">
+              <Clock className="w-8 h-8 mx-auto mb-2" />
+              <h4 className="font-bold text-xl mb-2">Времето работи срещу Вас!</h4>
+              <p className="text-blue-100 mb-4">
+                Всеки месец без финансов план означава пропуснати възможности. 
+                <br/>
+                <span className="font-semibold">93% от нашите клиенти</span> започват да виждат резултати още през първата година.
+              </p>
+              <div className="inline-flex items-center gap-2 bg-white/20 rounded-full px-4 py-2">
+                <TrendingUp className="w-4 h-4" />
+                <span className="text-sm font-medium">Средна доходност: 7-12% годишно</span>
+              </div>
+            </div>
+          </div>
+        ) : (
+          <div className="text-center py-8">
+            <button
+              onClick={generateAnalysis}
+              className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-full font-medium transition-colors"
+            >
+              <Sparkles className="w-4 h-4 inline mr-2" />
+              Генерирай персонализиран анализ
+            </button>
+          </div>
+        )}
+      </div>
     </div>
   );
 }

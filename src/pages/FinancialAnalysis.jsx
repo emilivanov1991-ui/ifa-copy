@@ -612,8 +612,7 @@ export default function FinancialAnalysis() {
               <Button
                 type="button"
                 onClick={nextStep}
-                disabled={!validateStep(currentStep)}
-                className="bg-blue-600 hover:bg-blue-700 rounded-full px-6 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="bg-blue-600 hover:bg-blue-700 rounded-full px-6"
               >
                 Напред
                 <ArrowRight className="ml-2 h-4 w-4" />

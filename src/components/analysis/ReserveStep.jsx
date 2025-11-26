@@ -110,7 +110,7 @@ export default function ReserveStep({ data, onChange, showErrors }) {
               />
             </div>
             {data.include_partner && (
-              <div className="space-y-2">
+              <div className="space-y-2" data-invalid={isFieldInvalid(data.partner_monthly_net_income) ? "true" : undefined}>
                 <Label className="text-sm">Партньор (€) <span className="text-red-500">*</span></Label>
                 <Input
                   type="number"
@@ -122,7 +122,7 @@ export default function ReserveStep({ data, onChange, showErrors }) {
                     onChange('partner_monthly_net_income', partnerIncome);
                     onChange('total_monthly_income', (data.client_monthly_net_income || 0) + partnerIncome);
                   }}
-                  className="rounded-lg"
+                  className={`rounded-lg ${isFieldInvalid(data.partner_monthly_net_income) ? 'border-red-500 bg-red-50' : ''}`}
                   required
                 />
               </div>
@@ -190,15 +190,15 @@ export default function ReserveStep({ data, onChange, showErrors }) {
             
             <div className="space-y-3">
               {/* Разплащателна сметка */}
-              <div className="grid grid-cols-3 gap-2 items-center">
+              <div className="grid grid-cols-3 gap-2 items-center" data-invalid={isFieldInvalid(data.client_checking_account) ? "true" : undefined}>
                 <Label className="text-sm">Разплащателна сметка <span className="text-red-500">*</span></Label>
                 <Input
                   type="number"
                   min="0"
                   placeholder="0"
                   value={data.client_checking_account ?? ''}
-                  onChange={(e) => onChange('client_checking_account', parseInt(e.target.value) || 0)}
-                  className="rounded-lg text-center"
+                  onChange={(e) => onChange('client_checking_account', e.target.value === '' ? '' : parseInt(e.target.value))}
+                  className={`rounded-lg text-center ${isFieldInvalid(data.client_checking_account) ? 'border-red-500 bg-red-50' : ''}`}
                   required
                 />
                 <Select 
@@ -269,15 +269,15 @@ export default function ReserveStep({ data, onChange, showErrors }) {
               </div>
 
               {/* Пари в брой */}
-              <div className="grid grid-cols-3 gap-2 items-center">
+              <div className="grid grid-cols-3 gap-2 items-center" data-invalid={isFieldInvalid(data.client_cash) ? "true" : undefined}>
                 <Label className="text-sm">Пари в брой <span className="text-red-500">*</span></Label>
                 <Input
                   type="number"
                   min="0"
                   placeholder="0"
                   value={data.client_cash ?? ''}
-                  onChange={(e) => onChange('client_cash', parseInt(e.target.value) || 0)}
-                  className="rounded-lg text-center"
+                  onChange={(e) => onChange('client_cash', e.target.value === '' ? '' : parseInt(e.target.value))}
+                  className={`rounded-lg text-center ${isFieldInvalid(data.client_cash) ? 'border-red-500 bg-red-50' : ''}`}
                   required
                 />
                 <div></div>
@@ -360,15 +360,15 @@ export default function ReserveStep({ data, onChange, showErrors }) {
               
               <div className="space-y-3">
                 {/* Разплащателна сметка */}
-                <div className="grid grid-cols-3 gap-2 items-center">
+                <div className="grid grid-cols-3 gap-2 items-center" data-invalid={isFieldInvalid(data.partner_checking_account) ? "true" : undefined}>
                   <Label className="text-sm">Разплащателна сметка <span className="text-red-500">*</span></Label>
                   <Input
                     type="number"
                     min="0"
                     placeholder="0"
                     value={data.partner_checking_account ?? ''}
-                    onChange={(e) => onChange('partner_checking_account', parseInt(e.target.value) || 0)}
-                    className="rounded-lg text-center"
+                    onChange={(e) => onChange('partner_checking_account', e.target.value === '' ? '' : parseInt(e.target.value))}
+                    className={`rounded-lg text-center ${isFieldInvalid(data.partner_checking_account) ? 'border-red-500 bg-red-50' : ''}`}
                     required
                   />
                   <Select 
@@ -439,15 +439,15 @@ export default function ReserveStep({ data, onChange, showErrors }) {
                 </div>
 
                 {/* Пари в брой */}
-                <div className="grid grid-cols-3 gap-2 items-center">
+                <div className="grid grid-cols-3 gap-2 items-center" data-invalid={isFieldInvalid(data.partner_cash) ? "true" : undefined}>
                   <Label className="text-sm">Пари в брой <span className="text-red-500">*</span></Label>
                   <Input
                     type="number"
                     min="0"
                     placeholder="0"
                     value={data.partner_cash ?? ''}
-                    onChange={(e) => onChange('partner_cash', parseInt(e.target.value) || 0)}
-                    className="rounded-lg text-center"
+                    onChange={(e) => onChange('partner_cash', e.target.value === '' ? '' : parseInt(e.target.value))}
+                    className={`rounded-lg text-center ${isFieldInvalid(data.partner_cash) ? 'border-red-500 bg-red-50' : ''}`}
                     required
                   />
                   <div></div>
@@ -528,15 +528,15 @@ export default function ReserveStep({ data, onChange, showErrors }) {
       <div className="bg-slate-50 rounded-xl p-6">
         <h3 className="font-semibold text-slate-900 mb-4">Какъв размер на резерва е достатъчен според Вас?</h3>
         <div className="space-y-4">
-          <div className="space-y-2">
+          <div className="space-y-2" data-invalid={isFieldInvalid(data.desired_reserve_amount) ? "true" : undefined}>
             <Label>Желан размер на резерва (€) <span className="text-red-500">*</span></Label>
             <Input
               type="number"
               min="0"
               placeholder="0"
               value={data.desired_reserve_amount ?? ''}
-              onChange={(e) => onChange('desired_reserve_amount', parseInt(e.target.value) || 0)}
-              className="rounded-lg w-48"
+              onChange={(e) => onChange('desired_reserve_amount', e.target.value === '' ? '' : parseInt(e.target.value))}
+              className={`rounded-lg w-48 ${isFieldInvalid(data.desired_reserve_amount) ? 'border-red-500 bg-red-50' : ''}`}
               required
             />
           </div>

@@ -400,15 +400,15 @@ export default function PensionStep({ data, onChange, showErrors }) {
                   </div>
                 </div>
                 {(data.client_pillar_2 ?? true) && (
-                  <div className="ml-4 space-y-2">
-                    <Label className="text-sm">Име на частен пенсионен фонд? <span className="text-red-500">*</span></Label>
-                    <Select 
-                      value={data.client_pension_fund || ''} 
-                      onValueChange={(value) => onChange('client_pension_fund', value)}
-                    >
-                      <SelectTrigger className="rounded-lg">
-                        <SelectValue placeholder="Изберете" />
-                      </SelectTrigger>
+                    <div className="ml-4 space-y-2" data-invalid={isFieldInvalid(data.client_pension_fund) ? "true" : undefined}>
+                      <Label className="text-sm">Име на частен пенсионен фонд? <span className="text-red-500">*</span></Label>
+                      <Select 
+                        value={data.client_pension_fund || ''} 
+                        onValueChange={(value) => onChange('client_pension_fund', value)}
+                      >
+                        <SelectTrigger className={`rounded-lg ${isFieldInvalid(data.client_pension_fund) ? 'border-red-500 bg-red-50' : ''}`}>
+                          <SelectValue placeholder="Изберете" />
+                        </SelectTrigger>
                       <SelectContent>
                         {PENSION_FUND_OPTIONS.map(fund => (
                           <SelectItem key={fund.value} value={fund.value}>{fund.label}</SelectItem>
@@ -545,13 +545,13 @@ export default function PensionStep({ data, onChange, showErrors }) {
                     </div>
                   </div>
                   {(data.partner_pillar_2 ?? true) && (
-                    <div className="ml-4 space-y-2">
+                    <div className="ml-4 space-y-2" data-invalid={isFieldInvalid(data.partner_pension_fund) ? "true" : undefined}>
                       <Label className="text-sm">Име на частен пенсионен фонд? <span className="text-red-500">*</span></Label>
                       <Select 
                         value={data.partner_pension_fund || ''} 
                         onValueChange={(value) => onChange('partner_pension_fund', value)}
                       >
-                        <SelectTrigger className="rounded-lg">
+                        <SelectTrigger className={`rounded-lg ${isFieldInvalid(data.partner_pension_fund) ? 'border-red-500 bg-red-50' : ''}`}>
                           <SelectValue placeholder="Изберете" />
                         </SelectTrigger>
                         <SelectContent>

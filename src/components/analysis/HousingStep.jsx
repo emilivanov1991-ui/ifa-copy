@@ -13,6 +13,23 @@ import {
 import { Home, Building2 } from 'lucide-react';
 import { cn } from "@/lib/utils";
 
+// Format date in Bulgarian with ordinal suffix
+const formatBulgarianDate = (dateStr) => {
+  if (!dateStr) return '';
+  const date = new Date(dateStr);
+  const day = date.getDate();
+  const month = date.toLocaleDateString('bg-BG', { month: 'long' });
+  
+  // Bulgarian ordinal suffixes
+  let suffix = '-ти';
+  if (day === 1) suffix = '-ви';
+  else if (day === 2) suffix = '-ри';
+  else if (day === 7 || day === 8) suffix = '-ми';
+  else if (day === 3) suffix = '-ти';
+  
+  return `${day}${suffix} ${month}`;
+};
+
 // Calculate monthly mortgage payment using amortization formula
 const calculateMonthlyPayment = (principal, annualRate, years) => {
   if (!principal || !annualRate || !years) return '';
@@ -621,49 +638,69 @@ export default function HousingStep({ data, onChange }) {
         </div>
       </div>
 
-      {/* Birthday Example Section */}
+      {/* Visualization Help Section */}
       <div className="bg-slate-50 rounded-xl p-6">
         <div className="flex items-center justify-between mb-4">
-          <h3 className="font-semibold text-slate-900">Пример с Рожден Ден</h3>
-          <Switch
-            checked={data.birthday_example_enabled || false}
-            onCheckedChange={(checked) => onChange('birthday_example_enabled', checked)}
-          />
+          <h3 className="font-semibold text-slate-900">Визуализационна помощ за препоръки</h3>
+          <div className="flex items-center gap-2">
+            <span className={cn("text-sm font-medium", !(data.birthday_example_enabled ?? false) ? "text-red-600" : "text-slate-400")}>Не</span>
+            <button
+              type="button"
+              onClick={() => onChange('birthday_example_enabled', !(data.birthday_example_enabled ?? false))}
+              className={cn(
+                "w-12 h-7 rounded-full transition-colors relative",
+                (data.birthday_example_enabled ?? false) ? "bg-green-500" : "bg-red-500"
+              )}
+            >
+              <div className={cn(
+                "w-5 h-5 bg-white rounded-full absolute top-1 transition-all",
+                (data.birthday_example_enabled ?? false) ? "right-1" : "left-1"
+              )} />
+            </button>
+            <span className={cn("text-sm font-medium", (data.birthday_example_enabled ?? false) ? "text-green-600" : "text-slate-400")}>Да</span>
+          </div>
         </div>
 
         {data.birthday_example_enabled && (
           <div className="space-y-6">
             {/* Display birthdays */}
             <div className="p-4 bg-white rounded-lg border border-slate-200">
-              <Label className="text-slate-700 mb-2 block">Рожден ден:</Label>
-              <div className="flex flex-wrap gap-4 text-slate-600">
-                {data.client_birthdate && (
-                  <span>Клиент: {new Date(data.client_birthdate).toLocaleDateString('bg-BG', { day: 'numeric', month: 'long' })}</span>
-                )}
+              <Label className="text-slate-700 mb-2 block">
+                Рожден ден на {data.client_first_name || 'Клиент'} ({data.client_birthdate ? formatBulgarianDate(data.client_birthdate) : 'не е въведена дата'})
                 {data.include_partner && data.partner_birthdate && (
-                  <span>Партньор: {new Date(data.partner_birthdate).toLocaleDateString('bg-BG', { day: 'numeric', month: 'long' })}</span>
+                  <> и на {data.partner_first_name || 'Партньор'} ({formatBulgarianDate(data.partner_birthdate)})</>
                 )}
-              </div>
+              </Label>
             </div>
 
             {/* Question 1: Where would you celebrate */}
             <div className="space-y-3">
               <Label className="text-slate-700">
-                Представете си, че днес е {data.client_birthdate ? new Date(data.client_birthdate).toLocaleDateString('bg-BG', { day: 'numeric', month: 'long' }) : '(вашият рожден ден)'}{data.include_partner && data.partner_birthdate ? ` / ${new Date(data.partner_birthdate).toLocaleDateString('bg-BG', { day: 'numeric', month: 'long' })}` : ''} и <span className="font-bold">имате неограничен бюджет</span>! Къде бихте празнували своя рожен ден?
+                Представете си, че днес е {data.client_birthdate ? formatBulgarianDate(data.client_birthdate) : '(вашият рожден ден)'}{data.include_partner && data.partner_birthdate ? ` / ${formatBulgarianDate(data.partner_birthdate)}` : ''} и <span className="font-bold">имате неограничен бюджет</span>! Къде бихте празнували своя рожен ден?
               </Label>
               <Input
                 placeholder="Опишете мястото..."
                 value={data.birthday_celebration_place || ''}
-                onChange={(e) => onChange('birthday_celebration_place', e.target.value)}
+                onChange={(e) => {
+                  onChange('birthday_celebration_place', e.target.value);
+                  onChange('birthday_place_ready', false);
+                  // Set timeout to show next question after 2 seconds
+                  if (e.target.value) {
+                    clearTimeout(window.birthdayPlaceTimeout);
+                    window.birthdayPlaceTimeout = setTimeout(() => {
+                      onChange('birthday_place_ready', true);
+                    }, 2000);
+                  }
+                }}
                 className="rounded-lg"
               />
             </div>
 
-            {/* Question 2: How many people - only show if place is filled */}
-            {data.birthday_celebration_place && (
+            {/* Question 2: How many people - only show if place is filled and ready */}
+            {data.birthday_celebration_place && data.birthday_place_ready && (
               <div className="space-y-3">
                 <Label className="text-slate-700">
-                  Представете си, че е {data.client_birthdate ? new Date(data.client_birthdate).toLocaleDateString('bg-BG', { day: 'numeric', month: 'long' }) : '(вашият рожден ден)'}{data.include_partner && data.partner_birthdate ? ` / ${new Date(data.partner_birthdate).toLocaleDateString('bg-BG', { day: 'numeric', month: 'long' })}` : ''}, <span className="font-bold">имате неограничен бюджет и организирате едно голямо парти. Колко човека бихте поканили на едно такова голямо парти?</span>
+                  Представете си, че сте {/^[аъоуеи|АЪОУЕИ]/.test(data.birthday_celebration_place || '') ? 'в' : 'на'} <span className="font-semibold">{data.birthday_celebration_place}</span> и е {data.client_birthdate ? formatBulgarianDate(data.client_birthdate) : ''}{data.include_partner && data.partner_birthdate ? ` / ${formatBulgarianDate(data.partner_birthdate)}` : ''}, <span className="font-bold">имате неограничен бюджет и организирате едно голямо парти. Колко човека бихте поканили на едно такова голямо парти?</span>
                 </Label>
                 <Input
                   type="number"
@@ -680,7 +717,7 @@ export default function HousingStep({ data, onChange }) {
             {data.birthday_party_guests_total > 0 && (
               <div className="space-y-4">
                 <Label className="text-slate-700">
-                  Колко от тези {data.birthday_party_guests_total} биха били Семейство, Приятели, Колеги?
+                  Вероятно биха били в три категории: Семейство, Приятели и Колеги. Колко от тези {data.birthday_party_guests_total} биха били Семейство, Приятели, Колеги?
                 </Label>
                 
                 <div className="grid sm:grid-cols-3 gap-4">
@@ -719,8 +756,10 @@ export default function HousingStep({ data, onChange }) {
                   </div>
                 </div>
 
-                {/* Warning if sum is less than total */}
-                {((data.birthday_guests_family || 0) + (data.birthday_guests_friends || 0) + (data.birthday_guests_colleagues || 0)) > 0 &&
+                {/* Warning if sum is less than total - only show when all three fields have values */}
+                {data.birthday_guests_family !== undefined && data.birthday_guests_family !== '' &&
+                 data.birthday_guests_friends !== undefined && data.birthday_guests_friends !== '' &&
+                 data.birthday_guests_colleagues !== undefined && data.birthday_guests_colleagues !== '' &&
                  ((data.birthday_guests_family || 0) + (data.birthday_guests_friends || 0) + (data.birthday_guests_colleagues || 0)) < data.birthday_party_guests_total && (
                   <div className="p-3 bg-amber-50 border border-amber-200 rounded-lg text-amber-700 text-sm">
                     Общият сбор е по-малък от посоченото по-горе.

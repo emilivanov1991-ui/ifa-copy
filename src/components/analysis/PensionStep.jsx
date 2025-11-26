@@ -158,7 +158,7 @@ export default function PensionStep({ data, onChange }) {
               </div>
               {/* Gross Income */}
               <div className="space-y-2">
-                <Label>Брутен доход (€)</Label>
+                <Label>Брутен доход (€) <span className="text-red-500">*</span></Label>
                 <Input
                   type="number"
                   min="0"
@@ -166,10 +166,11 @@ export default function PensionStep({ data, onChange }) {
                   value={data.client_gross_income_pension || ''}
                   onChange={(e) => onChange('client_gross_income_pension', parseInt(e.target.value) || '')}
                   className="rounded-lg"
+                  required
                 />
               </div>
               <div className="space-y-2">
-                <Label>Кога искате да излезете в пенсия? (възраст)</Label>
+                <Label>Кога искате да излезете в пенсия? (възраст) <span className="text-red-500">*</span></Label>
                 <Input
                   type="number"
                   min="50"
@@ -178,10 +179,11 @@ export default function PensionStep({ data, onChange }) {
                   value={data.client_retirement_age || ''}
                   onChange={(e) => onChange('client_retirement_age', parseInt(e.target.value) || '')}
                   className="rounded-lg"
+                  required
                 />
               </div>
               <div className="space-y-2">
-                <Label>От каква месечна пенсия ще се нуждаете? (€)</Label>
+                <Label>От каква месечна пенсия ще се нуждаете? (€) <span className="text-red-500">*</span></Label>
                 <Input
                   type="number"
                   min="0"
@@ -189,6 +191,7 @@ export default function PensionStep({ data, onChange }) {
                   value={data.client_desired_pension || ''}
                   onChange={(e) => onChange('client_desired_pension', parseInt(e.target.value) || '')}
                   className="rounded-lg"
+                  required
                 />
               </div>
               <div className="space-y-2">
@@ -247,7 +250,7 @@ export default function PensionStep({ data, onChange }) {
                 </div>
                 {/* Gross Income */}
                 <div className="space-y-2">
-                  <Label>Брутен доход (€)</Label>
+                  <Label>Брутен доход (€) <span className="text-red-500">*</span></Label>
                   <Input
                     type="number"
                     min="0"
@@ -255,10 +258,11 @@ export default function PensionStep({ data, onChange }) {
                     value={data.partner_gross_income_pension || ''}
                     onChange={(e) => onChange('partner_gross_income_pension', parseInt(e.target.value) || '')}
                     className="rounded-lg"
+                    required
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label>Кога искате да излезете в пенсия? (възраст)</Label>
+                  <Label>Кога искате да излезете в пенсия? (възраст) <span className="text-red-500">*</span></Label>
                   <Input
                     type="number"
                     min="50"
@@ -267,10 +271,11 @@ export default function PensionStep({ data, onChange }) {
                     value={data.partner_retirement_age || ''}
                     onChange={(e) => onChange('partner_retirement_age', parseInt(e.target.value) || '')}
                     className="rounded-lg"
+                    required
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label>От каква месечна пенсия ще се нуждаете? (€)</Label>
+                  <Label>От каква месечна пенсия ще се нуждаете? (€) <span className="text-red-500">*</span></Label>
                   <Input
                     type="number"
                     min="0"
@@ -278,6 +283,7 @@ export default function PensionStep({ data, onChange }) {
                     value={data.partner_desired_pension || ''}
                     onChange={(e) => onChange('partner_desired_pension', parseInt(e.target.value) || '')}
                     className="rounded-lg"
+                    required
                   />
                 </div>
                 <div className="space-y-2">
@@ -392,11 +398,14 @@ export default function PensionStep({ data, onChange }) {
                         ))}
                       </SelectContent>
                     </Select>
+                    <p className="text-xs text-slate-500 mt-2">
+                      В случай, на необходимост за откриване на дружеството, което управлява Вашите средства: Телефон за информация на НОИ: <span className="font-bold">0700 10 292</span> !
+                    </p>
                   </div>
                 )}
-              </div>
+                </div>
 
-              {/* III. Pillar */}
+                {/* III. Pillar */}
               <div className="flex items-center gap-3">
                 <Label className="flex-1">III. Стълб (доброволно осигуряване)</Label>
                 <div className="flex items-center gap-2">
@@ -488,11 +497,14 @@ export default function PensionStep({ data, onChange }) {
                           ))}
                         </SelectContent>
                       </Select>
+                      <p className="text-xs text-slate-500 mt-2">
+                        В случай, на необходимост за откриване на дружеството, което управлява Вашите средства: Телефон за информация на НОИ: <span className="font-bold">0700 10 292</span> !
+                      </p>
                     </div>
                   )}
-                </div>
+                  </div>
 
-                {/* III. Pillar */}
+                  {/* III. Pillar */}
                 <div className="flex items-center gap-3">
                   <Label className="flex-1">III. Стълб (доброволно осигуряване)</Label>
                   <div className="flex items-center gap-2">
@@ -518,11 +530,7 @@ export default function PensionStep({ data, onChange }) {
           )}
         </div>
 
-        {/* NOI Information */}
-        <p className="text-xs text-slate-500 mt-4">
-          В случай, на необходимост за откриване на дружеството, което управлява Вашите средства: Телефон за информация на НОИ: 0700 10 292 !
-        </p>
-      </div>
+        </div>
 
       {/* Pension Referrals */}
       <div className="bg-slate-50 rounded-xl p-6">

@@ -454,6 +454,16 @@ export default function ConsultantCRMAdvanced() {
           onSelectClient={setSelectedClient}
           onCall={handleCallClick}
           selectedClient={selectedClient}
+          onStatusChange={(client, newStatus, newType) => {
+            setClients(prev => prev.map(c => {
+              if (c.id === client.id) {
+                const updated = { ...c, status: newStatus, type: newType };
+                if (selectedClient?.id === c.id) setSelectedClient(updated);
+                return updated;
+              }
+              return c;
+            }));
+          }}
         />
       )}
 

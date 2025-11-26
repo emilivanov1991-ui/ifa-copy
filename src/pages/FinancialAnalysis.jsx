@@ -256,7 +256,33 @@ export default function FinancialAnalysis() {
 
         return true;
       
-      case 5: // Pension - no strict required fields  
+      case 5: // Pension
+        // Client required fields
+        if (formData.client_gross_income_pension === undefined || formData.client_gross_income_pension === '') return false;
+        if (!formData.client_retirement_age) return false;
+        if (formData.client_desired_pension === undefined || formData.client_desired_pension === '') return false;
+        
+        // III. Pillar fields if enabled
+        if (formData.client_pillar_3) {
+          if (!formData.client_voluntary_pension_fund) return false;
+          if (formData.client_voluntary_pension_monthly === undefined || formData.client_voluntary_pension_monthly === '') return false;
+          if (formData.client_voluntary_pension_total === undefined || formData.client_voluntary_pension_total === '') return false;
+        }
+        
+        // Partner required fields (if included)
+        if (formData.include_partner) {
+          if (formData.partner_gross_income_pension === undefined || formData.partner_gross_income_pension === '') return false;
+          if (!formData.partner_retirement_age) return false;
+          if (formData.partner_desired_pension === undefined || formData.partner_desired_pension === '') return false;
+          
+          // Partner III. Pillar fields if enabled
+          if (formData.partner_pillar_3) {
+            if (!formData.partner_voluntary_pension_fund) return false;
+            if (formData.partner_voluntary_pension_monthly === undefined || formData.partner_voluntary_pension_monthly === '') return false;
+            if (formData.partner_voluntary_pension_total === undefined || formData.partner_voluntary_pension_total === '') return false;
+          }
+        }
+        
         return true;
       
       case 6: // Children & Goals - no strict required fields

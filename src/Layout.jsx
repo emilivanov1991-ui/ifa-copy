@@ -124,15 +124,15 @@ export default function Layout({ children, currentPageName }) {
             </motion.div>
           )}
         </AnimatePresence>
-      </header>
+        </header>}
 
       {/* Main Content */}
-      <main>
+      <main className={currentPageName === 'ConsultantPortal' ? 'pt-0' : ''}>
         {children}
       </main>
 
-      {/* Footer */}
-      <footer className="bg-slate-900 text-white py-16">
+      {/* Footer - Hide on ConsultantPortal */}
+      {currentPageName !== 'ConsultantPortal' && <footer className="bg-slate-900 text-white py-16">
         <div className="max-w-6xl mx-auto px-6">
           <div className="grid md:grid-cols-4 gap-12 mb-12">
             {/* Brand */}
@@ -187,8 +187,8 @@ export default function Layout({ children, currentPageName }) {
               <a href="#" className="hover:text-white transition-colors">Разкрития</a>
             </div>
           </div>
-        </div>
-      </footer>
-    </div>
+          </div>
+          </footer>}
+          </div>
   );
 }

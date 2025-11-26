@@ -9,6 +9,7 @@ import {
   SelectValue 
 } from "@/components/ui/select";
 import { ListOrdered, TrendingUp } from 'lucide-react';
+import FinancialHealthCard from './FinancialHealthCard';
 
 const allPriorities = [
   { key: 'priority_income_protection', label: 'Подсигуряване на доходите' },
@@ -79,6 +80,9 @@ export default function PrioritiesStep({ data, onChange, showErrors }) {
 
   return (
     <div className="space-y-8">
+      {/* Financial Health Card */}
+      <FinancialHealthCard data={data} />
+
       {/* Priorities */}
       <div className="bg-slate-50 rounded-xl p-6">
         <div className="flex items-center gap-2 mb-2">

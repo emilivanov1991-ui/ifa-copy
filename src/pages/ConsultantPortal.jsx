@@ -31,16 +31,21 @@ import ConsultantReports from '@/components/consultant/ConsultantReports';
 import ConsultantElearningAdvanced from '@/components/consultant/ConsultantElearningAdvanced';
 import ConsultantCalendar from '@/components/consultant/ConsultantCalendar';
 import ConsultantMail from '@/components/consultant/ConsultantMail';
+import ConsultantAnalytics from '@/components/consultant/ConsultantAnalytics';
+import ConsultantIntegrations from '@/components/consultant/ConsultantIntegrations';
+import ConsultantNotifications from '@/components/consultant/ConsultantNotifications';
 
 const menuItems = [
   { id: 'dashboard', label: 'Табло', icon: LayoutDashboard },
   { id: 'crm', label: 'CRM / Клиенти', icon: Users },
   { id: 'analysis', label: 'Финансов анализ', icon: FileText },
-  { id: 'statistics', label: 'Статистики', icon: BarChart3 },
+  { id: 'analytics', label: 'Аналитика', icon: BarChart3 },
   { id: 'reports', label: 'Отчети', icon: DollarSign },
   { id: 'elearning', label: 'E-Learning', icon: GraduationCap },
   { id: 'calendar', label: 'Календар', icon: Calendar },
   { id: 'mail', label: 'Съобщения', icon: Mail },
+  { id: 'integrations', label: 'Интеграции', icon: LayoutDashboard },
+  { id: 'notifications', label: 'Известия', icon: Mail },
 ];
 
 export default function ConsultantPortal() {
@@ -130,11 +135,13 @@ export default function ConsultantPortal() {
               </CardContent>
             </Card>
           )}
-          {activeTab === 'statistics' && <ConsultantStatistics />}
+          {activeTab === 'analytics' && <ConsultantAnalytics />}
           {activeTab === 'reports' && <ConsultantReports />}
           {activeTab === 'elearning' && <ConsultantElearningAdvanced />}
           {activeTab === 'calendar' && <ConsultantCalendar />}
           {activeTab === 'mail' && <ConsultantMail />}
+          {activeTab === 'integrations' && <ConsultantIntegrations />}
+          {activeTab === 'notifications' && <ConsultantNotifications />}
         </div>
       </div>
     </div>

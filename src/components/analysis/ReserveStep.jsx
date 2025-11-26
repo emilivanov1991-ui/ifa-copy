@@ -373,7 +373,7 @@ export default function ReserveStep({ data, onChange }) {
                     value={data.partner_checking_account_bank || ''} 
                     onValueChange={(value) => onChange('partner_checking_account_bank', value)}
                   >
-                    <SelectTrigger className="rounded-lg text-sm">
+                    <SelectTrigger className="rounded-lg text-sm [&>span]:text-center [&>span]:w-full">
                       <SelectValue placeholder="Изберете" />
                     </SelectTrigger>
                     <SelectContent>
@@ -399,7 +399,7 @@ export default function ReserveStep({ data, onChange }) {
                     value={data.partner_savings_account_bank || ''} 
                     onValueChange={(value) => onChange('partner_savings_account_bank', value)}
                   >
-                    <SelectTrigger className="rounded-lg text-sm">
+                    <SelectTrigger className="rounded-lg text-sm [&>span]:text-center [&>span]:w-full">
                       <SelectValue placeholder="Изберете" />
                     </SelectTrigger>
                     <SelectContent>
@@ -425,7 +425,7 @@ export default function ReserveStep({ data, onChange }) {
                     value={data.partner_term_deposit_bank || ''} 
                     onValueChange={(value) => onChange('partner_term_deposit_bank', value)}
                   >
-                    <SelectTrigger className="rounded-lg text-sm">
+                    <SelectTrigger className="rounded-lg text-sm [&>span]:text-center [&>span]:w-full">
                       <SelectValue placeholder="Изберете" />
                     </SelectTrigger>
                     <SelectContent>

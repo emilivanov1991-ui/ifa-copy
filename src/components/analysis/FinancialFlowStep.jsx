@@ -56,6 +56,29 @@ export default function FinancialFlowStep({ data, onChange, showErrors }) {
     }
   }, [data.client_voluntary_pension_total, data.partner_voluntary_pension_total, data.children_current_savings, includePartner]);
 
+  // Auto-populate real estate value
+  useEffect(() => {
+    if (data.asset_real_estate === undefined) {
+      const currentHousing = data.current_housing === 'owned' ? (data.current_housing_value || 0) : 0;
+      const property2 = data.has_property_2 ? (data.property_2_value || 0) : 0;
+      const property3 = data.has_property_3 ? (data.property_3_value || 0) : 0;
+      onChange('asset_real_estate', currentHousing + property2 + property3);
+    }
+  }, [data.current_housing, data.current_housing_value, data.has_property_2, data.property_2_value, data.has_property_3, data.property_3_value]);
+
+  // Auto-populate movable property value
+  useEffect(() => {
+    if (data.asset_movable_property === undefined) {
+      const currentMovable = data.current_housing === 'owned' ? (data.current_housing_movable_value || 0) : 0;
+      const property2Movable = data.has_property_2 ? (data.property_2_movable_value || 0) : 0;
+      const property3Movable = data.has_property_3 ? (data.property_3_movable_value || 0) : 0;
+      const car1 = data.has_car_1 ? (data.car_1_value || 0) : 0;
+      const car2 = data.has_car_2 ? (data.car_2_value || 0) : 0;
+      const car3 = data.has_car_3 ? (data.car_3_value || 0) : 0;
+      onChange('asset_movable_property', currentMovable + property2Movable + property3Movable + car1 + car2 + car3);
+    }
+  }, [data.current_housing, data.current_housing_movable_value, data.has_property_2, data.property_2_movable_value, data.has_property_3, data.property_3_movable_value, data.has_car_1, data.car_1_value, data.has_car_2, data.car_2_value, data.has_car_3, data.car_3_value]);
+
   // Auto-populate mortgage from Housing step
   useEffect(() => {
     if (data.liability_mortgage_monthly === undefined && data.current_mortgage_monthly_payment) {
@@ -88,8 +111,12 @@ export default function FinancialFlowStep({ data, onChange, showErrors }) {
 
   const totalExpenses = totalHousingExpenses + totalCarExpenses + totalVariableExpenses;
 
-  const totalAssets = (data.asset_checking_account || 0) + (data.asset_long_term_savings || 0) +
+  const totalFinancialAssets = (data.asset_checking_account || 0) + (data.asset_long_term_savings || 0) +
     (data.asset_medium_term_savings || 0) + (data.asset_short_term_savings || 0);
+  
+  const totalPropertyAssets = (data.asset_real_estate || 0) + (data.asset_movable_property || 0);
+  
+  const totalAssets = totalFinancialAssets + totalPropertyAssets;
 
   const totalLiabilitiesMonthly = (data.liability_mortgage_monthly || 0) + (data.liability_consumer_loans_monthly || 0) +
     (data.liability_credit_cards_monthly || 0) + (data.liability_leasing_monthly || 0) + (data.liability_overdraft_monthly || 0);
@@ -328,6 +355,24 @@ export default function FinancialFlowStep({ data, onChange, showErrors }) {
             </div>
             <p className="text-xs text-slate-500">Това е сборът от пенсионни фондове и спестявания за деца.</p>
           </div>
+          <div className="space-y-1" data-invalid={isFieldInvalid(data.asset_real_estate) ? "true" : undefined}>
+            <div className="flex items-center justify-between gap-2">
+              <Label className="text-sm">Обща стойност на недвижимо имущество <span className="text-red-500">*</span></Label>
+              <Input type="number" min="0" value={data.asset_real_estate ?? ''}
+                onChange={(e) => onChange('asset_real_estate', e.target.value === '' ? '' : parseInt(e.target.value))} 
+                className={`rounded-lg w-28 ${isFieldInvalid(data.asset_real_estate) ? 'border-red-500 bg-red-50' : ''}`} />
+            </div>
+            <p className="text-xs text-slate-500">Това е общата стойност на недвижимото имущество попълнено в анализа.</p>
+          </div>
+          <div className="space-y-1" data-invalid={isFieldInvalid(data.asset_movable_property) ? "true" : undefined}>
+            <div className="flex items-center justify-between gap-2">
+              <Label className="text-sm">Обща стойност на движимо имущество <span className="text-red-500">*</span></Label>
+              <Input type="number" min="0" value={data.asset_movable_property ?? ''}
+                onChange={(e) => onChange('asset_movable_property', e.target.value === '' ? '' : parseInt(e.target.value))} 
+                className={`rounded-lg w-28 ${isFieldInvalid(data.asset_movable_property) ? 'border-red-500 bg-red-50' : ''}`} />
+            </div>
+            <p className="text-xs text-slate-500">Това е общата стойност на движимото имущество попълнено в анализа. (Автомобили и движимо имущество в апартаменти/къщи)</p>
+          </div>
         </div>
         <div className="mt-3 pt-3 border-t border-slate-200 flex justify-between">
           <span className="text-sm font-medium">Общо активи:</span>
@@ -447,22 +492,53 @@ export default function FinancialFlowStep({ data, onChange, showErrors }) {
       {/* Summary */}
       <div className="bg-blue-50 border border-blue-200 rounded-xl p-6">
         <h3 className="font-semibold text-slate-900 mb-4">Баланс</h3>
-        <div className="grid sm:grid-cols-2 gap-4">
+        <div className="space-y-4">
+          {/* Income */}
           <div className="flex justify-between">
             <span>Общо доходи:</span>
             <span className="font-semibold text-green-600">{totalMonthlyIncome.toLocaleString()} €</span>
           </div>
-          <div className="flex justify-between">
-            <span>Общо разходи:</span>
-            <span className="font-semibold text-red-600">{totalExpenses.toLocaleString()} €</span>
+          
+          {/* Expenses breakdown */}
+          <div className="space-y-2">
+            <div className="flex justify-between">
+              <span className="text-slate-600">Променливи разходи:</span>
+              <span className="text-red-500">{totalExpenses.toLocaleString()} €</span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-slate-600">Разходи за заеми/кредити:</span>
+              <span className="text-red-500">{totalLiabilitiesMonthly.toLocaleString()} €</span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-slate-600">Разходи за застраховане:</span>
+              <span className="text-red-500">{totalInsurance.toLocaleString()} €</span>
+            </div>
+            <div className="flex justify-between">
+              <span className="font-semibold">Общи разходи:</span>
+              <span className="font-semibold text-red-600">{(totalExpenses + totalLiabilitiesMonthly + totalInsurance).toLocaleString()} €</span>
+            </div>
           </div>
-          <div className="flex justify-between">
-            <span>Имущество (активи):</span>
-            <span className="font-semibold text-blue-600">{totalAssets.toLocaleString()} €</span>
+          
+          {/* Assets breakdown */}
+          <div className="space-y-2 pt-2 border-t border-blue-200">
+            <div className="flex justify-between">
+              <span className="text-slate-600">Активи на финансов пазар:</span>
+              <span className="text-blue-500">{totalFinancialAssets.toLocaleString()} €</span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-slate-600">Активи от движимо и недвижимо имущество:</span>
+              <span className="text-blue-500">{totalPropertyAssets.toLocaleString()} €</span>
+            </div>
+            <div className="flex justify-between">
+              <span className="font-semibold">Общо активи:</span>
+              <span className="font-semibold text-blue-600">{totalAssets.toLocaleString()} €</span>
+            </div>
           </div>
-          <div className="flex justify-between">
-            <span>Задължения (месечни):</span>
-            <span className="font-semibold text-orange-600">{totalLiabilitiesMonthly.toLocaleString()} €</span>
+          
+          {/* Liabilities */}
+          <div className="flex justify-between pt-2 border-t border-blue-200">
+            <span>Задължения (оставаща сума):</span>
+            <span className="font-semibold text-orange-600">{totalLiabilitiesRemaining.toLocaleString()} €</span>
           </div>
         </div>
         <div className="mt-4 pt-4 border-t border-blue-200 flex justify-between">

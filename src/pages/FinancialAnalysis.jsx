@@ -401,7 +401,7 @@ export default function FinancialAnalysis() {
         }
         
         // Assets
-        const assetFields = ['asset_checking_account', 'asset_short_term_savings', 'asset_medium_term_savings', 'asset_long_term_savings'];
+        const assetFields = ['asset_checking_account', 'asset_short_term_savings', 'asset_medium_term_savings', 'asset_long_term_savings', 'asset_real_estate', 'asset_movable_property'];
         for (const field of assetFields) {
           if (formData[field] === undefined || formData[field] === '') return false;
         }

@@ -203,8 +203,8 @@ export default function ReserveStep({ data, onChange }) {
                   value={data.client_checking_account_bank || ''} 
                   onValueChange={(value) => onChange('client_checking_account_bank', value)}
                 >
-                  <SelectTrigger className="rounded-lg text-sm text-center">
-                    <SelectValue placeholder="Изберете" className="text-center" />
+                  <SelectTrigger className="rounded-lg text-sm [&>span]:text-center [&>span]:w-full">
+                    <SelectValue placeholder="Изберете" />
                   </SelectTrigger>
                   <SelectContent>
                     {BANK_OPTIONS.map(bank => (
@@ -229,8 +229,8 @@ export default function ReserveStep({ data, onChange }) {
                   value={data.client_savings_account_bank || ''} 
                   onValueChange={(value) => onChange('client_savings_account_bank', value)}
                 >
-                  <SelectTrigger className="rounded-lg text-sm text-center">
-                    <SelectValue placeholder="Изберете" className="text-center" />
+                  <SelectTrigger className="rounded-lg text-sm [&>span]:text-center [&>span]:w-full">
+                    <SelectValue placeholder="Изберете" />
                   </SelectTrigger>
                   <SelectContent>
                     {BANK_OPTIONS.map(bank => (
@@ -255,8 +255,8 @@ export default function ReserveStep({ data, onChange }) {
                   value={data.client_term_deposit_bank || ''} 
                   onValueChange={(value) => onChange('client_term_deposit_bank', value)}
                 >
-                  <SelectTrigger className="rounded-lg text-sm text-center">
-                    <SelectValue placeholder="Изберете" className="text-center" />
+                  <SelectTrigger className="rounded-lg text-sm [&>span]:text-center [&>span]:w-full">
+                    <SelectValue placeholder="Изберете" />
                   </SelectTrigger>
                   <SelectContent>
                     {BANK_OPTIONS.map(bank => (

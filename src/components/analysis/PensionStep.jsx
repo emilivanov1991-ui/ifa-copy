@@ -1,10 +1,30 @@
 import React, { useEffect } from 'react';
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Switch } from "@/components/ui/switch";
 import { Checkbox } from "@/components/ui/checkbox";
+import { 
+  Select, 
+  SelectContent, 
+  SelectItem, 
+  SelectTrigger, 
+  SelectValue 
+} from "@/components/ui/select";
 import { Umbrella, User, Users } from 'lucide-react';
 import { cn } from "@/lib/utils";
+
+// Pension fund options for II. Pillar
+const PENSION_FUND_OPTIONS = [
+  { value: 'allianz', label: 'УПФ "Алианц България"' },
+  { value: 'badeshte', label: 'УПФ "Бъдеще"' },
+  { value: 'dallbogg', label: 'УПФ "ДаллБогг: Живот и Здраве"' },
+  { value: 'doverie', label: 'УПФ "Доверие"' },
+  { value: 'dsk_rodina', label: 'УПФ "ДСК - Родина"' },
+  { value: 'obb', label: 'УПФ "ОББ" ЕАД' },
+  { value: 'poi', label: 'УПФ "Пенсионноосигурителен институт"' },
+  { value: 'saglasie', label: 'УПФ "Съгласие"' },
+  { value: 'toplina', label: 'УПФ "Топлина"' },
+  { value: 'ckb_sila', label: 'УПФ "ЦКБ - Сила"' },
+];
 
 // Calculate expected state pension based on category, age and gross income
 const calculateStatePension = (category, retirementAge, grossIncome) => {
@@ -142,7 +162,7 @@ export default function PensionStep({ data, onChange }) {
                 <Input
                   type="number"
                   min="0"
-                  placeholder="2000"
+                  placeholder=""
                   value={data.client_gross_income_pension || ''}
                   onChange={(e) => onChange('client_gross_income_pension', parseInt(e.target.value) || '')}
                   className="rounded-lg"
@@ -154,7 +174,7 @@ export default function PensionStep({ data, onChange }) {
                   type="number"
                   min="50"
                   max="75"
-                  placeholder="65"
+                  placeholder=""
                   value={data.client_retirement_age || ''}
                   onChange={(e) => onChange('client_retirement_age', parseInt(e.target.value) || '')}
                   className="rounded-lg"
@@ -165,14 +185,14 @@ export default function PensionStep({ data, onChange }) {
                 <Input
                   type="number"
                   min="0"
-                  placeholder="2000"
+                  placeholder=""
                   value={data.client_desired_pension || ''}
                   onChange={(e) => onChange('client_desired_pension', parseInt(e.target.value) || '')}
                   className="rounded-lg"
                 />
               </div>
               <div className="space-y-2">
-                <Label>Очаквана държавна пенсия (€) - автоматично</Label>
+                <Label>Очаквана държавна пенсия (€)</Label>
                 <Input
                   type="number"
                   min="0"
@@ -231,7 +251,7 @@ export default function PensionStep({ data, onChange }) {
                   <Input
                     type="number"
                     min="0"
-                    placeholder="2000"
+                    placeholder=""
                     value={data.partner_gross_income_pension || ''}
                     onChange={(e) => onChange('partner_gross_income_pension', parseInt(e.target.value) || '')}
                     className="rounded-lg"
@@ -243,7 +263,7 @@ export default function PensionStep({ data, onChange }) {
                     type="number"
                     min="50"
                     max="75"
-                    placeholder="65"
+                    placeholder=""
                     value={data.partner_retirement_age || ''}
                     onChange={(e) => onChange('partner_retirement_age', parseInt(e.target.value) || '')}
                     className="rounded-lg"
@@ -254,14 +274,14 @@ export default function PensionStep({ data, onChange }) {
                   <Input
                     type="number"
                     min="0"
-                    placeholder="2000"
+                    placeholder=""
                     value={data.partner_desired_pension || ''}
                     onChange={(e) => onChange('partner_desired_pension', parseInt(e.target.value) || '')}
                     className="rounded-lg"
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label>Очаквана държавна пенсия (€) - автоматично</Label>
+                  <Label>Очаквана държавна пенсия (€)</Label>
                   <Input
                     type="number"
                     min="0"
@@ -311,27 +331,91 @@ export default function PensionStep({ data, onChange }) {
               <User className="h-4 w-4 text-slate-500" />
               <span className="font-medium text-slate-700">Клиент</span>
             </div>
-            <div className="space-y-3">
-              <div className="flex items-center justify-between">
-                <Label className="cursor-pointer">I. Стълб (държавно осигуряване)</Label>
-                <Switch
-                  checked={data.client_pillar_1 || false}
-                  onCheckedChange={(checked) => onChange('client_pillar_1', checked)}
-                />
+            <div className="space-y-4">
+              {/* I. Pillar */}
+              <div className="flex items-center gap-3">
+                <Label className="flex-1">I. Стълб (държавно осигуряване)</Label>
+                <div className="flex items-center gap-2">
+                  <span className={cn("text-sm font-medium", (data.client_pillar_1 ?? true) ? "text-green-600" : "text-slate-400")}>Да</span>
+                  <button
+                    type="button"
+                    onClick={() => onChange('client_pillar_1', !(data.client_pillar_1 ?? true))}
+                    className={cn(
+                      "w-12 h-6 rounded-full transition-colors relative",
+                      (data.client_pillar_1 ?? true) ? "bg-green-500" : "bg-red-500"
+                    )}
+                  >
+                    <div className={cn(
+                      "w-5 h-5 bg-white rounded-full absolute top-0.5 transition-all",
+                      (data.client_pillar_1 ?? true) ? "left-0.5" : "left-6"
+                    )} />
+                  </button>
+                  <span className={cn("text-sm font-medium", !(data.client_pillar_1 ?? true) ? "text-red-600" : "text-slate-400")}>Не</span>
+                </div>
               </div>
-              <div className="flex items-center justify-between">
-                <Label className="cursor-pointer">II. Стълб (допълнително задължително)</Label>
-                <Switch
-                  checked={data.client_pillar_2 || false}
-                  onCheckedChange={(checked) => onChange('client_pillar_2', checked)}
-                />
+
+              {/* II. Pillar */}
+              <div className="space-y-3">
+                <div className="flex items-center gap-3">
+                  <Label className="flex-1">II. Стълб (допълнително задължително)</Label>
+                  <div className="flex items-center gap-2">
+                    <span className={cn("text-sm font-medium", (data.client_pillar_2 ?? true) ? "text-green-600" : "text-slate-400")}>Да</span>
+                    <button
+                      type="button"
+                      onClick={() => onChange('client_pillar_2', !(data.client_pillar_2 ?? true))}
+                      className={cn(
+                        "w-12 h-6 rounded-full transition-colors relative",
+                        (data.client_pillar_2 ?? true) ? "bg-green-500" : "bg-red-500"
+                      )}
+                    >
+                      <div className={cn(
+                        "w-5 h-5 bg-white rounded-full absolute top-0.5 transition-all",
+                        (data.client_pillar_2 ?? true) ? "left-0.5" : "left-6"
+                      )} />
+                    </button>
+                    <span className={cn("text-sm font-medium", !(data.client_pillar_2 ?? true) ? "text-red-600" : "text-slate-400")}>Не</span>
+                  </div>
+                </div>
+                {(data.client_pillar_2 ?? true) && (
+                  <div className="ml-4 space-y-2">
+                    <Label className="text-sm">Име на частен пенсионен фонд?</Label>
+                    <Select 
+                      value={data.client_pension_fund || ''} 
+                      onValueChange={(value) => onChange('client_pension_fund', value)}
+                    >
+                      <SelectTrigger className="rounded-lg">
+                        <SelectValue placeholder="Изберете" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {PENSION_FUND_OPTIONS.map(fund => (
+                          <SelectItem key={fund.value} value={fund.value}>{fund.label}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                )}
               </div>
-              <div className="flex items-center justify-between">
-                <Label className="cursor-pointer">III. Стълб (доброволно осигуряване)</Label>
-                <Switch
-                  checked={data.client_pillar_3 || false}
-                  onCheckedChange={(checked) => onChange('client_pillar_3', checked)}
-                />
+
+              {/* III. Pillar */}
+              <div className="flex items-center gap-3">
+                <Label className="flex-1">III. Стълб (доброволно осигуряване)</Label>
+                <div className="flex items-center gap-2">
+                  <span className={cn("text-sm font-medium", (data.client_pillar_3 ?? false) ? "text-green-600" : "text-slate-400")}>Да</span>
+                  <button
+                    type="button"
+                    onClick={() => onChange('client_pillar_3', !(data.client_pillar_3 ?? false))}
+                    className={cn(
+                      "w-12 h-6 rounded-full transition-colors relative",
+                      (data.client_pillar_3 ?? false) ? "bg-green-500" : "bg-red-500"
+                    )}
+                  >
+                    <div className={cn(
+                      "w-5 h-5 bg-white rounded-full absolute top-0.5 transition-all",
+                      (data.client_pillar_3 ?? false) ? "left-0.5" : "left-6"
+                    )} />
+                  </button>
+                  <span className={cn("text-sm font-medium", !(data.client_pillar_3 ?? false) ? "text-red-600" : "text-slate-400")}>Не</span>
+                </div>
               </div>
             </div>
           </div>
@@ -343,32 +427,101 @@ export default function PensionStep({ data, onChange }) {
                 <Users className="h-4 w-4 text-slate-500" />
                 <span className="font-medium text-slate-700">Партньор</span>
               </div>
-              <div className="space-y-3">
-                <div className="flex items-center justify-between">
-                  <Label className="cursor-pointer">I. Стълб (държавно осигуряване)</Label>
-                  <Switch
-                    checked={data.partner_pillar_1 || false}
-                    onCheckedChange={(checked) => onChange('partner_pillar_1', checked)}
-                  />
+              <div className="space-y-4">
+                {/* I. Pillar */}
+                <div className="flex items-center gap-3">
+                  <Label className="flex-1">I. Стълб (държавно осигуряване)</Label>
+                  <div className="flex items-center gap-2">
+                    <span className={cn("text-sm font-medium", (data.partner_pillar_1 ?? true) ? "text-green-600" : "text-slate-400")}>Да</span>
+                    <button
+                      type="button"
+                      onClick={() => onChange('partner_pillar_1', !(data.partner_pillar_1 ?? true))}
+                      className={cn(
+                        "w-12 h-6 rounded-full transition-colors relative",
+                        (data.partner_pillar_1 ?? true) ? "bg-green-500" : "bg-red-500"
+                      )}
+                    >
+                      <div className={cn(
+                        "w-5 h-5 bg-white rounded-full absolute top-0.5 transition-all",
+                        (data.partner_pillar_1 ?? true) ? "left-0.5" : "left-6"
+                      )} />
+                    </button>
+                    <span className={cn("text-sm font-medium", !(data.partner_pillar_1 ?? true) ? "text-red-600" : "text-slate-400")}>Не</span>
+                  </div>
                 </div>
-                <div className="flex items-center justify-between">
-                  <Label className="cursor-pointer">II. Стълб (допълнително задължително)</Label>
-                  <Switch
-                    checked={data.partner_pillar_2 || false}
-                    onCheckedChange={(checked) => onChange('partner_pillar_2', checked)}
-                  />
+
+                {/* II. Pillar */}
+                <div className="space-y-3">
+                  <div className="flex items-center gap-3">
+                    <Label className="flex-1">II. Стълб (допълнително задължително)</Label>
+                    <div className="flex items-center gap-2">
+                      <span className={cn("text-sm font-medium", (data.partner_pillar_2 ?? true) ? "text-green-600" : "text-slate-400")}>Да</span>
+                      <button
+                        type="button"
+                        onClick={() => onChange('partner_pillar_2', !(data.partner_pillar_2 ?? true))}
+                        className={cn(
+                          "w-12 h-6 rounded-full transition-colors relative",
+                          (data.partner_pillar_2 ?? true) ? "bg-green-500" : "bg-red-500"
+                        )}
+                      >
+                        <div className={cn(
+                          "w-5 h-5 bg-white rounded-full absolute top-0.5 transition-all",
+                          (data.partner_pillar_2 ?? true) ? "left-0.5" : "left-6"
+                        )} />
+                      </button>
+                      <span className={cn("text-sm font-medium", !(data.partner_pillar_2 ?? true) ? "text-red-600" : "text-slate-400")}>Не</span>
+                    </div>
+                  </div>
+                  {(data.partner_pillar_2 ?? true) && (
+                    <div className="ml-4 space-y-2">
+                      <Label className="text-sm">Име на частен пенсионен фонд?</Label>
+                      <Select 
+                        value={data.partner_pension_fund || ''} 
+                        onValueChange={(value) => onChange('partner_pension_fund', value)}
+                      >
+                        <SelectTrigger className="rounded-lg">
+                          <SelectValue placeholder="Изберете" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {PENSION_FUND_OPTIONS.map(fund => (
+                            <SelectItem key={fund.value} value={fund.value}>{fund.label}</SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  )}
                 </div>
-                <div className="flex items-center justify-between">
-                  <Label className="cursor-pointer">III. Стълб (доброволно осигуряване)</Label>
-                  <Switch
-                    checked={data.partner_pillar_3 || false}
-                    onCheckedChange={(checked) => onChange('partner_pillar_3', checked)}
-                  />
+
+                {/* III. Pillar */}
+                <div className="flex items-center gap-3">
+                  <Label className="flex-1">III. Стълб (доброволно осигуряване)</Label>
+                  <div className="flex items-center gap-2">
+                    <span className={cn("text-sm font-medium", (data.partner_pillar_3 ?? false) ? "text-green-600" : "text-slate-400")}>Да</span>
+                    <button
+                      type="button"
+                      onClick={() => onChange('partner_pillar_3', !(data.partner_pillar_3 ?? false))}
+                      className={cn(
+                        "w-12 h-6 rounded-full transition-colors relative",
+                        (data.partner_pillar_3 ?? false) ? "bg-green-500" : "bg-red-500"
+                      )}
+                    >
+                      <div className={cn(
+                        "w-5 h-5 bg-white rounded-full absolute top-0.5 transition-all",
+                        (data.partner_pillar_3 ?? false) ? "left-0.5" : "left-6"
+                      )} />
+                    </button>
+                    <span className={cn("text-sm font-medium", !(data.partner_pillar_3 ?? false) ? "text-red-600" : "text-slate-400")}>Не</span>
+                  </div>
                 </div>
               </div>
             </div>
           )}
         </div>
+
+        {/* NOI Information */}
+        <p className="text-xs text-slate-500 mt-4">
+          В случай, на необходимост за откриване на дружеството, което управлява Вашите средства: Телефон за информация на НОИ: 0700 10 292 !
+        </p>
       </div>
 
       {/* Pension Referrals */}

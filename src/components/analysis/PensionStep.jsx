@@ -12,7 +12,7 @@ import {
 import { Umbrella, User, Users } from 'lucide-react';
 import { cn } from "@/lib/utils";
 
-// Pension fund options for II. Pillar
+// Pension fund options for II. Pillar (УПФ)
 const PENSION_FUND_OPTIONS = [
   { value: 'allianz', label: 'УПФ "Алианц България"' },
   { value: 'badeshte', label: 'УПФ "Бъдеще"' },
@@ -24,6 +24,20 @@ const PENSION_FUND_OPTIONS = [
   { value: 'saglasie', label: 'УПФ "Съгласие"' },
   { value: 'toplina', label: 'УПФ "Топлина"' },
   { value: 'ckb_sila', label: 'УПФ "ЦКБ - Сила"' },
+];
+
+// Pension fund options for III. Pillar (ДПФ)
+const VOLUNTARY_PENSION_FUND_OPTIONS = [
+  { value: 'allianz', label: 'ДПФ "Алианц България"' },
+  { value: 'badeshte', label: 'ДПФ "Бъдеще"' },
+  { value: 'dallbogg', label: 'ДПФ "ДаллБогг: Живот и Здраве"' },
+  { value: 'doverie', label: 'ДПФ "Доверие"' },
+  { value: 'dsk_rodina', label: 'ДПФ "ДСК - Родина"' },
+  { value: 'obb', label: 'ДПФ "ОББ" ЕАД' },
+  { value: 'poi', label: 'ДПФ "Пенсионноосигурителен институт"' },
+  { value: 'saglasie', label: 'ДПФ "Съгласие"' },
+  { value: 'toplina', label: 'ДПФ "Топлина"' },
+  { value: 'ckb_sila', label: 'ДПФ "ЦКБ - Сила"' },
 ];
 
 // Calculate expected state pension based on category, age and gross income
@@ -406,28 +420,74 @@ export default function PensionStep({ data, onChange }) {
                 </div>
 
                 {/* III. Pillar */}
-              <div className="flex items-center gap-3">
-                <Label className="flex-1">III. Стълб (доброволно осигуряване)</Label>
-                <div className="flex items-center gap-2">
-                  <span className={cn("text-sm font-medium", (data.client_pillar_3 ?? false) ? "text-green-600" : "text-slate-400")}>Да</span>
-                  <button
-                    type="button"
-                    onClick={() => onChange('client_pillar_3', !(data.client_pillar_3 ?? false))}
-                    className={cn(
-                      "w-12 h-6 rounded-full transition-colors relative",
-                      (data.client_pillar_3 ?? false) ? "bg-green-500" : "bg-red-500"
-                    )}
-                  >
-                    <div className={cn(
-                      "w-5 h-5 bg-white rounded-full absolute top-0.5 transition-all",
-                      (data.client_pillar_3 ?? false) ? "left-0.5" : "left-6"
-                    )} />
-                  </button>
-                  <span className={cn("text-sm font-medium", !(data.client_pillar_3 ?? false) ? "text-red-600" : "text-slate-400")}>Не</span>
+                <div className="space-y-3">
+                  <div className="flex items-center gap-3">
+                    <Label className="flex-1">III. Стълб (доброволно осигуряване)</Label>
+                    <div className="flex items-center gap-2">
+                      <span className={cn("text-sm font-medium", (data.client_pillar_3 ?? false) ? "text-green-600" : "text-slate-400")}>Да</span>
+                      <button
+                        type="button"
+                        onClick={() => onChange('client_pillar_3', !(data.client_pillar_3 ?? false))}
+                        className={cn(
+                          "w-12 h-6 rounded-full transition-colors relative",
+                          (data.client_pillar_3 ?? false) ? "bg-green-500" : "bg-red-500"
+                        )}
+                      >
+                        <div className={cn(
+                          "w-5 h-5 bg-white rounded-full absolute top-0.5 transition-all",
+                          (data.client_pillar_3 ?? false) ? "left-0.5" : "left-6"
+                        )} />
+                      </button>
+                      <span className={cn("text-sm font-medium", !(data.client_pillar_3 ?? false) ? "text-red-600" : "text-slate-400")}>Не</span>
+                    </div>
+                  </div>
+                  {(data.client_pillar_3 ?? false) && (
+                    <div className="ml-4 space-y-3">
+                      <div className="space-y-2">
+                        <Label className="text-sm">Име на частен пенсионен фонд <span className="text-red-500">*</span></Label>
+                        <Select 
+                          value={data.client_voluntary_pension_fund || ''} 
+                          onValueChange={(value) => onChange('client_voluntary_pension_fund', value)}
+                        >
+                          <SelectTrigger className="rounded-lg">
+                            <SelectValue placeholder="Изберете" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {VOLUNTARY_PENSION_FUND_OPTIONS.map(fund => (
+                              <SelectItem key={fund.value} value={fund.value}>{fund.label}</SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      <div className="space-y-2">
+                        <Label className="text-sm">Месечна вноска (€) <span className="text-red-500">*</span></Label>
+                        <Input
+                          type="number"
+                          min="0"
+                          placeholder=""
+                          value={data.client_voluntary_pension_monthly || ''}
+                          onChange={(e) => onChange('client_voluntary_pension_monthly', parseInt(e.target.value) || '')}
+                          className="rounded-lg"
+                          required
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label className="text-sm">Обща стойност на партидата (ориентировъчна стойност) (€) <span className="text-red-500">*</span></Label>
+                        <Input
+                          type="number"
+                          min="0"
+                          placeholder=""
+                          value={data.client_voluntary_pension_total || ''}
+                          onChange={(e) => onChange('client_voluntary_pension_total', parseInt(e.target.value) || '')}
+                          className="rounded-lg"
+                          required
+                        />
+                      </div>
+                    </div>
+                  )}
                 </div>
-              </div>
-            </div>
-          </div>
+                </div>
+                </div>
 
           {/* Partner - only show if included */}
           {includePartner && (

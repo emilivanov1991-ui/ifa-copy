@@ -10,6 +10,7 @@ import {
   SelectValue 
 } from "@/components/ui/select";
 import { User, Users, Baby, Shield, X } from 'lucide-react';
+import BulgarianDateInput from '@/components/ui/BulgarianDateInput';
 
 // Bank options
 const BANK_OPTIONS = [
@@ -228,10 +229,9 @@ export default function PersonalDataStep({ data, onChange }) {
 
           <div className="space-y-2">
             <Label>Дата на раждане <span className="text-red-500">*</span></Label>
-            <Input
-              type="date"
+            <BulgarianDateInput
               value={data.client_birthdate || ''}
-              onChange={(e) => onChange('client_birthdate', e.target.value)}
+              onChange={(value) => onChange('client_birthdate', value)}
               className="rounded-lg"
               required
             />
@@ -305,10 +305,9 @@ export default function PersonalDataStep({ data, onChange }) {
 
           <div className="space-y-2">
             <Label>Лична карта валидна до <span className="text-red-500">*</span></Label>
-            <Input
-              type="date"
+            <BulgarianDateInput
               value={data.client_id_valid_until || ''}
-              onChange={(e) => onChange('client_id_valid_until', e.target.value)}
+              onChange={(value) => onChange('client_id_valid_until', value)}
               className="rounded-lg"
               required
             />
@@ -578,10 +577,9 @@ export default function PersonalDataStep({ data, onChange }) {
 
               <div className="space-y-2">
                 <Label>Дата на раждане <span className="text-red-500">*</span></Label>
-                <Input
-                  type="date"
+                <BulgarianDateInput
                   value={data.partner_birthdate || ''}
-                  onChange={(e) => onChange('partner_birthdate', e.target.value)}
+                  onChange={(value) => onChange('partner_birthdate', value)}
                   className="rounded-lg"
                   required
                 />
@@ -655,10 +653,9 @@ export default function PersonalDataStep({ data, onChange }) {
 
               <div className="space-y-2">
                 <Label>Лична карта валидна до <span className="text-red-500">*</span></Label>
-                <Input
-                  type="date"
+                <BulgarianDateInput
                   value={data.partner_id_valid_until || ''}
-                  onChange={(e) => onChange('partner_id_valid_until', e.target.value)}
+                  onChange={(value) => onChange('partner_id_valid_until', value)}
                   className="rounded-lg"
                   required
                 />
@@ -936,15 +933,14 @@ export default function PersonalDataStep({ data, onChange }) {
                     />
                   </div>
                   <div className="space-y-1">
-                    <Label className="text-xs">Дата на раждане <span className="text-red-500">*</span></Label>
-                    <Input
-                      type="date"
-                      value={data[`child_${index + 1}_birthdate`] || ''}
-                      onChange={(e) => onChange(`child_${index + 1}_birthdate`, e.target.value)}
-                      className="rounded-lg"
-                      required
-                    />
-                  </div>
+                      <Label className="text-xs">Дата на раждане <span className="text-red-500">*</span></Label>
+                      <BulgarianDateInput
+                        value={data[`child_${index + 1}_birthdate`] || ''}
+                        onChange={(value) => onChange(`child_${index + 1}_birthdate`, value)}
+                        className="rounded-lg"
+                        required
+                      />
+                    </div>
                 </div>
               ))}
             </div>

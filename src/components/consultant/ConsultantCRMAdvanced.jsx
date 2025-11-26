@@ -79,7 +79,7 @@ const mockClients = [
 
 const communicationIcons = { call: Phone, meeting: Video, email: Mail };
 
-export default function ConsultantCRMAdvanced() {
+export default function ConsultantCRMAdvanced({ isAdmin = false }) {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedClient, setSelectedClient] = useState(null);
   const [clients, setClients] = useState(mockClients);
@@ -454,6 +454,7 @@ export default function ConsultantCRMAdvanced() {
           onSelectClient={setSelectedClient}
           onCall={handleCallClick}
           selectedClient={selectedClient}
+          isAdmin={isAdmin}
           onStatusChange={(client, newStatus, newType) => {
             setClients(prev => prev.map(c => {
               if (c.id === client.id) {

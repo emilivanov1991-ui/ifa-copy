@@ -72,7 +72,7 @@ const getStatusOptionsForStage = (stageId) => {
   }));
 };
 
-export default function KanbanBoard({ clients, onSelectClient, onCall, selectedClient, onStatusChange }) {
+export default function KanbanBoard({ clients, onSelectClient, onCall, selectedClient, onStatusChange, isAdmin = false }) {
   const [statusDialogOpen, setStatusDialogOpen] = useState(false);
   const [pendingMove, setPendingMove] = useState(null);
   const [selectedNewStatus, setSelectedNewStatus] = useState('');
@@ -92,7 +92,7 @@ export default function KanbanBoard({ clients, onSelectClient, onCall, selectedC
     const destStage = KANBAN_STAGES.find(s => s.id === destStageId);
     
     // Block moving to signed_paid (admin only)
-    if (destStage?.adminOnly) {
+    if (destStage?.adminOnly && !isAdmin) {
       toast.error('Действието може да бъде извършено само от Администратор.');
       return;
     }

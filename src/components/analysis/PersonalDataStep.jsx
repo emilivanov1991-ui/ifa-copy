@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
@@ -9,7 +9,7 @@ import {
   SelectTrigger, 
   SelectValue 
 } from "@/components/ui/select";
-import { User, Users, Baby } from 'lucide-react';
+import { User, Users, Baby, Shield, X } from 'lucide-react';
 import HealthQuestionnaire from './HealthQuestionnaire';
 
 // Helper function to calculate age from birthdate
@@ -25,7 +25,32 @@ const calculateAge = (birthdate) => {
   return age;
 };
 
+// Toggle button component with yes/no indicator
+const ToggleWithLabel = ({ checked, onChange, defaultYes = false, label }) => {
+  const isYes = defaultYes ? checked : !checked;
+  return (
+    <div className="flex items-center gap-3">
+      <span className={`text-sm font-medium ${!isYes ? 'text-green-600' : 'text-slate-400'}`}>Не</span>
+      <Switch
+        checked={checked}
+        onCheckedChange={onChange}
+        className={checked === defaultYes ? 'data-[state=checked]:bg-green-500' : checked ? 'data-[state=checked]:bg-red-500' : ''}
+      />
+      <span className={`text-sm font-medium ${isYes ? 'text-green-600' : 'text-slate-400'}`}>Да</span>
+    </div>
+  );
+};
+
 export default function PersonalDataStep({ data, onChange }) {
+  const [showDisclaimer, setShowDisclaimer] = useState(true);
+
+  // Initialize defaults
+  useEffect(() => {
+    if (data.client_is_employed === undefined) onChange('client_is_employed', true);
+    if (data.client_is_good_health === undefined) onChange('client_is_good_health', true);
+    if (data.children_economically_dependent === undefined) onChange('children_economically_dependent', true);
+  }, []);
+
   // Auto-calculate client age when birthdate changes
   useEffect(() => {
     if (data.client_birthdate) {
@@ -46,8 +71,36 @@ export default function PersonalDataStep({ data, onChange }) {
     }
   }, [data.partner_birthdate]);
 
+  // Initialize partner defaults when enabled
+  useEffect(() => {
+    if (data.include_partner) {
+      if (data.partner_is_employed === undefined) onChange('partner_is_employed', true);
+      if (data.partner_is_good_health === undefined) onChange('partner_is_good_health', true);
+    }
+  }, [data.include_partner]);
+
   return (
-    <div className="space-y-8">
+    <div className="space-y-8 relative">
+      {/* Floating Disclaimer */}
+      {showDisclaimer && (
+        <div className="fixed bottom-4 right-4 max-w-sm bg-blue-600 text-white p-4 rounded-xl shadow-xl z-50">
+          <button 
+            onClick={() => setShowDisclaimer(false)}
+            className="absolute top-2 right-2 text-white/80 hover:text-white"
+          >
+            <X className="h-4 w-4" />
+          </button>
+          <div className="flex items-start gap-3">
+            <Shield className="h-5 w-5 flex-shrink-0 mt-0.5" />
+            <p className="text-sm leading-relaxed">
+              Ние сме регулирани към Комисията за финансов надзор и сме администратор на лични данни. 
+              Информацията е законодателно необходима за изготвяне на Вашия анализ и финансов план. 
+              Никога не споделяме данните Ви с трети страни без Вашето съгласие.
+            </p>
+          </div>
+        </div>
+      )}
+
       {/* Client Section */}
       <div className="bg-slate-50 rounded-xl p-6">
         <div className="flex items-center gap-2 mb-6">
@@ -58,56 +111,45 @@ export default function PersonalDataStep({ data, onChange }) {
         {/* Personal Info */}
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
           <div className="space-y-2">
-            <Label>Име</Label>
+            <Label>Име <span className="text-red-500">*</span></Label>
             <Input
-              placeholder="Иван"
               value={data.client_first_name || ''}
               onChange={(e) => onChange('client_first_name', e.target.value)}
               className="rounded-lg"
+              required
             />
           </div>
           <div className="space-y-2">
-            <Label>Презиме</Label>
+            <Label>Презиме <span className="text-red-500">*</span></Label>
             <Input
-              placeholder="Петров"
               value={data.client_middle_name || ''}
               onChange={(e) => onChange('client_middle_name', e.target.value)}
               className="rounded-lg"
+              required
             />
           </div>
           <div className="space-y-2">
-            <Label>Фамилия</Label>
+            <Label>Фамилия <span className="text-red-500">*</span></Label>
             <Input
-              placeholder="Георгиев"
               value={data.client_last_name || ''}
               onChange={(e) => onChange('client_last_name', e.target.value)}
               className="rounded-lg"
+              required
             />
           </div>
 
           <div className="space-y-2">
-            <Label>Дата на раждане (дд.мм.гггг)</Label>
+            <Label>Дата на раждане <span className="text-red-500">*</span></Label>
             <Input
-              type="text"
-              placeholder="дд.мм.гггг"
-              value={data.client_birthdate_input !== undefined ? data.client_birthdate_input : (data.client_birthdate ? new Date(data.client_birthdate).toLocaleDateString('bg-BG') : '')}
-              onChange={(e) => onChange('client_birthdate_input', e.target.value)}
-              onBlur={(e) => {
-                const val = e.target.value;
-                const parts = val.split('.');
-                if (parts.length === 3 && parts[0] && parts[1] && parts[2]) {
-                  const date = new Date(`${parts[2]}-${parts[1].padStart(2, '0')}-${parts[0].padStart(2, '0')}`);
-                  if (!isNaN(date.getTime())) {
-                    onChange('client_birthdate', `${parts[2]}-${parts[1].padStart(2, '0')}-${parts[0].padStart(2, '0')}`);
-                    onChange('client_birthdate_input', undefined);
-                  }
-                }
-              }}
+              type="date"
+              value={data.client_birthdate || ''}
+              onChange={(e) => onChange('client_birthdate', e.target.value)}
               className="rounded-lg"
+              required
             />
           </div>
           <div className="space-y-2">
-            <Label>Възраст (автоматично)</Label>
+            <Label>Възраст</Label>
             <Input
               type="number"
               value={data.client_age || ''}
@@ -116,7 +158,7 @@ export default function PersonalDataStep({ data, onChange }) {
             />
           </div>
           <div className="space-y-2">
-            <Label>Пол</Label>
+            <Label>Пол <span className="text-red-500">*</span></Label>
             <Select 
               value={data.client_gender || ''} 
               onValueChange={(value) => onChange('client_gender', value)}
@@ -132,83 +174,78 @@ export default function PersonalDataStep({ data, onChange }) {
           </div>
 
           <div className="space-y-2">
-            <Label>Място на раждане</Label>
+            <Label>Място на раждане <span className="text-red-500">*</span></Label>
             <Input
-              placeholder="гр. София"
               value={data.client_birthplace || ''}
               onChange={(e) => onChange('client_birthplace', e.target.value)}
               className="rounded-lg"
+              required
             />
           </div>
           <div className="space-y-2">
-            <Label>ЕГН</Label>
+            <Label>ЕГН <span className="text-red-500">*</span></Label>
             <Input
               placeholder="0000000000"
               value={data.client_egn || ''}
               onChange={(e) => onChange('client_egn', e.target.value)}
               className="rounded-lg"
+              required
             />
           </div>
           <div className="space-y-2">
-            <Label>Номер на лична карта</Label>
+            <Label>Номер на лична карта <span className="text-red-500">*</span></Label>
             <Input
               placeholder="000000000"
               value={data.client_id_number || ''}
               onChange={(e) => onChange('client_id_number', e.target.value)}
               className="rounded-lg"
+              required
             />
           </div>
 
           <div className="space-y-2">
-            <Label>Лична карта валидна до (дд.мм.гггг)</Label>
+            <Label>Лична карта валидна до <span className="text-red-500">*</span></Label>
             <Input
-              type="text"
-              placeholder="дд.мм.гггг"
-              value={data.client_id_valid_until ? new Date(data.client_id_valid_until).toLocaleDateString('bg-BG') : ''}
-              onChange={(e) => {
-                const val = e.target.value;
-                const parts = val.split('.');
-                if (parts.length === 3 && parts[0].length <= 2 && parts[1].length <= 2 && parts[2].length === 4) {
-                  const date = new Date(`${parts[2]}-${parts[1].padStart(2, '0')}-${parts[0].padStart(2, '0')}`);
-                  if (!isNaN(date.getTime())) {
-                    onChange('client_id_valid_until', `${parts[2]}-${parts[1].padStart(2, '0')}-${parts[0].padStart(2, '0')}`);
-                  }
-                }
-              }}
+              type="date"
+              value={data.client_id_valid_until || ''}
+              onChange={(e) => onChange('client_id_valid_until', e.target.value)}
               className="rounded-lg"
+              required
             />
           </div>
           <div className="space-y-2 sm:col-span-2">
-            <Label>Постоянен адрес</Label>
+            <Label>Постоянен адрес <span className="text-red-500">*</span></Label>
             <Input
-              placeholder="гр. София, ул. Примерна 1"
               value={data.client_address || ''}
               onChange={(e) => onChange('client_address', e.target.value)}
               className="rounded-lg"
+              required
             />
           </div>
 
           <div className="space-y-2">
-            <Label>Телефонен номер</Label>
+            <Label>Телефонен номер <span className="text-red-500">*</span></Label>
             <Input
               placeholder="+359 888 000 000"
               value={data.client_phone || ''}
               onChange={(e) => onChange('client_phone', e.target.value)}
               className="rounded-lg"
+              required
             />
           </div>
           <div className="space-y-2">
-            <Label>Email</Label>
+            <Label>Email <span className="text-red-500">*</span></Label>
             <Input
               type="email"
               placeholder="email@example.com"
               value={data.client_email || ''}
               onChange={(e) => onChange('client_email', e.target.value)}
               className="rounded-lg"
+              required
             />
           </div>
           <div className="space-y-2">
-            <Label>Семейно положение</Label>
+            <Label>Семейно положение <span className="text-red-500">*</span></Label>
             <Select 
               value={data.client_marital_status || ''} 
               onValueChange={(value) => onChange('client_marital_status', value)}
@@ -226,7 +263,7 @@ export default function PersonalDataStep({ data, onChange }) {
           </div>
 
           <div className="space-y-2">
-            <Label>Националност</Label>
+            <Label>Националност <span className="text-red-500">*</span></Label>
             <Select 
               value={data.client_nationality || ''} 
               onValueChange={(value) => onChange('client_nationality', value)}
@@ -246,11 +283,12 @@ export default function PersonalDataStep({ data, onChange }) {
         {/* ZMIP Declaration */}
         <div className="border-t border-slate-200 pt-4 mb-4">
           <h4 className="font-medium text-slate-700 mb-3">Декларация по член 36 от ЗМИП</h4>
-          <div className="flex items-center justify-between p-3 bg-white rounded-lg border border-slate-200">
+          <div className={`flex items-center justify-between p-3 rounded-lg border ${data.client_is_pep ? 'bg-red-50 border-red-200' : 'bg-green-50 border-green-200'}`}>
             <Label className="cursor-pointer text-sm">Вие или член на Вашето семейство лице ли сте по член 36 от ЗМИП?</Label>
-            <Switch
+            <ToggleWithLabel 
               checked={data.client_is_pep || false}
-              onCheckedChange={(checked) => onChange('client_is_pep', checked)}
+              onChange={(checked) => onChange('client_is_pep', checked)}
+              defaultYes={false}
             />
           </div>
         </div>
@@ -259,11 +297,12 @@ export default function PersonalDataStep({ data, onChange }) {
         <div className="border-t border-slate-200 pt-4">
           <h4 className="font-medium text-slate-700 mb-3">Данни за заетост, доходи и работодател</h4>
           
-          <div className="flex items-center justify-between p-3 bg-white rounded-lg border border-slate-200 mb-4">
+          <div className={`flex items-center justify-between p-3 rounded-lg border mb-4 ${data.client_is_employed ? 'bg-green-50 border-green-200' : 'bg-red-50 border-red-200'}`}>
             <Label className="cursor-pointer">Трудова заетост</Label>
-            <Switch
-              checked={data.client_is_employed || false}
-              onCheckedChange={(checked) => onChange('client_is_employed', checked)}
+            <ToggleWithLabel 
+              checked={data.client_is_employed ?? true}
+              onChange={(checked) => onChange('client_is_employed', checked)}
+              defaultYes={true}
             />
           </div>
 
@@ -394,56 +433,45 @@ export default function PersonalDataStep({ data, onChange }) {
             {/* Personal Info */}
             <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
               <div className="space-y-2">
-                <Label>Име</Label>
+                <Label>Име <span className="text-red-500">*</span></Label>
                 <Input
-                  placeholder="Мария"
                   value={data.partner_first_name || ''}
                   onChange={(e) => onChange('partner_first_name', e.target.value)}
                   className="rounded-lg"
+                  required
                 />
               </div>
               <div className="space-y-2">
-                <Label>Презиме</Label>
+                <Label>Презиме <span className="text-red-500">*</span></Label>
                 <Input
-                  placeholder="Иванова"
                   value={data.partner_middle_name || ''}
                   onChange={(e) => onChange('partner_middle_name', e.target.value)}
                   className="rounded-lg"
+                  required
                 />
               </div>
               <div className="space-y-2">
-                <Label>Фамилия</Label>
+                <Label>Фамилия <span className="text-red-500">*</span></Label>
                 <Input
-                  placeholder="Георгиева"
                   value={data.partner_last_name || ''}
                   onChange={(e) => onChange('partner_last_name', e.target.value)}
                   className="rounded-lg"
+                  required
                 />
               </div>
 
               <div className="space-y-2">
-                <Label>Дата на раждане (дд.мм.гггг)</Label>
+                <Label>Дата на раждане <span className="text-red-500">*</span></Label>
                 <Input
-                  type="text"
-                  placeholder="дд.мм.гггг"
-                  value={data.partner_birthdate_input !== undefined ? data.partner_birthdate_input : (data.partner_birthdate ? new Date(data.partner_birthdate).toLocaleDateString('bg-BG') : '')}
-                  onChange={(e) => onChange('partner_birthdate_input', e.target.value)}
-                  onBlur={(e) => {
-                    const val = e.target.value;
-                    const parts = val.split('.');
-                    if (parts.length === 3 && parts[0] && parts[1] && parts[2]) {
-                      const date = new Date(`${parts[2]}-${parts[1].padStart(2, '0')}-${parts[0].padStart(2, '0')}`);
-                      if (!isNaN(date.getTime())) {
-                        onChange('partner_birthdate', `${parts[2]}-${parts[1].padStart(2, '0')}-${parts[0].padStart(2, '0')}`);
-                        onChange('partner_birthdate_input', undefined);
-                      }
-                    }
-                  }}
+                  type="date"
+                  value={data.partner_birthdate || ''}
+                  onChange={(e) => onChange('partner_birthdate', e.target.value)}
                   className="rounded-lg"
+                  required
                 />
               </div>
               <div className="space-y-2">
-                <Label>Възраст (автоматично)</Label>
+                <Label>Възраст</Label>
                 <Input
                   type="number"
                   value={data.partner_age || ''}
@@ -452,7 +480,7 @@ export default function PersonalDataStep({ data, onChange }) {
                 />
               </div>
               <div className="space-y-2">
-                <Label>Пол</Label>
+                <Label>Пол <span className="text-red-500">*</span></Label>
                 <Select 
                   value={data.partner_gender || ''} 
                   onValueChange={(value) => onChange('partner_gender', value)}
@@ -468,83 +496,78 @@ export default function PersonalDataStep({ data, onChange }) {
               </div>
 
               <div className="space-y-2">
-                <Label>Място на раждане</Label>
+                <Label>Място на раждане <span className="text-red-500">*</span></Label>
                 <Input
-                  placeholder="гр. София"
                   value={data.partner_birthplace || ''}
                   onChange={(e) => onChange('partner_birthplace', e.target.value)}
                   className="rounded-lg"
+                  required
                 />
               </div>
               <div className="space-y-2">
-                <Label>ЕГН</Label>
+                <Label>ЕГН <span className="text-red-500">*</span></Label>
                 <Input
                   placeholder="0000000000"
                   value={data.partner_egn || ''}
                   onChange={(e) => onChange('partner_egn', e.target.value)}
                   className="rounded-lg"
+                  required
                 />
               </div>
               <div className="space-y-2">
-                <Label>Номер на лична карта</Label>
+                <Label>Номер на лична карта <span className="text-red-500">*</span></Label>
                 <Input
                   placeholder="000000000"
                   value={data.partner_id_number || ''}
                   onChange={(e) => onChange('partner_id_number', e.target.value)}
                   className="rounded-lg"
+                  required
                 />
               </div>
 
               <div className="space-y-2">
-                <Label>Лична карта валидна до (дд.мм.гггг)</Label>
+                <Label>Лична карта валидна до <span className="text-red-500">*</span></Label>
                 <Input
-                  type="text"
-                  placeholder="дд.мм.гггг"
-                  value={data.partner_id_valid_until ? new Date(data.partner_id_valid_until).toLocaleDateString('bg-BG') : ''}
-                  onChange={(e) => {
-                    const val = e.target.value;
-                    const parts = val.split('.');
-                    if (parts.length === 3 && parts[0].length <= 2 && parts[1].length <= 2 && parts[2].length === 4) {
-                      const date = new Date(`${parts[2]}-${parts[1].padStart(2, '0')}-${parts[0].padStart(2, '0')}`);
-                      if (!isNaN(date.getTime())) {
-                        onChange('partner_id_valid_until', `${parts[2]}-${parts[1].padStart(2, '0')}-${parts[0].padStart(2, '0')}`);
-                      }
-                    }
-                  }}
+                  type="date"
+                  value={data.partner_id_valid_until || ''}
+                  onChange={(e) => onChange('partner_id_valid_until', e.target.value)}
                   className="rounded-lg"
+                  required
                 />
               </div>
               <div className="space-y-2 sm:col-span-2">
-                <Label>Постоянен адрес</Label>
+                <Label>Постоянен адрес <span className="text-red-500">*</span></Label>
                 <Input
-                  placeholder="гр. София, ул. Примерна 1"
                   value={data.partner_address || ''}
                   onChange={(e) => onChange('partner_address', e.target.value)}
                   className="rounded-lg"
+                  required
                 />
               </div>
 
               <div className="space-y-2">
-                <Label>Телефонен номер</Label>
+                <Label>Телефонен номер <span className="text-red-500">*</span></Label>
                 <Input
                   placeholder="+359 888 000 000"
                   value={data.partner_phone || ''}
                   onChange={(e) => onChange('partner_phone', e.target.value)}
                   className="rounded-lg"
+                  required
                 />
               </div>
               <div className="space-y-2">
-                <Label>Email</Label>
+                <Label>Email <span className="text-red-500">*</span></Label>
                 <Input
                   type="email"
                   placeholder="email@example.com"
                   value={data.partner_email || ''}
                   onChange={(e) => onChange('partner_email', e.target.value)}
                   className="rounded-lg"
+                  required
                 />
               </div>
               <div className="space-y-2">
-                <Label>Семейно положение</Label>
+                <Label>Семейно положение <span className="text-red-500">*</span></Label>
                 <Select 
                   value={data.partner_marital_status || ''} 
                   onValueChange={(value) => onChange('partner_marital_status', value)}
@@ -560,16 +583,34 @@ export default function PersonalDataStep({ data, onChange }) {
                   </SelectContent>
                 </Select>
               </div>
+
+              <div className="space-y-2">
+                <Label>Националност <span className="text-red-500">*</span></Label>
+                <Select 
+                  value={data.partner_nationality || ''} 
+                  onValueChange={(value) => onChange('partner_nationality', value)}
+                >
+                  <SelectTrigger className="rounded-lg">
+                    <SelectValue placeholder="Изберете" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="bulgarian">Българска</SelectItem>
+                    <SelectItem value="other_eu">Друга от ЕС</SelectItem>
+                    <SelectItem value="non_eu">Извън ЕС</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
             </div>
 
             {/* ZMIP Declaration */}
             <div className="border-t border-slate-200 pt-4 mb-4">
               <h4 className="font-medium text-slate-700 mb-3">Декларация по член 36 от ЗМИП</h4>
-              <div className="flex items-center justify-between p-3 bg-white rounded-lg border border-slate-200">
+              <div className={`flex items-center justify-between p-3 rounded-lg border ${data.partner_is_pep ? 'bg-red-50 border-red-200' : 'bg-green-50 border-green-200'}`}>
                 <Label className="cursor-pointer text-sm">Вие или член на Вашето семейство лице ли сте по член 36 от ЗМИП?</Label>
-                <Switch
+                <ToggleWithLabel 
                   checked={data.partner_is_pep || false}
-                  onCheckedChange={(checked) => onChange('partner_is_pep', checked)}
+                  onChange={(checked) => onChange('partner_is_pep', checked)}
+                  defaultYes={false}
                 />
               </div>
             </div>
@@ -578,15 +619,16 @@ export default function PersonalDataStep({ data, onChange }) {
             <div className="border-t border-slate-200 pt-4">
               <h4 className="font-medium text-slate-700 mb-3">Данни за заетост, доходи и работодател</h4>
               
-              <div className="flex items-center justify-between p-3 bg-white rounded-lg border border-slate-200 mb-4">
+              <div className={`flex items-center justify-between p-3 rounded-lg border mb-4 ${data.partner_is_employed ?? true ? 'bg-green-50 border-green-200' : 'bg-red-50 border-red-200'}`}>
                 <Label className="cursor-pointer">Трудова заетост</Label>
-                <Switch
-                  checked={data.partner_is_employed || false}
-                  onCheckedChange={(checked) => onChange('partner_is_employed', checked)}
+                <ToggleWithLabel 
+                  checked={data.partner_is_employed ?? true}
+                  onChange={(checked) => onChange('partner_is_employed', checked)}
+                  defaultYes={true}
                 />
               </div>
 
-              {data.partner_is_employed ? (
+              {(data.partner_is_employed ?? true) ? (
                 <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
                   <div className="space-y-2 sm:col-span-2 lg:col-span-3">
                     <Label>Описание на месторабота и трудови задължения</Label>
@@ -709,7 +751,7 @@ export default function PersonalDataStep({ data, onChange }) {
         <div className="space-y-4">
           <div className="grid sm:grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label>Брой деца</Label>
+              <Label>Брой деца <span className="text-red-500">*</span></Label>
               <Select 
                 value={data.children_count?.toString() || ''} 
                 onValueChange={(value) => onChange('children_count', parseInt(value))}
@@ -718,17 +760,19 @@ export default function PersonalDataStep({ data, onChange }) {
                   <SelectValue placeholder="Изберете" />
                 </SelectTrigger>
                 <SelectContent>
-                  {[0, 1, 2, 3, 4, 5].map(num => (
+                  <SelectItem value="0">Няма</SelectItem>
+                  {[1, 2, 3, 4, 5].map(num => (
                     <SelectItem key={num} value={num.toString()}>{num}</SelectItem>
                   ))}
                 </SelectContent>
               </Select>
             </div>
-            <div className="flex items-center justify-between">
+            <div className={`flex items-center justify-between p-3 rounded-lg border ${data.children_economically_dependent ?? true ? 'bg-green-50 border-green-200' : 'bg-red-50 border-red-200'}`}>
               <Label className="cursor-pointer">Икономическа зависимост</Label>
-              <Switch
-                checked={data.children_economically_dependent || false}
-                onCheckedChange={(checked) => onChange('children_economically_dependent', checked)}
+              <ToggleWithLabel 
+                checked={data.children_economically_dependent ?? true}
+                onChange={(checked) => onChange('children_economically_dependent', checked)}
+                defaultYes={true}
               />
             </div>
           </div>
@@ -739,33 +783,22 @@ export default function PersonalDataStep({ data, onChange }) {
               {Array.from({ length: data.children_count || 0 }).map((_, index) => (
                 <div key={index} className="grid sm:grid-cols-2 gap-3 p-3 bg-white rounded-lg border border-slate-200">
                   <div className="space-y-1">
-                    <Label className="text-xs">Дете {index + 1} - Име</Label>
+                    <Label className="text-xs">Дете {index + 1} - Име <span className="text-red-500">*</span></Label>
                     <Input
-                      placeholder="Име на детето"
                       value={data[`child_${index + 1}_name`] || ''}
                       onChange={(e) => onChange(`child_${index + 1}_name`, e.target.value)}
                       className="rounded-lg"
+                      required
                     />
                   </div>
                   <div className="space-y-1">
-                    <Label className="text-xs">Дата на раждане (дд.мм.гггг)</Label>
+                    <Label className="text-xs">Дата на раждане <span className="text-red-500">*</span></Label>
                     <Input
-                      type="text"
-                      placeholder="дд.мм.гггг"
-                      value={data[`child_${index + 1}_birthdate_input`] !== undefined ? data[`child_${index + 1}_birthdate_input`] : (data[`child_${index + 1}_birthdate`] ? new Date(data[`child_${index + 1}_birthdate`]).toLocaleDateString('bg-BG') : '')}
-                      onChange={(e) => onChange(`child_${index + 1}_birthdate_input`, e.target.value)}
-                      onBlur={(e) => {
-                        const val = e.target.value;
-                        const parts = val.split('.');
-                        if (parts.length === 3 && parts[0] && parts[1] && parts[2]) {
-                          const date = new Date(`${parts[2]}-${parts[1].padStart(2, '0')}-${parts[0].padStart(2, '0')}`);
-                          if (!isNaN(date.getTime())) {
-                            onChange(`child_${index + 1}_birthdate`, `${parts[2]}-${parts[1].padStart(2, '0')}-${parts[0].padStart(2, '0')}`);
-                            onChange(`child_${index + 1}_birthdate_input`, undefined);
-                          }
-                        }
-                      }}
+                      type="date"
+                      value={data[`child_${index + 1}_birthdate`] || ''}
+                      onChange={(e) => onChange(`child_${index + 1}_birthdate`, e.target.value)}
                       className="rounded-lg"
+                      required
                     />
                   </div>
                 </div>

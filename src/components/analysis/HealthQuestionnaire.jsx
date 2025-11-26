@@ -51,8 +51,23 @@ const additionalHealthQuestions = [
   }
 ];
 
+// Toggle component with yes/no labels
+const HealthToggle = ({ checked, onChange }) => {
+  return (
+    <div className="flex items-center gap-2 flex-shrink-0">
+      <span className={`text-xs font-medium ${!checked ? 'text-green-600' : 'text-slate-400'}`}>Не</span>
+      <Switch
+        checked={checked || false}
+        onCheckedChange={onChange}
+        className={checked ? 'data-[state=checked]:bg-red-500' : 'data-[state=unchecked]:bg-green-500'}
+      />
+      <span className={`text-xs font-medium ${checked ? 'text-red-600' : 'text-slate-400'}`}>Да</span>
+    </div>
+  );
+};
+
 export default function HealthQuestionnaire({ data, onChange, prefix }) {
-  const isGoodHealth = data[`${prefix}_is_good_health`];
+  const isGoodHealth = data[`${prefix}_is_good_health`] ?? true;
   
   return (
     <div className="border-t border-slate-200 pt-4 mt-4">
@@ -62,18 +77,19 @@ export default function HealthQuestionnaire({ data, onChange, prefix }) {
       </div>
       
       {/* Main health question */}
-      <div className="p-4 bg-white rounded-lg border border-slate-200 mb-4">
+      <div className={`p-4 rounded-lg border mb-4 ${isGoodHealth ? 'bg-green-50 border-green-200' : 'bg-red-50 border-red-200'}`}>
         <div className="flex items-start justify-between gap-4">
           <Label className="cursor-pointer text-sm leading-relaxed flex-1">
             Доколкото Ви е известно Вие в добро здраве и без физически недъзи, умствени разстройства и сериозни и/или хронични заболявания ли сте?
           </Label>
           <div className="flex items-center gap-3 flex-shrink-0">
-            <span className={`text-sm ${isGoodHealth === true ? 'font-semibold text-green-600' : 'text-slate-400'}`}>Да</span>
+            <span className={`text-sm font-medium ${!isGoodHealth ? 'text-green-600' : 'text-slate-400'}`}>Не</span>
             <Switch
-              checked={isGoodHealth === false}
-              onCheckedChange={(checked) => onChange(`${prefix}_is_good_health`, !checked)}
+              checked={isGoodHealth}
+              onCheckedChange={(checked) => onChange(`${prefix}_is_good_health`, checked)}
+              className={isGoodHealth ? 'data-[state=checked]:bg-green-500' : ''}
             />
-            <span className={`text-sm ${isGoodHealth === false ? 'font-semibold text-red-600' : 'text-slate-400'}`}>Не</span>
+            <span className={`text-sm font-medium ${isGoodHealth ? 'text-green-600' : 'text-slate-400'}`}>Да</span>
           </div>
         </div>
       </div>
@@ -98,11 +114,11 @@ export default function HealthQuestionnaire({ data, onChange, prefix }) {
             </p>
             <div className="space-y-3">
               {healthQuestions.map((q) => (
-                <div key={q.id} className="flex items-start justify-between gap-3 p-3 bg-white rounded-lg border border-slate-200">
+                <div key={q.id} className={`flex items-start justify-between gap-3 p-3 rounded-lg border ${data[`${prefix}_health_${q.id}`] ? 'bg-red-50 border-red-200' : 'bg-green-50 border-green-200'}`}>
                   <Label className="cursor-pointer text-xs leading-relaxed flex-1">{q.text}</Label>
-                  <Switch
+                  <HealthToggle
                     checked={data[`${prefix}_health_${q.id}`] || false}
-                    onCheckedChange={(checked) => onChange(`${prefix}_health_${q.id}`, checked)}
+                    onChange={(checked) => onChange(`${prefix}_health_${q.id}`, checked)}
                   />
                 </div>
               ))}
@@ -110,73 +126,73 @@ export default function HealthQuestionnaire({ data, onChange, prefix }) {
           </div>
 
           <div className="border-t border-red-200 pt-4">
-            <div className="flex items-start justify-between gap-3 p-3 bg-white rounded-lg border border-slate-200">
+            <div className={`flex items-start justify-between gap-3 p-3 rounded-lg border ${data[`${prefix}_health_under_treatment`] ? 'bg-red-50 border-red-200' : 'bg-green-50 border-green-200'}`}>
               <Label className="cursor-pointer text-sm leading-relaxed flex-1">
                 2. В момента намирате ли се под наблюдение или лечение (включително медикаментозно) за каквото и да е състояние/заболяване?
               </Label>
-              <Switch
+              <HealthToggle
                 checked={data[`${prefix}_health_under_treatment`] || false}
-                onCheckedChange={(checked) => onChange(`${prefix}_health_under_treatment`, checked)}
+                onChange={(checked) => onChange(`${prefix}_health_under_treatment`, checked)}
               />
             </div>
           </div>
 
           <div className="border-t border-red-200 pt-4">
-            <div className="flex items-start justify-between gap-3 p-3 bg-white rounded-lg border border-slate-200">
+            <div className={`flex items-start justify-between gap-3 p-3 rounded-lg border ${data[`${prefix}_health_hospitalized`] ? 'bg-red-50 border-red-200' : 'bg-green-50 border-green-200'}`}>
               <Label className="cursor-pointer text-sm leading-relaxed flex-1">
                 4. Били ли сте хоспитализирани или оперирани през последните 5 години?
               </Label>
-              <Switch
+              <HealthToggle
                 checked={data[`${prefix}_health_hospitalized`] || false}
-                onCheckedChange={(checked) => onChange(`${prefix}_health_hospitalized`, checked)}
+                onChange={(checked) => onChange(`${prefix}_health_hospitalized`, checked)}
               />
             </div>
           </div>
 
           <div className="border-t border-red-200 pt-4">
-            <div className="flex items-start justify-between gap-3 p-3 bg-white rounded-lg border border-slate-200">
+            <div className={`flex items-start justify-between gap-3 p-3 rounded-lg border ${data[`${prefix}_health_family_history`] ? 'bg-red-50 border-red-200' : 'bg-green-50 border-green-200'}`}>
               <Label className="cursor-pointer text-sm leading-relaxed flex-1">
                 5. Някой от Вашите биологични роднини бил ли е някога диагностициран с кардиомиопатия, CADASIL, порфирия, мускулна дистрофия, моторно невронно заболяване, множествена склероза, болест на Хънтингтън, деменция, Паркинсон, поликистозно бъбречно заболяване, меланом или рак на: червата, гърдата, дебелото черво, яйчниците или простатата?
               </Label>
-              <Switch
+              <HealthToggle
                 checked={data[`${prefix}_health_family_history`] || false}
-                onCheckedChange={(checked) => onChange(`${prefix}_health_family_history`, checked)}
+                onChange={(checked) => onChange(`${prefix}_health_family_history`, checked)}
               />
             </div>
           </div>
 
           <div className="border-t border-red-200 pt-4">
-            <div className="flex items-start justify-between gap-3 p-3 bg-white rounded-lg border border-slate-200">
+            <div className={`flex items-start justify-between gap-3 p-3 rounded-lg border ${data[`${prefix}_health_risky_activities`] ? 'bg-red-50 border-red-200' : 'bg-green-50 border-green-200'}`}>
               <Label className="cursor-pointer text-sm leading-relaxed flex-1">
                 6. Занимавате ли се или възнамерявате да се занимавате с някаква рискова дейност или спорт като: пилотиране на самолет или други летателни апарати, парашутизъм, параглайдинг, гмуркане с акваланг, рафтинг, скално катерене, състезание с каквото и да е летателно, пара, водно или моторно средство, ски състезание/скокове или каране на ски в участък без маркировка, управление или возене на дву- или триколесно пътно превозно средство, мотоциклет, моторен скутер, ATV, включително такова с електрически двигател за задвижване, с или без място за сядане, с максимална конструктивна мощност по-голяма от 11kW или 125 куб. см. или друга опасна дейност?
               </Label>
-              <Switch
+              <HealthToggle
                 checked={data[`${prefix}_health_risky_activities`] || false}
-                onCheckedChange={(checked) => onChange(`${prefix}_health_risky_activities`, checked)}
+                onChange={(checked) => onChange(`${prefix}_health_risky_activities`, checked)}
               />
             </div>
           </div>
 
           <div className="border-t border-red-200 pt-4">
-            <div className="flex items-start justify-between gap-3 p-3 bg-white rounded-lg border border-slate-200">
+            <div className={`flex items-start justify-between gap-3 p-3 rounded-lg border ${data[`${prefix}_health_travel_abroad`] ? 'bg-red-50 border-red-200' : 'bg-green-50 border-green-200'}`}>
               <Label className="cursor-pointer text-sm leading-relaxed flex-1">
                 7. Планирате ли да прекарате 2 месеца или повече на територията на страна, различна от Република България?
               </Label>
-              <Switch
+              <HealthToggle
                 checked={data[`${prefix}_health_travel_abroad`] || false}
-                onCheckedChange={(checked) => onChange(`${prefix}_health_travel_abroad`, checked)}
+                onChange={(checked) => onChange(`${prefix}_health_travel_abroad`, checked)}
               />
             </div>
           </div>
 
           <div className="border-t border-red-200 pt-4">
-            <div className="flex items-start justify-between gap-3 p-3 bg-white rounded-lg border border-slate-200">
+            <div className={`flex items-start justify-between gap-3 p-3 rounded-lg border ${data[`${prefix}_health_smoking`] ? 'bg-red-50 border-red-200' : 'bg-green-50 border-green-200'}`}>
               <Label className="cursor-pointer text-sm leading-relaxed flex-1">
                 8. Употреба на цигари
               </Label>
-              <Switch
+              <HealthToggle
                 checked={data[`${prefix}_health_smoking`] || false}
-                onCheckedChange={(checked) => onChange(`${prefix}_health_smoking`, checked)}
+                onChange={(checked) => onChange(`${prefix}_health_smoking`, checked)}
               />
             </div>
           </div>
@@ -210,11 +226,11 @@ export default function HealthQuestionnaire({ data, onChange, prefix }) {
             </p>
             <div className="space-y-3">
               {additionalHealthQuestions.map((q) => (
-                <div key={q.id} className="flex items-start justify-between gap-3 p-3 bg-white rounded-lg border border-slate-200">
+                <div key={q.id} className={`flex items-start justify-between gap-3 p-3 rounded-lg border ${data[`${prefix}_health_${q.id}`] ? 'bg-red-50 border-red-200' : 'bg-green-50 border-green-200'}`}>
                   <Label className="cursor-pointer text-xs leading-relaxed flex-1">{q.text}</Label>
-                  <Switch
+                  <HealthToggle
                     checked={data[`${prefix}_health_${q.id}`] || false}
-                    onCheckedChange={(checked) => onChange(`${prefix}_health_${q.id}`, checked)}
+                    onChange={(checked) => onChange(`${prefix}_health_${q.id}`, checked)}
                   />
                 </div>
               ))}

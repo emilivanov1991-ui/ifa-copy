@@ -282,34 +282,34 @@ export default function PersonalDataStep({ data, onChange }) {
           <div className="space-y-2">
             <Label>ЕГН <span className="text-red-500">*</span></Label>
             <Input
-              placeholder="0000000000"
-              value={data.client_egn || ''}
-              onChange={(e) => onChange('client_egn', e.target.value)}
-              className={`rounded-lg ${data.client_egn && !validateEGN(data.client_egn).valid ? 'border-red-500' : data.client_egn && validateEGN(data.client_egn).valid ? 'border-green-500' : ''}`}
-              required
-            />
-            {data.client_egn && !validateEGN(data.client_egn).valid && (
-              <p className="text-red-500 text-xs">{validateEGN(data.client_egn).error}</p>
-            )}
-            {data.client_egn && validateEGN(data.client_egn).valid && (
-              <p className="text-green-500 text-xs">✓ Валидно ЕГН</p>
-            )}
+                                placeholder="0000000000"
+                                value={data.client_egn || ''}
+                                onChange={(e) => onChange('client_egn', e.target.value)}
+                                className={`rounded-lg ${data.client_egn?.length === 10 && !validateEGN(data.client_egn).valid ? 'border-red-500' : data.client_egn?.length === 10 && validateEGN(data.client_egn).valid ? 'border-green-500' : ''}`}
+                                required
+                              />
+                              {data.client_egn?.length === 10 && !validateEGN(data.client_egn).valid && (
+                                <p className="text-red-500 text-xs">{validateEGN(data.client_egn).error}</p>
+                              )}
+                              {data.client_egn?.length === 10 && validateEGN(data.client_egn).valid && (
+                                <p className="text-green-500 text-xs">✓ Валидно ЕГН</p>
+                              )}
           </div>
           <div className="space-y-2">
             <Label>Номер на лична карта <span className="text-red-500">*</span></Label>
             <Input
-              placeholder="000000000"
-              value={data.client_id_number || ''}
-              onChange={(e) => onChange('client_id_number', e.target.value)}
-              className={`rounded-lg ${data.client_id_number && !validateIDNumber(data.client_id_number).valid ? 'border-red-500' : data.client_id_number && validateIDNumber(data.client_id_number).valid ? 'border-green-500' : ''}`}
-              required
-            />
-            {data.client_id_number && !validateIDNumber(data.client_id_number).valid && (
-              <p className="text-red-500 text-xs">{validateIDNumber(data.client_id_number).error}</p>
-            )}
-            {data.client_id_number && validateIDNumber(data.client_id_number).valid && (
-              <p className="text-green-500 text-xs">✓ Валиден номер</p>
-            )}
+                                placeholder="000000000"
+                                value={data.client_id_number || ''}
+                                onChange={(e) => onChange('client_id_number', e.target.value)}
+                                className={`rounded-lg ${data.client_id_number?.length >= 9 && !validateIDNumber(data.client_id_number).valid ? 'border-red-500' : data.client_id_number?.length >= 9 && validateIDNumber(data.client_id_number).valid ? 'border-green-500' : ''}`}
+                                required
+                              />
+                              {data.client_id_number?.length >= 9 && !validateIDNumber(data.client_id_number).valid && (
+                                <p className="text-red-500 text-xs">{validateIDNumber(data.client_id_number).error}</p>
+                              )}
+                              {data.client_id_number?.length >= 9 && validateIDNumber(data.client_id_number).valid && (
+                                <p className="text-green-500 text-xs">✓ Валиден номер</p>
+                              )}
           </div>
 
           <div className="space-y-2">
@@ -630,34 +630,34 @@ export default function PersonalDataStep({ data, onChange }) {
               <div className="space-y-2">
                 <Label>ЕГН <span className="text-red-500">*</span></Label>
                 <Input
-                  placeholder="0000000000"
-                  value={data.partner_egn || ''}
-                  onChange={(e) => onChange('partner_egn', e.target.value)}
-                  className={`rounded-lg ${data.partner_egn && !validateEGN(data.partner_egn).valid ? 'border-red-500' : data.partner_egn && validateEGN(data.partner_egn).valid ? 'border-green-500' : ''}`}
-                  required
-                />
-                {data.partner_egn && !validateEGN(data.partner_egn).valid && (
-                  <p className="text-red-500 text-xs">{validateEGN(data.partner_egn).error}</p>
-                )}
-                {data.partner_egn && validateEGN(data.partner_egn).valid && (
-                  <p className="text-green-500 text-xs">✓ Валидно ЕГН</p>
-                )}
+                                    placeholder="0000000000"
+                                    value={data.partner_egn || ''}
+                                    onChange={(e) => onChange('partner_egn', e.target.value)}
+                                    className={`rounded-lg ${data.partner_egn?.length === 10 && !validateEGN(data.partner_egn).valid ? 'border-red-500' : data.partner_egn?.length === 10 && validateEGN(data.partner_egn).valid ? 'border-green-500' : ''}`}
+                                    required
+                                  />
+                                  {data.partner_egn?.length === 10 && !validateEGN(data.partner_egn).valid && (
+                                    <p className="text-red-500 text-xs">{validateEGN(data.partner_egn).error}</p>
+                                  )}
+                                  {data.partner_egn?.length === 10 && validateEGN(data.partner_egn).valid && (
+                                    <p className="text-green-500 text-xs">✓ Валидно ЕГН</p>
+                                  )}
               </div>
               <div className="space-y-2">
                 <Label>Номер на лична карта <span className="text-red-500">*</span></Label>
                 <Input
-                  placeholder="000000000"
-                  value={data.partner_id_number || ''}
-                  onChange={(e) => onChange('partner_id_number', e.target.value)}
-                  className={`rounded-lg ${data.partner_id_number && !validateIDNumber(data.partner_id_number).valid ? 'border-red-500' : data.partner_id_number && validateIDNumber(data.partner_id_number).valid ? 'border-green-500' : ''}`}
-                  required
-                />
-                {data.partner_id_number && !validateIDNumber(data.partner_id_number).valid && (
-                  <p className="text-red-500 text-xs">{validateIDNumber(data.partner_id_number).error}</p>
-                )}
-                {data.partner_id_number && validateIDNumber(data.partner_id_number).valid && (
-                  <p className="text-green-500 text-xs">✓ Валиден номер</p>
-                )}
+                                    placeholder="000000000"
+                                    value={data.partner_id_number || ''}
+                                    onChange={(e) => onChange('partner_id_number', e.target.value)}
+                                    className={`rounded-lg ${data.partner_id_number?.length >= 9 && !validateIDNumber(data.partner_id_number).valid ? 'border-red-500' : data.partner_id_number?.length >= 9 && validateIDNumber(data.partner_id_number).valid ? 'border-green-500' : ''}`}
+                                    required
+                                  />
+                                  {data.partner_id_number?.length >= 9 && !validateIDNumber(data.partner_id_number).valid && (
+                                    <p className="text-red-500 text-xs">{validateIDNumber(data.partner_id_number).error}</p>
+                                  )}
+                                  {data.partner_id_number?.length >= 9 && validateIDNumber(data.partner_id_number).valid && (
+                                    <p className="text-green-500 text-xs">✓ Валиден номер</p>
+                                  )}
               </div>
 
               <div className="space-y-2">

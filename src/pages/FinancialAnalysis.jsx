@@ -424,7 +424,38 @@ export default function FinancialAnalysis() {
         
         return true;
       
-      case 9: // Priorities - no strict required fields
+      case 9: // Priorities - all priority fields required based on active priorities
+        // Check which priorities should be active
+        const activePriorityKeys = [];
+
+        // Always include these
+        activePriorityKeys.push('priority_income_protection');
+        activePriorityKeys.push('priority_reserve');
+        activePriorityKeys.push('priority_pension');
+
+        // Conditional priorities
+        if (!formData.skip_other_goals_section) {
+          activePriorityKeys.push('priority_other');
+        }
+        if (!formData.skip_children_section) {
+          activePriorityKeys.push('priority_children');
+        }
+        // Housing: only if planning change OR has mortgage
+        if (formData.planning_housing_change !== false || formData.current_housing_has_mortgage) {
+          activePriorityKeys.push('priority_housing');
+        }
+        // Property protection: only if has property or car
+        if (formData.has_property_1 || formData.has_property_2 || formData.has_property_3 || 
+            formData.has_car_1 || formData.has_car_2 || formData.has_car_3) {
+          activePriorityKeys.push('priority_property_protection');
+        }
+
+        // Check all active priorities are filled
+        for (const key of activePriorityKeys) {
+          if (formData[key] === undefined || formData[key] === null || formData[key] === '') {
+            return false;
+          }
+        }
         return true;
       
       default:

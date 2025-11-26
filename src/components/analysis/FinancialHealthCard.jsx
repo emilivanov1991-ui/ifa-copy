@@ -171,21 +171,51 @@ export default function FinancialHealthCard({ data }) {
     return 'critical';
   };
 
-  const categories = [
-    { key: 'housing', label: 'Жилищно финансиране', icon: Home, status: getHousingStatus() },
+  // Organized by house structure
+  const foundation = [
     { key: 'reserve', label: 'Финансов резерв', icon: PiggyBank, status: getReserveStatus() },
+    { key: 'income', label: 'Защита на доходите', icon: Wallet, status: getIncomeProtectionStatus() },
+    { key: 'property', label: 'Защита на собствеността', icon: Shield, status: getPropertyProtectionStatus() },
+  ];
+
+  const middle = [
+    { key: 'housing', label: 'Жилищно финансиране', icon: Home, status: getHousingStatus() },
+  ];
+
+  const upper = [
     { key: 'pension', label: 'Пенсионно осигуряване', icon: Umbrella, status: getPensionStatus() },
     { key: 'children', label: 'Подсигуряване на децата', icon: Baby, status: getChildrenStatus() },
-    { key: 'property', label: 'Защита на собствеността', icon: Shield, status: getPropertyProtectionStatus() },
-    { key: 'income', label: 'Защита на доходите', icon: Wallet, status: getIncomeProtectionStatus() },
+  ];
+
+  const roof = [
     { key: 'investment', label: 'Инвестиции', icon: TrendingUp, status: getInvestmentStatus() },
+  ];
+
+  const chimney = [
     { key: 'debt', label: 'Заем / Кредит', icon: CreditCard, status: getDebtStatus() },
   ];
 
+  const allCategories = [...foundation, ...middle, ...upper, ...roof, ...chimney];
+
+  const renderCategory = (cat, isSmall = false) => {
+    const config = STATUS_CONFIG[cat.status];
+    const Icon = cat.icon;
+    
+    return (
+      <div 
+        key={cat.key}
+        className={`flex items-center gap-2 px-3 py-2 rounded-lg ${config.bgLight} border-l-4 ${cat.status === 'excellent' ? 'border-green-500' : cat.status === 'good' ? 'border-green-400' : cat.status === 'attention' ? 'border-amber-400' : cat.status === 'warning' ? 'border-orange-500' : cat.status === 'critical' ? 'border-red-500' : 'border-slate-300'}`}
+      >
+        <Icon className={`w-4 h-4 ${config.textColor}`} />
+        <span className={`text-xs font-medium ${config.textColor}`}>{cat.label}</span>
+      </div>
+    );
+  };
+
   return (
-    <div className="bg-white rounded-xl border border-slate-200 p-6 mb-8">
-      <h3 className="font-semibold text-slate-900 text-center mb-2">ВАШЕТО НАСТОЯЩО ПОРТФОЛИО</h3>
-      <p className="text-sm text-slate-500 text-center mb-6">Обобщение на финансовото Ви здраве</p>
+    <div className="bg-slate-50 rounded-xl p-6">
+      <h3 className="font-semibold text-slate-900 text-center mb-2">ВАШЕТО ФИНАНСОВО ПОРТФОЛИО</h3>
+      <p className="text-sm text-slate-500 text-center mb-4">Обобщение на финансовото Ви здраве</p>
       
       {/* Legend */}
       <div className="flex flex-wrap justify-center gap-3 mb-6 text-xs">
@@ -197,70 +227,69 @@ export default function FinancialHealthCard({ data }) {
         ))}
       </div>
 
-      {/* House visualization */}
-      <div className="relative max-w-lg mx-auto">
-        {/* Roof */}
-        <div className="relative mx-auto" style={{ width: '90%' }}>
-          <div className="h-0 border-l-[150px] border-r-[150px] border-b-[60px] border-l-transparent border-r-transparent border-b-rose-400 mx-auto" 
-               style={{ borderLeftWidth: '45%', borderRightWidth: '45%' }}></div>
-          {/* Chimney */}
-          <div className="absolute right-[20%] -top-4 w-8 h-12 bg-rose-300 rounded-t"></div>
+      {/* Abstract house structure */}
+      <div className="max-w-md mx-auto space-y-2">
+        {/* Chimney - Debt */}
+        <div className="flex justify-end pr-8">
+          <div className="w-32">
+            {chimney.map(cat => renderCategory(cat))}
+          </div>
         </div>
-        
-        {/* House body - categories as floors */}
-        <div className="border-4 border-rose-300 border-t-0 bg-slate-50 mx-auto" style={{ width: '80%' }}>
-          {categories.map((cat, index) => {
-            const config = STATUS_CONFIG[cat.status];
-            const Icon = cat.icon;
-            const StatusIcon = config.icon;
-            
-            return (
-              <div 
-                key={cat.key}
-                className={`flex items-center justify-between px-4 py-3 border-b border-slate-200 last:border-b-0 ${config.bgLight} transition-colors`}
-              >
-                <div className="flex items-center gap-3">
-                  <div className={`w-8 h-8 rounded-lg ${config.color} flex items-center justify-center`}>
-                    <Icon className="w-4 h-4 text-white" />
-                  </div>
-                  <span className="text-sm font-medium text-slate-700">{cat.label}</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <span className={`text-xs font-medium ${config.textColor}`}>{config.label}</span>
-                  <StatusIcon className={`w-4 h-4 ${config.textColor}`} />
-                </div>
-              </div>
-            );
-          })}
+
+        {/* Roof - Investments */}
+        <div className="bg-slate-200 rounded-t-xl p-3 mx-4">
+          <div className="text-center text-xs text-slate-500 mb-1 font-medium">▲ ПОКРИВ</div>
+          <div className="flex justify-center">
+            {roof.map(cat => renderCategory(cat))}
+          </div>
         </div>
-        
-        {/* Foundation */}
-        <div className="h-4 bg-slate-400 mx-auto rounded-b" style={{ width: '85%' }}></div>
+
+        {/* Upper floor - Pension & Children */}
+        <div className="bg-white border border-slate-200 rounded-lg p-3 mx-2">
+          <div className="grid grid-cols-2 gap-2">
+            {upper.map(cat => renderCategory(cat))}
+          </div>
+        </div>
+
+        {/* Middle - Housing */}
+        <div className="bg-white border-2 border-slate-300 rounded-lg p-3">
+          <div className="flex justify-center">
+            {middle.map(cat => renderCategory(cat))}
+          </div>
+        </div>
+
+        {/* Foundation - Reserve, Income, Property Protection */}
+        <div className="bg-slate-300 rounded-b-xl p-3">
+          <div className="text-center text-xs text-slate-600 mb-1 font-medium">▼ ОСНОВА</div>
+          <div className="grid grid-cols-3 gap-2">
+            {foundation.map(cat => renderCategory(cat))}
+          </div>
+        </div>
       </div>
 
       {/* Summary stats */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mt-6 pt-6 border-t border-slate-200">
+      <div className="grid grid-cols-4 gap-2 mt-6 pt-4 border-t border-slate-200">
         <div className="text-center">
-          <div className="text-2xl font-bold text-green-600">
-            {categories.filter(c => c.status === 'excellent' || c.status === 'good').length}
+          <div className="text-lg font-bold text-green-600">
+            {allCategories.filter(c => c.status === 'excellent' || c.status === 'good').length}
           </div>
           <div className="text-xs text-slate-500">Добре</div>
         </div>
         <div className="text-center">
-          <div className="text-2xl font-bold text-amber-500">
-            {categories.filter(c => c.status === 'attention').length}
+          <div className="text-lg font-bold text-amber-500">
+            {allCategories.filter(c => c.status === 'attention').length}
           </div>
           <div className="text-xs text-slate-500">Внимание</div>
         </div>
         <div className="text-center">
-          <div className="text-2xl font-bold text-orange-500">
-            {categories.filter(c => c.status === 'warning' || c.status === 'critical').length}
+          <div className="text-lg font-bold text-orange-500">
+            {allCategories.filter(c => c.status === 'warning' || c.status === 'critical').length}
           </div>
-          <div className="text-xs text-slate-500">Препоръчително</div>
+          <div className="text-xs text-slate-500">Критично</div>
         </div>
         <div className="text-center">
-          <div className="text-2xl font-bold text-slate-400">
-            {categories.filter(c => c.status === 'inactive').length}
+          <div className="text-lg font-bold text-slate-400">
+            {allCategories.filter(c => c.status === 'inactive').length}
           </div>
           <div className="text-xs text-slate-500">Неактивно</div>
         </div>

@@ -80,9 +80,6 @@ export default function PrioritiesStep({ data, onChange, showErrors }) {
 
   return (
     <div className="space-y-8">
-      {/* Financial Health Card */}
-      <FinancialHealthCard data={data} />
-
       {/* Priorities */}
       <div className="bg-slate-50 rounded-xl p-6">
         <div className="flex items-center gap-2 mb-2">
@@ -134,6 +131,9 @@ export default function PrioritiesStep({ data, onChange, showErrors }) {
           <p className="text-red-500 text-sm mt-2">Моля, задайте приоритет на всички елементи.</p>
         )}
       </div>
+
+      {/* Financial Health Card */}
+      <FinancialHealthCard data={data} />
 
       {/* Investment Summary */}
       <div className="bg-slate-50 rounded-xl p-6">

@@ -278,7 +278,7 @@ export default function FinancialAnalysis() {
               <React.Fragment key={step.id}>
                 <button
                   onClick={() => setCurrentStep(step.id)}
-                  className="flex flex-col items-center cursor-pointer hover:opacity-80 transition-opacity relative"
+                  className="flex flex-col items-center cursor-pointer hover:opacity-80 transition-opacity"
                 >
                   <div 
                     className={cn(
@@ -287,23 +287,20 @@ export default function FinancialAnalysis() {
                         ? "bg-blue-600 text-white" 
                         : validateStep(step.id)
                           ? "bg-green-500 text-white"
-                          : "bg-slate-200 text-slate-500"
+                          : "bg-amber-400 text-white"
                     )}
                   >
-                    {validateStep(step.id) && currentStep !== step.id ? (
+                    {currentStep === step.id ? (
+                      <step.icon className="h-4 w-4" />
+                    ) : validateStep(step.id) ? (
                       <CheckCircle className="h-5 w-5" />
                     ) : (
-                      <step.icon className="h-4 w-4" />
+                      <AlertTriangle className="h-5 w-5" />
                     )}
                   </div>
-                  {!validateStep(step.id) && currentStep !== step.id && (
-                    <div className="absolute -top-1 -right-1 w-5 h-5 bg-amber-400 rounded-full flex items-center justify-center">
-                      <AlertTriangle className="h-3 w-3 text-white" />
-                    </div>
-                  )}
                   <span className={cn(
                     "text-xs mt-1 font-medium whitespace-nowrap",
-                    currentStep === step.id ? "text-blue-600" : validateStep(step.id) ? "text-green-600" : "text-slate-500"
+                    currentStep === step.id ? "text-blue-600" : validateStep(step.id) ? "text-green-600" : "text-amber-500"
                   )}>
                     {step.title}
                   </span>

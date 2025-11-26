@@ -19,7 +19,9 @@ import {
   Search,
   Filter,
   Plus,
-  Eye
+  Eye,
+  Brain,
+  Shield
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
@@ -34,18 +36,22 @@ import ConsultantMail from '@/components/consultant/ConsultantMail';
 import ConsultantAnalytics from '@/components/consultant/ConsultantAnalytics';
 import ConsultantIntegrations from '@/components/consultant/ConsultantIntegrations';
 import ConsultantNotifications from '@/components/consultant/ConsultantNotifications';
+import AIAnalyticsDashboard from '@/components/consultant/AIAnalyticsDashboard';
+import RBACManager from '@/components/consultant/RBACManager';
 
 const menuItems = [
   { id: 'dashboard', label: 'Табло', icon: LayoutDashboard },
   { id: 'crm', label: 'CRM / Клиенти', icon: Users },
   { id: 'analysis', label: 'Финансов анализ', icon: FileText },
-  { id: 'analytics', label: 'Аналитика', icon: BarChart3 },
+  { id: 'ai-analytics', label: 'AI Аналитика', icon: Brain },
+  { id: 'analytics', label: 'Статистики', icon: BarChart3 },
   { id: 'reports', label: 'Отчети', icon: DollarSign },
   { id: 'elearning', label: 'E-Learning', icon: GraduationCap },
   { id: 'calendar', label: 'Календар', icon: Calendar },
   { id: 'mail', label: 'Съобщения', icon: Mail },
   { id: 'integrations', label: 'Интеграции', icon: LayoutDashboard },
   { id: 'notifications', label: 'Известия', icon: Mail },
+  { id: 'rbac', label: 'Достъп', icon: Shield, adminOnly: true },
 ];
 
 export default function ConsultantPortal() {
@@ -135,6 +141,7 @@ export default function ConsultantPortal() {
               </CardContent>
             </Card>
           )}
+          {activeTab === 'ai-analytics' && <AIAnalyticsDashboard />}
           {activeTab === 'analytics' && <ConsultantAnalytics />}
           {activeTab === 'reports' && <ConsultantReports />}
           {activeTab === 'elearning' && <ConsultantElearningAdvanced />}
@@ -142,6 +149,7 @@ export default function ConsultantPortal() {
           {activeTab === 'mail' && <ConsultantMail />}
           {activeTab === 'integrations' && <ConsultantIntegrations />}
           {activeTab === 'notifications' && <ConsultantNotifications />}
+          {activeTab === 'rbac' && <RBACManager />}
         </div>
       </div>
     </div>

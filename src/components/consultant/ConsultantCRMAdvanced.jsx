@@ -39,6 +39,7 @@ import {
   PhoneCall
 } from 'lucide-react';
 import CallOutcomeDialog from './CallOutcomeDialog';
+import AICRMAssistant from './AICRMAssistant';
 import { toast } from 'sonner';
 
 const mockClients = [
@@ -337,6 +338,7 @@ export default function ConsultantCRMAdvanced() {
                     <TabsTrigger value="tasks">Задачи</TabsTrigger>
                     <TabsTrigger value="communications">Комуникация</TabsTrigger>
                     <TabsTrigger value="reminders">Напомняния</TabsTrigger>
+                    <TabsTrigger value="ai">AI Асистент</TabsTrigger>
                   </TabsList>
 
                   <TabsContent value="tasks">
@@ -510,6 +512,25 @@ export default function ConsultantCRMAdvanced() {
                         ))
                       )}
                     </div>
+                  </TabsContent>
+
+                  <TabsContent value="ai">
+                    <AICRMAssistant 
+                      client={selectedClient}
+                      communications={selectedClient.communications}
+                      onCreateTask={(task) => {
+                        // Add task to client
+                        setClients(prev => prev.map(c => {
+                          if (c.id === selectedClient.id) {
+                            const newTask = { ...task, id: Date.now(), status: 'pending' };
+                            const updated = { ...c, tasks: [newTask, ...c.tasks] };
+                            setSelectedClient(updated);
+                            return updated;
+                          }
+                          return c;
+                        }));
+                      }}
+                    />
                   </TabsContent>
                 </Tabs>
               </CardContent>

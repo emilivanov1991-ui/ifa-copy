@@ -159,9 +159,6 @@ export default function HousingStep({ data, onChange }) {
             </>
           )}
 
-          </>
-          )}
-
           {/* Mortgage section for owned housing */}
           {data.current_housing === 'owned' && (
             <div className="border-t border-slate-200 pt-4 mt-4">

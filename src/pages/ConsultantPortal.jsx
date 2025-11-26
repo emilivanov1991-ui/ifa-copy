@@ -58,50 +58,35 @@ export default function ConsultantPortal() {
   const [activeTab, setActiveTab] = useState('dashboard');
 
   return (
-    <div className="min-h-screen bg-slate-100">
-      {/* Header */}
-      <header className="bg-white border-b border-slate-200 sticky top-0 z-40">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-16">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-blue-600 flex items-center justify-center">
-                <TrendingUp className="h-5 w-5 text-white" />
-              </div>
-              <div>
-                <h1 className="font-semibold text-slate-900">APEX Consultant</h1>
-                <p className="text-xs text-slate-500">Консултантски портал</p>
-              </div>
+    <div className="min-h-screen bg-slate-100 flex">
+      {/* Sidebar */}
+      <aside className="w-64 bg-white border-r border-slate-200 fixed left-0 top-0 bottom-0 z-40 flex flex-col">
+        {/* Logo */}
+        <div className="p-4 border-b border-slate-200">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-blue-600 flex items-center justify-center">
+              <TrendingUp className="h-5 w-5 text-white" />
             </div>
-            <div className="flex items-center gap-4">
-              <Button variant="ghost" size="icon" className="relative">
-                <Mail className="h-5 w-5 text-slate-600" />
-                <span className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 rounded-full text-[10px] text-white flex items-center justify-center">3</span>
-              </Button>
-              <Button variant="ghost" size="icon">
-                <Calendar className="h-5 w-5 text-slate-600" />
-              </Button>
-              <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center">
-                <span className="text-sm font-medium text-blue-600">ИП</span>
-              </div>
+            <div>
+              <h1 className="font-semibold text-slate-900">APEX</h1>
+              <p className="text-xs text-slate-500">Консултант</p>
             </div>
           </div>
         </div>
-      </header>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-        {/* Navigation Tabs */}
-        <div className="mb-6 overflow-x-auto">
-          <div className="flex gap-2 min-w-max">
+        {/* Navigation */}
+        <nav className="flex-1 p-3 overflow-y-auto">
+          <div className="space-y-1">
             {menuItems.map((item) => {
               const Icon = item.icon;
               return (
                 <button
                   key={item.id}
                   onClick={() => setActiveTab(item.id)}
-                  className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium text-sm transition-all ${
+                  className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg font-medium text-sm transition-all ${
                     activeTab === item.id
-                      ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/25'
-                      : 'bg-white text-slate-600 hover:bg-slate-50 border border-slate-200'
+                      ? 'bg-blue-600 text-white shadow-md shadow-blue-600/25'
+                      : 'text-slate-600 hover:bg-slate-100'
                   }`}
                 >
                   <Icon className="h-4 w-4" />
@@ -110,10 +95,43 @@ export default function ConsultantPortal() {
               );
             })}
           </div>
-        </div>
+        </nav>
 
-        {/* Content */}
-        <div className="space-y-6">
+        {/* User */}
+        <div className="p-4 border-t border-slate-200">
+          <div className="flex items-center gap-3">
+            <div className="w-9 h-9 rounded-full bg-blue-100 flex items-center justify-center">
+              <span className="text-sm font-medium text-blue-600">ИП</span>
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="text-sm font-medium text-slate-900 truncate">Иван Петров</p>
+              <p className="text-xs text-slate-500">Консултант</p>
+            </div>
+          </div>
+        </div>
+      </aside>
+
+      {/* Main Content */}
+      <div className="flex-1 ml-64">
+        {/* Top Header */}
+        <header className="bg-white border-b border-slate-200 sticky top-0 z-30 px-6 h-14 flex items-center justify-between">
+          <h2 className="font-medium text-slate-900">
+            {menuItems.find(m => m.id === activeTab)?.label || 'Табло'}
+          </h2>
+          <div className="flex items-center gap-3">
+            <Button variant="ghost" size="icon" className="relative" onClick={() => setActiveTab('mail')}>
+              <Mail className="h-5 w-5 text-slate-600" />
+              <span className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 rounded-full text-[10px] text-white flex items-center justify-center">3</span>
+            </Button>
+            <Button variant="ghost" size="icon" onClick={() => setActiveTab('calendar')}>
+              <Calendar className="h-5 w-5 text-slate-600" />
+            </Button>
+          </div>
+        </header>
+
+        {/* Page Content */}
+        <div className="p-6">
+          <div className="space-y-6">
           {activeTab === 'dashboard' && <ConsultantDashboard onNavigate={setActiveTab} />}
           {activeTab === 'crm' && <ConsultantCRMAdvanced />}
           {activeTab === 'analysis' && (
@@ -150,6 +168,7 @@ export default function ConsultantPortal() {
           {activeTab === 'integrations' && <ConsultantIntegrations />}
           {activeTab === 'notifications' && <ConsultantNotifications />}
           {activeTab === 'rbac' && <RBACManager />}
+          </div>
         </div>
       </div>
     </div>

@@ -171,127 +171,139 @@ export default function FinancialHealthCard({ data }) {
     return 'critical';
   };
 
-  // Organized by house structure
-  const foundation = [
-    { key: 'reserve', label: 'Финансов резерв', icon: PiggyBank, status: getReserveStatus() },
-    { key: 'income', label: 'Защита на доходите', icon: Wallet, status: getIncomeProtectionStatus() },
-    { key: 'property', label: 'Защита на собствеността', icon: Shield, status: getPropertyProtectionStatus() },
-  ];
+  // Categories organized by house structure
+  const debtStatus = getDebtStatus();
+  const investmentStatus = getInvestmentStatus();
+  const pensionStatus = getPensionStatus();
+  const childrenStatus = getChildrenStatus();
+  const housingStatus = getHousingStatus();
+  const propertyStatus = getPropertyProtectionStatus();
+  const incomeStatus = getIncomeProtectionStatus();
+  const reserveStatus = getReserveStatus();
 
-  const middle = [
-    { key: 'housing', label: 'Жилищно финансиране', icon: Home, status: getHousingStatus() },
-  ];
-
-  const upper = [
-    { key: 'pension', label: 'Пенсионно осигуряване', icon: Umbrella, status: getPensionStatus() },
-    { key: 'children', label: 'Подсигуряване на децата', icon: Baby, status: getChildrenStatus() },
-  ];
-
-  const roof = [
-    { key: 'investment', label: 'Инвестиции', icon: TrendingUp, status: getInvestmentStatus() },
-  ];
-
-  const chimney = [
-    { key: 'debt', label: 'Заем / Кредит', icon: CreditCard, status: getDebtStatus() },
-  ];
-
-  const allCategories = [...foundation, ...middle, ...upper, ...roof, ...chimney];
-
-  const renderCategory = (cat, isSmall = false) => {
-    const config = STATUS_CONFIG[cat.status];
-    const Icon = cat.icon;
-    
-    return (
-      <div 
-        key={cat.key}
-        className={`flex items-center gap-2 px-3 py-2 rounded-lg ${config.bgLight} border-l-4 ${cat.status === 'excellent' ? 'border-green-500' : cat.status === 'good' ? 'border-green-400' : cat.status === 'attention' ? 'border-amber-400' : cat.status === 'warning' ? 'border-orange-500' : cat.status === 'critical' ? 'border-red-500' : 'border-slate-300'}`}
-      >
-        <Icon className={`w-4 h-4 ${config.textColor}`} />
-        <span className={`text-xs font-medium ${config.textColor}`}>{cat.label}</span>
-      </div>
-    );
+  const getStatusColor = (status) => {
+    switch(status) {
+      case 'excellent': return 'bg-green-200 border-green-400';
+      case 'good': return 'bg-green-100 border-green-300';
+      case 'attention': return 'bg-amber-100 border-amber-300';
+      case 'warning': return 'bg-orange-100 border-orange-300';
+      case 'critical': return 'bg-red-100 border-red-300';
+      default: return 'bg-slate-100 border-slate-300';
+    }
   };
 
+  const getBarColor = (status) => {
+    switch(status) {
+      case 'excellent': return 'bg-green-300';
+      case 'good': return 'bg-green-200';
+      case 'attention': return 'bg-amber-200';
+      case 'warning': return 'bg-orange-200';
+      case 'critical': return 'bg-red-200';
+      default: return 'bg-slate-200';
+    }
+  };
+
+  const allStatuses = [debtStatus, investmentStatus, pensionStatus, childrenStatus, housingStatus, propertyStatus, incomeStatus, reserveStatus];
+
   return (
-    <div className="bg-slate-50 rounded-xl p-6">
-      <h3 className="font-semibold text-slate-900 text-center mb-2">ВАШЕТО ФИНАНСОВО ПОРТФОЛИО</h3>
-      <p className="text-sm text-slate-500 text-center mb-4">Обобщение на финансовото Ви здраве</p>
+    <div className="bg-white rounded-xl border border-slate-200 p-6">
+      <h3 className="font-semibold text-rose-700 text-center mb-6 text-lg tracking-wide">ВАШЕТО НАСТОЯЩО ПОРТФОЛИО</h3>
       
+      {/* House visualization */}
+      <div className="relative max-w-lg mx-auto">
+        {/* Background horizontal lines */}
+        <div className="absolute inset-0 flex flex-col justify-between py-4 pointer-events-none">
+          {[...Array(12)].map((_, i) => (
+            <div key={i} className="h-0.5 bg-blue-100 w-full"></div>
+          ))}
+        </div>
+
+        <div className="relative">
+          {/* Chimney with smoke - Debt */}
+          <div className="absolute left-16 -top-8 z-10">
+            {/* Smoke */}
+            <div className="absolute -top-6 left-2">
+              <div className={`w-8 h-4 ${getBarColor(debtStatus)} rounded-full opacity-60 mb-1`}></div>
+              <div className={`w-6 h-3 ${getBarColor(debtStatus)} rounded-full opacity-40 ml-1`}></div>
+            </div>
+            {/* Chimney */}
+            <div className={`w-12 h-16 ${getStatusColor(debtStatus)} border-2 rounded-t flex items-center justify-center`}>
+              <span className="text-xs text-slate-600 font-medium text-center leading-tight">Заем/<br/>Кредит</span>
+            </div>
+          </div>
+
+          {/* Roof section */}
+          <div className="relative pt-8">
+            {/* Roof shape */}
+            <div className="relative mx-8">
+              {/* Left roof slope */}
+              <div className="absolute left-0 top-0 w-1/2 h-16 bg-rose-300 origin-bottom-left transform -skew-y-6 rounded-tl-lg"></div>
+              {/* Right roof slope */}
+              <div className="absolute right-0 top-0 w-1/2 h-16 bg-rose-400 origin-bottom-right transform skew-y-6 rounded-tr-lg"></div>
+              
+              {/* Roof content - Investments */}
+              <div className="relative z-10 pt-4 pb-2 px-4">
+                <div className={`${getStatusColor(investmentStatus)} border-2 rounded-lg px-4 py-2 mx-auto max-w-xs text-center`}>
+                  <span className="text-sm text-slate-700 font-medium">Инвестиции</span>
+                </div>
+              </div>
+            </div>
+
+            {/* House body */}
+            <div className="bg-rose-50 border-l-4 border-r-4 border-rose-300 mx-4 relative">
+              {/* Upper floor - Pension & Children */}
+              <div className="grid grid-cols-2 gap-3 p-4 border-b border-rose-200">
+                <div className={`${getStatusColor(pensionStatus)} border-2 rounded-lg px-3 py-3 text-center`}>
+                  <span className="text-xs text-slate-700 font-medium">Пенсионно<br/>осигуряване</span>
+                </div>
+                <div className={`${getStatusColor(childrenStatus)} border-2 rounded-lg px-3 py-3 text-center`}>
+                  <span className="text-xs text-slate-700 font-medium">Подсигуряване<br/>на децата</span>
+                </div>
+              </div>
+
+              {/* Middle - Housing */}
+              <div className="p-4 border-b border-rose-200">
+                <div className={`${getStatusColor(housingStatus)} border-2 rounded-lg px-4 py-3 text-center mx-auto max-w-xs`}>
+                  <span className="text-sm text-slate-700 font-medium">Жилищно<br/>финансиране</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Foundation */}
+            <div className="bg-slate-200 mx-2 p-4 rounded-b-lg border-b-4 border-slate-400">
+              <div className="grid grid-cols-3 gap-2">
+                <div className={`${getStatusColor(propertyStatus)} border-2 rounded-lg px-2 py-3 text-center`}>
+                  <span className="text-xs text-slate-700 font-medium leading-tight">Защита на собствеността</span>
+                </div>
+                <div className={`${getStatusColor(incomeStatus)} border-2 rounded-lg px-2 py-3 text-center`}>
+                  <span className="text-xs text-slate-700 font-medium leading-tight">Защита на доходите</span>
+                </div>
+                <div className={`${getStatusColor(reserveStatus)} border-2 rounded-lg px-2 py-3 text-center`}>
+                  <span className="text-xs text-slate-700 font-medium leading-tight">Създаване на финансов резерв</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
       {/* Legend */}
-      <div className="flex flex-wrap justify-center gap-3 mb-6 text-xs">
-        {Object.entries(STATUS_CONFIG).filter(([key]) => key !== 'inactive').map(([key, config]) => (
-          <div key={key} className="flex items-center gap-1">
-            <div className={`w-3 h-3 rounded-full ${config.color}`}></div>
-            <span className="text-slate-600">{config.label}</span>
-          </div>
-        ))}
-      </div>
-
-      {/* Abstract house structure */}
-      <div className="max-w-md mx-auto space-y-2">
-        {/* Chimney - Debt */}
-        <div className="flex justify-end pr-8">
-          <div className="w-32">
-            {chimney.map(cat => renderCategory(cat))}
-          </div>
+      <div className="flex flex-wrap justify-center gap-4 mt-6 pt-4 border-t border-slate-100 text-xs">
+        <div className="flex items-center gap-1">
+          <div className="w-3 h-3 rounded bg-green-300 border border-green-400"></div>
+          <span className="text-slate-600">Отлично/Добре</span>
         </div>
-
-        {/* Roof - Investments */}
-        <div className="bg-slate-200 rounded-t-xl p-3 mx-4">
-          <div className="text-center text-xs text-slate-500 mb-1 font-medium">▲ ПОКРИВ</div>
-          <div className="flex justify-center">
-            {roof.map(cat => renderCategory(cat))}
-          </div>
+        <div className="flex items-center gap-1">
+          <div className="w-3 h-3 rounded bg-amber-200 border border-amber-300"></div>
+          <span className="text-slate-600">Внимание</span>
         </div>
-
-        {/* Upper floor - Pension & Children */}
-        <div className="bg-white border border-slate-200 rounded-lg p-3 mx-2">
-          <div className="grid grid-cols-2 gap-2">
-            {upper.map(cat => renderCategory(cat))}
-          </div>
+        <div className="flex items-center gap-1">
+          <div className="w-3 h-3 rounded bg-orange-200 border border-orange-300"></div>
+          <span className="text-slate-600">Препоръчително</span>
         </div>
-
-        {/* Middle - Housing */}
-        <div className="bg-white border-2 border-slate-300 rounded-lg p-3">
-          <div className="flex justify-center">
-            {middle.map(cat => renderCategory(cat))}
-          </div>
-        </div>
-
-        {/* Foundation - Reserve, Income, Property Protection */}
-        <div className="bg-slate-300 rounded-b-xl p-3">
-          <div className="text-center text-xs text-slate-600 mb-1 font-medium">▼ ОСНОВА</div>
-          <div className="grid grid-cols-3 gap-2">
-            {foundation.map(cat => renderCategory(cat))}
-          </div>
-        </div>
-      </div>
-
-      {/* Summary stats */}
-      <div className="grid grid-cols-4 gap-2 mt-6 pt-4 border-t border-slate-200">
-        <div className="text-center">
-          <div className="text-lg font-bold text-green-600">
-            {allCategories.filter(c => c.status === 'excellent' || c.status === 'good').length}
-          </div>
-          <div className="text-xs text-slate-500">Добре</div>
-        </div>
-        <div className="text-center">
-          <div className="text-lg font-bold text-amber-500">
-            {allCategories.filter(c => c.status === 'attention').length}
-          </div>
-          <div className="text-xs text-slate-500">Внимание</div>
-        </div>
-        <div className="text-center">
-          <div className="text-lg font-bold text-orange-500">
-            {allCategories.filter(c => c.status === 'warning' || c.status === 'critical').length}
-          </div>
-          <div className="text-xs text-slate-500">Критично</div>
-        </div>
-        <div className="text-center">
-          <div className="text-lg font-bold text-slate-400">
-            {allCategories.filter(c => c.status === 'inactive').length}
-          </div>
-          <div className="text-xs text-slate-500">Неактивно</div>
+        <div className="flex items-center gap-1">
+          <div className="w-3 h-3 rounded bg-red-200 border border-red-300"></div>
+          <span className="text-slate-600">Критично</span>
         </div>
       </div>
     </div>

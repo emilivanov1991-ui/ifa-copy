@@ -14,6 +14,7 @@ import { cn } from "@/lib/utils";
 
 // Pension fund options for II. Pillar (УПФ)
 const PENSION_FUND_OPTIONS = [
+  { value: 'to_check', label: 'Да се провери допълнително' },
   { value: 'allianz', label: 'УПФ "Алианц България"' },
   { value: 'badeshte', label: 'УПФ "Бъдеще"' },
   { value: 'dallbogg', label: 'УПФ "ДаллБогг: Живот и Здраве"' },

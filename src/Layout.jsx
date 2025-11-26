@@ -28,7 +28,8 @@ export default function Layout({ children, currentPageName }) {
 
   return (
     <div className="min-h-screen bg-white">
-      {/* Navigation */}
+      {/* Navigation - Hide on ConsultantPortal */}
+      {currentPageName !== 'ConsultantPortal' && (
       <header 
         className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
           isScrolled 
@@ -124,7 +125,8 @@ export default function Layout({ children, currentPageName }) {
             </motion.div>
           )}
         </AnimatePresence>
-        </header>}
+      </header>
+      )}
 
       {/* Main Content */}
       <main className={currentPageName === 'ConsultantPortal' ? 'pt-0' : ''}>

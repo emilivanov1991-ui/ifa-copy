@@ -312,6 +312,39 @@ export default function FinancialAnalysis() {
     }
   };
 
+  // Check if a step has been started (at least one required field filled)
+  const isStepStarted = (step) => {
+    switch (step) {
+      case 1:
+        return formData.gdpr_consent_a || formData.gdpr_consent_c;
+      case 2:
+        return !!(formData.client_first_name || formData.client_middle_name || formData.client_last_name);
+      case 3:
+        return !!formData.current_housing;
+      case 4:
+        return formData.client_monthly_net_income !== undefined && formData.client_monthly_net_income !== '';
+      case 5:
+        return formData.client_gross_income_pension !== undefined && formData.client_gross_income_pension !== '';
+      case 6:
+        return formData.other_goals_car !== undefined || formData.children_birth_costs !== undefined;
+      case 7:
+        return formData.properties?.length > 0 || formData.vehicles?.length > 0;
+      case 8:
+        return formData.client_gross_income !== undefined;
+      case 9:
+        return formData.priority_income_protection !== undefined;
+      default:
+        return false;
+    }
+  };
+
+  // Get step status: 'complete', 'started', 'future'
+  const getStepStatus = (stepId) => {
+    if (validateStep(stepId)) return 'complete';
+    if (stepId > currentStep && !isStepStarted(stepId)) return 'future';
+    return 'started';
+  };
+
   // Check which steps are incomplete
   const getIncompleteSteps = () => {
     const incomplete = [];
@@ -428,22 +461,32 @@ export default function FinancialAnalysis() {
                       "w-10 h-10 rounded-full flex items-center justify-center transition-all duration-300",
                       currentStep === step.id 
                         ? "bg-blue-600 text-white" 
-                        : validateStep(step.id)
+                        : getStepStatus(step.id) === 'complete'
                           ? "bg-green-500 text-white"
-                          : "bg-amber-400 text-white"
+                          : getStepStatus(step.id) === 'future'
+                            ? "bg-blue-400 text-white"
+                            : "bg-amber-400 text-white"
                     )}
                   >
                     {currentStep === step.id ? (
                       <step.icon className="h-4 w-4" />
-                    ) : validateStep(step.id) ? (
+                    ) : getStepStatus(step.id) === 'complete' ? (
                       <CheckCircle className="h-5 w-5" />
+                    ) : getStepStatus(step.id) === 'future' ? (
+                      <step.icon className="h-4 w-4" />
                     ) : (
                       <AlertTriangle className="h-5 w-5" />
                     )}
                   </div>
                   <span className={cn(
                     "text-xs mt-1 font-medium whitespace-nowrap",
-                    currentStep === step.id ? "text-blue-600" : validateStep(step.id) ? "text-green-600" : "text-amber-500"
+                    currentStep === step.id 
+                      ? "text-blue-600" 
+                      : getStepStatus(step.id) === 'complete' 
+                        ? "text-green-600" 
+                        : getStepStatus(step.id) === 'future'
+                          ? "text-blue-400"
+                          : "text-amber-500"
                   )}>
                     {step.title}
                   </span>

@@ -35,8 +35,11 @@ import {
   Bell,
   FileText,
   TrendingUp,
-  AlertCircle
+  AlertCircle,
+  PhoneCall
 } from 'lucide-react';
+import CallOutcomeDialog from './CallOutcomeDialog';
+import { toast } from 'sonner';
 
 const mockClients = [
   { 
@@ -123,13 +126,83 @@ export default function ConsultantCRMAdvanced() {
   const [selectedClient, setSelectedClient] = useState(null);
   const [isAddTaskOpen, setIsAddTaskOpen] = useState(false);
   const [isAddCommOpen, setIsAddCommOpen] = useState(false);
+  const [isCallDialogOpen, setIsCallDialogOpen] = useState(false);
+  const [callingClient, setCallingClient] = useState(null);
+  const [clients, setClients] = useState(mockClients);
 
-  const filteredClients = mockClients.filter(client =>
+  const handleCallClick = (client, e) => {
+    e.stopPropagation();
+    // Initiate call via tel: scheme
+    window.location.href = `tel:${client.phone.replace(/\s/g, '')}`;
+    // Open outcome dialog
+    setCallingClient(client);
+    setIsCallDialogOpen(true);
+  };
+
+  const handleCallOutcomeSave = (callData) => {
+    // Update client status and add communication record
+    setClients(prevClients => prevClients.map(client => {
+      if (client.id === callData.clientId) {
+        const newCommunication = {
+          id: Date.now(),
+          type: 'call',
+          date: new Date().toISOString().split('T')[0],
+          outcome: callData.outcomeLabel,
+          notes: callData.notes,
+          status: callData.newClientStatusLabel
+        };
+
+        const updatedClient = {
+          ...client,
+          status: callData.newClientStatus,
+          lastContact: new Date().toISOString().split('T')[0],
+          communications: [newCommunication, ...client.communications]
+        };
+
+        // Add follow-up task if specified
+        if (callData.followUp?.date) {
+          const newTask = {
+            id: Date.now() + 1,
+            title: callData.followUp.action || 'Последващо обаждане',
+            due: callData.followUp.date,
+            time: callData.followUp.time,
+            status: 'pending'
+          };
+          updatedClient.tasks = [newTask, ...client.tasks];
+        }
+
+        // Add meeting task if arranged
+        if (callData.meeting?.date) {
+          const meetingTask = {
+            id: Date.now() + 2,
+            title: `Среща с ${client.name}${callData.meeting.location ? ` - ${callData.meeting.location}` : ''}`,
+            due: callData.meeting.date,
+            time: callData.meeting.time,
+            status: 'pending',
+            type: 'meeting'
+          };
+          updatedClient.tasks = [meetingTask, ...updatedClient.tasks];
+        }
+
+        // Update selectedClient if it's the same
+        if (selectedClient?.id === client.id) {
+          setSelectedClient(updatedClient);
+        }
+
+        return updatedClient;
+      }
+      return client;
+    }));
+
+    toast.success('Резултатът от обаждането е записан');
+  };
+
+  const filteredClients = clients.filter(client =>
     client.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
     client.email.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  const allTasks = mockClients.flatMap(c => c.tasks.map(t => ({ ...t, clientName: c.name, clientId: c.id })));
+  const allTasks = clients.flatMap(c => c.tasks.map(t => ({ ...t, clientName: c.name, clientId: c.id })));
   const pendingTasks = allTasks.filter(t => t.status === 'pending');
 
   return (
@@ -208,6 +281,16 @@ export default function ConsultantCRMAdvanced() {
                     </Badge>
                   )}
                 </div>
+                <div className="mt-3 pt-3 border-t border-slate-100">
+                  <Button 
+                    size="sm" 
+                    className="w-full bg-green-600 hover:bg-green-700"
+                    onClick={(e) => handleCallClick(client, e)}
+                  >
+                    <PhoneCall className="h-4 w-4 mr-2" />
+                    Обади се
+                  </Button>
+                </div>
               </CardContent>
             </Card>
           ))}
@@ -228,7 +311,17 @@ export default function ConsultantCRMAdvanced() {
                     <div>
                       <h2 className="text-xl font-semibold text-slate-900">{selectedClient.name}</h2>
                       <p className="text-slate-500">{selectedClient.email}</p>
-                      <p className="text-slate-500">{selectedClient.phone}</p>
+                      <div className="flex items-center gap-2">
+                        <p className="text-slate-500">{selectedClient.phone}</p>
+                        <Button 
+                          size="sm" 
+                          className="bg-green-600 hover:bg-green-700 h-7 px-2"
+                          onClick={(e) => handleCallClick(selectedClient, e)}
+                        >
+                          <PhoneCall className="h-3.5 w-3.5 mr-1" />
+                          Обади се
+                        </Button>
+                      </div>
                     </div>
                   </div>
                   <div className="flex items-center gap-2">
@@ -380,6 +473,12 @@ export default function ConsultantCRMAdvanced() {
                                 <span className="text-xs text-slate-500">{comm.date}</span>
                               </div>
                               {comm.duration && <p className="text-xs text-slate-500">Продължителност: {comm.duration}</p>}
+                              {comm.outcome && (
+                                <Badge variant="outline" className="text-xs mt-1">{comm.outcome}</Badge>
+                              )}
+                              {comm.status && (
+                                <p className="text-xs text-slate-500 mt-1">Статус: {comm.status}</p>
+                              )}
                               <p className="text-sm text-slate-600 mt-1">{comm.notes}</p>
                             </div>
                           </div>
@@ -425,6 +524,16 @@ export default function ConsultantCRMAdvanced() {
           )}
         </div>
       </div>
+      {/* Call Outcome Dialog */}
+      <CallOutcomeDialog 
+        isOpen={isCallDialogOpen}
+        onClose={() => {
+          setIsCallDialogOpen(false);
+          setCallingClient(null);
+        }}
+        client={callingClient}
+        onSave={handleCallOutcomeSave}
+      />
     </div>
   );
 }

@@ -93,7 +93,7 @@ export default function KanbanBoard({ clients, onSelectClient, onCall, selectedC
     
     // Block moving to signed_paid (admin only)
     if (destStage?.adminOnly) {
-      toast.error('Само администратор може да премести клиенти в "Signed & Paid"');
+      toast.error('Действието може да бъде извършено само от Администратор.');
       return;
     }
     

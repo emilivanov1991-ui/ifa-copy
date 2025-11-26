@@ -303,7 +303,20 @@ export default function FinancialAnalysis() {
         // Other goals section has no required fields (can be skipped)
         return true;
       
-      case 7: // Protection - no strict required fields
+      case 7: // Protection
+        // Income source is required
+        if (!formData.income_source) return false;
+
+        // If client has income protection, insurer and date are required
+        if (formData.client_has_income_protection) {
+          if (!formData.client_income_protection_insurer || !formData.client_income_protection_date) return false;
+        }
+
+        // If partner included and has income protection, insurer and date are required
+        if (formData.include_partner && formData.partner_has_income_protection) {
+          if (!formData.partner_income_protection_insurer || !formData.partner_income_protection_date) return false;
+        }
+
         return true;
       
       case 8: // Financial Flow - no strict required fields

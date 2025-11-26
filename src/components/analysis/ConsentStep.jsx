@@ -56,7 +56,14 @@ export default function ConsentStep({ data, onChange, showErrors }) {
       </Collapsible>
 
       <div className="space-y-4">
-        <label className="flex items-start gap-4 p-4 rounded-xl border-2 border-slate-200 hover:border-blue-300 cursor-pointer transition-colors">
+        <label 
+          className={`flex items-start gap-4 p-4 rounded-xl border-2 cursor-pointer transition-colors ${
+            showErrors && !data.gdpr_consent_a 
+              ? 'border-red-500 bg-red-50' 
+              : 'border-slate-200 hover:border-blue-300'
+          }`}
+          data-invalid={showErrors && !data.gdpr_consent_a ? "true" : undefined}
+        >
           <Checkbox
             checked={data.gdpr_consent_a || false}
             onCheckedChange={(checked) => onChange('gdpr_consent_a', checked)}
@@ -71,7 +78,14 @@ export default function ConsentStep({ data, onChange, showErrors }) {
           </div>
         </label>
 
-        <label className="flex items-start gap-4 p-4 rounded-xl border-2 border-slate-200 hover:border-blue-300 cursor-pointer transition-colors">
+        <label 
+          className={`flex items-start gap-4 p-4 rounded-xl border-2 cursor-pointer transition-colors ${
+            showErrors && !data.gdpr_consent_c 
+              ? 'border-red-500 bg-red-50' 
+              : 'border-slate-200 hover:border-blue-300'
+          }`}
+          data-invalid={showErrors && !data.gdpr_consent_c ? "true" : undefined}
+        >
           <Checkbox
             checked={data.gdpr_consent_c || false}
             onCheckedChange={(checked) => onChange('gdpr_consent_c', checked)}

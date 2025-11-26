@@ -60,7 +60,7 @@ export default function HousingStep({ data, onChange }) {
         
         <div className="space-y-4">
           <div className="space-y-2">
-            <Label>Текущо жилище</Label>
+            <Label>Текущо жилище <span className="text-red-500">*</span></Label>
             <Select 
               value={data.current_housing || ''} 
               onValueChange={(value) => onChange('current_housing', value)}
@@ -76,83 +76,91 @@ export default function HousingStep({ data, onChange }) {
             </Select>
           </div>
 
-          {/* Location field for rented/with_parents */}
-          {(data.current_housing === 'rented' || data.current_housing === 'with_parents') && (
-            <div className="space-y-2">
-              <Label>Локация <span className="text-red-500">*</span></Label>
-              <Input
-                value={data.current_housing_location || ''}
-                onChange={(e) => onChange('current_housing_location', e.target.value)}
-                className="rounded-lg"
-                required
-              />
-            </div>
-          )}
-
-          {/* Address field for owned housing */}
-          {data.current_housing === 'owned' && (
-            <div className="space-y-2">
-              <Label>Адрес <span className="text-red-500">*</span></Label>
-              <Input
-                value={data.current_housing_address || ''}
-                onChange={(e) => onChange('current_housing_address', e.target.value)}
-                className="rounded-lg"
-                required
-              />
-            </div>
-          )}
-
-          <div className={cn("grid gap-4", (data.current_housing === 'with_parents' || data.current_housing === 'rented') ? "sm:grid-cols-2" : "sm:grid-cols-2 lg:grid-cols-4")}>
-            <div className="space-y-2">
-              <Label>Брой стаи <span className="text-red-500">*</span></Label>
-              <Input
-                type="number"
-                min="1"
-                max="20"
-                value={data.current_housing_rooms || ''}
-                onChange={(e) => onChange('current_housing_rooms', parseInt(e.target.value) || '')}
-                className="rounded-lg"
-                required
-              />
-            </div>
-            <div className="space-y-2">
-              <Label>Застроена площ (кв.м) <span className="text-red-500">*</span></Label>
-              <Input
-                type="number"
-                min="10"
-                value={data.current_housing_area || ''}
-                onChange={(e) => onChange('current_housing_area', parseInt(e.target.value) || '')}
-                className="rounded-lg"
-                required
-              />
-            </div>
-            {data.current_housing === 'owned' && (
-              <>
+          {/* Only show fields after housing type is selected */}
+          {data.current_housing && (
+            <>
+              {/* Location field for rented/with_parents */}
+              {(data.current_housing === 'rented' || data.current_housing === 'with_parents') && (
                 <div className="space-y-2">
-                  <Label>Стойност (€) <span className="text-red-500">*</span></Label>
+                  <Label>Локация <span className="text-red-500">*</span></Label>
+                  <Input
+                    value={data.current_housing_location || ''}
+                    onChange={(e) => onChange('current_housing_location', e.target.value)}
+                    className="rounded-lg"
+                    required
+                  />
+                </div>
+              )}
+
+              {/* Address field for owned housing */}
+              {data.current_housing === 'owned' && (
+                <div className="space-y-2">
+                  <Label>Адрес <span className="text-red-500">*</span></Label>
+                  <Input
+                    value={data.current_housing_address || ''}
+                    onChange={(e) => onChange('current_housing_address', e.target.value)}
+                    className="rounded-lg"
+                    required
+                  />
+                </div>
+              )}
+
+              <div className={cn("grid gap-4", (data.current_housing === 'with_parents' || data.current_housing === 'rented') ? "sm:grid-cols-2" : "sm:grid-cols-2 lg:grid-cols-4")}>
+                <div className="space-y-2">
+                  <Label>Брой стаи <span className="text-red-500">*</span></Label>
                   <Input
                     type="number"
-                    min="0"
-                    value={data.current_housing_value || ''}
-                    onChange={(e) => onChange('current_housing_value', parseInt(e.target.value) || '')}
+                    min="1"
+                    max="20"
+                    value={data.current_housing_rooms || ''}
+                    onChange={(e) => onChange('current_housing_rooms', parseInt(e.target.value) || '')}
                     className="rounded-lg"
                     required
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label>Стойност на движимо имущество (€) <span className="text-red-500">*</span></Label>
+                  <Label>Застроена площ (кв.м) <span className="text-red-500">*</span></Label>
                   <Input
                     type="number"
-                    min="0"
-                    value={data.current_housing_movable_value || ''}
-                    onChange={(e) => onChange('current_housing_movable_value', parseInt(e.target.value) || '')}
+                    min="10"
+                    value={data.current_housing_area || ''}
+                    onChange={(e) => onChange('current_housing_area', parseInt(e.target.value) || '')}
                     className="rounded-lg"
                     required
                   />
                 </div>
-              </>
-            )}
-          </div>
+                {data.current_housing === 'owned' && (
+                  <>
+                    <div className="space-y-2">
+                      <Label>Стойност (€) <span className="text-red-500">*</span></Label>
+                      <Input
+                        type="number"
+                        min="0"
+                        value={data.current_housing_value || ''}
+                        onChange={(e) => onChange('current_housing_value', parseInt(e.target.value) || '')}
+                        className="rounded-lg"
+                        required
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label>Движимо имущество (€) <span className="text-red-500">*</span></Label>
+                      <Input
+                        type="number"
+                        min="0"
+                        value={data.current_housing_movable_value || ''}
+                        onChange={(e) => onChange('current_housing_movable_value', parseInt(e.target.value) || '')}
+                        className="rounded-lg"
+                        required
+                      />
+                    </div>
+                  </>
+                )}
+              </div>
+            </>
+          )}
+
+          </>
+          )}
 
           {/* Mortgage section for owned housing */}
           {data.current_housing === 'owned' && (
@@ -205,12 +213,34 @@ export default function HousingStep({ data, onChange }) {
                   </div>
                   <div className="space-y-2">
                     <Label>Банка <span className="text-red-500">*</span></Label>
-                    <Input
-                      value={data.current_mortgage_bank || ''}
-                      onChange={(e) => onChange('current_mortgage_bank', e.target.value)}
-                      className="rounded-lg"
-                      required
-                    />
+                    <Select 
+                      value={data.current_mortgage_bank || ''} 
+                      onValueChange={(value) => onChange('current_mortgage_bank', value)}
+                    >
+                      <SelectTrigger className="rounded-lg">
+                        <SelectValue placeholder="Изберете" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="allianz">Алианц Банк България АД</SelectItem>
+                        <SelectItem value="dsk">Банка ДСК АД</SelectItem>
+                        <SelectItem value="bacb">Българо-Американска Кредитна Банка (БАКБ) АД</SelectItem>
+                        <SelectItem value="bbr">Българска Банка за Развитие ЕАД</SelectItem>
+                        <SelectItem value="ccb">Централна Кооперативна Банка (ЦКБ) АД</SelectItem>
+                        <SelectItem value="investbank">Инвестбанк АД</SelectItem>
+                        <SelectItem value="iab">Интернешънъл Асет Банк АД</SelectItem>
+                        <SelectItem value="municipal">Общинска Банка АД</SelectItem>
+                        <SelectItem value="ubb">Обединена Българска Банка (ОББ) АД</SelectItem>
+                        <SelectItem value="fibank">Първа Инвестиционна Банка АД (Fibank)</SelectItem>
+                        <SelectItem value="procredit">ПроКредит Банк (България) ЕАД</SelectItem>
+                        <SelectItem value="postbank">Пощенска Банка Юробанк България АД</SelectItem>
+                        <SelectItem value="texim">Тексим Банк АД</SelectItem>
+                        <SelectItem value="tbi">Ти Би Ай Банк ЕАД</SelectItem>
+                        <SelectItem value="tokuda">Токуда Банк АД</SelectItem>
+                        <SelectItem value="tbank">Търговска Банка Д АД</SelectItem>
+                        <SelectItem value="unicredit">Уникредит Булбанк АД</SelectItem>
+                        <SelectItem value="eurobank">Юробанк България АД (Пощенска Банка)</SelectItem>
+                      </SelectContent>
+                    </Select>
                   </div>
                   <div className="space-y-2">
                     <Label>Оставащ период (години) <span className="text-red-500">*</span></Label>
@@ -282,7 +312,7 @@ export default function HousingStep({ data, onChange }) {
                   <SelectValue placeholder="Изберете" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="apartment">Покупка Апартамент или Къща</SelectItem>
+                  <SelectItem value="apartment">Покупка на Апартамент или Къща</SelectItem>
                   <SelectItem value="house">Строителство на Къща</SelectItem>
                   <SelectItem value="reconstruction">Реконструкция и ремонтни дейности</SelectItem>
                 </SelectContent>
@@ -291,65 +321,80 @@ export default function HousingStep({ data, onChange }) {
 
             {/* Full fields for apartment and house */}
             {(data.planned_housing_type === 'apartment' || data.planned_housing_type === 'house') && (
-              <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                <div className="space-y-2">
-                  <Label>Брой стаи <span className="text-red-500">*</span></Label>
-                  <Input
-                    type="number"
-                    min="1"
-                    max="20"
-                    value={data.planned_housing_rooms || ''}
-                    onChange={(e) => onChange('planned_housing_rooms', parseInt(e.target.value) || '')}
-                    className="rounded-lg"
-                    required
-                  />
+              <>
+                <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                  <div className="space-y-2">
+                    <Label>Брой стаи <span className="text-red-500">*</span></Label>
+                    <Input
+                      type="number"
+                      min="1"
+                      max="20"
+                      value={data.planned_housing_rooms || ''}
+                      onChange={(e) => onChange('planned_housing_rooms', parseInt(e.target.value) || '')}
+                      className="rounded-lg"
+                      required
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Застроена площ (кв.м) <span className="text-red-500">*</span></Label>
+                    <Input
+                      type="number"
+                      min="10"
+                      value={data.planned_housing_area || ''}
+                      onChange={(e) => onChange('planned_housing_area', parseInt(e.target.value) || '')}
+                      className="rounded-lg"
+                      required
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Стойност на имота (€) <span className="text-red-500">*</span></Label>
+                    <Input
+                      type="number"
+                      min="0"
+                      value={data.planned_housing_value || ''}
+                      onChange={(e) => onChange('planned_housing_value', parseInt(e.target.value) || '')}
+                      className="rounded-lg"
+                      required
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Времеви хоризонт (години) <span className="text-red-500">*</span></Label>
+                    <Input
+                      type="number"
+                      min="1"
+                      max="30"
+                      value={data.planned_housing_timeline_years || ''}
+                      onChange={(e) => onChange('planned_housing_timeline_years', parseInt(e.target.value) || '')}
+                      className="rounded-lg"
+                      required
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Разходи ремонт/обзавеждане (€) <span className="text-red-500">*</span></Label>
+                    <Input
+                      type="number"
+                      min="0"
+                      value={data.planned_housing_extra_costs || ''}
+                      onChange={(e) => onChange('planned_housing_extra_costs', parseInt(e.target.value) || '')}
+                      className="rounded-lg"
+                      required
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Цена на кв.м. (€)</Label>
+                    <Input
+                      type="number"
+                      value={data.planned_housing_area > 0 ? Math.round((data.planned_housing_value || 0) / data.planned_housing_area) : ''}
+                      readOnly
+                      className="rounded-lg bg-slate-100"
+                    />
+                  </div>
                 </div>
-                <div className="space-y-2">
-                  <Label>Застроена площ (кв.м) <span className="text-red-500">*</span></Label>
-                  <Input
-                    type="number"
-                    min="10"
-                    value={data.planned_housing_area || ''}
-                    onChange={(e) => onChange('planned_housing_area', parseInt(e.target.value) || '')}
-                    className="rounded-lg"
-                    required
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label>Стойност на имота (€) <span className="text-red-500">*</span></Label>
-                  <Input
-                    type="number"
-                    min="0"
-                    value={data.planned_housing_value || ''}
-                    onChange={(e) => onChange('planned_housing_value', parseInt(e.target.value) || '')}
-                    className="rounded-lg"
-                    required
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label>Времеви хоризонт (години) <span className="text-red-500">*</span></Label>
-                  <Input
-                    type="number"
-                    min="1"
-                    max="30"
-                    value={data.planned_housing_timeline_years || ''}
-                    onChange={(e) => onChange('planned_housing_timeline_years', parseInt(e.target.value) || '')}
-                    className="rounded-lg"
-                    required
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label>Общи разходи - ремонт и обзавеждане (€) <span className="text-red-500">*</span></Label>
-                  <Input
-                    type="number"
-                    min="0"
-                    value={data.planned_housing_extra_costs || ''}
-                    onChange={(e) => onChange('planned_housing_extra_costs', parseInt(e.target.value) || '')}
-                    className="rounded-lg"
-                    required
-                  />
-                </div>
-              </div>
+                <p className="text-xs text-slate-500 mt-1">
+                  В случай на необходимост за определяне на приблизителната стойност на имота кликнете{' '}
+                  <a href="https://www.imot.bg/sredni-ceni/table" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">тук</a>!
+                </p>
+              </>
             )}
 
             {/* Limited fields for reconstruction */}
@@ -368,7 +413,7 @@ export default function HousingStep({ data, onChange }) {
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label>Общи разходи - ремонт и обзавеждане (€) <span className="text-red-500">*</span></Label>
+                  <Label>Разходи ремонт/обзавеждане (€) <span className="text-red-500">*</span></Label>
                   <Input
                     type="number"
                     min="0"
@@ -500,7 +545,12 @@ export default function HousingStep({ data, onChange }) {
                       min="0"
                       value={totalOverpayment}
                       readOnly
-                      className="rounded-lg bg-red-100 text-red-700 font-semibold"
+                      className={cn(
+                        "rounded-lg",
+                        data.available_cash && data.loan_term_years && calculatedLoanAmount > 0
+                          ? "bg-red-100 text-red-700 font-semibold"
+                          : "bg-slate-100"
+                      )}
                     />
                   </div>
                 </div>

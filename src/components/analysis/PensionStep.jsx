@@ -66,8 +66,8 @@ const calculateMonthlyInvestment = (targetAmount, years, annualRate) => {
 };
 
 export default function PensionStep({ data, onChange, showErrors }) {
-  // Helper to check if a field is invalid
-  const isInvalid = (value) => showErrors && (value === undefined || value === '' || value === null);
+  // Helper to check if a field is invalid - only when showErrors is true
+  const isFieldInvalid = (value) => showErrors && (value === undefined || value === '' || value === null);
   const includePartner = data.include_partner || false;
 
   // Auto-calculate client expected pension
@@ -174,7 +174,7 @@ export default function PensionStep({ data, onChange, showErrors }) {
                 </div>
               </div>
               {/* Gross Income */}
-              <div className="space-y-2" data-invalid={isInvalid(data.client_gross_income_pension) ? "true" : undefined}>
+              <div className="space-y-2" data-invalid={isFieldInvalid(data.client_gross_income_pension) ? "true" : undefined}>
                 <Label>Брутен доход (€) <span className="text-red-500">*</span></Label>
                 <Input
                   type="number"
@@ -182,11 +182,11 @@ export default function PensionStep({ data, onChange, showErrors }) {
                   placeholder=""
                   value={data.client_gross_income_pension || ''}
                   onChange={(e) => onChange('client_gross_income_pension', parseInt(e.target.value) || '')}
-                  className={`rounded-lg ${isInvalid(data.client_gross_income_pension) ? 'border-red-500 bg-red-50' : ''}`}
+                  className={`rounded-lg ${isFieldInvalid(data.client_gross_income_pension) ? 'border-red-500 bg-red-50' : ''}`}
                   required
                 />
               </div>
-              <div className="space-y-2" data-invalid={isInvalid(data.client_retirement_age) ? "true" : undefined}>
+              <div className="space-y-2" data-invalid={isFieldInvalid(data.client_retirement_age) ? "true" : undefined}>
                 <Label>Кога искате да излезете в пенсия? (възраст) <span className="text-red-500">*</span></Label>
                 <Input
                   type="number"
@@ -195,11 +195,11 @@ export default function PensionStep({ data, onChange, showErrors }) {
                   placeholder=""
                   value={data.client_retirement_age || ''}
                   onChange={(e) => onChange('client_retirement_age', parseInt(e.target.value) || '')}
-                  className={`rounded-lg ${isInvalid(data.client_retirement_age) ? 'border-red-500 bg-red-50' : ''}`}
+                  className={`rounded-lg ${isFieldInvalid(data.client_retirement_age) ? 'border-red-500 bg-red-50' : ''}`}
                   required
                 />
               </div>
-              <div className="space-y-2" data-invalid={isInvalid(data.client_desired_pension) ? "true" : undefined}>
+              <div className="space-y-2" data-invalid={isFieldInvalid(data.client_desired_pension) ? "true" : undefined}>
                 <Label>От каква месечна пенсия ще се нуждаете? (€) <span className="text-red-500">*</span></Label>
                 <Input
                   type="number"
@@ -207,7 +207,7 @@ export default function PensionStep({ data, onChange, showErrors }) {
                   placeholder=""
                   value={data.client_desired_pension || ''}
                   onChange={(e) => onChange('client_desired_pension', parseInt(e.target.value) || '')}
-                  className={`rounded-lg ${isInvalid(data.client_desired_pension) ? 'border-red-500 bg-red-50' : ''}`}
+                  className={`rounded-lg ${isFieldInvalid(data.client_desired_pension) ? 'border-red-500 bg-red-50' : ''}`}
                   required
                 />
               </div>

@@ -37,8 +37,8 @@ const BANK_OPTIONS = [
 ];
 
 export default function ReserveStep({ data, onChange, showErrors }) {
-  // Helper to check if a field is invalid
-  const isInvalid = (value) => showErrors && (value === undefined || value === '' || value === null);
+  // Helper to check if a field is invalid - only when showErrors is true
+  const isFieldInvalid = (value) => showErrors && (value === undefined || value === '' || value === null);
   // Get total monthly income from input
   const totalMonthlyIncome = data.total_monthly_income || 0;
 
@@ -93,7 +93,7 @@ export default function ReserveStep({ data, onChange, showErrors }) {
         <div className="mb-6 p-4 bg-white rounded-lg border border-slate-200">
           <h4 className="font-medium text-slate-700 mb-4">Месечен среден нетен доход <span className="text-red-500">*</span></h4>
           <div className={data.include_partner ? "grid sm:grid-cols-2 gap-4" : ""}>
-            <div className="space-y-2" data-invalid={isInvalid(data.client_monthly_net_income) ? "true" : undefined}>
+            <div className="space-y-2" data-invalid={isFieldInvalid(data.client_monthly_net_income) ? "true" : undefined}>
               <Label className="text-sm">Клиент (€) <span className="text-red-500">*</span></Label>
               <Input
                 type="number"
@@ -105,7 +105,7 @@ export default function ReserveStep({ data, onChange, showErrors }) {
                   onChange('client_monthly_net_income', clientIncome);
                   onChange('total_monthly_income', clientIncome + (data.partner_monthly_net_income || 0));
                 }}
-                className={`rounded-lg ${isInvalid(data.client_monthly_net_income) ? 'border-red-500 bg-red-50' : ''}`}
+                className={`rounded-lg ${isFieldInvalid(data.client_monthly_net_income) ? 'border-red-500 bg-red-50' : ''}`}
                 required
               />
             </div>
@@ -135,13 +135,13 @@ export default function ReserveStep({ data, onChange, showErrors }) {
         </div>
 
         <div className="space-y-4">
-          <div className="space-y-2" data-invalid={isInvalid(data.savings_method) ? "true" : undefined}>
+          <div className="space-y-2" data-invalid={isFieldInvalid(data.savings_method) ? "true" : undefined}>
             <Label>Метод на спестяване <span className="text-red-500">*</span></Label>
             <Select 
               value={data.savings_method || ''} 
               onValueChange={(value) => onChange('savings_method', value)}
             >
-              <SelectTrigger className={`rounded-lg ${isInvalid(data.savings_method) ? 'border-red-500 bg-red-50' : ''}`}>
+              <SelectTrigger className={`rounded-lg ${isFieldInvalid(data.savings_method) ? 'border-red-500 bg-red-50' : ''}`}>
                 <SelectValue placeholder="Изберете" />
               </SelectTrigger>
               <SelectContent>

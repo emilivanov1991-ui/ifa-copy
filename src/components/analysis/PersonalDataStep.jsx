@@ -140,8 +140,8 @@ const ToggleWithLabel = ({ checked, onChange, defaultYes = false }) => {
 };
 
 export default function PersonalDataStep({ data, onChange, showErrors }) {
-  // Helper to check if a field is invalid
-  const isInvalid = (value) => showErrors && (value === undefined || value === '' || value === null);
+  // Helper to check if a field is invalid - only show errors when showErrors is true
+  const isFieldInvalid = (value) => showErrors && (value === undefined || value === '' || value === null);
   const [showDisclaimer, setShowDisclaimer] = useState(true);
 
   // Initialize defaults
@@ -210,40 +210,40 @@ export default function PersonalDataStep({ data, onChange, showErrors }) {
         
         {/* Personal Info */}
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
-          <div className="space-y-2" data-invalid={isInvalid(data.client_first_name) ? "true" : undefined}>
+          <div className="space-y-2" data-invalid={isFieldInvalid(data.client_first_name) ? "true" : undefined}>
             <Label>Име <span className="text-red-500">*</span></Label>
             <Input
               value={data.client_first_name || ''}
               onChange={(e) => onChange('client_first_name', e.target.value)}
-              className={`rounded-lg ${isInvalid(data.client_first_name) ? 'border-red-500 bg-red-50' : ''}`}
+              className={`rounded-lg ${isFieldInvalid(data.client_first_name) ? 'border-red-500 bg-red-50' : ''}`}
               required
             />
           </div>
-          <div className="space-y-2">
+          <div className="space-y-2" data-invalid={isFieldInvalid(data.client_middle_name) ? "true" : undefined}>
             <Label>Презиме <span className="text-red-500">*</span></Label>
             <Input
               value={data.client_middle_name || ''}
               onChange={(e) => onChange('client_middle_name', e.target.value)}
-              className="rounded-lg"
+              className={`rounded-lg ${isFieldInvalid(data.client_middle_name) ? 'border-red-500 bg-red-50' : ''}`}
               required
             />
           </div>
-          <div className="space-y-2">
+          <div className="space-y-2" data-invalid={isFieldInvalid(data.client_last_name) ? "true" : undefined}>
             <Label>Фамилия <span className="text-red-500">*</span></Label>
             <Input
               value={data.client_last_name || ''}
               onChange={(e) => onChange('client_last_name', e.target.value)}
-              className="rounded-lg"
+              className={`rounded-lg ${isFieldInvalid(data.client_last_name) ? 'border-red-500 bg-red-50' : ''}`}
               required
             />
           </div>
 
-          <div className="space-y-2">
+          <div className="space-y-2" data-invalid={isFieldInvalid(data.client_birthdate) ? "true" : undefined}>
             <Label>Дата на раждане <span className="text-red-500">*</span></Label>
             <BulgarianDateInput
               value={data.client_birthdate || ''}
               onChange={(value) => onChange('client_birthdate', value)}
-              className="rounded-lg"
+              className={`rounded-lg ${isFieldInvalid(data.client_birthdate) ? 'border-red-500 bg-red-50' : ''}`}
               required
             />
           </div>
@@ -256,13 +256,13 @@ export default function PersonalDataStep({ data, onChange, showErrors }) {
               className="rounded-lg bg-slate-100"
             />
           </div>
-          <div className="space-y-2">
+          <div className="space-y-2" data-invalid={isFieldInvalid(data.client_gender) ? "true" : undefined}>
             <Label>Пол <span className="text-red-500">*</span></Label>
             <Select 
               value={data.client_gender || ''} 
               onValueChange={(value) => onChange('client_gender', value)}
             >
-              <SelectTrigger className="rounded-lg">
+              <SelectTrigger className={`rounded-lg ${isFieldInvalid(data.client_gender) ? 'border-red-500 bg-red-50' : ''}`}>
                 <SelectValue placeholder="Изберете" />
               </SelectTrigger>
               <SelectContent>
@@ -272,12 +272,12 @@ export default function PersonalDataStep({ data, onChange, showErrors }) {
             </Select>
           </div>
 
-          <div className="space-y-2">
+          <div className="space-y-2" data-invalid={isFieldInvalid(data.client_birthplace) ? "true" : undefined}>
             <Label>Място на раждане <span className="text-red-500">*</span></Label>
             <Input
               value={data.client_birthplace || ''}
               onChange={(e) => onChange('client_birthplace', e.target.value)}
-              className="rounded-lg"
+              className={`rounded-lg ${isFieldInvalid(data.client_birthplace) ? 'border-red-500 bg-red-50' : ''}`}
               required
             />
           </div>

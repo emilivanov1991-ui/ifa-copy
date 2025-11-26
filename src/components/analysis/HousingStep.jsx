@@ -47,8 +47,8 @@ for (let rate = 1; rate <= 8; rate += 0.5) {
 }
 
 export default function HousingStep({ data, onChange, showErrors }) {
-  // Helper to check if a field is invalid
-  const isInvalid = (value) => showErrors && (value === undefined || value === '' || value === null);
+  // Helper to check if a field is invalid - only when showErrors is true
+  const isFieldInvalid = (value) => showErrors && (value === undefined || value === '' || value === null);
   // Calculate loan amount automatically
   const plannedValue = data.planned_housing_value || 0;
   const extraCosts = data.planned_housing_extra_costs || 0;
@@ -78,13 +78,13 @@ export default function HousingStep({ data, onChange, showErrors }) {
         </div>
         
         <div className="space-y-4">
-          <div className="space-y-2" data-invalid={isInvalid(data.current_housing) ? "true" : undefined}>
+          <div className="space-y-2" data-invalid={isFieldInvalid(data.current_housing) ? "true" : undefined}>
             <Label>Текущо жилище <span className="text-red-500">*</span></Label>
             <Select 
               value={data.current_housing || ''} 
               onValueChange={(value) => onChange('current_housing', value)}
             >
-              <SelectTrigger className={`rounded-lg ${isInvalid(data.current_housing) ? 'border-red-500 bg-red-50' : ''}`}>
+              <SelectTrigger className={`rounded-lg ${isFieldInvalid(data.current_housing) ? 'border-red-500 bg-red-50' : ''}`}>
                 <SelectValue placeholder="Изберете" />
               </SelectTrigger>
               <SelectContent>

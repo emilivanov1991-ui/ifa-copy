@@ -6,7 +6,9 @@ import { Button } from "@/components/ui/button";
 import { Baby, Car, Palmtree, SkipForward, Power } from 'lucide-react';
 import { cn } from "@/lib/utils";
 
-export default function ChildrenGoalsStep({ data, onChange }) {
+export default function ChildrenGoalsStep({ data, onChange, showErrors }) {
+  // Helper to check if a field is invalid
+  const isInvalid = (value) => showErrors && (value === undefined || value === '' || value === null);
   // Initialize other goals as skipped by default
   useEffect(() => {
     if (data.skip_other_goals_section === undefined) {
@@ -277,7 +279,7 @@ export default function ChildrenGoalsStep({ data, onChange }) {
             </div>
           </div>
 
-          <div className="grid grid-cols-2 gap-4 items-end">
+          <div className="grid grid-cols-2 gap-4 items-end" data-invalid={!data.skip_children_section && isInvalid(data.children_education_costs) ? "true" : undefined}>
             <div>
               <Label className="font-medium">Висше образование <span className="text-red-500">*</span></Label>
               <p className="text-xs text-slate-500">студентски такси, общежитие...</p>
@@ -290,7 +292,7 @@ export default function ChildrenGoalsStep({ data, onChange }) {
                 placeholder="0"
                 value={data.children_education_costs ?? ''}
                 onChange={(e) => onChange('children_education_costs', e.target.value === '' ? '' : parseInt(e.target.value))}
-                className="rounded-lg text-center"
+                className={`rounded-lg text-center ${!data.skip_children_section && isInvalid(data.children_education_costs) ? 'border-red-500 bg-red-50' : ''}`}
                 required
               />
             </div>

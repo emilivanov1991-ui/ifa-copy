@@ -139,7 +139,9 @@ const ToggleWithLabel = ({ checked, onChange, defaultYes = false }) => {
   );
 };
 
-export default function PersonalDataStep({ data, onChange }) {
+export default function PersonalDataStep({ data, onChange, showErrors }) {
+  // Helper to check if a field is invalid
+  const isInvalid = (value) => showErrors && (value === undefined || value === '' || value === null);
   const [showDisclaimer, setShowDisclaimer] = useState(true);
 
   // Initialize defaults
@@ -208,12 +210,12 @@ export default function PersonalDataStep({ data, onChange }) {
         
         {/* Personal Info */}
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
-          <div className="space-y-2">
+          <div className="space-y-2" data-invalid={isInvalid(data.client_first_name) ? "true" : undefined}>
             <Label>Име <span className="text-red-500">*</span></Label>
             <Input
               value={data.client_first_name || ''}
               onChange={(e) => onChange('client_first_name', e.target.value)}
-              className="rounded-lg"
+              className={`rounded-lg ${isInvalid(data.client_first_name) ? 'border-red-500 bg-red-50' : ''}`}
               required
             />
           </div>

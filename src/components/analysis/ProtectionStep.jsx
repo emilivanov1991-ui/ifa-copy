@@ -1018,7 +1018,7 @@ export default function ProtectionStep({ data, onChange }) {
 
         <div className="space-y-4">
           <div className="space-y-2">
-            <Label>От къде идват Вашите доходи?</Label>
+            <Label>От къде идват Вашите доходи? <span className="text-red-500">*</span></Label>
             <Select 
               value={data.income_source || ''} 
               onValueChange={(value) => onChange('income_source', value)}
@@ -1051,10 +1051,23 @@ export default function ProtectionStep({ data, onChange }) {
                   <div className="space-y-3">
                     <div className="flex items-center justify-between">
                       <Label className="cursor-pointer">Съкращение</Label>
-                      <Switch
-                        checked={data.client_risk_layoff || false}
-                        onCheckedChange={(checked) => onChange('client_risk_layoff', checked)}
-                      />
+                      <div className="flex items-center gap-2">
+                        <span className={cn("text-sm font-medium", !(data.client_risk_layoff ?? false) ? "text-green-600" : "text-slate-400")}>не</span>
+                        <button
+                          type="button"
+                          onClick={() => onChange('client_risk_layoff', !(data.client_risk_layoff ?? false))}
+                          className={cn(
+                            "w-12 h-6 rounded-full transition-colors relative",
+                            (data.client_risk_layoff ?? false) ? "bg-red-500" : "bg-green-500"
+                          )}
+                        >
+                          <div className={cn(
+                            "w-5 h-5 bg-white rounded-full absolute top-0.5 transition-all",
+                            (data.client_risk_layoff ?? false) ? "left-6" : "left-0.5"
+                          )} />
+                        </button>
+                        <span className={cn("text-sm font-medium", (data.client_risk_layoff ?? false) ? "text-red-600" : "text-slate-400")}>да</span>
+                      </div>
                     </div>
                     {data.client_risk_layoff && (() => {
                       const compensation = calculateLayoffCompensation(clientGrossIncome);
@@ -1088,10 +1101,23 @@ export default function ProtectionStep({ data, onChange }) {
                   <div className="space-y-3">
                     <div className="flex items-center justify-between">
                       <Label className="cursor-pointer">Отпуск по майчинство</Label>
-                      <Switch
-                        checked={data.client_risk_maternity || false}
-                        onCheckedChange={(checked) => onChange('client_risk_maternity', checked)}
-                      />
+                      <div className="flex items-center gap-2">
+                        <span className={cn("text-sm font-medium", !(data.client_risk_maternity ?? false) ? "text-green-600" : "text-slate-400")}>не</span>
+                        <button
+                          type="button"
+                          onClick={() => onChange('client_risk_maternity', !(data.client_risk_maternity ?? false))}
+                          className={cn(
+                            "w-12 h-6 rounded-full transition-colors relative",
+                            (data.client_risk_maternity ?? false) ? "bg-red-500" : "bg-green-500"
+                          )}
+                        >
+                          <div className={cn(
+                            "w-5 h-5 bg-white rounded-full absolute top-0.5 transition-all",
+                            (data.client_risk_maternity ?? false) ? "left-6" : "left-0.5"
+                          )} />
+                        </button>
+                        <span className={cn("text-sm font-medium", (data.client_risk_maternity ?? false) ? "text-red-600" : "text-slate-400")}>да</span>
+                      </div>
                     </div>
                     {data.client_risk_maternity && (() => {
                       const compYear1 = calculateMaternityYear1(clientGrossIncome);
@@ -1144,10 +1170,23 @@ export default function ProtectionStep({ data, onChange }) {
                   <div className="space-y-3">
                     <div className="flex items-center justify-between">
                       <Label className="cursor-pointer">Болнични</Label>
-                      <Switch
-                        checked={data.client_risk_sick_leave || false}
-                        onCheckedChange={(checked) => onChange('client_risk_sick_leave', checked)}
-                      />
+                      <div className="flex items-center gap-2">
+                        <span className={cn("text-sm font-medium", !(data.client_risk_sick_leave ?? false) ? "text-green-600" : "text-slate-400")}>не</span>
+                        <button
+                          type="button"
+                          onClick={() => onChange('client_risk_sick_leave', !(data.client_risk_sick_leave ?? false))}
+                          className={cn(
+                            "w-12 h-6 rounded-full transition-colors relative",
+                            (data.client_risk_sick_leave ?? false) ? "bg-red-500" : "bg-green-500"
+                          )}
+                        >
+                          <div className={cn(
+                            "w-5 h-5 bg-white rounded-full absolute top-0.5 transition-all",
+                            (data.client_risk_sick_leave ?? false) ? "left-6" : "left-0.5"
+                          )} />
+                        </button>
+                        <span className={cn("text-sm font-medium", (data.client_risk_sick_leave ?? false) ? "text-red-600" : "text-slate-400")}>да</span>
+                      </div>
                     </div>
                     {data.client_risk_sick_leave && (() => {
                       const compensation = calculateSickLeaveCompensation(clientGrossIncome);
@@ -1181,10 +1220,23 @@ export default function ProtectionStep({ data, onChange }) {
                   <div className="space-y-3">
                     <div className="flex items-center justify-between">
                       <Label className="cursor-pointer">Инвалидност</Label>
-                      <Switch
-                        checked={data.client_risk_disability || false}
-                        onCheckedChange={(checked) => onChange('client_risk_disability', checked)}
-                      />
+                      <div className="flex items-center gap-2">
+                        <span className={cn("text-sm font-medium", !(data.client_risk_disability ?? false) ? "text-green-600" : "text-slate-400")}>не</span>
+                        <button
+                          type="button"
+                          onClick={() => onChange('client_risk_disability', !(data.client_risk_disability ?? false))}
+                          className={cn(
+                            "w-12 h-6 rounded-full transition-colors relative",
+                            (data.client_risk_disability ?? false) ? "bg-red-500" : "bg-green-500"
+                          )}
+                        >
+                          <div className={cn(
+                            "w-5 h-5 bg-white rounded-full absolute top-0.5 transition-all",
+                            (data.client_risk_disability ?? false) ? "left-6" : "left-0.5"
+                          )} />
+                        </button>
+                        <span className={cn("text-sm font-medium", (data.client_risk_disability ?? false) ? "text-red-600" : "text-slate-400")}>да</span>
+                      </div>
                     </div>
                     {data.client_risk_disability && (() => {
                       const compensation = calculateDisabilityCompensation(clientGrossIncome);
@@ -1218,10 +1270,23 @@ export default function ProtectionStep({ data, onChange }) {
                   <div className="space-y-3">
                     <div className="flex items-center justify-between">
                       <Label className="cursor-pointer">Смърт</Label>
-                      <Switch
-                        checked={data.client_risk_death || false}
-                        onCheckedChange={(checked) => onChange('client_risk_death', checked)}
-                      />
+                      <div className="flex items-center gap-2">
+                        <span className={cn("text-sm font-medium", !(data.client_risk_death ?? false) ? "text-green-600" : "text-slate-400")}>не</span>
+                        <button
+                          type="button"
+                          onClick={() => onChange('client_risk_death', !(data.client_risk_death ?? false))}
+                          className={cn(
+                            "w-12 h-6 rounded-full transition-colors relative",
+                            (data.client_risk_death ?? false) ? "bg-red-500" : "bg-green-500"
+                          )}
+                        >
+                          <div className={cn(
+                            "w-5 h-5 bg-white rounded-full absolute top-0.5 transition-all",
+                            (data.client_risk_death ?? false) ? "left-6" : "left-0.5"
+                          )} />
+                        </button>
+                        <span className={cn("text-sm font-medium", (data.client_risk_death ?? false) ? "text-red-600" : "text-slate-400")}>да</span>
+                      </div>
                     </div>
                     {data.client_risk_death && (() => {
                       const compensation = calculateDeathCompensation(clientGrossIncome);
@@ -1255,34 +1320,76 @@ export default function ProtectionStep({ data, onChange }) {
                   <div className="pt-4 border-t border-slate-200 space-y-3">
                     <div className="flex items-center justify-between">
                       <Label className="cursor-pointer">Подсигурени ли са Вашите доходи?</Label>
-                      <Switch
-                        checked={data.client_has_income_protection || false}
-                        onCheckedChange={(checked) => onChange('client_has_income_protection', checked)}
-                      />
+                      <div className="flex items-center gap-2">
+                        <span className={cn("text-sm font-medium", !(data.client_has_income_protection ?? false) ? "text-red-600" : "text-slate-400")}>не</span>
+                        <button
+                          type="button"
+                          onClick={() => onChange('client_has_income_protection', !(data.client_has_income_protection ?? false))}
+                          className={cn(
+                            "w-12 h-6 rounded-full transition-colors relative",
+                            (data.client_has_income_protection ?? false) ? "bg-green-500" : "bg-red-500"
+                          )}
+                        >
+                          <div className={cn(
+                            "w-5 h-5 bg-white rounded-full absolute top-0.5 transition-all",
+                            (data.client_has_income_protection ?? false) ? "left-6" : "left-0.5"
+                          )} />
+                        </button>
+                        <span className={cn("text-sm font-medium", (data.client_has_income_protection ?? false) ? "text-green-600" : "text-slate-400")}>да</span>
+                      </div>
                     </div>
                     {data.client_has_income_protection && (
                       <div className="grid sm:grid-cols-2 gap-3">
                         <div className="space-y-1">
-                          <Label className="text-xs text-slate-500">Застраховател</Label>
-                          <Input
-                            placeholder="Име на застраховател"
-                            value={data.client_income_protection_insurer || ''}
-                            onChange={(e) => onChange('client_income_protection_insurer', e.target.value)}
-                            className="rounded-lg text-sm"
-                          />
+                          <Label className="text-xs text-slate-500">Застраховател <span className="text-red-500">*</span></Label>
+                          <Select 
+                            value={data.client_income_protection_insurer || ''} 
+                            onValueChange={(value) => onChange('client_income_protection_insurer', value)}
+                          >
+                            <SelectTrigger className="rounded-lg text-sm">
+                              <SelectValue placeholder="Изберете" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {INSURANCE_COMPANIES.map(ins => (
+                                <SelectItem key={ins.value} value={ins.value}>{ins.label}</SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
                         </div>
                         <div className="space-y-1">
-                          <Label className="text-xs text-slate-500">Дата на сключване</Label>
-                          <Input
-                            type="text"
-                            placeholder="дд/мм/гггг"
+                          <Label className="text-xs text-slate-500">Дата на сключване <span className="text-red-500">*</span></Label>
+                          <BulgarianDateInput
                             value={data.client_income_protection_date || ''}
-                            onChange={(e) => onChange('client_income_protection_date', e.target.value)}
+                            onChange={(value) => onChange('client_income_protection_date', value)}
                             className="rounded-lg text-sm"
+                            required
                           />
                         </div>
                       </div>
                     )}
+                    
+                    {/* Human Capital Message - only if income is not from rent or investments */}
+                    {data.income_source && data.income_source !== 'rent' && data.income_source !== 'investments' && (() => {
+                      const clientAge = data.client_age || 0;
+                      const clientRetirementAge = data.client_retirement_age || 65;
+                      const clientYearsToRetirement = Math.max(0, clientRetirementAge - clientAge);
+                      
+                      // Calculate human capital with 3% annual increase
+                      let clientHumanCapital = 0;
+                      let currentIncome = (clientNetIncome || 0) * 12;
+                      for (let i = 0; i < clientYearsToRetirement; i++) {
+                        clientHumanCapital += currentIncome;
+                        currentIncome *= 1.03;
+                      }
+                      
+                      return clientHumanCapital > 0 ? (
+                        <div className="mt-4 p-4 bg-amber-50 border border-amber-200 rounded-lg">
+                          <p className="text-amber-800">
+                            <span className="font-bold">Вашият трудов капитал е {Math.round(clientHumanCapital).toLocaleString('bg-BG')} €.</span> Вашите доходи са пряко свързани със способността Ви да работите. Съветваме Ви да обмислите защита на Вашия доход!
+                          </p>
+                        </div>
+                      ) : null;
+                    })()}
                   </div>
                 </div>
               </div>
@@ -1299,10 +1406,23 @@ export default function ProtectionStep({ data, onChange }) {
                     <div className="space-y-3">
                       <div className="flex items-center justify-between">
                         <Label className="cursor-pointer">Съкращение</Label>
-                        <Switch
-                          checked={data.partner_risk_layoff || false}
-                          onCheckedChange={(checked) => onChange('partner_risk_layoff', checked)}
-                        />
+                        <div className="flex items-center gap-2">
+                          <span className={cn("text-sm font-medium", !(data.partner_risk_layoff ?? false) ? "text-green-600" : "text-slate-400")}>не</span>
+                          <button
+                            type="button"
+                            onClick={() => onChange('partner_risk_layoff', !(data.partner_risk_layoff ?? false))}
+                            className={cn(
+                              "w-12 h-6 rounded-full transition-colors relative",
+                              (data.partner_risk_layoff ?? false) ? "bg-red-500" : "bg-green-500"
+                            )}
+                          >
+                            <div className={cn(
+                              "w-5 h-5 bg-white rounded-full absolute top-0.5 transition-all",
+                              (data.partner_risk_layoff ?? false) ? "left-6" : "left-0.5"
+                            )} />
+                          </button>
+                          <span className={cn("text-sm font-medium", (data.partner_risk_layoff ?? false) ? "text-red-600" : "text-slate-400")}>да</span>
+                        </div>
                       </div>
                       {data.partner_risk_layoff && (() => {
                         const compensation = calculateLayoffCompensation(partnerGrossIncome);
@@ -1336,10 +1456,23 @@ export default function ProtectionStep({ data, onChange }) {
                     <div className="space-y-3">
                       <div className="flex items-center justify-between">
                         <Label className="cursor-pointer">Отпуск по майчинство</Label>
-                        <Switch
-                          checked={data.partner_risk_maternity || false}
-                          onCheckedChange={(checked) => onChange('partner_risk_maternity', checked)}
-                        />
+                        <div className="flex items-center gap-2">
+                          <span className={cn("text-sm font-medium", !(data.partner_risk_maternity ?? false) ? "text-green-600" : "text-slate-400")}>не</span>
+                          <button
+                            type="button"
+                            onClick={() => onChange('partner_risk_maternity', !(data.partner_risk_maternity ?? false))}
+                            className={cn(
+                              "w-12 h-6 rounded-full transition-colors relative",
+                              (data.partner_risk_maternity ?? false) ? "bg-red-500" : "bg-green-500"
+                            )}
+                          >
+                            <div className={cn(
+                              "w-5 h-5 bg-white rounded-full absolute top-0.5 transition-all",
+                              (data.partner_risk_maternity ?? false) ? "left-6" : "left-0.5"
+                            )} />
+                          </button>
+                          <span className={cn("text-sm font-medium", (data.partner_risk_maternity ?? false) ? "text-red-600" : "text-slate-400")}>да</span>
+                        </div>
                       </div>
                       {data.partner_risk_maternity && (() => {
                         const compYear1 = calculateMaternityYear1(partnerGrossIncome);
@@ -1392,10 +1525,23 @@ export default function ProtectionStep({ data, onChange }) {
                     <div className="space-y-3">
                       <div className="flex items-center justify-between">
                         <Label className="cursor-pointer">Болнични</Label>
-                        <Switch
-                          checked={data.partner_risk_sick_leave || false}
-                          onCheckedChange={(checked) => onChange('partner_risk_sick_leave', checked)}
-                        />
+                        <div className="flex items-center gap-2">
+                          <span className={cn("text-sm font-medium", !(data.partner_risk_sick_leave ?? false) ? "text-green-600" : "text-slate-400")}>не</span>
+                          <button
+                            type="button"
+                            onClick={() => onChange('partner_risk_sick_leave', !(data.partner_risk_sick_leave ?? false))}
+                            className={cn(
+                              "w-12 h-6 rounded-full transition-colors relative",
+                              (data.partner_risk_sick_leave ?? false) ? "bg-red-500" : "bg-green-500"
+                            )}
+                          >
+                            <div className={cn(
+                              "w-5 h-5 bg-white rounded-full absolute top-0.5 transition-all",
+                              (data.partner_risk_sick_leave ?? false) ? "left-6" : "left-0.5"
+                            )} />
+                          </button>
+                          <span className={cn("text-sm font-medium", (data.partner_risk_sick_leave ?? false) ? "text-red-600" : "text-slate-400")}>да</span>
+                        </div>
                       </div>
                       {data.partner_risk_sick_leave && (() => {
                         const compensation = calculateSickLeaveCompensation(partnerGrossIncome);
@@ -1429,10 +1575,23 @@ export default function ProtectionStep({ data, onChange }) {
                     <div className="space-y-3">
                       <div className="flex items-center justify-between">
                         <Label className="cursor-pointer">Инвалидност</Label>
-                        <Switch
-                          checked={data.partner_risk_disability || false}
-                          onCheckedChange={(checked) => onChange('partner_risk_disability', checked)}
-                        />
+                        <div className="flex items-center gap-2">
+                          <span className={cn("text-sm font-medium", !(data.partner_risk_disability ?? false) ? "text-green-600" : "text-slate-400")}>не</span>
+                          <button
+                            type="button"
+                            onClick={() => onChange('partner_risk_disability', !(data.partner_risk_disability ?? false))}
+                            className={cn(
+                              "w-12 h-6 rounded-full transition-colors relative",
+                              (data.partner_risk_disability ?? false) ? "bg-red-500" : "bg-green-500"
+                            )}
+                          >
+                            <div className={cn(
+                              "w-5 h-5 bg-white rounded-full absolute top-0.5 transition-all",
+                              (data.partner_risk_disability ?? false) ? "left-6" : "left-0.5"
+                            )} />
+                          </button>
+                          <span className={cn("text-sm font-medium", (data.partner_risk_disability ?? false) ? "text-red-600" : "text-slate-400")}>да</span>
+                        </div>
                       </div>
                       {data.partner_risk_disability && (() => {
                         const compensation = calculateDisabilityCompensation(partnerGrossIncome);
@@ -1466,10 +1625,23 @@ export default function ProtectionStep({ data, onChange }) {
                     <div className="space-y-3">
                       <div className="flex items-center justify-between">
                         <Label className="cursor-pointer">Смърт</Label>
-                        <Switch
-                          checked={data.partner_risk_death || false}
-                          onCheckedChange={(checked) => onChange('partner_risk_death', checked)}
-                        />
+                        <div className="flex items-center gap-2">
+                          <span className={cn("text-sm font-medium", !(data.partner_risk_death ?? false) ? "text-green-600" : "text-slate-400")}>не</span>
+                          <button
+                            type="button"
+                            onClick={() => onChange('partner_risk_death', !(data.partner_risk_death ?? false))}
+                            className={cn(
+                              "w-12 h-6 rounded-full transition-colors relative",
+                              (data.partner_risk_death ?? false) ? "bg-red-500" : "bg-green-500"
+                            )}
+                          >
+                            <div className={cn(
+                              "w-5 h-5 bg-white rounded-full absolute top-0.5 transition-all",
+                              (data.partner_risk_death ?? false) ? "left-6" : "left-0.5"
+                            )} />
+                          </button>
+                          <span className={cn("text-sm font-medium", (data.partner_risk_death ?? false) ? "text-red-600" : "text-slate-400")}>да</span>
+                        </div>
                       </div>
                       {data.partner_risk_death && (() => {
                         const compensation = calculateDeathCompensation(partnerGrossIncome);
@@ -1503,34 +1675,76 @@ export default function ProtectionStep({ data, onChange }) {
                     <div className="pt-4 border-t border-slate-200 space-y-3">
                       <div className="flex items-center justify-between">
                         <Label className="cursor-pointer">Подсигурени ли са Вашите доходи?</Label>
-                        <Switch
-                          checked={data.partner_has_income_protection || false}
-                          onCheckedChange={(checked) => onChange('partner_has_income_protection', checked)}
-                        />
+                        <div className="flex items-center gap-2">
+                          <span className={cn("text-sm font-medium", !(data.partner_has_income_protection ?? false) ? "text-red-600" : "text-slate-400")}>не</span>
+                          <button
+                            type="button"
+                            onClick={() => onChange('partner_has_income_protection', !(data.partner_has_income_protection ?? false))}
+                            className={cn(
+                              "w-12 h-6 rounded-full transition-colors relative",
+                              (data.partner_has_income_protection ?? false) ? "bg-green-500" : "bg-red-500"
+                            )}
+                          >
+                            <div className={cn(
+                              "w-5 h-5 bg-white rounded-full absolute top-0.5 transition-all",
+                              (data.partner_has_income_protection ?? false) ? "left-6" : "left-0.5"
+                            )} />
+                          </button>
+                          <span className={cn("text-sm font-medium", (data.partner_has_income_protection ?? false) ? "text-green-600" : "text-slate-400")}>да</span>
+                        </div>
                       </div>
                       {data.partner_has_income_protection && (
                         <div className="grid sm:grid-cols-2 gap-3">
                           <div className="space-y-1">
-                            <Label className="text-xs text-slate-500">Застраховател</Label>
-                            <Input
-                              placeholder="Име на застраховател"
-                              value={data.partner_income_protection_insurer || ''}
-                              onChange={(e) => onChange('partner_income_protection_insurer', e.target.value)}
-                              className="rounded-lg text-sm"
-                            />
+                            <Label className="text-xs text-slate-500">Застраховател <span className="text-red-500">*</span></Label>
+                            <Select 
+                              value={data.partner_income_protection_insurer || ''} 
+                              onValueChange={(value) => onChange('partner_income_protection_insurer', value)}
+                            >
+                              <SelectTrigger className="rounded-lg text-sm">
+                                <SelectValue placeholder="Изберете" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                {INSURANCE_COMPANIES.map(ins => (
+                                  <SelectItem key={ins.value} value={ins.value}>{ins.label}</SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
                           </div>
                           <div className="space-y-1">
-                            <Label className="text-xs text-slate-500">Дата на сключване</Label>
-                            <Input
-                              type="text"
-                              placeholder="дд/мм/гггг"
+                            <Label className="text-xs text-slate-500">Дата на сключване <span className="text-red-500">*</span></Label>
+                            <BulgarianDateInput
                               value={data.partner_income_protection_date || ''}
-                              onChange={(e) => onChange('partner_income_protection_date', e.target.value)}
+                              onChange={(value) => onChange('partner_income_protection_date', value)}
                               className="rounded-lg text-sm"
+                              required
                             />
                           </div>
                         </div>
                       )}
+                      
+                      {/* Human Capital Message for Partner - only if income is not from rent or investments */}
+                      {data.income_source && data.income_source !== 'rent' && data.income_source !== 'investments' && (() => {
+                        const partnerAge = data.partner_age || 0;
+                        const partnerRetirementAge = data.partner_retirement_age || 65;
+                        const partnerYearsToRetirement = Math.max(0, partnerRetirementAge - partnerAge);
+                        
+                        // Calculate human capital with 3% annual increase
+                        let partnerHumanCapital = 0;
+                        let currentIncome = (partnerNetIncome || 0) * 12;
+                        for (let i = 0; i < partnerYearsToRetirement; i++) {
+                          partnerHumanCapital += currentIncome;
+                          currentIncome *= 1.03;
+                        }
+                        
+                        return partnerHumanCapital > 0 ? (
+                          <div className="mt-4 p-4 bg-amber-50 border border-amber-200 rounded-lg">
+                            <p className="text-amber-800">
+                              <span className="font-bold">Вашият трудов капитал е {Math.round(partnerHumanCapital).toLocaleString('bg-BG')} €.</span> Вашите доходи са пряко свързани със способността Ви да работите. Съветваме Ви да обмислите защита на Вашия доход!
+                            </p>
+                          </div>
+                        ) : null;
+                      })()}
                     </div>
                   </div>
                 </div>

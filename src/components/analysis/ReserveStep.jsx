@@ -196,14 +196,14 @@ export default function ReserveStep({ data, onChange }) {
                   placeholder="0"
                   value={data.client_checking_account ?? ''}
                   onChange={(e) => onChange('client_checking_account', parseInt(e.target.value) || 0)}
-                  className="rounded-lg"
+                  className="rounded-lg text-center"
                   required
                 />
                 <Select 
                   value={data.client_checking_account_bank || ''} 
                   onValueChange={(value) => onChange('client_checking_account_bank', value)}
                 >
-                  <SelectTrigger className="rounded-lg text-xs">
+                  <SelectTrigger className="rounded-lg text-sm">
                     <SelectValue placeholder="Изберете" />
                   </SelectTrigger>
                   <SelectContent>
@@ -223,13 +223,13 @@ export default function ReserveStep({ data, onChange }) {
                   placeholder="0"
                   value={data.client_savings_account ?? ''}
                   onChange={(e) => onChange('client_savings_account', parseInt(e.target.value) || 0)}
-                  className="rounded-lg"
+                  className="rounded-lg text-center"
                 />
                 <Select 
                   value={data.client_savings_account_bank || ''} 
                   onValueChange={(value) => onChange('client_savings_account_bank', value)}
                 >
-                  <SelectTrigger className="rounded-lg text-xs">
+                  <SelectTrigger className="rounded-lg text-sm">
                     <SelectValue placeholder="Изберете" />
                   </SelectTrigger>
                   <SelectContent>
@@ -249,13 +249,13 @@ export default function ReserveStep({ data, onChange }) {
                   placeholder="0"
                   value={data.client_term_deposit ?? ''}
                   onChange={(e) => onChange('client_term_deposit', parseInt(e.target.value) || 0)}
-                  className="rounded-lg"
+                  className="rounded-lg text-center"
                 />
                 <Select 
                   value={data.client_term_deposit_bank || ''} 
                   onValueChange={(value) => onChange('client_term_deposit_bank', value)}
                 >
-                  <SelectTrigger className="rounded-lg text-xs">
+                  <SelectTrigger className="rounded-lg text-sm">
                     <SelectValue placeholder="Изберете" />
                   </SelectTrigger>
                   <SelectContent>
@@ -275,7 +275,7 @@ export default function ReserveStep({ data, onChange }) {
                   placeholder="0"
                   value={data.client_cash ?? ''}
                   onChange={(e) => onChange('client_cash', parseInt(e.target.value) || 0)}
-                  className="rounded-lg"
+                  className="rounded-lg text-center"
                   required
                 />
                 <div></div>
@@ -290,13 +290,13 @@ export default function ReserveStep({ data, onChange }) {
                   placeholder="0"
                   value={data.client_mutual_funds ?? ''}
                   onChange={(e) => onChange('client_mutual_funds', parseInt(e.target.value) || 0)}
-                  className="rounded-lg"
+                  className="rounded-lg text-center"
                 />
                 <Input
                   placeholder="Платформа"
                   value={data.client_mutual_funds_platform || ''}
                   onChange={(e) => onChange('client_mutual_funds_platform', e.target.value)}
-                  className="rounded-lg text-xs"
+                  className="rounded-lg text-sm text-center"
                 />
               </div>
 
@@ -309,13 +309,13 @@ export default function ReserveStep({ data, onChange }) {
                   placeholder="0"
                   value={data.client_crypto ?? ''}
                   onChange={(e) => onChange('client_crypto', parseInt(e.target.value) || 0)}
-                  className="rounded-lg"
+                  className="rounded-lg text-center"
                 />
                 <Input
                   placeholder="Платформа"
                   value={data.client_crypto_platform || ''}
                   onChange={(e) => onChange('client_crypto_platform', e.target.value)}
-                  className="rounded-lg text-xs"
+                  className="rounded-lg text-sm text-center"
                 />
               </div>
 
@@ -328,7 +328,7 @@ export default function ReserveStep({ data, onChange }) {
                   placeholder="0"
                   value={data.client_gold ?? ''}
                   onChange={(e) => onChange('client_gold', parseInt(e.target.value) || 0)}
-                  className="rounded-lg"
+                  className="rounded-lg text-center"
                 />
                 <div></div>
               </div>
@@ -366,14 +366,14 @@ export default function ReserveStep({ data, onChange }) {
                     placeholder="0"
                     value={data.partner_checking_account ?? ''}
                     onChange={(e) => onChange('partner_checking_account', parseInt(e.target.value) || 0)}
-                    className="rounded-lg"
+                    className="rounded-lg text-center"
                     required
                   />
                   <Select 
                     value={data.partner_checking_account_bank || ''} 
                     onValueChange={(value) => onChange('partner_checking_account_bank', value)}
                   >
-                    <SelectTrigger className="rounded-lg text-xs">
+                    <SelectTrigger className="rounded-lg text-sm">
                       <SelectValue placeholder="Изберете" />
                     </SelectTrigger>
                     <SelectContent>
@@ -393,13 +393,13 @@ export default function ReserveStep({ data, onChange }) {
                     placeholder="0"
                     value={data.partner_savings_account ?? ''}
                     onChange={(e) => onChange('partner_savings_account', parseInt(e.target.value) || 0)}
-                    className="rounded-lg"
+                    className="rounded-lg text-center"
                   />
                   <Select 
                     value={data.partner_savings_account_bank || ''} 
                     onValueChange={(value) => onChange('partner_savings_account_bank', value)}
                   >
-                    <SelectTrigger className="rounded-lg text-xs">
+                    <SelectTrigger className="rounded-lg text-sm">
                       <SelectValue placeholder="Изберете" />
                     </SelectTrigger>
                     <SelectContent>
@@ -419,13 +419,13 @@ export default function ReserveStep({ data, onChange }) {
                     placeholder="0"
                     value={data.partner_term_deposit ?? ''}
                     onChange={(e) => onChange('partner_term_deposit', parseInt(e.target.value) || 0)}
-                    className="rounded-lg"
+                    className="rounded-lg text-center"
                   />
                   <Select 
                     value={data.partner_term_deposit_bank || ''} 
                     onValueChange={(value) => onChange('partner_term_deposit_bank', value)}
                   >
-                    <SelectTrigger className="rounded-lg text-xs">
+                    <SelectTrigger className="rounded-lg text-sm">
                       <SelectValue placeholder="Изберете" />
                     </SelectTrigger>
                     <SelectContent>
@@ -445,7 +445,7 @@ export default function ReserveStep({ data, onChange }) {
                     placeholder="0"
                     value={data.partner_cash ?? ''}
                     onChange={(e) => onChange('partner_cash', parseInt(e.target.value) || 0)}
-                    className="rounded-lg"
+                    className="rounded-lg text-center"
                     required
                   />
                   <div></div>
@@ -460,13 +460,13 @@ export default function ReserveStep({ data, onChange }) {
                     placeholder="0"
                     value={data.partner_mutual_funds ?? ''}
                     onChange={(e) => onChange('partner_mutual_funds', parseInt(e.target.value) || 0)}
-                    className="rounded-lg"
+                    className="rounded-lg text-center"
                   />
                   <Input
                     placeholder="Платформа"
                     value={data.partner_mutual_funds_platform || ''}
                     onChange={(e) => onChange('partner_mutual_funds_platform', e.target.value)}
-                    className="rounded-lg text-xs"
+                    className="rounded-lg text-sm text-center"
                   />
                 </div>
 
@@ -479,13 +479,13 @@ export default function ReserveStep({ data, onChange }) {
                     placeholder="0"
                     value={data.partner_crypto ?? ''}
                     onChange={(e) => onChange('partner_crypto', parseInt(e.target.value) || 0)}
-                    className="rounded-lg"
+                    className="rounded-lg text-center"
                   />
                   <Input
                     placeholder="Платформа"
                     value={data.partner_crypto_platform || ''}
                     onChange={(e) => onChange('partner_crypto_platform', e.target.value)}
-                    className="rounded-lg text-xs"
+                    className="rounded-lg text-sm text-center"
                   />
                 </div>
 
@@ -498,7 +498,7 @@ export default function ReserveStep({ data, onChange }) {
                     placeholder="0"
                     value={data.partner_gold ?? ''}
                     onChange={(e) => onChange('partner_gold', parseInt(e.target.value) || 0)}
-                    className="rounded-lg"
+                    className="rounded-lg text-center"
                   />
                   <div></div>
                 </div>

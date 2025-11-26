@@ -85,7 +85,7 @@ export default function ConsultantCRMAdvanced() {
   const [clients, setClients] = useState(mockClients);
   const [typeFilter, setTypeFilter] = useState('all');
   const [statusFilter, setStatusFilter] = useState('all');
-  const [viewMode, setViewMode] = useState('list'); // 'list' or 'kanban'
+  const [viewMode, setViewMode] = useState('kanban'); // 'list' or 'kanban'
   const [periodFilter, setPeriodFilter] = useState('all'); // 'all', '1m', '3m', '6m', '1y'
   
   const [isImportOpen, setIsImportOpen] = useState(false);

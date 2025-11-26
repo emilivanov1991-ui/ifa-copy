@@ -307,6 +307,33 @@ export default function FinancialAnalysis() {
         // Income source is required
         if (!formData.income_source) return false;
 
+        // Property 1 validation - if has property, all fields are required
+        if (formData.has_property_1) {
+          if (!formData.property_1_address || 
+              formData.property_1_rooms === undefined || formData.property_1_rooms === '' ||
+              formData.property_1_area === undefined || formData.property_1_area === '' ||
+              formData.property_1_value === undefined || formData.property_1_value === '' ||
+              formData.property_1_movable_value === undefined || formData.property_1_movable_value === '') return false;
+
+          // If property has insurance, insurer and expiry are required
+          if (formData.property_1_has_insurance) {
+            if (!formData.property_1_insurer || !formData.property_1_insurance_expiry) return false;
+          }
+        }
+
+        // Car 1 validation - if has car, all fields are required
+        if (formData.has_car_1) {
+          if (!formData.car_1_brand || !formData.car_1_model ||
+              formData.car_1_year === undefined || formData.car_1_year === '' ||
+              formData.car_1_value === undefined || formData.car_1_value === '' ||
+              !formData.car_1_go_insurer) return false;
+
+          // If car has casco, insurer and expiry are required
+          if (formData.car_1_has_casco) {
+            if (!formData.car_1_casco_insurer || !formData.car_1_casco_expiry) return false;
+          }
+        }
+
         // If client has income protection, insurer and date are required
         if (formData.client_has_income_protection) {
           if (!formData.client_income_protection_insurer || !formData.client_income_protection_date) return false;

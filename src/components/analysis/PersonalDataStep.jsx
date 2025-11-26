@@ -25,6 +25,55 @@ const calculateAge = (birthdate) => {
   return age;
 };
 
+// Bulgarian EGN validation
+const validateEGN = (egn) => {
+  if (!egn || egn.length !== 10) return { valid: false, error: 'ЕГН трябва да е 10 цифри' };
+  if (!/^\d{10}$/.test(egn)) return { valid: false, error: 'ЕГН трябва да съдържа само цифри' };
+  
+  const weights = [2, 4, 8, 5, 10, 9, 7, 3, 6];
+  let sum = 0;
+  for (let i = 0; i < 9; i++) {
+    sum += parseInt(egn[i]) * weights[i];
+  }
+  const checkDigit = sum % 11;
+  const expectedCheck = checkDigit === 10 ? 0 : checkDigit;
+  
+  if (parseInt(egn[9]) !== expectedCheck) {
+    return { valid: false, error: 'Невалидно ЕГН (грешна контролна цифра)' };
+  }
+  
+  // Validate date from EGN
+  const year = parseInt(egn.substring(0, 2));
+  let month = parseInt(egn.substring(2, 4));
+  const day = parseInt(egn.substring(4, 6));
+  
+  let fullYear;
+  if (month > 40) {
+    fullYear = 2000 + year;
+    month -= 40;
+  } else if (month > 20) {
+    fullYear = 1800 + year;
+    month -= 20;
+  } else {
+    fullYear = 1900 + year;
+  }
+  
+  const date = new Date(fullYear, month - 1, day);
+  if (date.getFullYear() !== fullYear || date.getMonth() !== month - 1 || date.getDate() !== day) {
+    return { valid: false, error: 'Невалидна дата в ЕГН' };
+  }
+  
+  return { valid: true, error: null };
+};
+
+// Bulgarian ID card number validation
+const validateIDNumber = (idNumber) => {
+  if (!idNumber) return { valid: false, error: 'Номерът на личната карта е задължителен' };
+  if (idNumber.length !== 9) return { valid: false, error: 'Номерът на личната карта трябва да е 9 цифри' };
+  if (!/^\d{9}$/.test(idNumber)) return { valid: false, error: 'Номерът трябва да съдържа само цифри' };
+  return { valid: true, error: null };
+};
+
 // Toggle button component with yes/no indicator
 const ToggleWithLabel = ({ checked, onChange, defaultYes = false }) => {
   // For defaultYes=true (like employment): Yes=green, No=red
@@ -203,9 +252,15 @@ export default function PersonalDataStep({ data, onChange }) {
               placeholder="0000000000"
               value={data.client_egn || ''}
               onChange={(e) => onChange('client_egn', e.target.value)}
-              className="rounded-lg"
+              className={`rounded-lg ${data.client_egn && !validateEGN(data.client_egn).valid ? 'border-red-500' : data.client_egn && validateEGN(data.client_egn).valid ? 'border-green-500' : ''}`}
               required
             />
+            {data.client_egn && !validateEGN(data.client_egn).valid && (
+              <p className="text-red-500 text-xs">{validateEGN(data.client_egn).error}</p>
+            )}
+            {data.client_egn && validateEGN(data.client_egn).valid && (
+              <p className="text-green-500 text-xs">✓ Валидно ЕГН</p>
+            )}
           </div>
           <div className="space-y-2">
             <Label>Номер на лична карта <span className="text-red-500">*</span></Label>
@@ -213,9 +268,15 @@ export default function PersonalDataStep({ data, onChange }) {
               placeholder="000000000"
               value={data.client_id_number || ''}
               onChange={(e) => onChange('client_id_number', e.target.value)}
-              className="rounded-lg"
+              className={`rounded-lg ${data.client_id_number && !validateIDNumber(data.client_id_number).valid ? 'border-red-500' : data.client_id_number && validateIDNumber(data.client_id_number).valid ? 'border-green-500' : ''}`}
               required
             />
+            {data.client_id_number && !validateIDNumber(data.client_id_number).valid && (
+              <p className="text-red-500 text-xs">{validateIDNumber(data.client_id_number).error}</p>
+            )}
+            {data.client_id_number && validateIDNumber(data.client_id_number).valid && (
+              <p className="text-green-500 text-xs">✓ Валиден номер</p>
+            )}
           </div>
 
           <div className="space-y-2">
@@ -525,9 +586,15 @@ export default function PersonalDataStep({ data, onChange }) {
                   placeholder="0000000000"
                   value={data.partner_egn || ''}
                   onChange={(e) => onChange('partner_egn', e.target.value)}
-                  className="rounded-lg"
+                  className={`rounded-lg ${data.partner_egn && !validateEGN(data.partner_egn).valid ? 'border-red-500' : data.partner_egn && validateEGN(data.partner_egn).valid ? 'border-green-500' : ''}`}
                   required
                 />
+                {data.partner_egn && !validateEGN(data.partner_egn).valid && (
+                  <p className="text-red-500 text-xs">{validateEGN(data.partner_egn).error}</p>
+                )}
+                {data.partner_egn && validateEGN(data.partner_egn).valid && (
+                  <p className="text-green-500 text-xs">✓ Валидно ЕГН</p>
+                )}
               </div>
               <div className="space-y-2">
                 <Label>Номер на лична карта <span className="text-red-500">*</span></Label>
@@ -535,9 +602,15 @@ export default function PersonalDataStep({ data, onChange }) {
                   placeholder="000000000"
                   value={data.partner_id_number || ''}
                   onChange={(e) => onChange('partner_id_number', e.target.value)}
-                  className="rounded-lg"
+                  className={`rounded-lg ${data.partner_id_number && !validateIDNumber(data.partner_id_number).valid ? 'border-red-500' : data.partner_id_number && validateIDNumber(data.partner_id_number).valid ? 'border-green-500' : ''}`}
                   required
                 />
+                {data.partner_id_number && !validateIDNumber(data.partner_id_number).valid && (
+                  <p className="text-red-500 text-xs">{validateIDNumber(data.partner_id_number).error}</p>
+                )}
+                {data.partner_id_number && validateIDNumber(data.partner_id_number).valid && (
+                  <p className="text-green-500 text-xs">✓ Валиден номер</p>
+                )}
               </div>
 
               <div className="space-y-2">

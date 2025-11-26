@@ -61,6 +61,108 @@ export default function FinancialAnalysis() {
     switch (step) {
       case 1:
         return formData.gdpr_consent_a;
+      case 2:
+        // Client required fields
+        const clientValid = !!(
+          formData.client_first_name &&
+          formData.client_middle_name &&
+          formData.client_last_name &&
+          formData.client_birthdate &&
+          formData.client_gender &&
+          formData.client_birthplace &&
+          formData.client_egn &&
+          formData.client_id_number &&
+          formData.client_id_valid_until &&
+          formData.client_address &&
+          formData.client_phone &&
+          formData.client_email &&
+          formData.client_marital_status &&
+          formData.client_nationality
+        );
+        
+        // Employment validation
+        let clientEmploymentValid = true;
+        if (formData.client_is_employed) {
+          clientEmploymentValid = !!(
+            formData.client_job_description &&
+            formData.client_employer_name &&
+            formData.client_contract_type &&
+            formData.client_contract_term
+          );
+        } else {
+          clientEmploymentValid = !!(
+            formData.client_income_source &&
+            formData.client_activity
+          );
+        }
+        
+        // Health validation (if not in good health)
+        let clientHealthValid = true;
+        if (formData.client_is_good_health === false) {
+          clientHealthValid = !!(
+            formData.client_health_explanation &&
+            formData.client_height_cm &&
+            formData.client_weight_kg
+          );
+        }
+        
+        // Children validation
+        let childrenValid = formData.children_count !== undefined;
+        if ((formData.children_count || 0) > 0) {
+          for (let i = 1; i <= formData.children_count; i++) {
+            if (!formData[`child_${i}_name`] || !formData[`child_${i}_birthdate`]) {
+              childrenValid = false;
+              break;
+            }
+          }
+        }
+        
+        // Partner validation (only if included)
+        let partnerValid = true;
+        if (formData.include_partner) {
+          partnerValid = !!(
+            formData.partner_first_name &&
+            formData.partner_middle_name &&
+            formData.partner_last_name &&
+            formData.partner_birthdate &&
+            formData.partner_gender &&
+            formData.partner_birthplace &&
+            formData.partner_egn &&
+            formData.partner_id_number &&
+            formData.partner_id_valid_until &&
+            formData.partner_address &&
+            formData.partner_phone &&
+            formData.partner_email &&
+            formData.partner_marital_status &&
+            formData.partner_nationality
+          );
+          
+          // Partner employment validation
+          if (formData.partner_is_employed ?? true) {
+            partnerValid = partnerValid && !!(
+              formData.partner_job_description &&
+              formData.partner_employer_name &&
+              formData.partner_contract_type &&
+              formData.partner_contract_term
+            );
+          } else {
+            partnerValid = partnerValid && !!(
+              formData.partner_income_source &&
+              formData.partner_activity
+            );
+          }
+          
+          // Partner health validation
+          if (formData.partner_is_good_health === false) {
+            partnerValid = partnerValid && !!(
+              formData.partner_health_explanation &&
+              formData.partner_height_cm &&
+              formData.partner_weight_kg
+            );
+          }
+        }
+        
+        return clientValid && clientEmploymentValid && clientHealthValid && childrenValid && partnerValid;
       default:
         return true;
     }

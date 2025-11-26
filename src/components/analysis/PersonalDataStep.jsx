@@ -324,20 +324,22 @@ export default function PersonalDataStep({ data, onChange }) {
           {data.client_is_employed ? (
             <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
               <div className="space-y-2 sm:col-span-2 lg:col-span-3">
-                <Label>Описание на месторабота и трудови задължения</Label>
+                <Label>Описание на месторабота и трудови задължения <span className="text-red-500">*</span></Label>
                 <Input
                   placeholder="Описание на длъжността..."
                   value={data.client_job_description || ''}
                   onChange={(e) => onChange('client_job_description', e.target.value)}
                   className="rounded-lg"
+                  required
                 />
               </div>
               <div className="space-y-2">
-                <Label>Име на работодател</Label>
+                <Label>Име на работодател <span className="text-red-500">*</span></Label>
                 <Input
                   value={data.client_employer_name || ''}
                   onChange={(e) => onChange('client_employer_name', e.target.value)}
                   className="rounded-lg"
+                  required
                 />
               </div>
               <div className="space-y-2">
@@ -365,7 +367,7 @@ export default function PersonalDataStep({ data, onChange }) {
                 />
               </div>
               <div className="space-y-2">
-                <Label>Вид договор</Label>
+                <Label>Вид договор <span className="text-red-500">*</span></Label>
                 <Select 
                   value={data.client_contract_type || ''} 
                   onValueChange={(value) => onChange('client_contract_type', value)}
@@ -380,7 +382,7 @@ export default function PersonalDataStep({ data, onChange }) {
                 </Select>
               </div>
               <div className="space-y-2">
-                <Label>Срок на договора</Label>
+                <Label>Срок на договора <span className="text-red-500">*</span></Label>
                 <Select 
                   value={data.client_contract_term || ''} 
                   onValueChange={(value) => onChange('client_contract_term', value)}
@@ -398,21 +400,23 @@ export default function PersonalDataStep({ data, onChange }) {
           ) : (
             <div className="grid sm:grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label>Източник на доход</Label>
+                <Label>Източник на доход <span className="text-red-500">*</span></Label>
                 <Input
                   placeholder="Например: Наеми, Дивиденти..."
                   value={data.client_income_source || ''}
                   onChange={(e) => onChange('client_income_source', e.target.value)}
                   className="rounded-lg"
+                  required
                 />
               </div>
               <div className="space-y-2">
-                <Label>Дейност</Label>
+                <Label>Дейност <span className="text-red-500">*</span></Label>
                 <Input
                   placeholder="Описание на дейността..."
                   value={data.client_activity || ''}
                   onChange={(e) => onChange('client_activity', e.target.value)}
                   className="rounded-lg"
+                  required
                 />
               </div>
             </div>
@@ -642,20 +646,22 @@ export default function PersonalDataStep({ data, onChange }) {
               {(data.partner_is_employed ?? true) ? (
                 <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
                   <div className="space-y-2 sm:col-span-2 lg:col-span-3">
-                    <Label>Описание на месторабота и трудови задължения</Label>
+                    <Label>Описание на месторабота и трудови задължения <span className="text-red-500">*</span></Label>
                     <Input
                       placeholder="Описание на длъжността..."
                       value={data.partner_job_description || ''}
                       onChange={(e) => onChange('partner_job_description', e.target.value)}
                       className="rounded-lg"
+                      required
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label>Име на работодател</Label>
+                    <Label>Име на работодател <span className="text-red-500">*</span></Label>
                     <Input
                       value={data.partner_employer_name || ''}
                       onChange={(e) => onChange('partner_employer_name', e.target.value)}
                       className="rounded-lg"
+                      required
                     />
                   </div>
                   <div className="space-y-2">
@@ -683,7 +689,7 @@ export default function PersonalDataStep({ data, onChange }) {
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label>Вид договор</Label>
+                    <Label>Вид договор <span className="text-red-500">*</span></Label>
                     <Select 
                       value={data.partner_contract_type || ''} 
                       onValueChange={(value) => onChange('partner_contract_type', value)}
@@ -698,7 +704,7 @@ export default function PersonalDataStep({ data, onChange }) {
                     </Select>
                   </div>
                   <div className="space-y-2">
-                    <Label>Срок на договора</Label>
+                    <Label>Срок на договора <span className="text-red-500">*</span></Label>
                     <Select 
                       value={data.partner_contract_term || ''} 
                       onValueChange={(value) => onChange('partner_contract_term', value)}
@@ -716,21 +722,23 @@ export default function PersonalDataStep({ data, onChange }) {
               ) : (
                 <div className="grid sm:grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <Label>Източник на доход</Label>
+                    <Label>Източник на доход <span className="text-red-500">*</span></Label>
                     <Input
                       placeholder="Например: Наеми, Дивиденти..."
                       value={data.partner_income_source || ''}
                       onChange={(e) => onChange('partner_income_source', e.target.value)}
                       className="rounded-lg"
+                      required
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label>Дейност</Label>
+                    <Label>Дейност <span className="text-red-500">*</span></Label>
                     <Input
                       placeholder="Описание на дейността..."
                       value={data.partner_activity || ''}
                       onChange={(e) => onChange('partner_activity', e.target.value)}
                       className="rounded-lg"
+                      required
                     />
                   </div>
                 </div>

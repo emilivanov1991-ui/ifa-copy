@@ -10,6 +10,30 @@ import {
   SelectValue 
 } from "@/components/ui/select";
 import { User, Users, Baby, Shield, X } from 'lucide-react';
+
+// Bank options
+const BANK_OPTIONS = [
+  { value: 'allianz', label: 'Алианц Банк България АД' },
+  { value: 'dsk', label: 'Банка ДСК АД' },
+  { value: 'bacb', label: 'БАКБ АД' },
+  { value: 'bbr', label: 'Българска Банка за Развитие ЕАД' },
+  { value: 'ccb', label: 'ЦКБ АД' },
+  { value: 'investbank', label: 'Инвестбанк АД' },
+  { value: 'iab', label: 'Интернешънъл Асет Банк АД' },
+  { value: 'municipal', label: 'Общинска Банка АД' },
+  { value: 'ubb', label: 'ОББ АД' },
+  { value: 'fibank', label: 'Fibank' },
+  { value: 'procredit', label: 'ПроКредит Банк ЕАД' },
+  { value: 'postbank', label: 'Пощенска Банка' },
+  { value: 'texim', label: 'Тексим Банк АД' },
+  { value: 'tbi', label: 'Ти Би Ай Банк ЕАД' },
+  { value: 'tokuda', label: 'Токуда Банк АД' },
+  { value: 'tbank', label: 'Търговска Банка Д АД' },
+  { value: 'unicredit', label: 'Уникредит Булбанк АД' },
+  { value: 'eurobank', label: 'Юробанк България АД' },
+  { value: 'revolut', label: 'Revolut' },
+  { value: 'other', label: 'Друга' },
+];
 import HealthQuestionnaire from './HealthQuestionnaire';
 
 // Helper function to calculate age from birthdate
@@ -354,6 +378,22 @@ export default function PersonalDataStep({ data, onChange }) {
               </SelectContent>
             </Select>
           </div>
+          <div className="space-y-2">
+            <Label>Банка <span className="text-red-500">*</span></Label>
+            <Select 
+              value={data.client_bank || ''} 
+              onValueChange={(value) => onChange('client_bank', value)}
+            >
+              <SelectTrigger className="rounded-lg">
+                <SelectValue placeholder="Изберете" />
+              </SelectTrigger>
+              <SelectContent>
+                {BANK_OPTIONS.map(bank => (
+                  <SelectItem key={bank.value} value={bank.value}>{bank.label}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
         </div>
 
         {/* ZMIP Declaration */}
@@ -685,6 +725,22 @@ export default function PersonalDataStep({ data, onChange }) {
                     <SelectItem value="bulgarian">Българска</SelectItem>
                     <SelectItem value="other_eu">Друга от ЕС</SelectItem>
                     <SelectItem value="non_eu">Извън ЕС</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-2">
+                <Label>Банка <span className="text-red-500">*</span></Label>
+                <Select 
+                  value={data.partner_bank || ''} 
+                  onValueChange={(value) => onChange('partner_bank', value)}
+                >
+                  <SelectTrigger className="rounded-lg">
+                    <SelectValue placeholder="Изберете" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {BANK_OPTIONS.map(bank => (
+                      <SelectItem key={bank.value} value={bank.value}>{bank.label}</SelectItem>
+                    ))}
                   </SelectContent>
                 </Select>
               </div>

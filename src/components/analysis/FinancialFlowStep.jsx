@@ -1,12 +1,78 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Banknote, Home, Car, ShoppingBag, PiggyBank, CreditCard, Shield } from 'lucide-react';
 
-export default function FinancialFlowStep({ data, onChange }) {
+export default function FinancialFlowStep({ data, onChange, showErrors }) {
+  const includePartner = data.include_partner || false;
+  
+  // Helper to check if a field is invalid
+  const isFieldInvalid = (value) => showErrors && (value === undefined || value === null || value === '');
+
+  // Auto-populate gross income from Pension step
+  useEffect(() => {
+    if (data.client_gross_income_pension !== undefined && data.client_gross_income === undefined) {
+      onChange('client_gross_income', data.client_gross_income_pension);
+    }
+    if (includePartner && data.partner_gross_income_pension !== undefined && data.partner_gross_income === undefined) {
+      onChange('partner_gross_income', data.partner_gross_income_pension);
+    }
+  }, [data.client_gross_income_pension, data.partner_gross_income_pension, includePartner]);
+
+  // Auto-populate checking account from Reserve step
+  useEffect(() => {
+    if (data.asset_checking_account === undefined) {
+      const clientChecking = (data.client_checking_account || 0) + (data.client_cash || 0);
+      const partnerChecking = includePartner ? ((data.partner_checking_account || 0) + (data.partner_cash || 0)) : 0;
+      onChange('asset_checking_account', clientChecking + partnerChecking);
+    }
+  }, [data.client_checking_account, data.client_cash, data.partner_checking_account, data.partner_cash, includePartner]);
+
+  // Auto-populate short-term savings from Reserve step
+  useEffect(() => {
+    if (data.asset_short_term_savings === undefined) {
+      const clientShort = (data.client_savings_account || 0) + (data.client_term_deposit || 0);
+      const partnerShort = includePartner ? ((data.partner_savings_account || 0) + (data.partner_term_deposit || 0)) : 0;
+      onChange('asset_short_term_savings', clientShort + partnerShort);
+    }
+  }, [data.client_savings_account, data.client_term_deposit, data.partner_savings_account, data.partner_term_deposit, includePartner]);
+
+  // Auto-populate medium-term savings from Reserve step
+  useEffect(() => {
+    if (data.asset_medium_term_savings === undefined) {
+      const clientMedium = (data.client_mutual_funds || 0) + (data.client_crypto || 0) + (data.client_gold || 0);
+      const partnerMedium = includePartner ? ((data.partner_mutual_funds || 0) + (data.partner_crypto || 0) + (data.partner_gold || 0)) : 0;
+      onChange('asset_medium_term_savings', clientMedium + partnerMedium);
+    }
+  }, [data.client_mutual_funds, data.client_crypto, data.client_gold, data.partner_mutual_funds, data.partner_crypto, data.partner_gold, includePartner]);
+
+  // Auto-populate long-term savings from Pension and Children steps
+  useEffect(() => {
+    if (data.asset_long_term_savings === undefined) {
+      const clientPension = data.client_voluntary_pension_total || 0;
+      const partnerPension = includePartner ? (data.partner_voluntary_pension_total || 0) : 0;
+      const childrenSavings = data.children_current_savings || 0;
+      onChange('asset_long_term_savings', clientPension + partnerPension + childrenSavings);
+    }
+  }, [data.client_voluntary_pension_total, data.partner_voluntary_pension_total, data.children_current_savings, includePartner]);
+
+  // Auto-populate mortgage from Housing step
+  useEffect(() => {
+    if (data.liability_mortgage_monthly === undefined && data.current_mortgage_monthly_payment) {
+      onChange('liability_mortgage_monthly', data.current_mortgage_monthly_payment);
+    }
+    if (data.liability_mortgage_remaining === undefined && data.current_mortgage_remaining) {
+      onChange('liability_mortgage_remaining', data.current_mortgage_remaining);
+    }
+  }, [data.current_mortgage_monthly_payment, data.current_mortgage_remaining]);
+
+  // Calculate annual bonus as monthly
+  const clientAnnualBonusMonthly = Math.round((data.client_annual_bonus || 0) / 12);
+  const partnerAnnualBonusMonthly = Math.round((data.partner_annual_bonus || 0) / 12);
+
   // Calculate totals
-  const totalClientIncome = (data.client_net_income || 0) + (data.client_other_monthly_income || 0);
-  const totalPartnerIncome = (data.partner_net_income || 0) + (data.partner_other_monthly_income || 0);
+  const totalClientIncome = (data.client_net_income || 0) + (data.client_other_monthly_income || 0) + clientAnnualBonusMonthly;
+  const totalPartnerIncome = includePartner ? ((data.partner_net_income || 0) + (data.partner_other_monthly_income || 0) + partnerAnnualBonusMonthly) : 0;
   const totalMonthlyIncome = totalClientIncome + totalPartnerIncome;
 
   const totalHousingExpenses = (data.expense_rent || 0) + (data.expense_utilities || 0) + 
@@ -16,18 +82,23 @@ export default function FinancialFlowStep({ data, onChange }) {
   
   const totalVariableExpenses = (data.expense_food || 0) + (data.expense_clothing || 0) + (data.expense_culture || 0) +
     (data.expense_travel || 0) + (data.expense_children || 0) + (data.expense_cigarettes || 0) +
-    (data.expense_pets || 0) + (data.expense_vacation || 0) + (data.expense_business || 0) + (data.expense_other || 0);
+    (data.expense_pets || 0) + (data.expense_vacation || 0) + (data.expense_business || 0) + (data.expense_other || 0) +
+    (data.expense_education || 0) + (data.expense_health || 0) + (data.expense_cosmetics || 0) +
+    (data.expense_hobbies || 0) + (data.expense_electronics || 0) + (data.expense_taxes || 0);
 
   const totalExpenses = totalHousingExpenses + totalCarExpenses + totalVariableExpenses;
 
   const totalAssets = (data.asset_checking_account || 0) + (data.asset_long_term_savings || 0) +
     (data.asset_medium_term_savings || 0) + (data.asset_short_term_savings || 0);
 
-  const totalLiabilities = (data.liability_mortgage || 0) + (data.liability_consumer_loans || 0) +
-    (data.liability_credit_cards || 0) + (data.liability_leasing || 0) + (data.liability_overdraft || 0);
+  const totalLiabilitiesMonthly = (data.liability_mortgage_monthly || 0) + (data.liability_consumer_loans_monthly || 0) +
+    (data.liability_credit_cards_monthly || 0) + (data.liability_leasing_monthly || 0) + (data.liability_overdraft_monthly || 0);
+
+  const totalLiabilitiesRemaining = (data.liability_mortgage_remaining || 0) + (data.liability_consumer_loans_remaining || 0) +
+    (data.liability_credit_cards_remaining || 0) + (data.liability_leasing_remaining || 0) + (data.liability_overdraft_remaining || 0);
 
   const totalInsurance = (data.insurance_life || 0) + (data.insurance_property || 0) +
-    (data.insurance_household || 0) + (data.insurance_civil || 0) + (data.insurance_casco || 0) + (data.insurance_other || 0);
+    (data.insurance_movable || 0) + (data.insurance_civil || 0) + (data.insurance_casco || 0) + (data.insurance_other || 0);
 
   return (
     <div className="space-y-8">
@@ -38,50 +109,78 @@ export default function FinancialFlowStep({ data, onChange }) {
           <h3 className="font-semibold text-slate-900">Доходи (месечни, в €)</h3>
         </div>
 
-        <div className="grid lg:grid-cols-2 gap-8">
+        <div className={includePartner ? "grid lg:grid-cols-2 gap-8" : ""}>
           {/* Client */}
           <div>
             <h4 className="font-medium text-slate-700 mb-3">Клиент</h4>
             <div className="space-y-3">
-              <div className="flex items-center justify-between gap-4">
-                <Label className="text-sm">Брутен доход</Label>
-                <Input type="number" min="0" placeholder="0" value={data.client_gross_income || ''}
-                  onChange={(e) => onChange('client_gross_income', parseInt(e.target.value) || '')} className="rounded-lg w-28" />
+              <div className="flex items-center justify-between gap-4" data-invalid={isFieldInvalid(data.client_gross_income) ? "true" : undefined}>
+                <Label className="text-sm">Брутен доход <span className="text-red-500">*</span></Label>
+                <Input type="number" min="0" value={data.client_gross_income ?? ''}
+                  onChange={(e) => onChange('client_gross_income', e.target.value === '' ? '' : parseInt(e.target.value))} 
+                  className={`rounded-lg w-28 ${isFieldInvalid(data.client_gross_income) ? 'border-red-500 bg-red-50' : ''}`} />
               </div>
-              <div className="flex items-center justify-between gap-4">
-                <Label className="text-sm">Нетен доход</Label>
-                <Input type="number" min="0" placeholder="0" value={data.client_net_income || ''}
-                  onChange={(e) => onChange('client_net_income', parseInt(e.target.value) || '')} className="rounded-lg w-28" />
+              <div className="flex items-center justify-between gap-4" data-invalid={isFieldInvalid(data.client_net_income) ? "true" : undefined}>
+                <Label className="text-sm">Нетен доход <span className="text-red-500">*</span></Label>
+                <Input type="number" min="0" value={data.client_net_income ?? ''}
+                  onChange={(e) => onChange('client_net_income', e.target.value === '' ? '' : parseInt(e.target.value))} 
+                  className={`rounded-lg w-28 ${isFieldInvalid(data.client_net_income) ? 'border-red-500 bg-red-50' : ''}`} />
               </div>
-              <div className="flex items-center justify-between gap-4">
-                <Label className="text-sm">Други месечни доходи</Label>
-                <Input type="number" min="0" placeholder="0" value={data.client_other_monthly_income || ''}
-                  onChange={(e) => onChange('client_other_monthly_income', parseInt(e.target.value) || '')} className="rounded-lg w-28" />
+              <div className="flex items-center justify-between gap-4" data-invalid={isFieldInvalid(data.client_annual_bonus) ? "true" : undefined}>
+                <Label className="text-sm">Годишен бонус <span className="text-red-500">*</span></Label>
+                <div className="flex items-center gap-2">
+                  <Input type="number" min="0" value={data.client_annual_bonus ?? ''}
+                    onChange={(e) => onChange('client_annual_bonus', e.target.value === '' ? '' : parseInt(e.target.value))} 
+                    className={`rounded-lg w-28 ${isFieldInvalid(data.client_annual_bonus) ? 'border-red-500 bg-red-50' : ''}`} />
+                  <Input type="number" min="0" value={clientAnnualBonusMonthly}
+                    readOnly className="rounded-lg w-28 bg-slate-100" />
+                </div>
+              </div>
+              <div className="flex items-center justify-between gap-4" data-invalid={isFieldInvalid(data.client_other_monthly_income) ? "true" : undefined}>
+                <Label className="text-sm">Други месечни доходи <span className="text-red-500">*</span></Label>
+                <Input type="number" min="0" value={data.client_other_monthly_income ?? ''}
+                  onChange={(e) => onChange('client_other_monthly_income', e.target.value === '' ? '' : parseInt(e.target.value))} 
+                  className={`rounded-lg w-28 ${isFieldInvalid(data.client_other_monthly_income) ? 'border-red-500 bg-red-50' : ''}`} />
               </div>
             </div>
           </div>
 
           {/* Partner */}
-          <div>
-            <h4 className="font-medium text-slate-700 mb-3">Партньор</h4>
-            <div className="space-y-3">
-              <div className="flex items-center justify-between gap-4">
-                <Label className="text-sm">Брутен доход</Label>
-                <Input type="number" min="0" placeholder="0" value={data.partner_gross_income || ''}
-                  onChange={(e) => onChange('partner_gross_income', parseInt(e.target.value) || '')} className="rounded-lg w-28" />
-              </div>
-              <div className="flex items-center justify-between gap-4">
-                <Label className="text-sm">Нетен доход</Label>
-                <Input type="number" min="0" placeholder="0" value={data.partner_net_income || ''}
-                  onChange={(e) => onChange('partner_net_income', parseInt(e.target.value) || '')} className="rounded-lg w-28" />
-              </div>
-              <div className="flex items-center justify-between gap-4">
-                <Label className="text-sm">Други месечни доходи</Label>
-                <Input type="number" min="0" placeholder="0" value={data.partner_other_monthly_income || ''}
-                  onChange={(e) => onChange('partner_other_monthly_income', parseInt(e.target.value) || '')} className="rounded-lg w-28" />
+          {includePartner && (
+            <div>
+              <h4 className="font-medium text-slate-700 mb-3">Партньор</h4>
+              <div className="space-y-3">
+                <div className="flex items-center justify-between gap-4" data-invalid={isFieldInvalid(data.partner_gross_income) ? "true" : undefined}>
+                  <Label className="text-sm">Брутен доход <span className="text-red-500">*</span></Label>
+                  <Input type="number" min="0" value={data.partner_gross_income ?? ''}
+                    onChange={(e) => onChange('partner_gross_income', e.target.value === '' ? '' : parseInt(e.target.value))} 
+                    className={`rounded-lg w-28 ${isFieldInvalid(data.partner_gross_income) ? 'border-red-500 bg-red-50' : ''}`} />
+                </div>
+                <div className="flex items-center justify-between gap-4" data-invalid={isFieldInvalid(data.partner_net_income) ? "true" : undefined}>
+                  <Label className="text-sm">Нетен доход <span className="text-red-500">*</span></Label>
+                  <Input type="number" min="0" value={data.partner_net_income ?? ''}
+                    onChange={(e) => onChange('partner_net_income', e.target.value === '' ? '' : parseInt(e.target.value))} 
+                    className={`rounded-lg w-28 ${isFieldInvalid(data.partner_net_income) ? 'border-red-500 bg-red-50' : ''}`} />
+                </div>
+                <div className="flex items-center justify-between gap-4" data-invalid={isFieldInvalid(data.partner_annual_bonus) ? "true" : undefined}>
+                  <Label className="text-sm">Годишен бонус <span className="text-red-500">*</span></Label>
+                  <div className="flex items-center gap-2">
+                    <Input type="number" min="0" value={data.partner_annual_bonus ?? ''}
+                      onChange={(e) => onChange('partner_annual_bonus', e.target.value === '' ? '' : parseInt(e.target.value))} 
+                      className={`rounded-lg w-28 ${isFieldInvalid(data.partner_annual_bonus) ? 'border-red-500 bg-red-50' : ''}`} />
+                    <Input type="number" min="0" value={partnerAnnualBonusMonthly}
+                      readOnly className="rounded-lg w-28 bg-slate-100" />
+                  </div>
+                </div>
+                <div className="flex items-center justify-between gap-4" data-invalid={isFieldInvalid(data.partner_other_monthly_income) ? "true" : undefined}>
+                  <Label className="text-sm">Други месечни доходи <span className="text-red-500">*</span></Label>
+                  <Input type="number" min="0" value={data.partner_other_monthly_income ?? ''}
+                    onChange={(e) => onChange('partner_other_monthly_income', e.target.value === '' ? '' : parseInt(e.target.value))} 
+                    className={`rounded-lg w-28 ${isFieldInvalid(data.partner_other_monthly_income) ? 'border-red-500 bg-red-50' : ''}`} />
+                </div>
               </div>
             </div>
-          </div>
+          )}
         </div>
 
         <div className="mt-4 pt-4 border-t border-slate-200">
@@ -99,36 +198,21 @@ export default function FinancialFlowStep({ data, onChange }) {
           <h3 className="font-semibold text-slate-900">Разходи за жилище (месечни, в €)</h3>
         </div>
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
-          <div className="flex items-center justify-between gap-2">
-            <Label className="text-sm">Наем</Label>
-            <Input type="number" min="0" placeholder="0" value={data.expense_rent || ''}
-              onChange={(e) => onChange('expense_rent', parseInt(e.target.value) || '')} className="rounded-lg w-24" />
-          </div>
-          <div className="flex items-center justify-between gap-2">
-            <Label className="text-sm">Режийни</Label>
-            <Input type="number" min="0" placeholder="0" value={data.expense_utilities || ''}
-              onChange={(e) => onChange('expense_utilities', parseInt(e.target.value) || '')} className="rounded-lg w-24" />
-          </div>
-          <div className="flex items-center justify-between gap-2">
-            <Label className="text-sm">Телефон</Label>
-            <Input type="number" min="0" placeholder="0" value={data.expense_phone || ''}
-              onChange={(e) => onChange('expense_phone', parseInt(e.target.value) || '')} className="rounded-lg w-24" />
-          </div>
-          <div className="flex items-center justify-between gap-2">
-            <Label className="text-sm">Интернет</Label>
-            <Input type="number" min="0" placeholder="0" value={data.expense_internet || ''}
-              onChange={(e) => onChange('expense_internet', parseInt(e.target.value) || '')} className="rounded-lg w-24" />
-          </div>
-          <div className="flex items-center justify-between gap-2">
-            <Label className="text-sm">Телевизия</Label>
-            <Input type="number" min="0" placeholder="0" value={data.expense_tv || ''}
-              onChange={(e) => onChange('expense_tv', parseInt(e.target.value) || '')} className="rounded-lg w-24" />
-          </div>
-          <div className="flex items-center justify-between gap-2">
-            <Label className="text-sm">Други</Label>
-            <Input type="number" min="0" placeholder="0" value={data.expense_other_housing || ''}
-              onChange={(e) => onChange('expense_other_housing', parseInt(e.target.value) || '')} className="rounded-lg w-24" />
-          </div>
+          {[
+            ['Наем', 'expense_rent'],
+            ['Режийни', 'expense_utilities'],
+            ['Телефон', 'expense_phone'],
+            ['Интернет', 'expense_internet'],
+            ['Телевизия', 'expense_tv'],
+            ['Други', 'expense_other_housing'],
+          ].map(([label, key]) => (
+            <div key={key} className="flex items-center justify-between gap-2" data-invalid={isFieldInvalid(data[key]) ? "true" : undefined}>
+              <Label className="text-sm">{label} <span className="text-red-500">*</span></Label>
+              <Input type="number" min="0" value={data[key] ?? ''}
+                onChange={(e) => onChange(key, e.target.value === '' ? '' : parseInt(e.target.value))} 
+                className={`rounded-lg w-24 ${isFieldInvalid(data[key]) ? 'border-red-500 bg-red-50' : ''}`} />
+            </div>
+          ))}
         </div>
         <div className="mt-3 pt-3 border-t border-slate-200 flex justify-between">
           <span className="text-sm font-medium">Общо жилище:</span>
@@ -143,21 +227,18 @@ export default function FinancialFlowStep({ data, onChange }) {
           <h3 className="font-semibold text-slate-900">Разходи за автомобил (месечни, в €)</h3>
         </div>
         <div className="grid sm:grid-cols-3 gap-3">
-          <div className="flex items-center justify-between gap-2">
-            <Label className="text-sm">Гориво</Label>
-            <Input type="number" min="0" placeholder="0" value={data.expense_fuel || ''}
-              onChange={(e) => onChange('expense_fuel', parseInt(e.target.value) || '')} className="rounded-lg w-24" />
-          </div>
-          <div className="flex items-center justify-between gap-2">
-            <Label className="text-sm">Поддръжка</Label>
-            <Input type="number" min="0" placeholder="0" value={data.expense_car_maintenance || ''}
-              onChange={(e) => onChange('expense_car_maintenance', parseInt(e.target.value) || '')} className="rounded-lg w-24" />
-          </div>
-          <div className="flex items-center justify-between gap-2">
-            <Label className="text-sm">Други</Label>
-            <Input type="number" min="0" placeholder="0" value={data.expense_car_other || ''}
-              onChange={(e) => onChange('expense_car_other', parseInt(e.target.value) || '')} className="rounded-lg w-24" />
-          </div>
+          {[
+            ['Гориво', 'expense_fuel'],
+            ['Поддръжка', 'expense_car_maintenance'],
+            ['Други', 'expense_car_other'],
+          ].map(([label, key]) => (
+            <div key={key} className="flex items-center justify-between gap-2" data-invalid={isFieldInvalid(data[key]) ? "true" : undefined}>
+              <Label className="text-sm">{label} <span className="text-red-500">*</span></Label>
+              <Input type="number" min="0" value={data[key] ?? ''}
+                onChange={(e) => onChange(key, e.target.value === '' ? '' : parseInt(e.target.value))} 
+                className={`rounded-lg w-24 ${isFieldInvalid(data[key]) ? 'border-red-500 bg-red-50' : ''}`} />
+            </div>
+          ))}
         </div>
         <div className="mt-3 pt-3 border-t border-slate-200 flex justify-between">
           <span className="text-sm font-medium">Общо автомобил:</span>
@@ -182,12 +263,19 @@ export default function FinancialFlowStep({ data, onChange }) {
             ['Домашни любимци', 'expense_pets'],
             ['Почивка', 'expense_vacation'],
             ['Бизнес разходи', 'expense_business'],
+            ['Образование', 'expense_education'],
+            ['Здраве', 'expense_health'],
+            ['Козметика', 'expense_cosmetics'],
+            ['Хобита', 'expense_hobbies'],
+            ['Електроника', 'expense_electronics'],
+            ['Данъци', 'expense_taxes'],
             ['Други', 'expense_other'],
           ].map(([label, key]) => (
-            <div key={key} className="flex items-center justify-between gap-2">
-              <Label className="text-sm">{label}</Label>
-              <Input type="number" min="0" placeholder="0" value={data[key] || ''}
-                onChange={(e) => onChange(key, parseInt(e.target.value) || '')} className="rounded-lg w-24" />
+            <div key={key} className="flex items-center justify-between gap-2" data-invalid={isFieldInvalid(data[key]) ? "true" : undefined}>
+              <Label className="text-sm">{label} <span className="text-red-500">*</span></Label>
+              <Input type="number" min="0" value={data[key] ?? ''}
+                onChange={(e) => onChange(key, e.target.value === '' ? '' : parseInt(e.target.value))} 
+                className={`rounded-lg w-24 ${isFieldInvalid(data[key]) ? 'border-red-500 bg-red-50' : ''}`} />
             </div>
           ))}
         </div>
@@ -203,19 +291,43 @@ export default function FinancialFlowStep({ data, onChange }) {
           <PiggyBank className="h-5 w-5 text-blue-600" />
           <h3 className="font-semibold text-slate-900">Активи (в €)</h3>
         </div>
-        <div className="grid sm:grid-cols-2 gap-3">
-          {[
-            ['Разплащателна сметка', 'asset_checking_account'],
-            ['Дългосрочни спестявания', 'asset_long_term_savings'],
-            ['Средносрочни спестявания', 'asset_medium_term_savings'],
-            ['Краткосрочни спестявания', 'asset_short_term_savings'],
-          ].map(([label, key]) => (
-            <div key={key} className="flex items-center justify-between gap-2">
-              <Label className="text-sm">{label}</Label>
-              <Input type="number" min="0" placeholder="0" value={data[key] || ''}
-                onChange={(e) => onChange(key, parseInt(e.target.value) || '')} className="rounded-lg w-28" />
+        <div className="grid sm:grid-cols-2 gap-4">
+          <div className="space-y-1" data-invalid={isFieldInvalid(data.asset_checking_account) ? "true" : undefined}>
+            <div className="flex items-center justify-between gap-2">
+              <Label className="text-sm">Разплащателна сметка <span className="text-red-500">*</span></Label>
+              <Input type="number" min="0" value={data.asset_checking_account ?? ''}
+                onChange={(e) => onChange('asset_checking_account', e.target.value === '' ? '' : parseInt(e.target.value))} 
+                className={`rounded-lg w-28 ${isFieldInvalid(data.asset_checking_account) ? 'border-red-500 bg-red-50' : ''}`} />
             </div>
-          ))}
+            <p className="text-xs text-slate-500">Това е сборът от кеш и суми в разплащателни сметки</p>
+          </div>
+          <div className="space-y-1" data-invalid={isFieldInvalid(data.asset_short_term_savings) ? "true" : undefined}>
+            <div className="flex items-center justify-between gap-2">
+              <Label className="text-sm">Краткосрочни спестявания <span className="text-red-500">*</span></Label>
+              <Input type="number" min="0" value={data.asset_short_term_savings ?? ''}
+                onChange={(e) => onChange('asset_short_term_savings', e.target.value === '' ? '' : parseInt(e.target.value))} 
+                className={`rounded-lg w-28 ${isFieldInvalid(data.asset_short_term_savings) ? 'border-red-500 bg-red-50' : ''}`} />
+            </div>
+            <p className="text-xs text-slate-500">Това е сборът от депозити и суми в спестовни сметки</p>
+          </div>
+          <div className="space-y-1" data-invalid={isFieldInvalid(data.asset_medium_term_savings) ? "true" : undefined}>
+            <div className="flex items-center justify-between gap-2">
+              <Label className="text-sm">Средносрочни спестявания <span className="text-red-500">*</span></Label>
+              <Input type="number" min="0" value={data.asset_medium_term_savings ?? ''}
+                onChange={(e) => onChange('asset_medium_term_savings', e.target.value === '' ? '' : parseInt(e.target.value))} 
+                className={`rounded-lg w-28 ${isFieldInvalid(data.asset_medium_term_savings) ? 'border-red-500 bg-red-50' : ''}`} />
+            </div>
+            <p className="text-xs text-slate-500">Това е сборът от инвестиции, фондове, крипто, злато и др.</p>
+          </div>
+          <div className="space-y-1" data-invalid={isFieldInvalid(data.asset_long_term_savings) ? "true" : undefined}>
+            <div className="flex items-center justify-between gap-2">
+              <Label className="text-sm">Дългосрочни спестявания <span className="text-red-500">*</span></Label>
+              <Input type="number" min="0" value={data.asset_long_term_savings ?? ''}
+                onChange={(e) => onChange('asset_long_term_savings', e.target.value === '' ? '' : parseInt(e.target.value))} 
+                className={`rounded-lg w-28 ${isFieldInvalid(data.asset_long_term_savings) ? 'border-red-500 bg-red-50' : ''}`} />
+            </div>
+            <p className="text-xs text-slate-500">Това е сборът от пенсионни фондове и спестявания за деца.</p>
+          </div>
         </div>
         <div className="mt-3 pt-3 border-t border-slate-200 flex justify-between">
           <span className="text-sm font-medium">Общо активи:</span>
@@ -229,24 +341,77 @@ export default function FinancialFlowStep({ data, onChange }) {
           <CreditCard className="h-5 w-5 text-orange-500" />
           <h3 className="font-semibold text-slate-900">Пасиви / Задължения (кредитно салдо, в €)</h3>
         </div>
-        <div className="grid sm:grid-cols-2 gap-3">
-          {[
-            ['Ипотека', 'liability_mortgage'],
-            ['Потребителски кредити', 'liability_consumer_loans'],
-            ['Кредитни карти', 'liability_credit_cards'],
-            ['Лизинг', 'liability_leasing'],
-            ['Овърдрафт', 'liability_overdraft'],
-          ].map(([label, key]) => (
-            <div key={key} className="flex items-center justify-between gap-2">
-              <Label className="text-sm">{label}</Label>
-              <Input type="number" min="0" placeholder="0" value={data[key] || ''}
-                onChange={(e) => onChange(key, parseInt(e.target.value) || '')} className="rounded-lg w-28" />
-            </div>
-          ))}
+        
+        <div className="grid grid-cols-[1fr_auto_auto] gap-2 items-center mb-2">
+          <div></div>
+          <span className="text-xs text-slate-500 text-center w-28">Месечна вноска</span>
+          <span className="text-xs text-slate-500 text-center w-28">Оставаща сума</span>
         </div>
-        <div className="mt-3 pt-3 border-t border-slate-200 flex justify-between">
+        
+        <div className="space-y-3">
+          {/* Mortgage */}
+          <div>
+            <div className="grid grid-cols-[1fr_auto_auto] gap-2 items-center" data-invalid={isFieldInvalid(data.liability_mortgage_monthly) || isFieldInvalid(data.liability_mortgage_remaining) ? "true" : undefined}>
+              <Label className="text-sm">Ипотека <span className="text-red-500">*</span></Label>
+              <Input type="number" min="0" value={data.liability_mortgage_monthly ?? ''}
+                onChange={(e) => onChange('liability_mortgage_monthly', e.target.value === '' ? '' : parseInt(e.target.value))} 
+                className={`rounded-lg w-28 ${isFieldInvalid(data.liability_mortgage_monthly) ? 'border-red-500 bg-red-50' : ''}`} />
+              <Input type="number" min="0" value={data.liability_mortgage_remaining ?? ''}
+                onChange={(e) => onChange('liability_mortgage_remaining', e.target.value === '' ? '' : parseInt(e.target.value))} 
+                className={`rounded-lg w-28 ${isFieldInvalid(data.liability_mortgage_remaining) ? 'border-red-500 bg-red-50' : ''}`} />
+            </div>
+            <p className="text-xs text-slate-500 mt-1">Това е спрямо информация от тема "Ново жилище"</p>
+          </div>
+          
+          {/* Consumer loans */}
+          <div className="grid grid-cols-[1fr_auto_auto] gap-2 items-center" data-invalid={isFieldInvalid(data.liability_consumer_loans_monthly) || isFieldInvalid(data.liability_consumer_loans_remaining) ? "true" : undefined}>
+            <Label className="text-sm">Потребителски кредити <span className="text-red-500">*</span></Label>
+            <Input type="number" min="0" value={data.liability_consumer_loans_monthly ?? ''}
+              onChange={(e) => onChange('liability_consumer_loans_monthly', e.target.value === '' ? '' : parseInt(e.target.value))} 
+              className={`rounded-lg w-28 ${isFieldInvalid(data.liability_consumer_loans_monthly) ? 'border-red-500 bg-red-50' : ''}`} />
+            <Input type="number" min="0" value={data.liability_consumer_loans_remaining ?? ''}
+              onChange={(e) => onChange('liability_consumer_loans_remaining', e.target.value === '' ? '' : parseInt(e.target.value))} 
+              className={`rounded-lg w-28 ${isFieldInvalid(data.liability_consumer_loans_remaining) ? 'border-red-500 bg-red-50' : ''}`} />
+          </div>
+          
+          {/* Credit cards */}
+          <div className="grid grid-cols-[1fr_auto_auto] gap-2 items-center" data-invalid={isFieldInvalid(data.liability_credit_cards_monthly) || isFieldInvalid(data.liability_credit_cards_remaining) ? "true" : undefined}>
+            <Label className="text-sm">Кредитни карти <span className="text-red-500">*</span></Label>
+            <Input type="number" min="0" value={data.liability_credit_cards_monthly ?? ''}
+              onChange={(e) => onChange('liability_credit_cards_monthly', e.target.value === '' ? '' : parseInt(e.target.value))} 
+              className={`rounded-lg w-28 ${isFieldInvalid(data.liability_credit_cards_monthly) ? 'border-red-500 bg-red-50' : ''}`} />
+            <Input type="number" min="0" value={data.liability_credit_cards_remaining ?? ''}
+              onChange={(e) => onChange('liability_credit_cards_remaining', e.target.value === '' ? '' : parseInt(e.target.value))} 
+              className={`rounded-lg w-28 ${isFieldInvalid(data.liability_credit_cards_remaining) ? 'border-red-500 bg-red-50' : ''}`} />
+          </div>
+          
+          {/* Leasing */}
+          <div className="grid grid-cols-[1fr_auto_auto] gap-2 items-center" data-invalid={isFieldInvalid(data.liability_leasing_monthly) || isFieldInvalid(data.liability_leasing_remaining) ? "true" : undefined}>
+            <Label className="text-sm">Лизинг <span className="text-red-500">*</span></Label>
+            <Input type="number" min="0" value={data.liability_leasing_monthly ?? ''}
+              onChange={(e) => onChange('liability_leasing_monthly', e.target.value === '' ? '' : parseInt(e.target.value))} 
+              className={`rounded-lg w-28 ${isFieldInvalid(data.liability_leasing_monthly) ? 'border-red-500 bg-red-50' : ''}`} />
+            <Input type="number" min="0" value={data.liability_leasing_remaining ?? ''}
+              onChange={(e) => onChange('liability_leasing_remaining', e.target.value === '' ? '' : parseInt(e.target.value))} 
+              className={`rounded-lg w-28 ${isFieldInvalid(data.liability_leasing_remaining) ? 'border-red-500 bg-red-50' : ''}`} />
+          </div>
+          
+          {/* Overdraft */}
+          <div className="grid grid-cols-[1fr_auto_auto] gap-2 items-center" data-invalid={isFieldInvalid(data.liability_overdraft_monthly) || isFieldInvalid(data.liability_overdraft_remaining) ? "true" : undefined}>
+            <Label className="text-sm">Овърдрафт <span className="text-red-500">*</span></Label>
+            <Input type="number" min="0" value={data.liability_overdraft_monthly ?? ''}
+              onChange={(e) => onChange('liability_overdraft_monthly', e.target.value === '' ? '' : parseInt(e.target.value))} 
+              className={`rounded-lg w-28 ${isFieldInvalid(data.liability_overdraft_monthly) ? 'border-red-500 bg-red-50' : ''}`} />
+            <Input type="number" min="0" value={data.liability_overdraft_remaining ?? ''}
+              onChange={(e) => onChange('liability_overdraft_remaining', e.target.value === '' ? '' : parseInt(e.target.value))} 
+              className={`rounded-lg w-28 ${isFieldInvalid(data.liability_overdraft_remaining) ? 'border-red-500 bg-red-50' : ''}`} />
+          </div>
+        </div>
+        
+        <div className="mt-3 pt-3 border-t border-slate-200 grid grid-cols-[1fr_auto_auto] gap-2">
           <span className="text-sm font-medium">Общо задължения:</span>
-          <span className="font-semibold text-orange-600">{totalLiabilities.toLocaleString()} €</span>
+          <span className="font-semibold text-orange-600 text-center w-28">{totalLiabilitiesMonthly.toLocaleString()} €</span>
+          <span className="font-semibold text-orange-600 text-center w-28">{totalLiabilitiesRemaining.toLocaleString()} €</span>
         </div>
       </div>
 
@@ -260,15 +425,16 @@ export default function FinancialFlowStep({ data, onChange }) {
           {[
             ['Живот и злополука', 'insurance_life'],
             ['Недвижимо имущество', 'insurance_property'],
-            ['Домакинство', 'insurance_household'],
+            ['Движимо имущество', 'insurance_movable'],
             ['Гражданска застраховка', 'insurance_civil'],
             ['Автокаско', 'insurance_casco'],
             ['Други', 'insurance_other'],
           ].map(([label, key]) => (
-            <div key={key} className="flex items-center justify-between gap-2">
-              <Label className="text-sm">{label}</Label>
-              <Input type="number" min="0" placeholder="0" value={data[key] || ''}
-                onChange={(e) => onChange(key, parseInt(e.target.value) || '')} className="rounded-lg w-24" />
+            <div key={key} className="flex items-center justify-between gap-2" data-invalid={isFieldInvalid(data[key]) ? "true" : undefined}>
+              <Label className="text-sm">{label} <span className="text-red-500">*</span></Label>
+              <Input type="number" min="0" value={data[key] ?? ''}
+                onChange={(e) => onChange(key, e.target.value === '' ? '' : parseInt(e.target.value))} 
+                className={`rounded-lg w-24 ${isFieldInvalid(data[key]) ? 'border-red-500 bg-red-50' : ''}`} />
             </div>
           ))}
         </div>
@@ -295,14 +461,14 @@ export default function FinancialFlowStep({ data, onChange }) {
             <span className="font-semibold text-blue-600">{totalAssets.toLocaleString()} €</span>
           </div>
           <div className="flex justify-between">
-            <span>Задължения:</span>
-            <span className="font-semibold text-orange-600">{totalLiabilities.toLocaleString()} €</span>
+            <span>Задължения (месечни):</span>
+            <span className="font-semibold text-orange-600">{totalLiabilitiesMonthly.toLocaleString()} €</span>
           </div>
         </div>
         <div className="mt-4 pt-4 border-t border-blue-200 flex justify-between">
           <span className="font-semibold">Месечен баланс:</span>
-          <span className={`font-bold text-lg ${(totalMonthlyIncome - totalExpenses - totalInsurance) >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-            {(totalMonthlyIncome - totalExpenses - totalInsurance).toLocaleString()} €
+          <span className={`font-bold text-lg ${(totalMonthlyIncome - totalExpenses - totalInsurance - totalLiabilitiesMonthly) >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+            {(totalMonthlyIncome - totalExpenses - totalInsurance - totalLiabilitiesMonthly).toLocaleString()} €
           </span>
         </div>
       </div>

@@ -435,6 +435,7 @@ export default function FinancialAnalysis() {
 
   const prevStep = () => {
     if (currentStep > 1) {
+      setShowValidationErrors(false);
       setCurrentStep(prev => prev - 1);
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
@@ -520,7 +521,10 @@ export default function FinancialAnalysis() {
             {steps.map((step, index) => (
               <React.Fragment key={step.id}>
                 <button
-                  onClick={() => setCurrentStep(step.id)}
+                  onClick={() => {
+                    setShowValidationErrors(false);
+                    setCurrentStep(step.id);
+                  }}
                   className="flex flex-col items-center cursor-pointer hover:opacity-80 transition-opacity"
                 >
                   <div 

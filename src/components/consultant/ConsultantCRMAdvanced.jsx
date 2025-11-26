@@ -478,7 +478,7 @@ export default function ConsultantCRMAdvanced() {
         )}
 
         {/* Client Detail */}
-        <div className={viewMode === 'list' ? 'lg:col-span-2' : 'lg:col-span-3'}
+        <div className={viewMode === 'list' ? 'lg:col-span-2' : 'lg:col-span-3'}>
           {selectedClient ? (
             <Card>
               <CardHeader className="pb-3">

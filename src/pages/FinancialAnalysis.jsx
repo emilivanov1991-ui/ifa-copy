@@ -16,7 +16,8 @@ import {
   ListOrdered,
   CheckCircle,
   Loader2,
-  FileCheck
+  FileCheck,
+  AlertTriangle
 } from 'lucide-react';
 import { cn } from "@/lib/utils";
 
@@ -82,7 +83,7 @@ export default function FinancialAnalysis() {
         
         // Employment validation
         let clientEmploymentValid = true;
-        if (formData.client_is_employed) {
+        if (formData.client_is_employed ?? true) {
           clientEmploymentValid = !!(
             formData.client_job_description &&
             formData.client_employer_name &&
@@ -167,6 +168,20 @@ export default function FinancialAnalysis() {
         return true;
     }
   };
+
+  // Check which steps are incomplete
+  const getIncompleteSteps = () => {
+    const incomplete = [];
+    for (let i = 1; i <= 9; i++) {
+      if (!validateStep(i)) {
+        incomplete.push(i);
+      }
+    }
+    return incomplete;
+  };
+
+  const incompleteSteps = getIncompleteSteps();
+  const canSubmit = incompleteSteps.length === 0;
 
   const nextStep = () => {
     if (validateStep(currentStep) && currentStep < 9) {
@@ -263,25 +278,32 @@ export default function FinancialAnalysis() {
               <React.Fragment key={step.id}>
                 <button
                   onClick={() => setCurrentStep(step.id)}
-                  className="flex flex-col items-center cursor-pointer hover:opacity-80 transition-opacity"
+                  className="flex flex-col items-center cursor-pointer hover:opacity-80 transition-opacity relative"
                 >
                   <div 
                     className={cn(
                       "w-10 h-10 rounded-full flex items-center justify-center transition-all duration-300",
-                      currentStep >= step.id 
+                      currentStep === step.id 
                         ? "bg-blue-600 text-white" 
-                        : "bg-slate-200 text-slate-500"
+                        : validateStep(step.id)
+                          ? "bg-green-500 text-white"
+                          : "bg-slate-200 text-slate-500"
                     )}
                   >
-                    {currentStep > step.id ? (
+                    {validateStep(step.id) && currentStep !== step.id ? (
                       <CheckCircle className="h-5 w-5" />
                     ) : (
                       <step.icon className="h-4 w-4" />
                     )}
                   </div>
+                  {!validateStep(step.id) && currentStep !== step.id && (
+                    <div className="absolute -top-1 -right-1 w-5 h-5 bg-amber-400 rounded-full flex items-center justify-center">
+                      <AlertTriangle className="h-3 w-3 text-white" />
+                    </div>
+                  )}
                   <span className={cn(
                     "text-xs mt-1 font-medium whitespace-nowrap",
-                    currentStep >= step.id ? "text-blue-600" : "text-slate-500"
+                    currentStep === step.id ? "text-blue-600" : validateStep(step.id) ? "text-green-600" : "text-slate-500"
                   )}>
                     {step.title}
                   </span>
@@ -340,7 +362,6 @@ export default function FinancialAnalysis() {
               <Button
                 type="button"
                 onClick={nextStep}
-                disabled={!validateStep(currentStep)}
                 className="bg-blue-600 hover:bg-blue-700 rounded-full px-6"
               >
                 Напред
@@ -350,13 +371,18 @@ export default function FinancialAnalysis() {
               <Button
                 type="button"
                 onClick={handleSubmit}
-                disabled={isSubmitting}
-                className="bg-green-600 hover:bg-green-700 rounded-full px-8"
+                disabled={isSubmitting || !canSubmit}
+                className="bg-green-600 hover:bg-green-700 rounded-full px-8 disabled:opacity-50"
               >
                 {isSubmitting ? (
                   <>
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                     Изпращане...
+                  </>
+                ) : !canSubmit ? (
+                  <>
+                    <AlertTriangle className="mr-2 h-4 w-4" />
+                    Попълнете всички полета
                   </>
                 ) : (
                   <>

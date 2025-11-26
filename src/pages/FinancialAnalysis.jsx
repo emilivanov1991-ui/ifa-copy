@@ -160,9 +160,8 @@ export default function FinancialAnalysis() {
             {steps.map((step, index) => (
               <React.Fragment key={step.id}>
                 <button
-                  onClick={() => currentStep > step.id && setCurrentStep(step.id)}
-                  disabled={currentStep < step.id}
-                  className="flex flex-col items-center"
+                  onClick={() => setCurrentStep(step.id)}
+                  className="flex flex-col items-center cursor-pointer hover:opacity-80 transition-opacity"
                 >
                   <div 
                     className={cn(

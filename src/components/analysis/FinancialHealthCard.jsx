@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   Home, 
   PiggyBank, 
@@ -11,8 +11,15 @@ import {
   CheckCircle,
   AlertTriangle,
   XCircle,
-  Minus
+  Minus,
+  Clock,
+  TrendingDown,
+  Loader2,
+  Sparkles,
+  AlertCircle
 } from 'lucide-react';
+import { base44 } from '@/api/base44Client';
+import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer, BarChart, Bar, Cell } from 'recharts';
 
 // Status colors and icons
 const STATUS_CONFIG = {

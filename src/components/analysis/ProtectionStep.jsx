@@ -13,9 +13,32 @@ import {
 } from "@/components/ui/select";
 import { Shield, Wallet, Building2, Car, Plus, Download, User, Users } from 'lucide-react';
 import { cn } from "@/lib/utils";
+import BulgarianDateInput from '@/components/ui/BulgarianDateInput';
+
+// Insurance companies list
+const INSURANCE_COMPANIES = [
+  { value: 'allianz', label: 'ЗД Алианц България' },
+  { value: 'armeec', label: 'ЗД Армеец' },
+  { value: 'bulins', label: 'ЗД Бул Инс' },
+  { value: 'bulstrad', label: 'ЗД Булстрад Виена Иншурънс Груп' },
+  { value: 'groupama', label: 'ЗД Групама' },
+  { value: 'dzi', label: 'ЗД ДЗИ' },
+  { value: 'generali', label: 'ЗД Дженерали Застраховане' },
+  { value: 'dallbogg', label: 'ЗД ДаллБогг Живот и Здраве' },
+  { value: 'euroins', label: 'ЗД Евроинс Иншурънс Груп' },
+  { value: 'levins', label: 'ЗД Лев Инс' },
+  { value: 'obb', label: 'ЗД ОББ' },
+  { value: 'ozk', label: 'ЗД ОЗК Застраховане' },
+  { value: 'uniqa', label: 'ЗД Уника' },
+];
 
 export default function ProtectionStep({ data, onChange }) {
   const includePartner = data.include_partner || false;
+  
+  // Check if any property or car exists
+  const hasAnyProperty = data.has_property_1 || false;
+  const hasAnyCar = data.has_car_1 || false;
+  const hasAnyAsset = hasAnyProperty || hasAnyCar;
 
   // Helper to import data from housing section
   const importFromHousing = () => {
@@ -125,10 +148,23 @@ export default function ProtectionStep({ data, onChange }) {
                 <Building2 className="h-4 w-4 text-slate-500" />
                 <Label className="font-medium">Недвижимо имущество</Label>
               </div>
-              <Switch
-                checked={data.has_property_1 || false}
-                onCheckedChange={(checked) => onChange('has_property_1', checked)}
-              />
+              <div className="flex items-center gap-2">
+                <span className={cn("text-sm font-medium", !(data.has_property_1 ?? false) ? "text-red-600" : "text-slate-400")}>няма</span>
+                <button
+                  type="button"
+                  onClick={() => onChange('has_property_1', !(data.has_property_1 ?? false))}
+                  className={cn(
+                    "w-12 h-6 rounded-full transition-colors relative",
+                    (data.has_property_1 ?? false) ? "bg-green-500" : "bg-red-500"
+                  )}
+                >
+                  <div className={cn(
+                    "w-5 h-5 bg-white rounded-full absolute top-0.5 transition-all",
+                    (data.has_property_1 ?? false) ? "left-6" : "left-0.5"
+                  )} />
+                </button>
+                <span className={cn("text-sm font-medium", (data.has_property_1 ?? false) ? "text-green-600" : "text-slate-400")}>има</span>
+              </div>
             </div>
 
             {data.has_property_1 && (
@@ -147,56 +183,56 @@ export default function ProtectionStep({ data, onChange }) {
                 
                 <div className="grid sm:grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <Label className="text-sm">Адрес</Label>
+                    <Label className="text-sm">Адрес <span className="text-red-500">*</span></Label>
                     <Input
-                      placeholder="гр. София, ул. ..."
                       value={data.property_1_address || ''}
                       onChange={(e) => onChange('property_1_address', e.target.value)}
                       className="rounded-lg"
+                      required
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label className="text-sm">Брой стаи</Label>
+                    <Label className="text-sm">Брой стаи <span className="text-red-500">*</span></Label>
                     <Input
                       type="number"
                       min="1"
-                      placeholder="3"
-                      value={data.property_1_rooms || ''}
-                      onChange={(e) => onChange('property_1_rooms', parseInt(e.target.value) || '')}
+                      value={data.property_1_rooms ?? ''}
+                      onChange={(e) => onChange('property_1_rooms', e.target.value === '' ? '' : parseInt(e.target.value))}
                       className="rounded-lg"
+                      required
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label className="text-sm">Застроена площ (кв.м)</Label>
+                    <Label className="text-sm">Застроена площ (кв.м) <span className="text-red-500">*</span></Label>
                     <Input
                       type="number"
                       min="0"
-                      placeholder="80"
-                      value={data.property_1_area || ''}
-                      onChange={(e) => onChange('property_1_area', parseInt(e.target.value) || '')}
+                      value={data.property_1_area ?? ''}
+                      onChange={(e) => onChange('property_1_area', e.target.value === '' ? '' : parseInt(e.target.value))}
                       className="rounded-lg"
+                      required
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label className="text-sm">Стойност (€)</Label>
+                    <Label className="text-sm">Стойност (€) <span className="text-red-500">*</span></Label>
                     <Input
                       type="number"
                       min="0"
-                      placeholder="100000"
-                      value={data.property_1_value || ''}
-                      onChange={(e) => onChange('property_1_value', parseInt(e.target.value) || '')}
+                      value={data.property_1_value ?? ''}
+                      onChange={(e) => onChange('property_1_value', e.target.value === '' ? '' : parseInt(e.target.value))}
                       className="rounded-lg"
+                      required
                     />
                   </div>
                   <div className="space-y-2 sm:col-span-2">
-                    <Label className="text-sm">Стойност на движимото имущество (€)</Label>
+                    <Label className="text-sm">Стойност на движимото имущество (€) <span className="text-red-500">*</span></Label>
                     <Input
                       type="number"
                       min="0"
-                      placeholder="10000"
-                      value={data.property_1_movable_value || ''}
-                      onChange={(e) => onChange('property_1_movable_value', parseInt(e.target.value) || '')}
+                      value={data.property_1_movable_value ?? ''}
+                      onChange={(e) => onChange('property_1_movable_value', e.target.value === '' ? '' : parseInt(e.target.value))}
                       className="rounded-lg"
+                      required
                     />
                   </div>
                 </div>
@@ -213,22 +249,28 @@ export default function ProtectionStep({ data, onChange }) {
                   {data.property_1_has_insurance && (
                     <div className="grid sm:grid-cols-2 gap-4">
                       <div className="space-y-2">
-                        <Label className="text-sm">Застраховател</Label>
-                        <Input
-                          placeholder="Име на застраховател"
-                          value={data.property_1_insurer || ''}
-                          onChange={(e) => onChange('property_1_insurer', e.target.value)}
-                          className="rounded-lg"
-                        />
+                        <Label className="text-sm">Застраховател <span className="text-red-500">*</span></Label>
+                        <Select 
+                          value={data.property_1_insurer || ''} 
+                          onValueChange={(value) => onChange('property_1_insurer', value)}
+                        >
+                          <SelectTrigger className="rounded-lg">
+                            <SelectValue placeholder="Изберете" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {INSURANCE_COMPANIES.map(ins => (
+                              <SelectItem key={ins.value} value={ins.value}>{ins.label}</SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
                       </div>
                       <div className="space-y-2">
-                        <Label className="text-sm">Срок на полицата (дд/мм/гггг)</Label>
-                        <Input
-                          type="text"
-                          placeholder="дд/мм/гггг"
+                        <Label className="text-sm">Срок на полицата (дд.мм.гггг) <span className="text-red-500">*</span></Label>
+                        <BulgarianDateInput
                           value={data.property_1_insurance_expiry || ''}
-                          onChange={(e) => onChange('property_1_insurance_expiry', e.target.value)}
+                          onChange={(value) => onChange('property_1_insurance_expiry', value)}
                           className="rounded-lg"
+                          required
                         />
                       </div>
                     </div>
@@ -487,54 +529,67 @@ export default function ProtectionStep({ data, onChange }) {
                 <Car className="h-4 w-4 text-slate-500" />
                 <Label className="font-medium">Автомобил</Label>
               </div>
-              <Switch
-                checked={data.has_car_1 || false}
-                onCheckedChange={(checked) => onChange('has_car_1', checked)}
-              />
+              <div className="flex items-center gap-2">
+                <span className={cn("text-sm font-medium", !(data.has_car_1 ?? false) ? "text-red-600" : "text-slate-400")}>няма</span>
+                <button
+                  type="button"
+                  onClick={() => onChange('has_car_1', !(data.has_car_1 ?? false))}
+                  className={cn(
+                    "w-12 h-6 rounded-full transition-colors relative",
+                    (data.has_car_1 ?? false) ? "bg-green-500" : "bg-red-500"
+                  )}
+                >
+                  <div className={cn(
+                    "w-5 h-5 bg-white rounded-full absolute top-0.5 transition-all",
+                    (data.has_car_1 ?? false) ? "left-6" : "left-0.5"
+                  )} />
+                </button>
+                <span className={cn("text-sm font-medium", (data.has_car_1 ?? false) ? "text-green-600" : "text-slate-400")}>има</span>
+              </div>
             </div>
 
             {data.has_car_1 && (
               <div className="ml-6 p-4 bg-white rounded-lg border border-slate-200 space-y-4">
                 <div className="grid sm:grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <Label className="text-sm">Марка</Label>
+                    <Label className="text-sm">Марка <span className="text-red-500">*</span></Label>
                     <Input
-                      placeholder="Toyota"
                       value={data.car_1_brand || ''}
                       onChange={(e) => onChange('car_1_brand', e.target.value)}
                       className="rounded-lg"
+                      required
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label className="text-sm">Модел</Label>
+                    <Label className="text-sm">Модел <span className="text-red-500">*</span></Label>
                     <Input
-                      placeholder="Corolla"
                       value={data.car_1_model || ''}
                       onChange={(e) => onChange('car_1_model', e.target.value)}
                       className="rounded-lg"
+                      required
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label className="text-sm">Година на производство</Label>
+                    <Label className="text-sm">Година на производство <span className="text-red-500">*</span></Label>
                     <Input
                       type="number"
                       min="1900"
                       max="2025"
-                      placeholder="2020"
-                      value={data.car_1_year || ''}
-                      onChange={(e) => onChange('car_1_year', parseInt(e.target.value) || '')}
+                      value={data.car_1_year ?? ''}
+                      onChange={(e) => onChange('car_1_year', e.target.value === '' ? '' : parseInt(e.target.value))}
                       className="rounded-lg"
+                      required
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label className="text-sm">Стойност (€)</Label>
+                    <Label className="text-sm">Стойност (€) <span className="text-red-500">*</span></Label>
                     <Input
                       type="number"
                       min="0"
-                      placeholder="15000"
-                      value={data.car_1_value || ''}
-                      onChange={(e) => onChange('car_1_value', parseInt(e.target.value) || '')}
+                      value={data.car_1_value ?? ''}
+                      onChange={(e) => onChange('car_1_value', e.target.value === '' ? '' : parseInt(e.target.value))}
                       className="rounded-lg"
+                      required
                     />
                   </div>
                 </div>
@@ -542,13 +597,20 @@ export default function ProtectionStep({ data, onChange }) {
                 {/* Car 1 GO Insurance */}
                 <div className="pt-4 border-t border-slate-200 space-y-3">
                   <div className="space-y-2">
-                    <Label className="text-sm">ГО-Застраховател</Label>
-                    <Input
-                      placeholder="Име на застраховател"
-                      value={data.car_1_go_insurer || ''}
-                      onChange={(e) => onChange('car_1_go_insurer', e.target.value)}
-                      className="rounded-lg"
-                    />
+                    <Label className="text-sm">ГО-Застраховател <span className="text-red-500">*</span></Label>
+                    <Select 
+                      value={data.car_1_go_insurer || ''} 
+                      onValueChange={(value) => onChange('car_1_go_insurer', value)}
+                    >
+                      <SelectTrigger className="rounded-lg">
+                        <SelectValue placeholder="Изберете" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {INSURANCE_COMPANIES.map(ins => (
+                          <SelectItem key={ins.value} value={ins.value}>{ins.label}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
                   </div>
                 </div>
 
@@ -564,22 +626,28 @@ export default function ProtectionStep({ data, onChange }) {
                   {data.car_1_has_casco && (
                     <div className="grid sm:grid-cols-2 gap-4">
                       <div className="space-y-2">
-                        <Label className="text-sm">Застраховател</Label>
-                        <Input
-                          placeholder="Име на застраховател"
-                          value={data.car_1_casco_insurer || ''}
-                          onChange={(e) => onChange('car_1_casco_insurer', e.target.value)}
-                          className="rounded-lg"
-                        />
+                        <Label className="text-sm">Застраховател <span className="text-red-500">*</span></Label>
+                        <Select 
+                          value={data.car_1_casco_insurer || ''} 
+                          onValueChange={(value) => onChange('car_1_casco_insurer', value)}
+                        >
+                          <SelectTrigger className="rounded-lg">
+                            <SelectValue placeholder="Изберете" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {INSURANCE_COMPANIES.map(ins => (
+                              <SelectItem key={ins.value} value={ins.value}>{ins.label}</SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
                       </div>
                       <div className="space-y-2">
-                        <Label className="text-sm">Срок на полицата (дд/мм/гггг)</Label>
-                        <Input
-                          type="text"
-                          placeholder="дд/мм/гггг"
+                        <Label className="text-sm">Срок на полицата (дд.мм.гггг) <span className="text-red-500">*</span></Label>
+                        <BulgarianDateInput
                           value={data.car_1_casco_expiry || ''}
-                          onChange={(e) => onChange('car_1_casco_expiry', e.target.value)}
+                          onChange={(value) => onChange('car_1_casco_expiry', value)}
                           className="rounded-lg"
+                          required
                         />
                       </div>
                     </div>
@@ -904,14 +972,16 @@ export default function ProtectionStep({ data, onChange }) {
         </div>
       </div>
 
-      {/* Include property in plan */}
-      <label className="flex items-center gap-3 p-4 rounded-xl border-2 border-blue-200 bg-blue-50 cursor-pointer">
-        <Checkbox
-          checked={data.include_property_in_plan || false}
-          onCheckedChange={(checked) => onChange('include_property_in_plan', checked)}
-        />
-        <span className="font-medium text-blue-800">Да бъде включено във финансовия план</span>
-      </label>
+      {/* Include property in plan - only show if any property or car exists */}
+      {hasAnyAsset && (
+        <label className="flex items-center gap-3 p-4 rounded-xl border-2 border-blue-200 bg-blue-50 cursor-pointer">
+          <Checkbox
+            checked={data.include_property_in_plan || false}
+            onCheckedChange={(checked) => onChange('include_property_in_plan', checked)}
+          />
+          <span className="font-medium text-blue-800">Да бъде включено във финансовия план</span>
+        </label>
+      )}
 
       {/* Income Protection */}
       <div className="bg-slate-50 rounded-xl p-6">

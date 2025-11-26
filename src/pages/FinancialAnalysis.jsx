@@ -295,7 +295,12 @@ export default function FinancialAnalysis() {
         
         return true;
       
-      case 6: // Children & Goals - no strict required fields
+      case 6: // Children & Goals
+        // If children section is not skipped, education is required (allow 0)
+        if (!formData.skip_children_section) {
+          if (formData.children_education_costs === undefined || formData.children_education_costs === '') return false;
+        }
+        // Other goals section has no required fields (can be skipped)
         return true;
       
       case 7: // Protection - no strict required fields
@@ -326,7 +331,7 @@ export default function FinancialAnalysis() {
       case 5:
         return formData.client_gross_income_pension !== undefined && formData.client_gross_income_pension !== '';
       case 6:
-        return formData.other_goals_car !== undefined || formData.children_birth_costs !== undefined;
+        return formData.children_education_costs !== undefined || formData.children_birth_costs !== undefined || formData.other_goals_car !== undefined;
       case 7:
         return formData.properties?.length > 0 || formData.vehicles?.length > 0;
       case 8:

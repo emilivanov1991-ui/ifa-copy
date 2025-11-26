@@ -1,12 +1,18 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
-import { Baby, Car, Palmtree, SkipForward } from 'lucide-react';
+import { Baby, Car, Palmtree, SkipForward, Power } from 'lucide-react';
 import { cn } from "@/lib/utils";
 
 export default function ChildrenGoalsStep({ data, onChange }) {
+  // Initialize other goals as skipped by default
+  useEffect(() => {
+    if (data.skip_other_goals_section === undefined) {
+      onChange('skip_other_goals_section', true);
+    }
+  }, []);
   // Calculate average children age
   const calculateAverageChildAge = () => {
     const childrenCount = data.children_count || 0;
@@ -73,6 +79,140 @@ export default function ChildrenGoalsStep({ data, onChange }) {
     return existingNames.some(h => h.toLowerCase().trim() === name.toLowerCase().trim());
   };
 
+  // Render Other Goals section (reusable)
+  const renderOtherGoalsSection = () => (
+    <>
+      <div className="bg-slate-50 rounded-xl p-6">
+        <div className="flex items-center justify-between mb-6">
+          <div className="flex items-center gap-2">
+            <Palmtree className="h-5 w-5 text-blue-600" />
+            <h3 className="font-semibold text-slate-900">Други цели (кола, почивка...)</h3>
+          </div>
+          <Button 
+            variant="outline" 
+            size="sm"
+            onClick={() => onChange('skip_other_goals_section', !(data.skip_other_goals_section ?? true))}
+            className="rounded-full text-slate-600"
+          >
+            <Power className="h-4 w-4 mr-2" />
+            {(data.skip_other_goals_section ?? true) ? 'Активирай темата' : 'Пропусни темата'}
+          </Button>
+        </div>
+
+        {(data.skip_other_goals_section ?? true) ? (
+          <p className="text-slate-500 text-center py-4">Няма други цели. Ако желаете да впишете такива активирайте темата.</p>
+        ) : (
+          <div className="space-y-4">
+            <div className="grid grid-cols-3 gap-4 items-end">
+              <div className="flex items-center gap-2">
+                <Car className="h-4 w-4 text-slate-500" />
+                <Label className="font-medium">Кола</Label>
+              </div>
+              <div className="space-y-1">
+                <Label className="text-xs text-slate-500 text-center block">Сума (€)</Label>
+                <Input
+                  type="number"
+                  min="0"
+                  placeholder="0"
+                  value={data.other_goals_car ?? ''}
+                  onChange={(e) => onChange('other_goals_car', e.target.value === '' ? '' : parseInt(e.target.value))}
+                  className="rounded-lg text-center"
+                />
+              </div>
+              <div className="space-y-1">
+                <Label className="text-xs text-slate-500 text-center block">Хоризонт (години)</Label>
+                <Input
+                  type="number"
+                  min="1"
+                  placeholder="1"
+                  value={data.other_goals_car_years || ''}
+                  onChange={(e) => onChange('other_goals_car_years', parseInt(e.target.value) || '')}
+                  className="rounded-lg text-center"
+                />
+              </div>
+            </div>
+
+            <div className="grid grid-cols-3 gap-4 items-end">
+              <div className="flex items-center gap-2">
+                <Palmtree className="h-4 w-4 text-slate-500" />
+                <Label className="font-medium">Почивка</Label>
+              </div>
+              <div className="space-y-1">
+                <Label className="text-xs text-slate-500 text-center block">Сума (€)</Label>
+                <Input
+                  type="number"
+                  min="0"
+                  placeholder="0"
+                  value={data.other_goals_vacation ?? ''}
+                  onChange={(e) => onChange('other_goals_vacation', e.target.value === '' ? '' : parseInt(e.target.value))}
+                  className="rounded-lg text-center"
+                />
+              </div>
+              <div className="space-y-1">
+                <Label className="text-xs text-slate-500 text-center block">Хоризонт (години)</Label>
+                <Input
+                  type="number"
+                  min="1"
+                  placeholder="1"
+                  value={data.other_goals_vacation_years || ''}
+                  onChange={(e) => onChange('other_goals_vacation_years', parseInt(e.target.value) || '')}
+                  className="rounded-lg text-center"
+                />
+              </div>
+            </div>
+
+            <div className="grid grid-cols-4 gap-4 items-end">
+              <Label className="font-medium">Други</Label>
+              <div className="space-y-1">
+                <Label className="text-xs text-slate-500 text-center block">Описание</Label>
+                <Input
+                  type="text"
+                  placeholder="Опишете целта..."
+                  value={data.other_goals_other_description || ''}
+                  onChange={(e) => onChange('other_goals_other_description', e.target.value)}
+                  className="rounded-lg text-center"
+                />
+              </div>
+              <div className="space-y-1">
+                <Label className="text-xs text-slate-500 text-center block">Сума (€)</Label>
+                <Input
+                  type="number"
+                  min="0"
+                  placeholder="0"
+                  value={data.other_goals_other ?? ''}
+                  onChange={(e) => onChange('other_goals_other', e.target.value === '' ? '' : parseInt(e.target.value))}
+                  className="rounded-lg text-center"
+                />
+              </div>
+              <div className="space-y-1">
+                <Label className="text-xs text-slate-500 text-center block">Хоризонт (години)</Label>
+                <Input
+                  type="number"
+                  min="1"
+                  placeholder="1"
+                  value={data.other_goals_other_years || ''}
+                  onChange={(e) => onChange('other_goals_other_years', parseInt(e.target.value) || '')}
+                  className="rounded-lg text-center"
+                />
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* Include other goals in plan - only show if section is active */}
+      {!(data.skip_other_goals_section ?? true) && (
+        <label className="flex items-center gap-3 p-4 rounded-xl border-2 border-blue-200 bg-blue-50 cursor-pointer">
+          <Checkbox
+            checked={data.include_other_goals_in_plan || false}
+            onCheckedChange={(checked) => onChange('include_other_goals_in_plan', checked)}
+          />
+          <span className="font-medium text-blue-800">Да бъде включено във финансовия план</span>
+        </label>
+      )}
+    </>
+  );
+
   // Skip children section
   if (data.skip_children_section) {
     return (
@@ -90,65 +230,7 @@ export default function ChildrenGoalsStep({ data, onChange }) {
           </Button>
         </div>
 
-        {/* Other Goals section still visible */}
-        <div className="bg-slate-50 rounded-xl p-6">
-          <div className="flex items-center gap-2 mb-6">
-            <Palmtree className="h-5 w-5 text-blue-600" />
-            <h3 className="font-semibold text-slate-900">Други цели (кола, почивка...)</h3>
-          </div>
-
-          <div className="space-y-4">
-            <div className="flex items-center justify-between gap-4">
-              <div className="flex items-center gap-2">
-                <Car className="h-4 w-4 text-slate-500" />
-                <Label className="font-medium">Кола</Label>
-              </div>
-              <Input
-                type="number"
-                min="0"
-                placeholder="0"
-                value={data.other_goals_car || ''}
-                onChange={(e) => onChange('other_goals_car', parseInt(e.target.value) || '')}
-                className="rounded-lg w-32"
-              />
-            </div>
-
-            <div className="flex items-center justify-between gap-4">
-              <div className="flex items-center gap-2">
-                <Palmtree className="h-4 w-4 text-slate-500" />
-                <Label className="font-medium">Почивка</Label>
-              </div>
-              <Input
-                type="number"
-                min="0"
-                placeholder="0"
-                value={data.other_goals_vacation || ''}
-                onChange={(e) => onChange('other_goals_vacation', parseInt(e.target.value) || '')}
-                className="rounded-lg w-32"
-              />
-            </div>
-
-            <div className="flex items-center justify-between gap-4">
-              <Label className="font-medium">Други</Label>
-              <Input
-                type="number"
-                min="0"
-                placeholder="0"
-                value={data.other_goals_other || ''}
-                onChange={(e) => onChange('other_goals_other', parseInt(e.target.value) || '')}
-                className="rounded-lg w-32"
-              />
-            </div>
-          </div>
-        </div>
-
-        <label className="flex items-center gap-3 p-4 rounded-xl border-2 border-blue-200 bg-blue-50 cursor-pointer">
-          <Checkbox
-            checked={data.include_other_goals_in_plan || false}
-            onCheckedChange={(checked) => onChange('include_other_goals_in_plan', checked)}
-          />
-          <span className="font-medium text-blue-800">Да бъде включено във финансовия план</span>
-        </label>
+        {renderOtherGoalsSection()}
       </div>
     );
   }
@@ -177,49 +259,59 @@ export default function ChildrenGoalsStep({ data, onChange }) {
         </p>
 
         <div className="space-y-4">
-          <div className="flex items-center justify-between gap-4">
+          <div className="grid grid-cols-2 gap-4 items-end">
             <div>
               <Label className="font-medium">Разходи за раждане</Label>
               <p className="text-xs text-slate-500">детска количка, пелени, медицински грижи...</p>
             </div>
-            <Input
-              type="number"
-              min="0"
-              placeholder="0"
-              value={data.children_birth_costs || ''}
-              onChange={(e) => onChange('children_birth_costs', parseInt(e.target.value) || '')}
-              className="rounded-lg w-32"
-            />
+            <div className="space-y-1">
+              <Label className="text-xs text-slate-500 text-center block">Сума (€)</Label>
+              <Input
+                type="number"
+                min="0"
+                placeholder="0"
+                value={data.children_birth_costs ?? ''}
+                onChange={(e) => onChange('children_birth_costs', e.target.value === '' ? '' : parseInt(e.target.value))}
+                className="rounded-lg text-center"
+              />
+            </div>
           </div>
 
-          <div className="flex items-center justify-between gap-4">
+          <div className="grid grid-cols-2 gap-4 items-end">
             <div>
-              <Label className="font-medium">Висше образование</Label>
+              <Label className="font-medium">Висше образование <span className="text-red-500">*</span></Label>
               <p className="text-xs text-slate-500">студентски такси, общежитие...</p>
             </div>
-            <Input
-              type="number"
-              min="0"
-              placeholder="0"
-              value={data.children_education_costs || ''}
-              onChange={(e) => onChange('children_education_costs', parseInt(e.target.value) || '')}
-              className="rounded-lg w-32"
-            />
+            <div className="space-y-1">
+              <Label className="text-xs text-slate-500 text-center block">Сума (€)</Label>
+              <Input
+                type="number"
+                min="0"
+                placeholder="0"
+                value={data.children_education_costs ?? ''}
+                onChange={(e) => onChange('children_education_costs', e.target.value === '' ? '' : parseInt(e.target.value))}
+                className="rounded-lg text-center"
+                required
+              />
+            </div>
           </div>
 
-          <div className="flex items-center justify-between gap-4">
+          <div className="grid grid-cols-2 gap-4 items-end">
             <div>
               <Label className="font-medium">Старт в живота</Label>
               <p className="text-xs text-slate-500">помощ за жилище, започване на бизнес</p>
             </div>
-            <Input
-              type="number"
-              min="0"
-              placeholder="0"
-              value={data.children_start_life_costs || ''}
-              onChange={(e) => onChange('children_start_life_costs', parseInt(e.target.value) || '')}
-              className="rounded-lg w-32"
-            />
+            <div className="space-y-1">
+              <Label className="text-xs text-slate-500 text-center block">Сума (€)</Label>
+              <Input
+                type="number"
+                min="0"
+                placeholder="0"
+                value={data.children_start_life_costs ?? ''}
+                onChange={(e) => onChange('children_start_life_costs', e.target.value === '' ? '' : parseInt(e.target.value))}
+                className="rounded-lg text-center"
+              />
+            </div>
           </div>
 
           <div className="pt-4 border-t border-slate-200">
@@ -230,16 +322,19 @@ export default function ChildrenGoalsStep({ data, onChange }) {
           </div>
 
           {/* Current savings for children goals */}
-          <div className="flex items-center justify-between gap-4 pt-4">
+          <div className="grid grid-cols-2 gap-4 items-end pt-4">
             <Label className="font-medium">Колко спестявания имате заделени за горните цели?</Label>
-            <Input
-              type="number"
-              min="0"
-              placeholder="0"
-              value={data.children_current_savings || ''}
-              onChange={(e) => onChange('children_current_savings', parseInt(e.target.value) || '')}
-              className="rounded-lg w-32"
-            />
+            <div className="space-y-1">
+              <Label className="text-xs text-slate-500 text-center block">Сума (€)</Label>
+              <Input
+                type="number"
+                min="0"
+                placeholder="0"
+                value={data.children_current_savings ?? ''}
+                onChange={(e) => onChange('children_current_savings', e.target.value === '' ? '' : parseInt(e.target.value))}
+                className="rounded-lg text-center"
+              />
+            </div>
           </div>
 
           {/* Investment calculation message */}
@@ -325,142 +420,18 @@ export default function ChildrenGoalsStep({ data, onChange }) {
         </div>
       </div>
 
-      {/* Include children in plan */}
-      <label className="flex items-center gap-3 p-4 rounded-xl border-2 border-blue-200 bg-blue-50 cursor-pointer">
-        <Checkbox
-          checked={data.include_children_in_plan || false}
-          onCheckedChange={(checked) => onChange('include_children_in_plan', checked)}
-        />
-        <span className="font-medium text-blue-800">Да бъде включено във финансовия план</span>
-      </label>
+      {/* Include children in plan - only show if section is not skipped */}
+      {!data.skip_children_section && (
+        <label className="flex items-center gap-3 p-4 rounded-xl border-2 border-blue-200 bg-blue-50 cursor-pointer">
+          <Checkbox
+            checked={data.include_children_in_plan || false}
+            onCheckedChange={(checked) => onChange('include_children_in_plan', checked)}
+          />
+          <span className="font-medium text-blue-800">Да бъде включено във финансовия план</span>
+        </label>
+      )}
 
-      {/* Other Goals */}
-      <div className="bg-slate-50 rounded-xl p-6">
-        <div className="flex items-center justify-between mb-6">
-          <div className="flex items-center gap-2">
-            <Palmtree className="h-5 w-5 text-blue-600" />
-            <h3 className="font-semibold text-slate-900">Други цели (кола, почивка...)</h3>
-          </div>
-          <Button 
-            variant="outline" 
-            size="sm"
-            onClick={() => onChange('skip_other_goals_section', !data.skip_other_goals_section)}
-            className="rounded-full text-slate-600"
-          >
-            <SkipForward className="h-4 w-4 mr-2" />
-            {data.skip_other_goals_section ? 'Върни темата' : 'Пропусни темата'}
-          </Button>
-        </div>
-
-        {data.skip_other_goals_section ? (
-          <p className="text-slate-500 text-center py-4">Тази секция е пропусната.</p>
-        ) : (
-        <div className="space-y-4">
-          <div className="grid grid-cols-3 gap-4 items-end">
-            <div className="flex items-center gap-2">
-              <Car className="h-4 w-4 text-slate-500" />
-              <Label className="font-medium">Кола</Label>
-            </div>
-            <div className="space-y-1">
-              <Label className="text-xs text-slate-500">Сума (€)</Label>
-              <Input
-                type="number"
-                min="0"
-                placeholder="0"
-                value={data.other_goals_car || ''}
-                onChange={(e) => onChange('other_goals_car', parseInt(e.target.value) || '')}
-                className="rounded-lg"
-              />
-            </div>
-            <div className="space-y-1">
-              <Label className="text-xs text-slate-500">Хоризонт (години)</Label>
-              <Input
-                type="number"
-                min="1"
-                placeholder="1"
-                value={data.other_goals_car_years || ''}
-                onChange={(e) => onChange('other_goals_car_years', parseInt(e.target.value) || '')}
-                className="rounded-lg"
-              />
-            </div>
-          </div>
-
-          <div className="grid grid-cols-3 gap-4 items-end">
-            <div className="flex items-center gap-2">
-              <Palmtree className="h-4 w-4 text-slate-500" />
-              <Label className="font-medium">Почивка</Label>
-            </div>
-            <div className="space-y-1">
-              <Label className="text-xs text-slate-500">Сума (€)</Label>
-              <Input
-                type="number"
-                min="0"
-                placeholder="0"
-                value={data.other_goals_vacation || ''}
-                onChange={(e) => onChange('other_goals_vacation', parseInt(e.target.value) || '')}
-                className="rounded-lg"
-              />
-            </div>
-            <div className="space-y-1">
-              <Label className="text-xs text-slate-500">Хоризонт (години)</Label>
-              <Input
-                type="number"
-                min="1"
-                placeholder="1"
-                value={data.other_goals_vacation_years || ''}
-                onChange={(e) => onChange('other_goals_vacation_years', parseInt(e.target.value) || '')}
-                className="rounded-lg"
-              />
-            </div>
-          </div>
-
-          <div className="grid grid-cols-4 gap-4 items-end">
-            <Label className="font-medium">Други</Label>
-            <div className="space-y-1">
-              <Label className="text-xs text-slate-500">Описание</Label>
-              <Input
-                type="text"
-                placeholder="Опишете целта..."
-                value={data.other_goals_other_description || ''}
-                onChange={(e) => onChange('other_goals_other_description', e.target.value)}
-                className="rounded-lg"
-              />
-            </div>
-            <div className="space-y-1">
-              <Label className="text-xs text-slate-500">Сума (€)</Label>
-              <Input
-                type="number"
-                min="0"
-                placeholder="0"
-                value={data.other_goals_other || ''}
-                onChange={(e) => onChange('other_goals_other', parseInt(e.target.value) || '')}
-                className="rounded-lg"
-              />
-            </div>
-            <div className="space-y-1">
-              <Label className="text-xs text-slate-500">Хоризонт (години)</Label>
-              <Input
-                type="number"
-                min="1"
-                placeholder="1"
-                value={data.other_goals_other_years || ''}
-                onChange={(e) => onChange('other_goals_other_years', parseInt(e.target.value) || '')}
-                className="rounded-lg"
-              />
-            </div>
-          </div>
-        </div>
-        )}
-      </div>
-
-      {/* Include other goals in plan */}
-      <label className="flex items-center gap-3 p-4 rounded-xl border-2 border-blue-200 bg-blue-50 cursor-pointer">
-        <Checkbox
-          checked={data.include_other_goals_in_plan || false}
-          onCheckedChange={(checked) => onChange('include_other_goals_in_plan', checked)}
-        />
-        <span className="font-medium text-blue-800">Да бъде включено във финансовия план</span>
-      </label>
+      {renderOtherGoalsSection()}
     </div>
   );
 }

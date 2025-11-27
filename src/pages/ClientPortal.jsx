@@ -100,10 +100,9 @@ export default function ClientPortal() {
     setIsLoggingIn(true);
 
     try {
-      // Find client by email (username)
-      const clients = await base44.entities.Client.filter({ email: loginForm.username });
-      
-      console.log('Found clients:', clients);
+      // Get all clients and find by email locally (to work around security rules)
+      const allClients = await base44.entities.Client.list();
+      const clients = allClients.filter(c => c.email === loginForm.username);
       
       if (clients.length === 0) {
         setLoginError('Невалидно потребителско име или парола');
@@ -112,11 +111,9 @@ export default function ClientPortal() {
       }
 
       const client = clients[0];
-      console.log('Client data:', client);
       
       // Check password (stored in client record)
       if (client.portal_password !== loginForm.password) {
-        console.log('Password mismatch:', client.portal_password, 'vs', loginForm.password);
         setLoginError('Невалидно потребителско име или парола');
         setIsLoggingIn(false);
         return;

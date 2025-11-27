@@ -256,8 +256,8 @@ export default function ClientPortal() {
   // Authenticated but no client record
   if (!clientLoading && !clientData) {
     return (
-      <div className={`pt-20 min-h-screen ${darkMode ? 'bg-slate-900' : 'bg-gradient-to-br from-slate-50 to-blue-50'}`}
-        <div className="max-w-md mx-auto px-6 py-24">
+      <div className={`pt-20 min-h-screen ${darkMode ? 'bg-slate-900' : 'bg-gradient-to-br from-slate-50 to-blue-50'}`}>
+                <div className="max-w-md mx-auto px-6 py-24">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}

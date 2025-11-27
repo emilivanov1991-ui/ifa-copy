@@ -135,55 +135,49 @@ export default function PrioritiesStep({ data, onChange, showErrors }) {
         )}
       </div>
 
-      {/* Investment Summary */}
+      {/* Monthly Allocation */}
       <div className="bg-slate-50 rounded-xl p-6">
         <div className="flex items-center gap-2 mb-6">
           <TrendingUp className="h-5 w-5 text-blue-600" />
-          <h3 className="font-semibold text-slate-900">Инвестиции на финансовия пазар</h3>
+          <h3 className="font-semibold text-slate-900">Месечно заделяне</h3>
         </div>
 
-        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          <div className="space-y-2">
-            <Label>Месечно фиксирани (€)</Label>
+        <div className="space-y-4">
+          <div className="space-y-2" data-invalid={showErrors && (data.monthly_priority_allocation === undefined || data.monthly_priority_allocation === '') ? "true" : undefined}>
+            <Label>
+              Каква част от <span className="font-semibold text-blue-600">{(data.monthly_balance || 0).toLocaleString()} €</span> (месечен баланс от "Финансов поток"), която Ви остава на месечна база бихте заделили за осигуряване на Вашите приоритети? <span className="text-red-500">*</span>
+            </Label>
             <Input
               type="number"
               min="0"
-              placeholder="0"
-              value={data.monthly_fixed_investment || ''}
-              onChange={(e) => onChange('monthly_fixed_investment', parseInt(e.target.value) || '')}
-              className="rounded-lg"
+              placeholder="Въведете сума в евро"
+              value={data.monthly_priority_allocation ?? ''}
+              onChange={(e) => onChange('monthly_priority_allocation', e.target.value === '' ? '' : parseInt(e.target.value))}
+              className={`rounded-lg max-w-xs ${showErrors && (data.monthly_priority_allocation === undefined || data.monthly_priority_allocation === '') ? 'border-red-500 bg-red-50' : ''}`}
+              required
             />
           </div>
-          <div className="space-y-2">
-            <Label>Месечно променливи (€)</Label>
-            <Input
-              type="number"
-              min="0"
-              placeholder="0"
-              value={data.monthly_variable_investment || ''}
-              onChange={(e) => onChange('monthly_variable_investment', parseInt(e.target.value) || '')}
-              className="rounded-lg"
-            />
-          </div>
-          <div className="space-y-2">
-            <Label>Общо на месец (€)</Label>
-            <div className="h-10 px-3 py-2 bg-blue-100 border border-blue-200 rounded-lg flex items-center">
-              <span className="font-semibold text-blue-700">
-                {((data.monthly_fixed_investment || 0) + (data.monthly_variable_investment || 0)).toLocaleString()}
-              </span>
-            </div>
-          </div>
-          <div className="space-y-2">
-            <Label>Еднократно (€)</Label>
-            <Input
-              type="number"
-              min="0"
-              placeholder="0"
-              value={data.one_time_investment || ''}
-              onChange={(e) => onChange('one_time_investment', parseInt(e.target.value) || '')}
-              className="rounded-lg"
-            />
-          </div>
+        </div>
+      </div>
+
+      {/* Next Meeting */}
+      <div className="bg-slate-50 rounded-xl p-6">
+        <div className="flex items-center gap-2 mb-6">
+          <ListOrdered className="h-5 w-5 text-blue-600" />
+          <h3 className="font-semibold text-slate-900">Следваща среща</h3>
+        </div>
+
+        <div className="space-y-2" data-invalid={showErrors && !data.next_meeting_datetime ? "true" : undefined}>
+          <Label>
+            Кога би било удобно да се срещнем за презентация на Вашия финансов план? <span className="text-red-500">*</span>
+          </Label>
+          <Input
+            type="datetime-local"
+            value={data.next_meeting_datetime || ''}
+            onChange={(e) => onChange('next_meeting_datetime', e.target.value)}
+            className={`rounded-lg max-w-xs ${showErrors && !data.next_meeting_datetime ? 'border-red-500 bg-red-50' : ''}`}
+            required
+          />
         </div>
       </div>
     </div>

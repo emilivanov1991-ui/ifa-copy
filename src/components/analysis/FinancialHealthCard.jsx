@@ -785,33 +785,104 @@ ${JSON.stringify(analysisContext, null, 2)}
                   </div>
                 )}
 
-                {/* Missed Savings Comparison */}
-                {aiAnalysis.missed_savings_10_years > 0 && (
-                  <div className="bg-slate-50 rounded-xl p-4 border border-slate-200">
-                    <h5 className="font-semibold text-slate-700 mb-2 text-sm">💰 Сценарий: С план vs. Без план (10 години)</h5>
-                    <ResponsiveContainer width="100%" height={150}>
-                      <BarChart data={[
-                        { name: 'Без план', value: 0, fill: '#fca5a5' },
-                        { name: 'С план', value: aiAnalysis.missed_savings_10_years, fill: '#86efac' }
-                      ]}>
-                        <XAxis dataKey="name" tick={{ fontSize: 11 }} />
-                        <YAxis tick={{ fontSize: 10 }} tickFormatter={(v) => `€${(v/1000).toFixed(0)}k`} />
-                        <RechartsTooltip formatter={(v) => [`€${v.toLocaleString()}`, 'Стойност']} />
-                        <Bar dataKey="value" radius={[4, 4, 0, 0]}>
-                          {[
-                            { name: 'Без план', value: 0, fill: '#fca5a5' },
-                            { name: 'С план', value: aiAnalysis.missed_savings_10_years, fill: '#86efac' }
-                          ].map((entry, index) => (
-                            <Cell key={`cell-${index}`} fill={entry.fill} />
-                          ))}
-                        </Bar>
-                      </BarChart>
-                    </ResponsiveContainer>
-                    <p className="text-center text-green-600 font-bold mt-2">
-                      Разлика: €{aiAnalysis.missed_savings_10_years.toLocaleString()}
-                    </p>
-                  </div>
-                )}
+                {/* Savings Growth Comparison - Line Chart */}
+                {aiAnalysis.missed_savings_10_years > 0 && (() => {
+                  // Calculate years to retirement based on client/partner ages
+                  const clientAge = data.client_age || 35;
+                  const partnerAge = data.include_partner ? (data.partner_age || 35) : clientAge;
+                  const avgAge = data.include_partner ? Math.round((clientAge + partnerAge) / 2) : clientAge;
+                  
+                  const clientRetirementAge = data.client_retirement_age || 65;
+                  const partnerRetirementAge = data.include_partner ? (data.partner_retirement_age || 65) : clientRetirementAge;
+                  const avgRetirementAge = data.include_partner ? Math.round((clientRetirementAge + partnerRetirementAge) / 2) : clientRetirementAge;
+                  
+                  const yearsToRetirement = Math.max(5, avgRetirementAge - avgAge);
+                  
+                  // Calculate monthly savings
+                  const monthlySavingsAmount = monthlySavings > 0 ? monthlySavings : 500;
+                  
+                  // Generate data for each year
+                  const chartData = Array.from({ length: yearsToRetirement + 1 }, (_, i) => {
+                    const year = i;
+                    // Without plan: linear growth (just savings, no returns)
+                    const withoutPlan = monthlySavingsAmount * 12 * year;
+                    // With plan: compound growth at 8% annual return
+                    const annualContribution = monthlySavingsAmount * 12;
+                    let withPlan = 0;
+                    for (let y = 0; y < year; y++) {
+                      withPlan = (withPlan + annualContribution) * 1.08;
+                    }
+                    
+                    return {
+                      year: `${year}`,
+                      withoutPlan: Math.round(withoutPlan),
+                      withPlan: Math.round(withPlan)
+                    };
+                  });
+                  
+                  const finalWithPlan = chartData[chartData.length - 1]?.withPlan || 0;
+                  const finalWithoutPlan = chartData[chartData.length - 1]?.withoutPlan || 0;
+                  const difference = finalWithPlan - finalWithoutPlan;
+                  
+                  return (
+                    <div className="bg-slate-50 rounded-xl p-4 border border-slate-200">
+                      <h5 className="font-semibold text-slate-700 mb-2 text-sm">Сценарий: С план vs. Без план (до пенсия - {yearsToRetirement} години)</h5>
+                      <p className="text-xs text-slate-500 mb-3">Средна възраст: {avgAge} г. → Пенсия: {avgRetirementAge} г.</p>
+                      <ResponsiveContainer width="100%" height={180}>
+                        <LineChart data={chartData}>
+                          <XAxis 
+                            dataKey="year" 
+                            tick={{ fontSize: 10 }} 
+                            interval={Math.floor(yearsToRetirement / 6)}
+                            label={{ value: 'Години', position: 'bottom', fontSize: 10, offset: -5 }}
+                          />
+                          <YAxis 
+                            tick={{ fontSize: 10 }} 
+                            tickFormatter={(v) => `€${(v/1000).toFixed(0)}k`} 
+                          />
+                          <RechartsTooltip 
+                            formatter={(v, name) => [
+                              `€${v.toLocaleString()}`, 
+                              name === 'withPlan' ? 'С финансов план' : 'Без план'
+                            ]} 
+                            labelFormatter={(label) => `Година ${label}`}
+                          />
+                          <Legend 
+                            formatter={(value) => value === 'withPlan' ? 'С финансов план' : 'Без план'}
+                            wrapperStyle={{ fontSize: '11px' }}
+                          />
+                          <Line 
+                            type="monotone" 
+                            dataKey="withoutPlan" 
+                            stroke="#f87171" 
+                            strokeWidth={2}
+                            dot={false}
+                          />
+                          <Line 
+                            type="monotone" 
+                            dataKey="withPlan" 
+                            stroke="#22c55e" 
+                            strokeWidth={3}
+                            dot={false}
+                          />
+                        </LineChart>
+                      </ResponsiveContainer>
+                      <div className="mt-3 grid grid-cols-2 gap-2 text-center text-sm">
+                        <div className="bg-red-100 rounded-lg p-2">
+                          <p className="text-red-600 font-medium">Без план</p>
+                          <p className="text-red-700 font-bold">€{finalWithoutPlan.toLocaleString()}</p>
+                        </div>
+                        <div className="bg-green-100 rounded-lg p-2">
+                          <p className="text-green-600 font-medium">С план</p>
+                          <p className="text-green-700 font-bold">€{finalWithPlan.toLocaleString()}</p>
+                        </div>
+                      </div>
+                      <p className="text-center text-blue-600 font-bold mt-2">
+                        Разлика: €{difference.toLocaleString()} повече с правилно управление!
+                      </p>
+                    </div>
+                  );
+                })()}
               </div>
             )}
 

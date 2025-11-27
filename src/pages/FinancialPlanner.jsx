@@ -75,7 +75,8 @@ export default function FinancialPlanner() {
     setClientAge(35);
     setPartnerAge(33);
     setMonthlyIncome(5000);
-    setMainPriority(null);
+    setPartnerIncome(3000);
+    setSelectedPriorities([]);
   };
 
   const visibleSteps = STEPS;
@@ -388,17 +389,20 @@ export default function FinancialPlanner() {
             {/* Step 3: Monthly Income */}
             {currentStep === 3 && (
               <motion.div
-                key="step-4"
+                key="step-3"
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -20 }}
                 className="grid lg:grid-cols-2 gap-8 items-start"
               >
                 <div className="lg:pr-12">
-                  <p className={cn("text-sm tracking-widest mb-4", accentColor)}>СТЪПКА 4</p>
+                  <p className={cn("text-sm tracking-widest mb-4", accentColor)}>СТЪПКА 3</p>
                   <h1 className="text-4xl md:text-5xl font-bold mb-6">Месечен доход</h1>
                   <p className={cn("text-lg mb-6", mutedTextClasses)}>
-                    Въведете общия месечен доход на домакинството.
+                    {familyType === 'family' 
+                      ? 'Въведете месечния доход на клиента и партньора.'
+                      : 'Въведете вашия месечен доход.'
+                    }
                   </p>
                   <div className="flex gap-3">
                     <Button 
@@ -416,7 +420,7 @@ export default function FinancialPlanner() {
 
                 <div className={cn("rounded-3xl border p-8", cardClasses)}>
                   <div className="flex items-center justify-between mb-6">
-                    <p className={cn("text-sm tracking-widest", mutedTextClasses)}>СТЪПКА 4</p>
+                    <p className={cn("text-sm tracking-widest", mutedTextClasses)}>СТЪПКА 3</p>
                     <button onClick={restart} className={cn("text-sm", mutedTextClasses, "hover:text-blue-400")}>
                       рестарт
                     </button>
@@ -424,25 +428,63 @@ export default function FinancialPlanner() {
                   
                   <h2 className="text-2xl font-bold mb-8">Месечен доход</h2>
 
-                  <div className="text-center mb-8">
-                    <span className="text-5xl font-bold text-blue-500">{formatNumber(monthlyIncome)}</span>
-                    <span className={cn("text-2xl ml-2", mutedTextClasses)}>лв.</span>
+                  {/* Client Income */}
+                  <div className="mb-8">
+                    <p className={cn("text-sm font-medium mb-4", mutedTextClasses)}>
+                      {familyType === 'family' ? 'КЛИЕНТ' : 'ВАШИЯТ ДОХОД'}
+                    </p>
+                    <div className="text-center mb-4">
+                      <span className="text-4xl font-bold text-blue-500">{formatNumber(monthlyIncome)}</span>
+                      <span className={cn("text-xl ml-2", mutedTextClasses)}>лв.</span>
+                    </div>
+                    <Slider
+                      value={[monthlyIncome]}
+                      onValueChange={(v) => setMonthlyIncome(v[0])}
+                      min={1000}
+                      max={30000}
+                      step={100}
+                      className="mb-2"
+                    />
+                    <div className={cn("flex justify-between text-sm", mutedTextClasses)}>
+                      <span>1 000 лв.</span>
+                      <span>30 000 лв.</span>
+                    </div>
                   </div>
 
-                  <Slider
-                    value={[monthlyIncome]}
-                    onValueChange={(v) => setMonthlyIncome(v[0])}
-                    min={1000}
-                    max={30000}
-                    step={100}
-                    className="mb-4"
-                  />
-                  <div className={cn("flex justify-between text-sm", mutedTextClasses)}>
-                    <span>1 000 лв.</span>
-                    <span>30 000 лв.</span>
-                  </div>
+                  {/* Partner Income (only for family) */}
+                  {familyType === 'family' && (
+                    <div className="mb-8 pt-6 border-t border-slate-700">
+                      <p className={cn("text-sm font-medium mb-4", mutedTextClasses)}>ПАРТНЬОР</p>
+                      <div className="text-center mb-4">
+                        <span className="text-4xl font-bold text-blue-500">{formatNumber(partnerIncome)}</span>
+                        <span className={cn("text-xl ml-2", mutedTextClasses)}>лв.</span>
+                      </div>
+                      <Slider
+                        value={[partnerIncome]}
+                        onValueChange={(v) => setPartnerIncome(v[0])}
+                        min={1000}
+                        max={30000}
+                        step={100}
+                        className="mb-2"
+                      />
+                      <div className={cn("flex justify-between text-sm", mutedTextClasses)}>
+                        <span>1 000 лв.</span>
+                        <span>30 000 лв.</span>
+                      </div>
+                    </div>
+                  )}
 
-                  <div className="flex gap-3 mt-8">
+                  {/* Total (for family) */}
+                  {familyType === 'family' && (
+                    <div className={cn("p-4 rounded-xl mb-6", isDarkMode ? "bg-slate-800" : "bg-slate-100")}>
+                      <div className="flex justify-between items-center">
+                        <span className={mutedTextClasses}>Общо месечен доход:</span>
+                        <span className="text-xl font-bold text-blue-500">{formatNumber(monthlyIncome + partnerIncome)} лв.</span>
+                      </div>
+                    </div>
+                  )}
+
+                  <div className="flex gap-3">
                     <Button 
                       variant="outline" 
                       onClick={goBack}
@@ -834,6 +876,92 @@ export default function FinancialPlanner() {
                       <p className={cn("text-sm", mutedTextClasses)}>
                         Проследяваме изпълнението чрез прозрачен цикъл на срещи, 
                         актуализации и навременни действия.
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="flex gap-3">
+                    <Button 
+                      variant="outline" 
+                      onClick={goBack}
+                      className={cn("rounded-full px-6", isDarkMode ? "border-slate-700 hover:bg-slate-800" : "")}
+                    >
+                      Назад
+                    </Button>
+                    <Button 
+                      onClick={goNext}
+                      className="rounded-full px-6 bg-blue-600 hover:bg-blue-700"
+                    >
+                      Напред
+                    </Button>
+                  </div>
+                </div>
+              </motion.div>
+            )}
+
+            {/* Step 7: Cooperation Rules */}
+            {currentStep === 7 && (
+              <motion.div
+                key="step-7"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -20 }}
+                className="max-w-4xl mx-auto"
+              >
+                <div className={cn("rounded-3xl border p-8", cardClasses)}>
+                  <div className="flex items-center gap-3 mb-6">
+                    <span className={cn("text-xs tracking-widest", mutedTextClasses)}>ДИСКРЕТНОСТ</span>
+                    <span className={cn("text-xs", mutedTextClasses)}>•</span>
+                    <span className={cn("text-xs tracking-widest", mutedTextClasses)}>КОРЕКТНОСТ</span>
+                    <span className={cn("text-xs", mutedTextClasses)}>•</span>
+                    <span className={cn("text-xs tracking-widest", mutedTextClasses)}>ПРОЗРАЧНОСТ</span>
+                    <span className={cn("text-xs", mutedTextClasses)}>•</span>
+                    <span className={cn("text-xs tracking-widest", mutedTextClasses)}>ВЪЗНАГРАЖДЕНИЕ</span>
+                  </div>
+
+                  <h2 className="text-3xl font-bold mb-4">Правила за сътрудничество</h2>
+                  <p className={cn("text-sm mb-8 max-w-2xl", mutedTextClasses)}>
+                    Нашите принципи на работа гарантират професионализъм и доверие във всяка стъпка от процеса.
+                  </p>
+
+                  <div className="grid md:grid-cols-2 gap-6 mb-8">
+                    <div className={cn("rounded-2xl border p-6", isDarkMode ? "border-slate-800" : "border-slate-200")}>
+                      <p className={cn("text-xs tracking-widest mb-2", mutedTextClasses)}>ПРАВИЛО 1</p>
+                      <h3 className="text-xl font-semibold mb-1">Дискретност</h3>
+                      <p className="text-blue-400 text-sm mb-3">Пълна конфиденциалност</p>
+                      <p className={cn("text-sm", mutedTextClasses)}>
+                        Вашите лични и финансови данни са напълно защитени. 
+                        Никога не споделяме информация с трети страни без вашето изрично съгласие.
+                      </p>
+                    </div>
+
+                    <div className={cn("rounded-2xl border p-6", isDarkMode ? "border-slate-800" : "border-slate-200")}>
+                      <p className={cn("text-xs tracking-widest mb-2", mutedTextClasses)}>ПРАВИЛО 2</p>
+                      <h3 className="text-xl font-semibold mb-1">Коректност</h3>
+                      <p className="text-blue-400 text-sm mb-3">Честни взаимоотношения</p>
+                      <p className={cn("text-sm", mutedTextClasses)}>
+                        Работим с ясни правила и спазваме всички договорености. 
+                        Вашият интерес е винаги на първо място в нашите препоръки.
+                      </p>
+                    </div>
+
+                    <div className={cn("rounded-2xl border p-6", isDarkMode ? "border-slate-800" : "border-slate-200")}>
+                      <p className={cn("text-xs tracking-widest mb-2", mutedTextClasses)}>ПРАВИЛО 3</p>
+                      <h3 className="text-xl font-semibold mb-1">Прозрачност</h3>
+                      <p className="text-blue-400 text-sm mb-3">Открита комуникация</p>
+                      <p className={cn("text-sm", mutedTextClasses)}>
+                        Обясняваме всяка стъпка и решение. Няма скрити условия или 
+                        неясни такси - всичко е ясно от самото начало.
+                      </p>
+                    </div>
+
+                    <div className={cn("rounded-2xl border p-6", isDarkMode ? "border-slate-800" : "border-slate-200")}>
+                      <p className={cn("text-xs tracking-widest mb-2", mutedTextClasses)}>ПРАВИЛО 4</p>
+                      <h3 className="text-xl font-semibold mb-1">Възнаграждение</h3>
+                      <p className="text-blue-400 text-sm mb-3">Без директни такси от клиенти</p>
+                      <p className={cn("text-sm", mutedTextClasses)}>
+                        Не получаваме директно заплащане от вас. Възнаграждението ни идва от 
+                        финансовите институции под формата на комисионна за посредничество.
                       </p>
                     </div>
                   </div>

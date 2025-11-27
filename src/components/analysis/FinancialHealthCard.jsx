@@ -19,7 +19,7 @@ import {
   AlertCircle
 } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
-import { AreaChart, Area, XAxis, YAxis, Tooltip as RechartsTooltip, ResponsiveContainer, BarChart, Bar, Cell } from 'recharts';
+import { AreaChart, Area, XAxis, YAxis, Tooltip as RechartsTooltip, ResponsiveContainer, LineChart, Line, Legend } from 'recharts';
 import {
   Tooltip,
   TooltipContent,

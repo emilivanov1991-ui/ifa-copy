@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider";
-import { Moon, Sun, RotateCcw } from 'lucide-react';
+import { Moon, Sun, RotateCcw, Loader2 } from 'lucide-react';
 import { cn } from "@/lib/utils";
 import { Link } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
@@ -38,6 +38,8 @@ export default function FinancialPlanner() {
     housing: 220000,
     cash: 45000
   });
+  
+  const [isGenerating, setIsGenerating] = useState(false);
 
   // Calculate total wealth
   const totalWealth = Object.values(goals).reduce((a, b) => a + b, 0);
@@ -58,7 +60,14 @@ export default function FinancialPlanner() {
 
   // Navigation
   const goNext = () => {
-    if (currentStep < 8) {
+    if (currentStep === 4) {
+      // Show generating animation before financial framework
+      setIsGenerating(true);
+      setTimeout(() => {
+        setIsGenerating(false);
+        setCurrentStep(5);
+      }, 3000);
+    } else if (currentStep < 8) {
       setCurrentStep(currentStep + 1);
     }
   };
@@ -187,34 +196,14 @@ export default function FinancialPlanner() {
                     Стъпките от оригиналния LifePlanner се представят като самостоятелни сцени. 
                     Изборите ви се запазват през целия поток.
                   </p>
-                  <div className="flex gap-3">
-                    <Button 
-                      variant="outline" 
-                      onClick={goBack}
-                      disabled={currentStep === 1}
-                      className={cn(
-                        "rounded-full px-6",
-                        isDarkMode ? "border-slate-700 hover:bg-slate-800" : ""
-                      )}
-                    >
-                      Назад
-                    </Button>
-                    <Button 
-                      onClick={goNext}
-                      disabled={!familyType}
-                      className="rounded-full px-6 bg-blue-600 hover:bg-blue-700"
-                    >
-                      Напред
-                    </Button>
-                  </div>
                 </div>
 
                 {/* Right side - card */}
                 <div className={cn("rounded-3xl border p-8", cardClasses)}>
                   <div className="flex items-center justify-between mb-6">
                     <p className={cn("text-sm tracking-widest", mutedTextClasses)}>СТЪПКА 1</p>
-                    <button onClick={restart} className={cn("text-sm", mutedTextClasses, "hover:text-blue-400")}>
-                      рестарт
+                    <button onClick={restart} className={cn("p-2 rounded-lg transition-colors", isDarkMode ? "hover:bg-slate-800" : "hover:bg-slate-100")}>
+                      <RotateCcw className={cn("w-4 h-4", mutedTextClasses, "hover:text-blue-400")} />
                     </button>
                   </div>
                   
@@ -300,25 +289,13 @@ export default function FinancialPlanner() {
                       : 'Въведете вашата възраст.'
                     }
                   </p>
-                  <div className="flex gap-3">
-                    <Button 
-                      variant="outline" 
-                      onClick={goBack}
-                      className={cn("rounded-full px-6", isDarkMode ? "border-slate-700 hover:bg-slate-800" : "")}
-                    >
-                      Назад
-                    </Button>
-                    <Button onClick={goNext} className="rounded-full px-6 bg-blue-600 hover:bg-blue-700">
-                      Напред
-                    </Button>
-                  </div>
                 </div>
 
                 <div className={cn("rounded-3xl border p-8", cardClasses)}>
                   <div className="flex items-center justify-between mb-6">
                     <p className={cn("text-sm tracking-widest", mutedTextClasses)}>СТЪПКА 2</p>
-                    <button onClick={restart} className={cn("text-sm", mutedTextClasses, "hover:text-blue-400")}>
-                      рестарт
+                    <button onClick={restart} className={cn("p-2 rounded-lg transition-colors", isDarkMode ? "hover:bg-slate-800" : "hover:bg-slate-100")}>
+                      <RotateCcw className={cn("w-4 h-4", mutedTextClasses, "hover:text-blue-400")} />
                     </button>
                   </div>
                   
@@ -404,25 +381,13 @@ export default function FinancialPlanner() {
                       : 'Въведете вашия месечен доход.'
                     }
                   </p>
-                  <div className="flex gap-3">
-                    <Button 
-                      variant="outline" 
-                      onClick={goBack}
-                      className={cn("rounded-full px-6", isDarkMode ? "border-slate-700 hover:bg-slate-800" : "")}
-                    >
-                      Назад
-                    </Button>
-                    <Button onClick={goNext} className="rounded-full px-6 bg-blue-600 hover:bg-blue-700">
-                      Напред
-                    </Button>
-                  </div>
                 </div>
 
                 <div className={cn("rounded-3xl border p-8", cardClasses)}>
                   <div className="flex items-center justify-between mb-6">
                     <p className={cn("text-sm tracking-widest", mutedTextClasses)}>СТЪПКА 3</p>
-                    <button onClick={restart} className={cn("text-sm", mutedTextClasses, "hover:text-blue-400")}>
-                      рестарт
+                    <button onClick={restart} className={cn("p-2 rounded-lg transition-colors", isDarkMode ? "hover:bg-slate-800" : "hover:bg-slate-100")}>
+                      <RotateCcw className={cn("w-4 h-4", mutedTextClasses, "hover:text-blue-400")} />
                     </button>
                   </div>
                   
@@ -515,29 +480,13 @@ export default function FinancialPlanner() {
                   <p className={cn("text-lg mb-6", mutedTextClasses)}>
                     Изберете една или повече посоки, които резонират с вашите мечти.
                   </p>
-                  <div className="flex gap-3">
-                    <Button 
-                      variant="outline" 
-                      onClick={goBack}
-                      className={cn("rounded-full px-6", isDarkMode ? "border-slate-700 hover:bg-slate-800" : "")}
-                    >
-                      Назад
-                    </Button>
-                    <Button 
-                      onClick={goNext}
-                      disabled={selectedPriorities.length === 0}
-                      className="rounded-full px-6 bg-blue-600 hover:bg-blue-700"
-                    >
-                      Напред
-                    </Button>
-                  </div>
                 </div>
 
                 <div className={cn("rounded-3xl border p-8", cardClasses)}>
                   <div className="flex items-center justify-between mb-6">
                     <p className={cn("text-sm tracking-widest", mutedTextClasses)}>СТЪПКА 4</p>
-                    <button onClick={restart} className={cn("text-sm", mutedTextClasses, "hover:text-blue-400")}>
-                      рестарт
+                    <button onClick={restart} className={cn("p-2 rounded-lg transition-colors", isDarkMode ? "hover:bg-slate-800" : "hover:bg-slate-100")}>
+                      <RotateCcw className={cn("w-4 h-4", mutedTextClasses, "hover:text-blue-400")} />
                     </button>
                   </div>
                   
@@ -634,10 +583,40 @@ export default function FinancialPlanner() {
               </motion.div>
             )}
 
-            {/* Step 5: Financial Framework */}
-            {currentStep === 5 && (
+            {/* Generating Animation */}
+            {isGenerating && (
               <motion.div
-                key="step-6"
+                key="generating"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                className="flex flex-col items-center justify-center min-h-[60vh]"
+              >
+                <motion.div
+                  animate={{ rotate: 360 }}
+                  transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
+                  className="mb-8"
+                >
+                  <Loader2 className="w-16 h-16 text-blue-500" />
+                </motion.div>
+                <h2 className="text-2xl font-bold mb-4">Генериране на финансов план</h2>
+                <div className="flex items-center gap-1">
+                  {[0, 1, 2].map((i) => (
+                    <motion.span
+                      key={i}
+                      className="w-2 h-2 bg-blue-500 rounded-full"
+                      animate={{ opacity: [0.3, 1, 0.3] }}
+                      transition={{ duration: 1.5, repeat: Infinity, delay: i * 0.3 }}
+                    />
+                  ))}
+                </div>
+              </motion.div>
+            )}
+
+            {/* Step 5: Financial Framework */}
+            {currentStep === 5 && !isGenerating && (
+              <motion.div
+                key="step-5"
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -20 }}
@@ -656,11 +635,7 @@ export default function FinancialPlanner() {
                       <span className={cn("text-xs tracking-widest", mutedTextClasses)}>РЕЗЕРВ</span>
                     </div>
 
-                    <h2 className="text-3xl font-bold mb-4">Финансова рамка</h2>
-                    <p className={cn("text-sm mb-8 max-w-2xl", mutedTextClasses)}>
-                      Пресъздадохме слайд 10 от LifePlanner като интерактивна карта на активите. 
-                      Регулирайте всяка категория, за да покажем как решенията влияят върху общото имущество.
-                    </p>
+                    <h2 className="text-3xl font-bold mb-8">Вашият оптимален финансов план</h2>
 
                     {/* Goal sliders */}
                     <div className="space-y-8">
@@ -670,10 +645,10 @@ export default function FinancialPlanner() {
                         <div className="flex items-start justify-between mb-4">
                           <div>
                             <h3 className="text-xl font-semibold">Финансова сигурност</h3>
-                            <p className={cn("text-sm", mutedTextClasses)}>Фонд за минимум 12 месеца защита на дохода и извънредни случай.</p>
+                            <p className={cn("text-sm", mutedTextClasses)}>Фонд за минимум 6 месеца защита на дохода и извънредни случаи.</p>
                           </div>
                           <div className="text-right">
-                            <span className="text-2xl font-bold text-blue-500">{formatNumber(goals.security)} лв.</span>
+                            <span className="text-2xl font-bold text-blue-500">{formatNumber((monthlyIncome + (familyType === 'family' ? partnerIncome : 0)) * 6)} лв.</span>
                           </div>
                         </div>
                         <Slider
@@ -696,7 +671,7 @@ export default function FinancialPlanner() {
                         <div className="flex items-start justify-between mb-4">
                           <div>
                             <h3 className="text-xl font-semibold">Пенсия</h3>
-                            <p className={cn("text-sm", mutedTextClasses)}>Капитал за пасивен доход след 55+ години.</p>
+                            <p className={cn("text-sm", mutedTextClasses)}>Месечна пенсия</p>
                           </div>
                           <div className="text-right">
                             <span className="text-2xl font-bold text-blue-500">{formatNumber(goals.pension)} лв.</span>

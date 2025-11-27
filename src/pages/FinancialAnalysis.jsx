@@ -107,7 +107,8 @@ export default function FinancialAnalysis() {
             formData.client_job_description &&
             formData.client_employer_name &&
             formData.client_contract_type &&
-            formData.client_contract_term
+            formData.client_contract_term &&
+            formData.client_contract_start_date
           );
         } else {
           clientEmploymentValid = !!(
@@ -163,7 +164,8 @@ export default function FinancialAnalysis() {
               formData.partner_job_description &&
               formData.partner_employer_name &&
               formData.partner_contract_type &&
-              formData.partner_contract_term
+              formData.partner_contract_term &&
+              formData.partner_contract_start_date
             );
           } else {
             partnerValid = partnerValid && !!(

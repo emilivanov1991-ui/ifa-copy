@@ -1,9 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { createPageUrl } from './utils';
-import { Menu, X, TrendingUp } from 'lucide-react';
+import { Menu, X, TrendingUp, LogIn, User, Briefcase } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { motion, AnimatePresence } from 'framer-motion';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 const navLinks = [
   { name: 'Начало', page: 'Home' },
@@ -13,7 +19,6 @@ const navLinks = [
   { name: 'Financial Planner', page: 'FinancialPlanner' },
   { name: 'Безплатен анализ', page: 'FinancialAnalysis' },
   { name: 'Контакти', page: 'Contact' },
-  { name: 'Клиентски портал', page: 'ClientPortal' },
 ];
 
 export default function Layout({ children, currentPageName }) {
@@ -74,15 +79,44 @@ export default function Layout({ children, currentPageName }) {
                 {link.name}
               </Link>
             ))}
-            <Button 
-              className={`rounded-full px-6 transition-all duration-300 ${
-                isScrolled 
-                  ? 'bg-blue-600 hover:bg-blue-700 text-white' 
-                  : 'bg-white/20 hover:bg-white/30 text-white backdrop-blur-sm border border-white/30'
-              }`}
-            >
-              Започнете сега
-            </Button>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button 
+                  className={`rounded-full px-6 transition-all duration-300 ${
+                    isScrolled 
+                      ? 'bg-blue-600 hover:bg-blue-700 text-white' 
+                      : 'bg-white/20 hover:bg-white/30 text-white backdrop-blur-sm border border-white/30'
+                  }`}
+                >
+                  <LogIn className="h-4 w-4 mr-2" />
+                  Вход
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-56 p-2 bg-white/95 backdrop-blur-md border-slate-200/50 shadow-xl">
+                <DropdownMenuItem asChild className="cursor-pointer rounded-lg py-3 px-4 focus:bg-blue-50">
+                  <Link to={createPageUrl('ClientPortal')} className="flex items-center gap-3">
+                    <div className="w-8 h-8 rounded-lg bg-blue-100 flex items-center justify-center">
+                      <User className="h-4 w-4 text-blue-600" />
+                    </div>
+                    <div>
+                      <p className="font-medium text-slate-900">Вход за клиенти</p>
+                      <p className="text-xs text-slate-500">Достъп до вашия портал</p>
+                    </div>
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild className="cursor-pointer rounded-lg py-3 px-4 focus:bg-violet-50">
+                  <Link to={createPageUrl('ConsultantPortal')} className="flex items-center gap-3">
+                    <div className="w-8 h-8 rounded-lg bg-violet-100 flex items-center justify-center">
+                      <Briefcase className="h-4 w-4 text-violet-600" />
+                    </div>
+                    <div>
+                      <p className="font-medium text-slate-900">Вход за консултанти</p>
+                      <p className="text-xs text-slate-500">Администрация и CRM</p>
+                    </div>
+                  </Link>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </nav>
 
           {/* Mobile Menu Button */}
@@ -120,9 +154,20 @@ export default function Layout({ children, currentPageName }) {
                     {link.name}
                   </Link>
                 ))}
-                <Button className="bg-blue-600 hover:bg-blue-700 text-white rounded-full mt-2">
-                  Започнете сега
-                </Button>
+                <div className="space-y-2 mt-2">
+                  <Link to={createPageUrl('ClientPortal')} onClick={() => setMobileMenuOpen(false)}>
+                    <Button className="w-full bg-blue-600 hover:bg-blue-700 text-white rounded-full">
+                      <User className="h-4 w-4 mr-2" />
+                      Вход за клиенти
+                    </Button>
+                  </Link>
+                  <Link to={createPageUrl('ConsultantPortal')} onClick={() => setMobileMenuOpen(false)}>
+                    <Button variant="outline" className="w-full border-violet-300 text-violet-700 hover:bg-violet-50 rounded-full">
+                      <Briefcase className="h-4 w-4 mr-2" />
+                      Вход за консултанти
+                    </Button>
+                  </Link>
+                </div>
               </nav>
             </motion.div>
           )}

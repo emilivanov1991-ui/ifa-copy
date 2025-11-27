@@ -30,6 +30,7 @@ import PortfolioChart from '../components/portal/PortfolioChart';
 import ProductsList from '../components/portal/ProductsList';
 import PaymentsList from '../components/portal/PaymentsList';
 import ProposedProducts from '../components/portal/ProposedProducts';
+import DocumentsManager from '../components/portal/DocumentsManager';
 
 export default function ClientPortal() {
   const [isAuthenticated, setIsAuthenticated] = useState(null);
@@ -294,6 +295,7 @@ export default function ClientPortal() {
                 <Badge className="ml-2 bg-blue-500">{proposedProducts.length}</Badge>
               )}
             </TabsTrigger>
+            <TabsTrigger value="documents" className="rounded-full">Документи</TabsTrigger>
           </TabsList>
 
           <TabsContent value="overview" className="space-y-6">
@@ -380,6 +382,10 @@ export default function ClientPortal() {
 
           <TabsContent value="proposed">
             <ProposedProducts products={proposedProducts} />
+          </TabsContent>
+
+          <TabsContent value="documents">
+            <DocumentsManager clientId={clientData?.id} />
           </TabsContent>
         </Tabs>
       </div>

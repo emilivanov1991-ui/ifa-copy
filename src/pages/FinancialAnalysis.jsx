@@ -693,6 +693,15 @@ export default function FinancialAnalysis() {
     }
   };
 
+  const generatePassword = () => {
+    const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz23456789';
+    let password = '';
+    for (let i = 0; i < 8; i++) {
+      password += chars.charAt(Math.floor(Math.random() * chars.length));
+    }
+    return password;
+  };
+
   const handleSubmit = async () => {
     setIsSubmitting(true);
 
@@ -704,6 +713,32 @@ export default function FinancialAnalysis() {
     });
 
     await base44.entities.FinancialAnalysisSubmission.create(cleanData);
+
+    // Generate passwords for portal access
+    const clientPassword = generatePassword();
+    const partnerPassword = generatePassword();
+
+    // Create Client record for client
+    await base44.entities.Client.create({
+      first_name: formData.client_first_name,
+      last_name: formData.client_last_name,
+      email: formData.client_email,
+      phone: formData.client_phone,
+      portal_password: clientPassword,
+      status: 'pending'
+    });
+
+    // Create Client record for partner if included
+    if (formData.include_partner && formData.partner_email) {
+      await base44.entities.Client.create({
+        first_name: formData.partner_first_name,
+        last_name: formData.partner_last_name,
+        email: formData.partner_email,
+        phone: formData.partner_phone,
+        portal_password: partnerPassword,
+        status: 'pending'
+      });
+    }
 
     // Send emails to client and partner
     const clientName = `${formData.client_first_name} ${formData.client_last_name}`;
@@ -719,10 +754,13 @@ export default function FinancialAnalysis() {
 
 Вашите данни са получени успешно и ще бъдат прегледани от нашия екип. Очаквайте обаждане или имейл в рамките на 24-48 часа за насрочване на Вашата безплатна консултация.
 
-👉 За достъп до Вашия клиентски портал, моля регистрирайте се на следния линк:
-${portalUrl}
+🔐 Данни за вход в клиентския портал:
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Потребител: ${clientEmail}
+Парола: ${clientPassword}
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-Използвайте имейл адреса: ${clientEmail}
+👉 Вход в портала: ${portalUrl}
 
 В клиентския портал можете да:
 • Преглеждате Вашия финансов анализ
@@ -738,7 +776,7 @@ ${portalUrl}
 
       await base44.integrations.Core.SendEmail({
         to: clientEmail,
-        subject: 'Вашият финансов анализ е получен - Регистрирайте се в портала',
+        subject: 'Вашият финансов анализ е получен - Данни за вход в портала',
         body: clientEmailBody
       });
     }
@@ -756,10 +794,13 @@ ${portalUrl}
 
 Вашите данни са получени успешно и ще бъдат прегледани от нашия екип. Очаквайте обаждане или имейл в рамките на 24-48 часа за насрочване на Вашата безплатна консултация.
 
-👉 За достъп до Вашия клиентски портал, моля регистрирайте се на следния линк:
-${portalUrl}
+🔐 Данни за вход в клиентския портал:
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Потребител: ${partnerEmail}
+Парола: ${partnerPassword}
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-Използвайте имейл адреса: ${partnerEmail}
+👉 Вход в портала: ${portalUrl}
 
 В клиентския портал можете да:
 • Преглеждате Вашия финансов анализ
@@ -775,7 +816,7 @@ ${portalUrl}
 
       await base44.integrations.Core.SendEmail({
         to: partnerEmail,
-        subject: 'Вашият финансов анализ е получен - Регистрирайте се в портала',
+        subject: 'Вашият финансов анализ е получен - Данни за вход в портала',
         body: partnerEmailBody
       });
     }

@@ -80,11 +80,14 @@ export default function PrioritiesStep({ data, onChange, showErrors }) {
 
   return (
     <div className="space-y-8">
+      {/* Financial Health Card */}
+      <FinancialHealthCard data={data} />
+
       {/* Priorities */}
       <div className="bg-slate-50 rounded-xl p-6">
         <div className="flex items-center gap-2 mb-2">
           <ListOrdered className="h-5 w-5 text-blue-600" />
-          <h3 className="font-semibold text-slate-900">Какви са Вашите приоритети сега? <span className="text-red-500">*</span></h3>
+          <h3 className="font-semibold text-slate-900">След анализа и на база на видяното - Какви са Вашите приоритети сега? <span className="text-red-500">*</span></h3>
         </div>
         <p className="text-sm text-slate-600 mb-4">1 - най-важно, {maxPriority} - най-малко важно</p>
 
@@ -130,10 +133,6 @@ export default function PrioritiesStep({ data, onChange, showErrors }) {
         {isInvalid && (
           <p className="text-red-500 text-sm mt-2">Моля, задайте приоритет на всички елементи.</p>
         )}
-      </div>
-
-      {/* Financial Health Card */}
-      <FinancialHealthCard data={data} />
 
       {/* Investment Summary */}
       <div className="bg-slate-50 rounded-xl p-6">

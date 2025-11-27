@@ -49,7 +49,7 @@ const steps = [
   { id: 6, title: 'Деца и Други цели', icon: Baby },
   { id: 7, title: 'Защита', icon: Wallet },
   { id: 8, title: 'Финансов поток', icon: BarChart3 },
-  { id: 9, title: 'Приоритети', icon: ListOrdered },
+  { id: 9, title: 'Обобщение', icon: FileCheck },
 ];
 
 export default function FinancialAnalysis() {

@@ -181,10 +181,6 @@ export default function FinancialPlanner() {
                   <p className={cn("text-lg mb-6", mutedTextClasses)}>
                     Изберете дали работим с един клиент или с домакинство.
                   </p>
-                  <p className={cn("text-sm mb-8", mutedTextClasses)}>
-                    Стъпките от оригиналния LifePlanner се представят като самостоятелни сцени. 
-                    Изборите ви се запазват през целия поток.
-                  </p>
                 </div>
 
                 {/* Right side - card */}
@@ -473,7 +469,7 @@ export default function FinancialPlanner() {
                   <p className={cn("text-sm tracking-widest mb-4", accentColor)}>СТЪПКА 4</p>
                   <h1 className="text-4xl md:text-5xl font-bold mb-6">Приоритети</h1>
                   <p className={cn("text-lg mb-6", mutedTextClasses)}>
-                    Изберете една или повече посоки, които резонират с вашите мечти.
+                    Изберете една или повече посоки, които резонират с Вашите мечти.
                   </p>
                 </div>
 
@@ -487,67 +483,67 @@ export default function FinancialPlanner() {
                   
                   <h2 className="text-2xl font-bold mb-2">Приоритети</h2>
                   <p className={cn("text-sm mb-4", mutedTextClasses)}>
-                    Изберете една или повече посоки, които резонират с вашите мечти.
+                    Изберете една или повече посоки, които резонират с Вашите мечти.
                   </p>
 
                   <div className="grid grid-cols-4 gap-3 mb-6">
                     <button
                       onClick={() => togglePriority('stability')}
                       className={cn(
-                        "p-4 rounded-2xl border-2 text-left transition-all",
+                        "p-4 rounded-2xl border-2 transition-all flex flex-col h-full",
                         selectedPriorities.includes('stability')
                           ? "border-blue-500 bg-blue-500/10"
                           : isDarkMode ? "border-slate-700 hover:border-slate-600" : "border-slate-200 hover:border-slate-300"
                       )}
                     >
-                      <h3 className="font-semibold text-sm mb-1">Финансова стабилност</h3>
-                      <p className={cn("text-xs", mutedTextClasses)}>
-                        Фонд за спокойствие и защита на дохода.
+                      <h3 className="font-semibold text-sm mb-2 text-center">Финансова стабилност</h3>
+                      <p className={cn("text-xs text-center flex-1", mutedTextClasses)}>
+                        Фонд за спокойствие и защита на дохода
                       </p>
                     </button>
                     
                     <button
                       onClick={() => togglePriority('investments')}
                       className={cn(
-                        "p-4 rounded-2xl border-2 text-left transition-all",
+                        "p-4 rounded-2xl border-2 transition-all flex flex-col h-full",
                         selectedPriorities.includes('investments')
                           ? "border-blue-500 bg-blue-500/10"
                           : isDarkMode ? "border-slate-700 hover:border-slate-600" : "border-slate-200 hover:border-slate-300"
                       )}
                     >
-                      <h3 className="font-semibold text-sm mb-1">Инвестиции</h3>
-                      <p className={cn("text-xs", mutedTextClasses)}>
-                        Ускорени инвестиции и възвръщаемост.
+                      <h3 className="font-semibold text-sm mb-2 text-center">Инвестиции</h3>
+                      <p className={cn("text-xs text-center flex-1", mutedTextClasses)}>
+                        Ускорени инвестиции и възвръщаемост
                       </p>
                     </button>
                     
                     <button
                       onClick={() => togglePriority('children')}
                       className={cn(
-                        "p-4 rounded-2xl border-2 text-left transition-all",
+                        "p-4 rounded-2xl border-2 transition-all flex flex-col h-full",
                         selectedPriorities.includes('children')
                           ? "border-blue-500 bg-blue-500/10"
                           : isDarkMode ? "border-slate-700 hover:border-slate-600" : "border-slate-200 hover:border-slate-300"
                       )}
                     >
-                      <h3 className="font-semibold text-sm mb-1">Подсигуряване на деца</h3>
-                      <p className={cn("text-xs", mutedTextClasses)}>
-                        Капитал за бъдещето на децата.
+                      <h3 className="font-semibold text-sm mb-2 text-center">Подсигуряване на деца</h3>
+                      <p className={cn("text-xs text-center flex-1", mutedTextClasses)}>
+                        Капитал за бъдещето на децата
                       </p>
                     </button>
                     
                     <button
                       onClick={() => togglePriority('housing')}
                       className={cn(
-                        "p-4 rounded-2xl border-2 text-left transition-all",
+                        "p-4 rounded-2xl border-2 transition-all flex flex-col h-full",
                         selectedPriorities.includes('housing')
                           ? "border-blue-500 bg-blue-500/10"
                           : isDarkMode ? "border-slate-700 hover:border-slate-600" : "border-slate-200 hover:border-slate-300"
                       )}
                     >
-                      <h3 className="font-semibold text-sm mb-1">Ново жилище</h3>
-                      <p className={cn("text-xs", mutedTextClasses)}>
-                        Собственост, ремонт или ново жилище.
+                      <h3 className="font-semibold text-sm mb-2 text-center">Ново жилище</h3>
+                      <p className={cn("text-xs text-center flex-1", mutedTextClasses)}>
+                        Собственост, ремонт или ново жилище
                       </p>
                     </button>
                   </div>
@@ -578,33 +574,39 @@ export default function FinancialPlanner() {
               </motion.div>
             )}
 
-            {/* Generating Animation */}
+            {/* Generating Animation Modal */}
             {isGenerating && (
               <motion.div
                 key="generating"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
-                className="flex flex-col items-center justify-center min-h-[60vh]"
+                className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm"
               >
                 <motion.div
-                  animate={{ rotate: 360 }}
-                  transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
-                  className="mb-8"
+                  initial={{ scale: 0.9, opacity: 0 }}
+                  animate={{ scale: 1, opacity: 1 }}
+                  className="bg-white rounded-3xl shadow-2xl p-12 flex flex-col items-center max-w-md mx-4"
                 >
-                  <Loader2 className="w-16 h-16 text-blue-500" />
+                  <motion.div
+                    animate={{ rotate: 360 }}
+                    transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
+                    className="mb-8"
+                  >
+                    <Loader2 className="w-16 h-16 text-blue-500" />
+                  </motion.div>
+                  <h2 className="text-2xl font-bold mb-4 text-slate-900">Генериране на финансов план</h2>
+                  <div className="flex items-center gap-1">
+                    {[0, 1, 2].map((i) => (
+                      <motion.span
+                        key={i}
+                        className="w-2 h-2 bg-blue-500 rounded-full"
+                        animate={{ opacity: [0.3, 1, 0.3] }}
+                        transition={{ duration: 1.5, repeat: Infinity, delay: i * 0.3 }}
+                      />
+                    ))}
+                  </div>
                 </motion.div>
-                <h2 className="text-2xl font-bold mb-4">Генериране на финансов план</h2>
-                <div className="flex items-center gap-1">
-                  {[0, 1, 2].map((i) => (
-                    <motion.span
-                      key={i}
-                      className="w-2 h-2 bg-blue-500 rounded-full"
-                      animate={{ opacity: [0.3, 1, 0.3] }}
-                      transition={{ duration: 1.5, repeat: Infinity, delay: i * 0.3 }}
-                    />
-                  ))}
-                </div>
               </motion.div>
             )}
 

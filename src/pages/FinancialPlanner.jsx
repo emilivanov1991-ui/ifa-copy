@@ -21,7 +21,7 @@ const STEPS = [
 
 export default function FinancialPlanner() {
   const [currentStep, setCurrentStep] = useState(1);
-  const [isDarkMode, setIsDarkMode] = useState(true);
+  const [isDarkMode, setIsDarkMode] = useState(false);
   
   // Data states
   const [familyType, setFamilyType] = useState(null); // 'individual' | 'family'

@@ -43,6 +43,7 @@ for (let rate = 1; rate <= 8; rate += 0.5) {
 }
 
 export default function HousingStep({ data, onChange, showErrors }) {
+  const [showDownPaymentWarning, setShowDownPaymentWarning] = React.useState(false);
   const isFieldInvalid = (value) => showErrors && (value === undefined || value === '' || value === null);
   const plannedValue = data.planned_housing_value || 0;
   const extraCosts = data.planned_housing_extra_costs || 0;

@@ -26,10 +26,10 @@ export default function FinancialPlanner() {
   // Data states
   const [familyType, setFamilyType] = useState(null); // 'individual' | 'family'
   const [clientAge, setClientAge] = useState(35);
-  const [partnerAge, setPartnerAge] = useState(33);
+  const [partnerAge, setPartnerAge] = useState(35);
   const [monthlyIncome, setMonthlyIncome] = useState(5000);
   const [selectedPriorities, setSelectedPriorities] = useState([]); // multi-select
-  const [partnerIncome, setPartnerIncome] = useState(3000);
+  const [partnerIncome, setPartnerIncome] = useState(5000);
   
   // Financial framework values
   const [goals, setGoals] = useState({
@@ -188,8 +188,8 @@ export default function FinancialPlanner() {
                 </div>
 
                 {/* Right side - card */}
-                <div className={cn("rounded-3xl border p-8", cardClasses)}>
-                  <div className="flex items-center justify-between mb-6">
+                <div className={cn("rounded-3xl border p-6", cardClasses)}>
+                  <div className="flex items-center justify-between mb-4">
                     <p className={cn("text-sm tracking-widest", mutedTextClasses)}>СТЪПКА 1</p>
                     <button onClick={restart} className={cn("p-2 rounded-lg transition-colors", isDarkMode ? "hover:bg-slate-800" : "hover:bg-slate-100")}>
                       <RotateCcw className={cn("w-4 h-4", mutedTextClasses, "hover:text-blue-400")} />
@@ -197,11 +197,11 @@ export default function FinancialPlanner() {
                   </div>
                   
                   <h2 className="text-2xl font-bold mb-2">С кого планираме?</h2>
-                  <p className={cn("text-sm mb-8", mutedTextClasses)}>
+                  <p className={cn("text-sm mb-6", mutedTextClasses)}>
                     Изберете дали работим с един клиент или с домакинство.
                   </p>
 
-                  <div className="grid grid-cols-2 gap-4 mb-8">
+                  <div className="grid grid-cols-2 gap-4 mb-6">
                     <button
                       onClick={() => setFamilyType('individual')}
                       className={cn(
@@ -280,61 +280,64 @@ export default function FinancialPlanner() {
                   </p>
                 </div>
 
-                <div className={cn("rounded-3xl border p-8", cardClasses)}>
-                  <div className="flex items-center justify-between mb-6">
+                <div className={cn("rounded-3xl border p-6", cardClasses)}>
+                  <div className="flex items-center justify-between mb-4">
                     <p className={cn("text-sm tracking-widest", mutedTextClasses)}>СТЪПКА 2</p>
                     <button onClick={restart} className={cn("p-2 rounded-lg transition-colors", isDarkMode ? "hover:bg-slate-800" : "hover:bg-slate-100")}>
                       <RotateCcw className={cn("w-4 h-4", mutedTextClasses, "hover:text-blue-400")} />
                     </button>
                   </div>
                   
-                  <h2 className="text-2xl font-bold mb-8">Възраст</h2>
+                  <h2 className="text-2xl font-bold mb-6">Възраст</h2>
 
-                  {/* Client Age */}
-                  <div className="mb-8">
-                    <p className={cn("text-sm font-medium mb-4", mutedTextClasses)}>
-                      {familyType === 'family' ? 'КЛИЕНТ' : 'ВАШАТА ВЪЗРАСТ'}
-                    </p>
-                    <div className="text-center mb-4">
-                      <span className="text-5xl font-bold text-blue-500">{clientAge}</span>
-                      <span className={cn("text-xl ml-2", mutedTextClasses)}>години</span>
-                    </div>
-                    <Slider
-                      value={[clientAge]}
-                      onValueChange={(v) => setClientAge(v[0])}
-                      min={18}
-                      max={70}
-                      step={1}
-                      className="mb-2"
-                    />
-                    <div className={cn("flex justify-between text-sm", mutedTextClasses)}>
-                      <span>18</span>
-                      <span>70</span>
-                    </div>
-                  </div>
-
-                  {/* Partner Age (only for family) */}
-                  {familyType === 'family' && (
-                    <div className="mb-8 pt-6 border-t border-slate-700">
-                      <p className={cn("text-sm font-medium mb-4", mutedTextClasses)}>ПАРТНЬОР</p>
-                      <div className="text-center mb-4">
-                        <span className="text-5xl font-bold text-blue-500">{partnerAge}</span>
-                        <span className={cn("text-xl ml-2", mutedTextClasses)}>години</span>
+                  {/* Age inputs side by side */}
+                  <div className={cn("grid gap-6 mb-6", familyType === 'family' ? "grid-cols-2" : "grid-cols-1")}>
+                    {/* Client Age */}
+                    <div>
+                      <p className={cn("text-sm font-medium mb-3", mutedTextClasses)}>
+                        {familyType === 'family' ? 'КЛИЕНТ' : 'ВАШАТА ВЪЗРАСТ'}
+                      </p>
+                      <div className="text-center mb-3">
+                        <span className="text-4xl font-bold text-blue-500">{clientAge}</span>
+                        <span className={cn("text-lg ml-2", mutedTextClasses)}>години</span>
                       </div>
                       <Slider
-                        value={[partnerAge]}
-                        onValueChange={(v) => setPartnerAge(v[0])}
+                        value={[clientAge]}
+                        onValueChange={(v) => setClientAge(v[0])}
                         min={18}
                         max={70}
                         step={1}
                         className="mb-2"
                       />
-                      <div className={cn("flex justify-between text-sm", mutedTextClasses)}>
+                      <div className={cn("flex justify-between text-xs", mutedTextClasses)}>
                         <span>18</span>
                         <span>70</span>
                       </div>
                     </div>
-                  )}
+
+                    {/* Partner Age (only for family) */}
+                    {familyType === 'family' && (
+                      <div>
+                        <p className={cn("text-sm font-medium mb-3", mutedTextClasses)}>ПАРТНЬОР</p>
+                        <div className="text-center mb-3">
+                          <span className="text-4xl font-bold text-blue-500">{partnerAge}</span>
+                          <span className={cn("text-lg ml-2", mutedTextClasses)}>години</span>
+                        </div>
+                        <Slider
+                          value={[partnerAge]}
+                          onValueChange={(v) => setPartnerAge(v[0])}
+                          min={18}
+                          max={70}
+                          step={1}
+                          className="mb-2"
+                        />
+                        <div className={cn("flex justify-between text-xs", mutedTextClasses)}>
+                          <span>18</span>
+                          <span>70</span>
+                        </div>
+                      </div>
+                    )}
+                  </div>
 
                   <div className="flex gap-3">
                     <Button 
@@ -372,65 +375,68 @@ export default function FinancialPlanner() {
                   </p>
                 </div>
 
-                <div className={cn("rounded-3xl border p-8", cardClasses)}>
-                  <div className="flex items-center justify-between mb-6">
+                <div className={cn("rounded-3xl border p-6", cardClasses)}>
+                  <div className="flex items-center justify-between mb-4">
                     <p className={cn("text-sm tracking-widest", mutedTextClasses)}>СТЪПКА 3</p>
                     <button onClick={restart} className={cn("p-2 rounded-lg transition-colors", isDarkMode ? "hover:bg-slate-800" : "hover:bg-slate-100")}>
                       <RotateCcw className={cn("w-4 h-4", mutedTextClasses, "hover:text-blue-400")} />
                     </button>
                   </div>
                   
-                  <h2 className="text-2xl font-bold mb-8">Месечен доход</h2>
+                  <h2 className="text-2xl font-bold mb-6">Месечен доход</h2>
 
-                  {/* Client Income */}
-                  <div className="mb-8">
-                    <p className={cn("text-sm font-medium mb-4", mutedTextClasses)}>
-                      {familyType === 'family' ? 'КЛИЕНТ' : 'ВАШИЯТ ДОХОД'}
-                    </p>
-                    <div className="text-center mb-4">
-                      <span className="text-4xl font-bold text-blue-500">{formatNumber(monthlyIncome)}</span>
-                      <span className={cn("text-xl ml-2", mutedTextClasses)}>лв.</span>
-                    </div>
-                    <Slider
-                      value={[monthlyIncome]}
-                      onValueChange={(v) => setMonthlyIncome(v[0])}
-                      min={1000}
-                      max={30000}
-                      step={100}
-                      className="mb-2"
-                    />
-                    <div className={cn("flex justify-between text-sm", mutedTextClasses)}>
-                      <span>1 000 лв.</span>
-                      <span>30 000 лв.</span>
-                    </div>
-                  </div>
-
-                  {/* Partner Income (only for family) */}
-                  {familyType === 'family' && (
-                    <div className="mb-8 pt-6 border-t border-slate-700">
-                      <p className={cn("text-sm font-medium mb-4", mutedTextClasses)}>ПАРТНЬОР</p>
-                      <div className="text-center mb-4">
-                        <span className="text-4xl font-bold text-blue-500">{formatNumber(partnerIncome)}</span>
-                        <span className={cn("text-xl ml-2", mutedTextClasses)}>лв.</span>
+                  {/* Income inputs side by side */}
+                  <div className={cn("grid gap-6 mb-4", familyType === 'family' ? "grid-cols-2" : "grid-cols-1")}>
+                    {/* Client Income */}
+                    <div>
+                      <p className={cn("text-sm font-medium mb-3", mutedTextClasses)}>
+                        {familyType === 'family' ? 'КЛИЕНТ' : 'ВАШИЯТ ДОХОД'}
+                      </p>
+                      <div className="text-center mb-3">
+                        <span className="text-3xl font-bold text-blue-500">{formatNumber(monthlyIncome)}</span>
+                        <span className={cn("text-lg ml-2", mutedTextClasses)}>лв.</span>
                       </div>
                       <Slider
-                        value={[partnerIncome]}
-                        onValueChange={(v) => setPartnerIncome(v[0])}
+                        value={[monthlyIncome]}
+                        onValueChange={(v) => setMonthlyIncome(v[0])}
                         min={1000}
                         max={30000}
                         step={100}
                         className="mb-2"
                       />
-                      <div className={cn("flex justify-between text-sm", mutedTextClasses)}>
+                      <div className={cn("flex justify-between text-xs", mutedTextClasses)}>
                         <span>1 000 лв.</span>
                         <span>30 000 лв.</span>
                       </div>
                     </div>
-                  )}
+
+                    {/* Partner Income (only for family) */}
+                    {familyType === 'family' && (
+                      <div>
+                        <p className={cn("text-sm font-medium mb-3", mutedTextClasses)}>ПАРТНЬОР</p>
+                        <div className="text-center mb-3">
+                          <span className="text-3xl font-bold text-blue-500">{formatNumber(partnerIncome)}</span>
+                          <span className={cn("text-lg ml-2", mutedTextClasses)}>лв.</span>
+                        </div>
+                        <Slider
+                          value={[partnerIncome]}
+                          onValueChange={(v) => setPartnerIncome(v[0])}
+                          min={1000}
+                          max={30000}
+                          step={100}
+                          className="mb-2"
+                        />
+                        <div className={cn("flex justify-between text-xs", mutedTextClasses)}>
+                          <span>1 000 лв.</span>
+                          <span>30 000 лв.</span>
+                        </div>
+                      </div>
+                    )}
+                  </div>
 
                   {/* Total (for family) */}
                   {familyType === 'family' && (
-                    <div className={cn("p-4 rounded-xl mb-6", isDarkMode ? "bg-slate-800" : "bg-slate-100")}>
+                    <div className={cn("p-3 rounded-xl mb-4", isDarkMode ? "bg-slate-800" : "bg-slate-100")}>
                       <div className="flex justify-between items-center">
                         <span className={mutedTextClasses}>Общо месечен доход:</span>
                         <span className="text-xl font-bold text-blue-500">{formatNumber(monthlyIncome + partnerIncome)} лв.</span>
@@ -471,8 +477,8 @@ export default function FinancialPlanner() {
                   </p>
                 </div>
 
-                <div className={cn("rounded-3xl border p-8", cardClasses)}>
-                  <div className="flex items-center justify-between mb-6">
+                <div className={cn("rounded-3xl border p-6", cardClasses)}>
+                  <div className="flex items-center justify-between mb-4">
                     <p className={cn("text-sm tracking-widest", mutedTextClasses)}>СТЪПКА 4</p>
                     <button onClick={restart} className={cn("p-2 rounded-lg transition-colors", isDarkMode ? "hover:bg-slate-800" : "hover:bg-slate-100")}>
                       <RotateCcw className={cn("w-4 h-4", mutedTextClasses, "hover:text-blue-400")} />
@@ -480,21 +486,21 @@ export default function FinancialPlanner() {
                   </div>
                   
                   <h2 className="text-2xl font-bold mb-2">Приоритети</h2>
-                  <p className={cn("text-sm mb-6", mutedTextClasses)}>
+                  <p className={cn("text-sm mb-4", mutedTextClasses)}>
                     Изберете една или повече посоки, които резонират с вашите мечти.
                   </p>
 
-                  <div className="grid grid-cols-2 gap-4 mb-8">
+                  <div className="grid grid-cols-4 gap-3 mb-6">
                     <button
                       onClick={() => togglePriority('stability')}
                       className={cn(
-                        "p-5 rounded-2xl border-2 text-left transition-all",
+                        "p-4 rounded-2xl border-2 text-left transition-all",
                         selectedPriorities.includes('stability')
                           ? "border-blue-500 bg-blue-500/10"
                           : isDarkMode ? "border-slate-700 hover:border-slate-600" : "border-slate-200 hover:border-slate-300"
                       )}
                     >
-                      <h3 className="font-semibold mb-1">Финансова стабилност</h3>
+                      <h3 className="font-semibold text-sm mb-1">Финансова стабилност</h3>
                       <p className={cn("text-xs", mutedTextClasses)}>
                         Фонд за спокойствие и защита на дохода.
                       </p>
@@ -503,13 +509,13 @@ export default function FinancialPlanner() {
                     <button
                       onClick={() => togglePriority('investments')}
                       className={cn(
-                        "p-5 rounded-2xl border-2 text-left transition-all",
+                        "p-4 rounded-2xl border-2 text-left transition-all",
                         selectedPriorities.includes('investments')
                           ? "border-blue-500 bg-blue-500/10"
                           : isDarkMode ? "border-slate-700 hover:border-slate-600" : "border-slate-200 hover:border-slate-300"
                       )}
                     >
-                      <h3 className="font-semibold mb-1">Инвестиции</h3>
+                      <h3 className="font-semibold text-sm mb-1">Инвестиции</h3>
                       <p className={cn("text-xs", mutedTextClasses)}>
                         Ускорени инвестиции и възвръщаемост.
                       </p>
@@ -518,13 +524,13 @@ export default function FinancialPlanner() {
                     <button
                       onClick={() => togglePriority('children')}
                       className={cn(
-                        "p-5 rounded-2xl border-2 text-left transition-all",
+                        "p-4 rounded-2xl border-2 text-left transition-all",
                         selectedPriorities.includes('children')
                           ? "border-blue-500 bg-blue-500/10"
                           : isDarkMode ? "border-slate-700 hover:border-slate-600" : "border-slate-200 hover:border-slate-300"
                       )}
                     >
-                      <h3 className="font-semibold mb-1">Подсигуряване на деца</h3>
+                      <h3 className="font-semibold text-sm mb-1">Подсигуряване на деца</h3>
                       <p className={cn("text-xs", mutedTextClasses)}>
                         Капитал за бъдещето на децата.
                       </p>
@@ -533,13 +539,13 @@ export default function FinancialPlanner() {
                     <button
                       onClick={() => togglePriority('housing')}
                       className={cn(
-                        "p-5 rounded-2xl border-2 text-left transition-all",
+                        "p-4 rounded-2xl border-2 text-left transition-all",
                         selectedPriorities.includes('housing')
                           ? "border-blue-500 bg-blue-500/10"
                           : isDarkMode ? "border-slate-700 hover:border-slate-600" : "border-slate-200 hover:border-slate-300"
                       )}
                     >
-                      <h3 className="font-semibold mb-1">Ново жилище</h3>
+                      <h3 className="font-semibold text-sm mb-1">Ново жилище</h3>
                       <p className={cn("text-xs", mutedTextClasses)}>
                         Собственост, ремонт или ново жилище.
                       </p>
@@ -547,7 +553,7 @@ export default function FinancialPlanner() {
                   </div>
 
                   {selectedPriorities.length > 0 && (
-                    <p className={cn("text-sm mb-6", accentColor)}>
+                    <p className={cn("text-sm mb-4", accentColor)}>
                       Избрани: {selectedPriorities.length} приоритет{selectedPriorities.length > 1 ? 'а' : ''}
                     </p>
                   )}

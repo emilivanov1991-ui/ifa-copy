@@ -63,7 +63,10 @@ export default function ClientPortal() {
   // Fetch client data based on user email
   const { data: clients, isLoading: clientLoading } = useQuery({
     queryKey: ['client', currentUser?.email],
-    queryFn: () => base44.entities.Client.filter({ email: currentUser?.email }),
+    queryFn: async () => {
+      const allClients = await base44.entities.Client.list();
+      return allClients.filter(c => c.email === currentUser?.email);
+    },
     enabled: !!currentUser?.email,
   });
 

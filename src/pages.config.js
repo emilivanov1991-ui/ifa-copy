@@ -6,6 +6,7 @@ import FinancialAnalysis from './pages/FinancialAnalysis';
 import CRM from './pages/CRM';
 import ClientPortal from './pages/ClientPortal';
 import ConsultantPortal from './pages/ConsultantPortal';
+import Calculators from './pages/Calculators';
 import __Layout from './Layout.jsx';
 
 
@@ -18,6 +19,7 @@ export const PAGES = {
     "CRM": CRM,
     "ClientPortal": ClientPortal,
     "ConsultantPortal": ConsultantPortal,
+    "Calculators": Calculators,
 }
 
 export const pagesConfig = {

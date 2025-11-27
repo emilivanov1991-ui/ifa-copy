@@ -32,10 +32,12 @@ import { Label } from "@/components/ui/label";
 import { cn } from "@/lib/utils";
 
 import PortfolioChart from '../components/portal/PortfolioChart';
-import ProductsList from '../components/portal/ProductsList';
+import ProductsListAdvanced from '../components/portal/ProductsListAdvanced';
 import PaymentsList from '../components/portal/PaymentsList';
 import ProposedProducts from '../components/portal/ProposedProducts';
 import DocumentsManager from '../components/portal/DocumentsManager';
+import NotificationsPanel from '../components/portal/NotificationsPanel';
+import CalendarIntegration from '../components/portal/CalendarIntegration';
 
 export default function ClientPortal() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -388,7 +390,7 @@ export default function ClientPortal() {
 
         {/* Main Content */}
         <Tabs defaultValue="overview" className="space-y-6">
-          <TabsList className="bg-white p-1 rounded-full">
+          <TabsList className="bg-white p-1 rounded-full flex-wrap">
             <TabsTrigger value="overview" className="rounded-full">Преглед</TabsTrigger>
             <TabsTrigger value="products" className="rounded-full">Продукти</TabsTrigger>
             <TabsTrigger value="payments" className="rounded-full">Вноски</TabsTrigger>
@@ -398,6 +400,8 @@ export default function ClientPortal() {
                 <Badge className="ml-2 bg-blue-500">{proposedProducts.length}</Badge>
               )}
             </TabsTrigger>
+            <TabsTrigger value="calendar" className="rounded-full">Календар</TabsTrigger>
+            <TabsTrigger value="notifications" className="rounded-full">Известия</TabsTrigger>
             <TabsTrigger value="documents" className="rounded-full">Документи</TabsTrigger>
           </TabsList>
 
@@ -476,7 +480,7 @@ export default function ClientPortal() {
           </TabsContent>
 
           <TabsContent value="products">
-            <ProductsList products={activeProducts} />
+            <ProductsListAdvanced products={activeProducts} />
           </TabsContent>
 
           <TabsContent value="payments">
@@ -485,6 +489,19 @@ export default function ClientPortal() {
 
           <TabsContent value="proposed">
             <ProposedProducts products={proposedProducts} />
+          </TabsContent>
+
+          <TabsContent value="calendar">
+            <CalendarIntegration 
+              clientId={clientData?.id} 
+              clientData={clientData}
+              products={activeProducts}
+              payments={payments}
+            />
+          </TabsContent>
+
+          <TabsContent value="notifications">
+            <NotificationsPanel clientId={clientData?.id} />
           </TabsContent>
 
           <TabsContent value="documents">

@@ -10,12 +10,12 @@ import { createPageUrl } from '@/utils';
 // Step definitions
 const STEPS = [
   { id: 1, label: 'С КОГО ПЛАНИРАМЕ?' },
-  { id: 2, label: 'ВЪЗРАСТ НА КЛИЕНТА' },
-  { id: 3, label: 'ВЪЗРАСТ НА ПАРТНЬОРА' },
-  { id: 4, label: 'МЕСЕЧЕН ДОХОД' },
-  { id: 5, label: 'ОСНОВЕН ПРИОРИТЕТ' },
-  { id: 6, label: 'ФИНАНСОВА РАМКА' },
-  { id: 7, label: 'СИСТЕМА НА РАБОТА' },
+  { id: 2, label: 'ВЪЗРАСТ' },
+  { id: 3, label: 'МЕСЕЧЕН ДОХОД' },
+  { id: 4, label: 'ПРИОРИТЕТИ' },
+  { id: 5, label: 'ФИНАНСОВА РАМКА' },
+  { id: 6, label: 'СИСТЕМА НА РАБОТА' },
+  { id: 7, label: 'ПРАВИЛА ЗА СЪТРУДНИЧЕСТВО' },
   { id: 8, label: 'МИКРО ПЛАН' },
 ];
 
@@ -28,7 +28,8 @@ export default function FinancialPlanner() {
   const [clientAge, setClientAge] = useState(35);
   const [partnerAge, setPartnerAge] = useState(33);
   const [monthlyIncome, setMonthlyIncome] = useState(5000);
-  const [mainPriority, setMainPriority] = useState(null); // 'security' | 'growth' | 'legacy'
+  const [selectedPriorities, setSelectedPriorities] = useState([]); // multi-select
+  const [partnerIncome, setPartnerIncome] = useState(3000);
   
   // Financial framework values
   const [goals, setGoals] = useState({
@@ -46,21 +47,24 @@ export default function FinancialPlanner() {
     return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
   };
 
+  // Toggle priority selection
+  const togglePriority = (priority) => {
+    setSelectedPriorities(prev => 
+      prev.includes(priority) 
+        ? prev.filter(p => p !== priority)
+        : [...prev, priority]
+    );
+  };
+
   // Navigation
   const goNext = () => {
-    if (currentStep === 1 && familyType === 'individual') {
-      setCurrentStep(2); // Skip to client age, will skip partner age
-    } else if (currentStep === 2 && familyType === 'individual') {
-      setCurrentStep(4); // Skip partner age for individual
-    } else if (currentStep < 8) {
+    if (currentStep < 8) {
       setCurrentStep(currentStep + 1);
     }
   };
 
   const goBack = () => {
-    if (currentStep === 4 && familyType === 'individual') {
-      setCurrentStep(2); // Skip back over partner age
-    } else if (currentStep > 1) {
+    if (currentStep > 1) {
       setCurrentStep(currentStep - 1);
     }
   };
@@ -74,15 +78,7 @@ export default function FinancialPlanner() {
     setMainPriority(null);
   };
 
-  // Get visible steps for progress bar
-  const getVisibleSteps = () => {
-    if (familyType === 'individual') {
-      return STEPS.filter(s => s.id !== 3); // Hide partner age step
-    }
-    return STEPS;
-  };
-
-  const visibleSteps = getVisibleSteps();
+  const visibleSteps = STEPS;
 
   // Theme classes
   const themeClasses = isDarkMode 
@@ -285,7 +281,7 @@ export default function FinancialPlanner() {
               </motion.div>
             )}
 
-            {/* Step 2: Client Age */}
+            {/* Step 2: Age (combined) */}
             {currentStep === 2 && (
               <motion.div
                 key="step-2"
@@ -296,9 +292,12 @@ export default function FinancialPlanner() {
               >
                 <div className="lg:pr-12">
                   <p className={cn("text-sm tracking-widest mb-4", accentColor)}>СТЪПКА 2</p>
-                  <h1 className="text-4xl md:text-5xl font-bold mb-6">Възраст на клиента</h1>
+                  <h1 className="text-4xl md:text-5xl font-bold mb-6">Възраст</h1>
                   <p className={cn("text-lg mb-6", mutedTextClasses)}>
-                    Въведете възрастта на основния клиент.
+                    {familyType === 'family' 
+                      ? 'Въведете възрастта на клиента и партньора.'
+                      : 'Въведете вашата възраст.'
+                    }
                   </p>
                   <div className="flex gap-3">
                     <Button 
@@ -322,57 +321,54 @@ export default function FinancialPlanner() {
                     </button>
                   </div>
                   
-                  <h2 className="text-2xl font-bold mb-8">Възраст на клиента</h2>
+                  <h2 className="text-2xl font-bold mb-8">Възраст</h2>
 
-                  <div className="text-center mb-8">
-                    <span className="text-6xl font-bold text-blue-500">{clientAge}</span>
-                    <span className={cn("text-2xl ml-2", mutedTextClasses)}>години</span>
+                  {/* Client Age */}
+                  <div className="mb-8">
+                    <p className={cn("text-sm font-medium mb-4", mutedTextClasses)}>
+                      {familyType === 'family' ? 'КЛИЕНТ' : 'ВАШАТА ВЪЗРАСТ'}
+                    </p>
+                    <div className="text-center mb-4">
+                      <span className="text-5xl font-bold text-blue-500">{clientAge}</span>
+                      <span className={cn("text-xl ml-2", mutedTextClasses)}>години</span>
+                    </div>
+                    <Slider
+                      value={[clientAge]}
+                      onValueChange={(v) => setClientAge(v[0])}
+                      min={18}
+                      max={70}
+                      step={1}
+                      className="mb-2"
+                    />
+                    <div className={cn("flex justify-between text-sm", mutedTextClasses)}>
+                      <span>18</span>
+                      <span>70</span>
+                    </div>
                   </div>
 
-                  <Slider
-                    value={[clientAge]}
-                    onValueChange={(v) => setClientAge(v[0])}
-                    min={18}
-                    max={70}
-                    step={1}
-                    className="mb-4"
-                  />
-                  <div className={cn("flex justify-between text-sm", mutedTextClasses)}>
-                    <span>18</span>
-                    <span>70</span>
-                  </div>
+                  {/* Partner Age (only for family) */}
+                  {familyType === 'family' && (
+                    <div className="mb-8 pt-6 border-t border-slate-700">
+                      <p className={cn("text-sm font-medium mb-4", mutedTextClasses)}>ПАРТНЬОР</p>
+                      <div className="text-center mb-4">
+                        <span className="text-5xl font-bold text-blue-500">{partnerAge}</span>
+                        <span className={cn("text-xl ml-2", mutedTextClasses)}>години</span>
+                      </div>
+                      <Slider
+                        value={[partnerAge]}
+                        onValueChange={(v) => setPartnerAge(v[0])}
+                        min={18}
+                        max={70}
+                        step={1}
+                        className="mb-2"
+                      />
+                      <div className={cn("flex justify-between text-sm", mutedTextClasses)}>
+                        <span>18</span>
+                        <span>70</span>
+                      </div>
+                    </div>
+                  )}
 
-                  <div className="flex gap-3 mt-8">
-                    <Button 
-                      variant="outline" 
-                      onClick={goBack}
-                      className={cn("rounded-full px-6", isDarkMode ? "border-slate-700 hover:bg-slate-800" : "")}
-                    >
-                      Назад
-                    </Button>
-                    <Button onClick={goNext} className="rounded-full px-6 bg-blue-600 hover:bg-blue-700">
-                      СЛЕДВАЩА СТЪПКА
-                    </Button>
-                  </div>
-                </div>
-              </motion.div>
-            )}
-
-            {/* Step 3: Partner Age (only for family) */}
-            {currentStep === 3 && familyType === 'family' && (
-              <motion.div
-                key="step-3"
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -20 }}
-                className="grid lg:grid-cols-2 gap-8 items-start"
-              >
-                <div className="lg:pr-12">
-                  <p className={cn("text-sm tracking-widest mb-4", accentColor)}>СТЪПКА 3</p>
-                  <h1 className="text-4xl md:text-5xl font-bold mb-6">Възраст на партньора</h1>
-                  <p className={cn("text-lg mb-6", mutedTextClasses)}>
-                    Въведете възрастта на партньора.
-                  </p>
                   <div className="flex gap-3">
                     <Button 
                       variant="outline" 
@@ -382,48 +378,6 @@ export default function FinancialPlanner() {
                       Назад
                     </Button>
                     <Button onClick={goNext} className="rounded-full px-6 bg-blue-600 hover:bg-blue-700">
-                      Напред
-                    </Button>
-                  </div>
-                </div>
-
-                <div className={cn("rounded-3xl border p-8", cardClasses)}>
-                  <div className="flex items-center justify-between mb-6">
-                    <p className={cn("text-sm tracking-widest", mutedTextClasses)}>СТЪПКА 3</p>
-                    <button onClick={restart} className={cn("text-sm", mutedTextClasses, "hover:text-blue-400")}>
-                      рестарт
-                    </button>
-                  </div>
-                  
-                  <h2 className="text-2xl font-bold mb-8">Възраст на партньора</h2>
-
-                  <div className="text-center mb-8">
-                    <span className="text-6xl font-bold text-blue-500">{partnerAge}</span>
-                    <span className={cn("text-2xl ml-2", mutedTextClasses)}>години</span>
-                  </div>
-
-                  <Slider
-                    value={[partnerAge]}
-                    onValueChange={(v) => setPartnerAge(v[0])}
-                    min={18}
-                    max={70}
-                    step={1}
-                    className="mb-4"
-                  />
-                  <div className={cn("flex justify-between text-sm", mutedTextClasses)}>
-                    <span>18</span>
-                    <span>70</span>
-                  </div>
-
-                  <div className="flex gap-3 mt-8">
-                    <Button 
-                      variant="outline" 
-                      onClick={goBack}
-                      className={cn("rounded-full px-6", isDarkMode ? "border-slate-700 hover:bg-slate-800" : "")}
-                    >
-                      Назад
-                    </Button>
-                    <Button onClick={goNext} className="rounded-full px-6 bg-blue-600 hover:bg-blue-700">
                       СЛЕДВАЩА СТЪПКА
                     </Button>
                   </div>
@@ -431,8 +385,8 @@ export default function FinancialPlanner() {
               </motion.div>
             )}
 
-            {/* Step 4: Monthly Income */}
-            {currentStep === 4 && (
+            {/* Step 3: Monthly Income */}
+            {currentStep === 3 && (
               <motion.div
                 key="step-4"
                 initial={{ opacity: 0, y: 20 }}
@@ -504,20 +458,20 @@ export default function FinancialPlanner() {
               </motion.div>
             )}
 
-            {/* Step 5: Main Priority */}
-            {currentStep === 5 && (
+            {/* Step 4: Priorities (multi-select) */}
+            {currentStep === 4 && (
               <motion.div
-                key="step-5"
+                key="step-4"
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -20 }}
                 className="grid lg:grid-cols-2 gap-8 items-start"
               >
                 <div className="lg:pr-12">
-                  <p className={cn("text-sm tracking-widest mb-4", accentColor)}>СТЪПКА 5</p>
-                  <h1 className="text-4xl md:text-5xl font-bold mb-6">Основен приоритет</h1>
+                  <p className={cn("text-sm tracking-widest mb-4", accentColor)}>СТЪПКА 4</p>
+                  <h1 className="text-4xl md:text-5xl font-bold mb-6">Приоритети</h1>
                   <p className={cn("text-lg mb-6", mutedTextClasses)}>
-                    Изберете посока, която резонира с вашите мечти.
+                    Изберете една или повече посоки, които резонират с вашите мечти.
                   </p>
                   <div className="flex gap-3">
                     <Button 
@@ -529,7 +483,7 @@ export default function FinancialPlanner() {
                     </Button>
                     <Button 
                       onClick={goNext}
-                      disabled={!mainPriority}
+                      disabled={selectedPriorities.length === 0}
                       className="rounded-full px-6 bg-blue-600 hover:bg-blue-700"
                     >
                       Напред
@@ -539,63 +493,84 @@ export default function FinancialPlanner() {
 
                 <div className={cn("rounded-3xl border p-8", cardClasses)}>
                   <div className="flex items-center justify-between mb-6">
-                    <p className={cn("text-sm tracking-widest", mutedTextClasses)}>СТЪПКА 5</p>
+                    <p className={cn("text-sm tracking-widest", mutedTextClasses)}>СТЪПКА 4</p>
                     <button onClick={restart} className={cn("text-sm", mutedTextClasses, "hover:text-blue-400")}>
                       рестарт
                     </button>
                   </div>
                   
-                  <h2 className="text-2xl font-bold mb-2">Основен приоритет</h2>
-                  <p className={cn("text-sm mb-8", mutedTextClasses)}>
-                    Изберете посока, която резонира с вашите мечти.
+                  <h2 className="text-2xl font-bold mb-2">Приоритети</h2>
+                  <p className={cn("text-sm mb-6", mutedTextClasses)}>
+                    Изберете една или повече посоки, които резонират с вашите мечти.
                   </p>
 
-                  <div className="grid grid-cols-3 gap-4 mb-8">
+                  <div className="grid grid-cols-2 gap-4 mb-8">
                     <button
-                      onClick={() => setMainPriority('security')}
+                      onClick={() => togglePriority('stability')}
                       className={cn(
-                        "p-6 rounded-2xl border-2 text-left transition-all",
-                        mainPriority === 'security'
+                        "p-5 rounded-2xl border-2 text-left transition-all",
+                        selectedPriorities.includes('stability')
                           ? "border-blue-500 bg-blue-500/10"
                           : isDarkMode ? "border-slate-700 hover:border-slate-600" : "border-slate-200 hover:border-slate-300"
                       )}
                     >
-                      <h3 className="font-semibold mb-2">Сигурност</h3>
+                      <h3 className="font-semibold mb-1">Финансова стабилност</h3>
                       <p className={cn("text-xs", mutedTextClasses)}>
-                        Фонд за спокойствие и защита на доход.
+                        Фонд за спокойствие и защита на дохода.
                       </p>
                     </button>
                     
                     <button
-                      onClick={() => setMainPriority('growth')}
+                      onClick={() => togglePriority('investments')}
                       className={cn(
-                        "p-6 rounded-2xl border-2 text-left transition-all",
-                        mainPriority === 'growth'
+                        "p-5 rounded-2xl border-2 text-left transition-all",
+                        selectedPriorities.includes('investments')
                           ? "border-blue-500 bg-blue-500/10"
                           : isDarkMode ? "border-slate-700 hover:border-slate-600" : "border-slate-200 hover:border-slate-300"
                       )}
                     >
-                      <h3 className="font-semibold mb-2">Растеж</h3>
+                      <h3 className="font-semibold mb-1">Инвестиции</h3>
                       <p className={cn("text-xs", mutedTextClasses)}>
                         Ускорени инвестиции и възвръщаемост.
                       </p>
                     </button>
                     
                     <button
-                      onClick={() => setMainPriority('legacy')}
+                      onClick={() => togglePriority('children')}
                       className={cn(
-                        "p-6 rounded-2xl border-2 text-left transition-all",
-                        mainPriority === 'legacy'
+                        "p-5 rounded-2xl border-2 text-left transition-all",
+                        selectedPriorities.includes('children')
                           ? "border-blue-500 bg-blue-500/10"
                           : isDarkMode ? "border-slate-700 hover:border-slate-600" : "border-slate-200 hover:border-slate-300"
                       )}
                     >
-                      <h3 className="font-semibold mb-2">Наследство</h3>
+                      <h3 className="font-semibold mb-1">Подсигуряване на деца</h3>
                       <p className={cn("text-xs", mutedTextClasses)}>
-                        Капитал за следващите поколения.
+                        Капитал за бъдещето на децата.
+                      </p>
+                    </button>
+                    
+                    <button
+                      onClick={() => togglePriority('housing')}
+                      className={cn(
+                        "p-5 rounded-2xl border-2 text-left transition-all",
+                        selectedPriorities.includes('housing')
+                          ? "border-blue-500 bg-blue-500/10"
+                          : isDarkMode ? "border-slate-700 hover:border-slate-600" : "border-slate-200 hover:border-slate-300"
+                      )}
+                    >
+                      <h3 className="font-semibold mb-1">Ново жилище</h3>
+                      <p className={cn("text-xs", mutedTextClasses)}>
+                        Собственост, ремонт или ново жилище.
                       </p>
                     </button>
                   </div>
+
+                  {selectedPriorities.length > 0 && (
+                    <p className={cn("text-sm mb-6", accentColor)}>
+                      Избрани: {selectedPriorities.length} приоритет{selectedPriorities.length > 1 ? 'а' : ''}
+                    </p>
+                  )}
 
                   <div className="flex gap-3">
                     <Button 
@@ -607,7 +582,7 @@ export default function FinancialPlanner() {
                     </Button>
                     <Button 
                       onClick={goNext}
-                      disabled={!mainPriority}
+                      disabled={selectedPriorities.length === 0}
                       className="rounded-full px-6 bg-blue-600 hover:bg-blue-700"
                     >
                       СЛЕДВАЩА СТЪПКА
@@ -617,8 +592,8 @@ export default function FinancialPlanner() {
               </motion.div>
             )}
 
-            {/* Step 6: Financial Framework */}
-            {currentStep === 6 && (
+            {/* Step 5: Financial Framework */}
+            {currentStep === 5 && (
               <motion.div
                 key="step-6"
                 initial={{ opacity: 0, y: 20 }}
@@ -795,8 +770,8 @@ export default function FinancialPlanner() {
               </motion.div>
             )}
 
-            {/* Step 7: Work System */}
-            {currentStep === 7 && (
+            {/* Step 6: Work System */}
+            {currentStep === 6 && (
               <motion.div
                 key="step-7"
                 initial={{ opacity: 0, y: 20 }}

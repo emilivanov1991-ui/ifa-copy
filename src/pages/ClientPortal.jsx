@@ -18,12 +18,17 @@ import {
   Clock,
   CheckCircle,
   AlertCircle,
-  Loader2
+  Loader2,
+  Lock,
+  Eye,
+  EyeOff
 } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { cn } from "@/lib/utils";
 
 import PortfolioChart from '../components/portal/PortfolioChart';
@@ -33,20 +38,26 @@ import ProposedProducts from '../components/portal/ProposedProducts';
 import DocumentsManager from '../components/portal/DocumentsManager';
 
 export default function ClientPortal() {
-  const [isAuthenticated, setIsAuthenticated] = useState(null);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [currentUser, setCurrentUser] = useState(null);
   const [clientData, setClientData] = useState(null);
+  const [loginForm, setLoginForm] = useState({ username: '', password: '' });
+  const [loginError, setLoginError] = useState('');
+  const [isLoggingIn, setIsLoggingIn] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
+  // Check for saved session
   useEffect(() => {
-    const checkAuth = async () => {
-      const authenticated = await base44.auth.isAuthenticated();
-      setIsAuthenticated(authenticated);
-      if (authenticated) {
-        const user = await base44.auth.me();
-        setCurrentUser(user);
+    const savedSession = localStorage.getItem('clientPortalSession');
+    if (savedSession) {
+      try {
+        const session = JSON.parse(savedSession);
+        setCurrentUser(session.user);
+        setIsAuthenticated(true);
+      } catch (e) {
+        localStorage.removeItem('clientPortalSession');
       }
-    };
-    checkAuth();
+    }
   }, []);
 
   // Fetch client data based on user email
@@ -83,24 +94,53 @@ export default function ClientPortal() {
     enabled: !!clientData?.id,
   });
 
-  const handleLogin = () => {
-    base44.auth.redirectToLogin(window.location.href);
+  const handleLogin = async (e) => {
+    e.preventDefault();
+    setLoginError('');
+    setIsLoggingIn(true);
+
+    try {
+      // Find client by email (username)
+      const clients = await base44.entities.Client.filter({ email: loginForm.username });
+      
+      if (clients.length === 0) {
+        setLoginError('Невалидно потребителско име или парола');
+        setIsLoggingIn(false);
+        return;
+      }
+
+      const client = clients[0];
+      
+      // Check password (stored in client record)
+      if (client.portal_password !== loginForm.password) {
+        setLoginError('Невалидно потребителско име или парола');
+        setIsLoggingIn(false);
+        return;
+      }
+
+      // Success - save session
+      const session = {
+        user: { email: client.email, name: `${client.first_name} ${client.last_name}` },
+        clientId: client.id
+      };
+      localStorage.setItem('clientPortalSession', JSON.stringify(session));
+      setCurrentUser(session.user);
+      setIsAuthenticated(true);
+    } catch (error) {
+      setLoginError('Възникна грешка. Моля, опитайте отново.');
+    }
+    
+    setIsLoggingIn(false);
   };
 
   const handleLogout = () => {
-    base44.auth.logout('/');
+    localStorage.removeItem('clientPortalSession');
+    setIsAuthenticated(false);
+    setCurrentUser(null);
+    setClientData(null);
   };
 
-  // Loading state
-  if (isAuthenticated === null) {
-    return (
-      <div className="pt-20 min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 flex items-center justify-center">
-        <Loader2 className="h-8 w-8 animate-spin text-blue-600" />
-      </div>
-    );
-  }
-
-  // Not authenticated - show login
+  // Not authenticated - show login form
   if (!isAuthenticated) {
     return (
       <div className="pt-20 min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
@@ -108,25 +148,80 @@ export default function ClientPortal() {
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="bg-white rounded-2xl shadow-xl p-10 text-center"
+            className="bg-white rounded-2xl shadow-xl p-10"
           >
-            <div className="w-16 h-16 rounded-full bg-blue-100 flex items-center justify-center mx-auto mb-6">
-              <User className="h-8 w-8 text-blue-600" />
+            <div className="text-center mb-8">
+              <div className="w-16 h-16 rounded-full bg-blue-100 flex items-center justify-center mx-auto mb-6">
+                <Lock className="h-8 w-8 text-blue-600" />
+              </div>
+              <h1 className="text-2xl font-semibold text-slate-900 mb-2">
+                Клиентски портал
+              </h1>
+              <p className="text-slate-600">
+                Влезте с вашето потребителско име и парола
+              </p>
             </div>
-            <h1 className="text-2xl font-semibold text-slate-900 mb-3">
-              Клиентски портал
-            </h1>
-            <p className="text-slate-600 mb-8">
-              Влезте или се регистрирайте, за да видите вашия финансов анализ, план и продукти.
-            </p>
-            <Button 
-              onClick={handleLogin}
-              className="w-full bg-blue-600 hover:bg-blue-700 rounded-full py-6 text-lg"
-            >
-              Вход / Регистрация
-            </Button>
-            <p className="text-sm text-slate-500 mt-4">
-              Използвайте имейла, с който сте попълнили финансовия анализ
+
+            <form onSubmit={handleLogin} className="space-y-5">
+              <div className="space-y-2">
+                <Label htmlFor="username">Потребителско име (имейл)</Label>
+                <Input
+                  id="username"
+                  type="email"
+                  placeholder="example@mail.com"
+                  value={loginForm.username}
+                  onChange={(e) => setLoginForm({ ...loginForm, username: e.target.value })}
+                  className="rounded-lg"
+                  required
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="password">Парола</Label>
+                <div className="relative">
+                  <Input
+                    id="password"
+                    type={showPassword ? "text" : "password"}
+                    placeholder="••••••••"
+                    value={loginForm.password}
+                    onChange={(e) => setLoginForm({ ...loginForm, password: e.target.value })}
+                    className="rounded-lg pr-10"
+                    required
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
+                  >
+                    {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                  </button>
+                </div>
+              </div>
+
+              {loginError && (
+                <div className="p-3 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm">
+                  {loginError}
+                </div>
+              )}
+
+              <Button 
+                type="submit"
+                disabled={isLoggingIn}
+                className="w-full bg-blue-600 hover:bg-blue-700 rounded-full py-6 text-lg"
+              >
+                {isLoggingIn ? (
+                  <>
+                    <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                    Влизане...
+                  </>
+                ) : (
+                  'Вход'
+                )}
+              </Button>
+            </form>
+
+            <p className="text-sm text-slate-500 mt-6 text-center">
+              Данните за вход са изпратени на вашия имейл след попълване на финансовия анализ
             </p>
           </motion.div>
         </div>

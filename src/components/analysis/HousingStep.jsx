@@ -564,7 +564,7 @@ export default function HousingStep({ data, onChange, showErrors }) {
                 </div>
 
                 {/* Warning for insufficient down payment */}
-                {plannedValue > 0 && availableCash > 0 && availableCash < (plannedValue * 0.15) && (
+                {showDownPaymentWarning && plannedValue > 0 && availableCash > 0 && availableCash < (plannedValue * 0.15) && (
                   <div className="mt-4 p-4 bg-amber-50 border border-amber-200 rounded-lg">
                     <p className="text-amber-700">
                       <span className="font-semibold">Внимание:</span> Необходимото минимално самоучастие е 15%. Съветваме Ви да го осигурим преди закупуването на имота.

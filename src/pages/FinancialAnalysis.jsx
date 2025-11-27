@@ -834,6 +834,111 @@ export default function FinancialAnalysis() {
           Вашата информация е защитена и поверителна. Никога не споделяме данните Ви с трети страни без Вашето съгласие.
         </p>
       </div>
+
+      {/* Savings Discrepancy Modal */}
+      <Dialog open={showSavingsDiscrepancyModal} onOpenChange={setShowSavingsDiscrepancyModal}>
+        <DialogContent className="max-w-lg">
+          <DialogHeader>
+            <DialogTitle className="text-amber-600 flex items-center gap-2">
+              <AlertTriangle className="h-5 w-5" />
+              Несъответствие в спестяванията
+            </DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4 pt-4">
+            <p className="text-slate-700">
+              Спрямо срока на Вашия договор би следвало да сте събрали по-високо ниво на спестявания. 
+              Каква е причината за несъответствието?
+            </p>
+            <p className="text-sm text-slate-500 italic">
+              (Изберете поне една причина)
+            </p>
+            
+            <div className="space-y-3">
+              <label className="flex items-start gap-3 p-3 rounded-lg border border-slate-200 hover:bg-slate-50 cursor-pointer">
+                <Checkbox
+                  checked={formData.savings_discrepancy_reason_1 || false}
+                  onCheckedChange={(checked) => handleChange('savings_discrepancy_reason_1', checked)}
+                  className="mt-0.5"
+                />
+                <span className="text-sm text-slate-700">
+                  Разчетът на разходите не е акуратен. Не успявам да спестявам толкова на месечна база. 
+                  <span className="text-amber-600 block text-xs mt-1">
+                    (Моля преди отбелязване, променете разходите, за да отразяват реалното състояние)
+                  </span>
+                </span>
+              </label>
+
+              <label className="flex items-start gap-3 p-3 rounded-lg border border-slate-200 hover:bg-slate-50 cursor-pointer">
+                <Checkbox
+                  checked={formData.savings_discrepancy_reason_2 || false}
+                  onCheckedChange={(checked) => handleChange('savings_discrepancy_reason_2', checked)}
+                  className="mt-0.5"
+                />
+                <span className="text-sm text-slate-700">
+                  Имал съм по-големи еднократни покупки в последните няколко години.
+                </span>
+              </label>
+
+              <label className="flex items-start gap-3 p-3 rounded-lg border border-slate-200 hover:bg-slate-50 cursor-pointer">
+                <Checkbox
+                  checked={formData.savings_discrepancy_reason_3 || false}
+                  onCheckedChange={(checked) => handleChange('savings_discrepancy_reason_3', checked)}
+                  className="mt-0.5"
+                />
+                <span className="text-sm text-slate-700">
+                  Имах увеличение в дохода си и отскоро мога да спестявам подобна сума.
+                </span>
+              </label>
+
+              <label className="flex items-start gap-3 p-3 rounded-lg border border-slate-200 hover:bg-slate-50 cursor-pointer">
+                <Checkbox
+                  checked={formData.savings_discrepancy_reason_4 || false}
+                  onCheckedChange={(checked) => handleChange('savings_discrepancy_reason_4', checked)}
+                  className="mt-0.5"
+                />
+                <span className="text-sm text-slate-700">
+                  Друго. Моля опишете:
+                </span>
+              </label>
+
+              {formData.savings_discrepancy_reason_4 && (
+                <div className="ml-8">
+                  <Textarea
+                    placeholder="Опишете причината..."
+                    value={formData.savings_discrepancy_reason_other || ''}
+                    onChange={(e) => handleChange('savings_discrepancy_reason_other', e.target.value)}
+                    className="min-h-[80px]"
+                  />
+                </div>
+              )}
+            </div>
+
+            <div className="flex justify-end gap-3 pt-4 border-t">
+              <Button
+                variant="outline"
+                onClick={() => setShowSavingsDiscrepancyModal(false)}
+              >
+                Назад към редакция
+              </Button>
+              <Button
+                onClick={() => {
+                  if (isSavingsDiscrepancyReasonValid()) {
+                    setShowSavingsDiscrepancyModal(false);
+                    setShowValidationErrors(false);
+                    setCurrentStep(prev => prev + 1);
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                  }
+                }}
+                disabled={!isSavingsDiscrepancyReasonValid()}
+                className="bg-blue-600 hover:bg-blue-700"
+              >
+                Продължи напред
+                <ArrowRight className="ml-2 h-4 w-4" />
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

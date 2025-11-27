@@ -39,6 +39,7 @@ import ChildrenGoalsStep from '../components/analysis/ChildrenGoalsStep';
 import ProtectionStep from '../components/analysis/ProtectionStep';
 import FinancialFlowStep from '../components/analysis/FinancialFlowStep';
 import PrioritiesStep from '../components/analysis/PrioritiesStep';
+import ReferralsStep from '../components/analysis/ReferralsStep';
 
 const steps = [
   { id: 1, title: 'Съгласие', icon: Shield },
@@ -58,6 +59,7 @@ export default function FinancialAnalysis() {
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [showValidationErrors, setShowValidationErrors] = useState(false);
   const [showSavingsDiscrepancyModal, setShowSavingsDiscrepancyModal] = useState(false);
+  const [showReferralsStep, setShowReferralsStep] = useState(false);
   const [formData, setFormData] = useState({
     gdpr_consent_a: false,
     gdpr_consent_b: false,
@@ -607,6 +609,67 @@ export default function FinancialAnalysis() {
   const incompleteSteps = getIncompleteSteps();
   const canSubmit = incompleteSteps.length === 0;
 
+  // Collect all unique names from all referral sections
+  const collectUniqueNames = () => {
+    const allNames = new Set();
+    
+    // Housing referrals
+    (formData.referrals_no_own_home || []).forEach(name => {
+      if (name && name.trim()) allNames.add(name.trim());
+    });
+    (formData.referrals_own_home_long || []).forEach(name => {
+      if (name && name.trim()) allNames.add(name.trim());
+    });
+    
+    // Birthday party names
+    (formData.birthday_family_names || []).forEach(name => {
+      if (name && name.trim()) allNames.add(name.trim());
+    });
+    (formData.birthday_friends_names || []).forEach(name => {
+      if (name && name.trim()) allNames.add(name.trim());
+    });
+    (formData.birthday_colleagues_names || []).forEach(name => {
+      if (name && name.trim()) allNames.add(name.trim());
+    });
+    
+    // Reserve referrals
+    (formData.referrals_no_reserve || []).forEach(name => {
+      if (name && name.trim()) allNames.add(name.trim());
+    });
+    (formData.referrals_has_reserve || []).forEach(name => {
+      if (name && name.trim()) allNames.add(name.trim());
+    });
+    
+    // Pension referrals
+    (formData.referrals_pension_planning || []).forEach(name => {
+      if (name && name.trim()) allNames.add(name.trim());
+    });
+    (formData.referrals_already_retired || []).forEach(name => {
+      if (name && name.trim()) allNames.add(name.trim());
+    });
+    
+    // Children referrals
+    (formData.referrals_have_children || []).forEach(name => {
+      if (name && name.trim()) allNames.add(name.trim());
+    });
+    (formData.referrals_recent_wedding || []).forEach(name => {
+      if (name && name.trim()) allNames.add(name.trim());
+    });
+    
+    // Protection referrals
+    (formData.referrals_property_protection || []).forEach(name => {
+      if (name && name.trim()) allNames.add(name.trim());
+    });
+    (formData.referrals_car_protection || []).forEach(name => {
+      if (name && name.trim()) allNames.add(name.trim());
+    });
+    
+    return Array.from(allNames);
+  };
+
+  const uniqueNames = collectUniqueNames();
+  const needsMoreReferrals = uniqueNames.length < 18;
+
   const nextStep = () => {
     if (validateStep(currentStep) && currentStep < 9) {
       // Check for savings discrepancy when leaving step 8 (Financial Flow)
@@ -907,7 +970,15 @@ export default function FinancialAnalysis() {
             ) : (
               <Button
                 type="button"
-                onClick={handleSubmit}
+                onClick={() => {
+                  if (canSubmit) {
+                    if (needsMoreReferrals) {
+                      setShowReferralsStep(true);
+                    } else {
+                      handleSubmit();
+                    }
+                  }
+                }}
                 disabled={isSubmitting || !canSubmit}
                 className="bg-green-600 hover:bg-green-700 rounded-full px-8 disabled:opacity-50"
               >
@@ -923,7 +994,7 @@ export default function FinancialAnalysis() {
                   </>
                 ) : (
                   <>
-                    Изпрати анализа
+                    Завърши анализа
                     <CheckCircle className="ml-2 h-4 w-4" />
                   </>
                 )}
@@ -1042,6 +1113,23 @@ export default function FinancialAnalysis() {
           </div>
         </DialogContent>
       </Dialog>
+
+      {/* Referrals Step Modal */}
+      {showReferralsStep && (
+        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-2xl shadow-2xl max-w-6xl w-full max-h-[90vh] overflow-y-auto p-6 md:p-10">
+            <ReferralsStep 
+              data={formData}
+              onChange={handleChange}
+              existingNames={uniqueNames}
+              onComplete={() => {
+                setShowReferralsStep(false);
+                handleSubmit();
+              }}
+            />
+          </div>
+        </div>
+      )}
     </div>
   );
 }

@@ -761,30 +761,8 @@ ${JSON.stringify(analysisContext, null, 2)}
             )}
 
             {/* Visualization Charts */}
-            {(aiAnalysis.pension_gap_yearly > 0 || aiAnalysis.missed_savings_10_years > 0) && (
-              <div className="grid md:grid-cols-2 gap-4 mt-6">
-                {/* Pension Gap Chart */}
-                {aiAnalysis.pension_gap_yearly > 0 && aiAnalysis.years_to_retirement > 0 && (
-                  <div className="bg-slate-50 rounded-xl p-4 border border-slate-200">
-                    <h5 className="font-semibold text-slate-700 mb-2 text-sm">📉 Пенсионен дефицит през годините</h5>
-                    <p className="text-xs text-slate-500 mb-3">Ако НЕ предприемете действия сега:</p>
-                    <ResponsiveContainer width="100%" height={150}>
-                      <AreaChart data={Array.from({ length: Math.min(aiAnalysis.years_to_retirement, 30) }, (_, i) => ({
-                        year: `Год ${i + 1}`,
-                        loss: aiAnalysis.pension_gap_yearly * (i + 1)
-                      }))}>
-                        <XAxis dataKey="year" tick={{ fontSize: 10 }} interval={4} />
-                        <YAxis tick={{ fontSize: 10 }} tickFormatter={(v) => `€${(v/1000).toFixed(0)}k`} />
-                        <RechartsTooltip formatter={(v) => [`€${v.toLocaleString()}`, 'Натрупана загуба']} />
-                        <Area type="monotone" dataKey="loss" stroke="#ef4444" fill="#fecaca" />
-                      </AreaChart>
-                    </ResponsiveContainer>
-                    <p className="text-center text-red-600 font-bold mt-2">
-                      Общо: €{(aiAnalysis.pension_gap_yearly * aiAnalysis.years_to_retirement).toLocaleString()} пропуснати!
-                    </p>
-                  </div>
-                )}
-
+            {aiAnalysis.missed_savings_10_years > 0 && (
+              <div className="mt-6">
                 {/* Savings Growth Comparison - Line Chart */}
                 {aiAnalysis.missed_savings_10_years > 0 && (() => {
                   // Calculate years to retirement based on client/partner ages

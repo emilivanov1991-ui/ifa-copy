@@ -600,6 +600,11 @@ export default function FinancialAnalysis() {
 
   const nextStep = () => {
     if (validateStep(currentStep) && currentStep < 9) {
+      // Check for savings discrepancy when leaving step 8 (Financial Flow)
+      if (currentStep === 8 && checkSavingsDiscrepancy() && !isSavingsDiscrepancyReasonValid()) {
+        setShowSavingsDiscrepancyModal(true);
+        return;
+      }
       setShowValidationErrors(false);
       setCurrentStep(prev => prev + 1);
       window.scrollTo({ top: 0, behavior: 'smooth' });

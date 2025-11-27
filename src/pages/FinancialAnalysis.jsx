@@ -57,12 +57,89 @@ export default function FinancialAnalysis() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [showValidationErrors, setShowValidationErrors] = useState(false);
+  const [showSavingsDiscrepancyModal, setShowSavingsDiscrepancyModal] = useState(false);
   const [formData, setFormData] = useState({
     gdpr_consent_a: false,
     gdpr_consent_b: false,
     gdpr_consent_c: false,
     status: 'new'
   });
+
+  // Calculate if savings discrepancy exists
+  const checkSavingsDiscrepancy = () => {
+    // Calculate months since contract start
+    const calculateMonthsSinceStart = (startDate) => {
+      if (!startDate) return 0;
+      const start = new Date(startDate);
+      const now = new Date();
+      const months = (now.getFullYear() - start.getFullYear()) * 12 + (now.getMonth() - start.getMonth());
+      return Math.max(0, months);
+    };
+
+    const clientMonthsWorking = calculateMonthsSinceStart(formData.client_contract_start_date);
+    const partnerMonthsWorking = formData.include_partner ? calculateMonthsSinceStart(formData.partner_contract_start_date) : 0;
+
+    // Get incomes
+    const clientNetIncome = formData.client_net_income || 0;
+    const partnerNetIncome = formData.include_partner ? (formData.partner_net_income || 0) : 0;
+    const totalMonthlyIncome = clientNetIncome + partnerNetIncome;
+
+    // Calculate monthly balance (income - expenses)
+    const totalExpenses = (formData.expense_rent || 0) + (formData.expense_utilities || 0) + 
+      (formData.expense_phone || 0) + (formData.expense_internet || 0) + (formData.expense_tv || 0) + 
+      (formData.expense_other_housing || 0) + (formData.expense_fuel || 0) + (formData.expense_car_maintenance || 0) + 
+      (formData.expense_car_other || 0) + (formData.expense_food || 0) + (formData.expense_clothing || 0) + 
+      (formData.expense_culture || 0) + (formData.expense_travel || 0) + (formData.expense_children || 0) + 
+      (formData.expense_cigarettes || 0) + (formData.expense_pets || 0) + (formData.expense_vacation || 0) + 
+      (formData.expense_business || 0) + (formData.expense_other || 0) + (formData.expense_education || 0) + 
+      (formData.expense_health || 0) + (formData.expense_cosmetics || 0) + (formData.expense_hobbies || 0) + 
+      (formData.expense_electronics || 0) + (formData.expense_taxes || 0);
+
+    const monthlyDebtPayments = (formData.liability_mortgage_monthly || 0) + (formData.liability_consumer_loans_monthly || 0) +
+      (formData.liability_credit_cards_monthly || 0) + (formData.liability_leasing_monthly || 0) + 
+      (formData.liability_overdraft_monthly || 0);
+
+    const monthlyBalance = totalMonthlyIncome - totalExpenses - monthlyDebtPayments;
+
+    // Calculate expected savings
+    let expectedSavings = 0;
+    if (formData.include_partner && totalMonthlyIncome > 0) {
+      // Each person saves their proportion based on savings rate
+      const savingsRate = monthlyBalance / totalMonthlyIncome;
+      expectedSavings = (clientNetIncome * savingsRate * clientMonthsWorking) + 
+                        (partnerNetIncome * savingsRate * partnerMonthsWorking);
+    } else {
+      expectedSavings = monthlyBalance * clientMonthsWorking;
+    }
+
+    // Get actual savings
+    const actualSavings = (formData.asset_checking_account || 0) + (formData.asset_short_term_savings || 0) + 
+      (formData.asset_medium_term_savings || 0) + (formData.asset_long_term_savings || 0);
+
+    // Check if expected is 20% or more higher than actual
+    if (expectedSavings > 0 && actualSavings > 0) {
+      const discrepancyRatio = (expectedSavings - actualSavings) / actualSavings;
+      return discrepancyRatio >= 0.2;
+    }
+
+    return false;
+  };
+
+  // Check if discrepancy reason is valid
+  const isSavingsDiscrepancyReasonValid = () => {
+    if (!checkSavingsDiscrepancy()) return true;
+    
+    const hasAnyReason = formData.savings_discrepancy_reason_1 || 
+                         formData.savings_discrepancy_reason_2 || 
+                         formData.savings_discrepancy_reason_3 || 
+                         formData.savings_discrepancy_reason_4;
+    
+    if (formData.savings_discrepancy_reason_4 && !formData.savings_discrepancy_reason_other) {
+      return false;
+    }
+    
+    return hasAnyReason;
+  };
 
   const handleChange = (field, value) => {
     setFormData(prev => ({ ...prev, [field]: value }));

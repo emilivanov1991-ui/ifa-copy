@@ -483,7 +483,17 @@ export default function HousingStep({ data, onChange, showErrors }) {
                       type="number"
                       min="0"
                       value={data.available_cash || ''}
-                      onChange={(e) => onChange('available_cash', parseInt(e.target.value) || '')}
+                      onChange={(e) => {
+                        const newValue = parseInt(e.target.value) || '';
+                        onChange('available_cash', newValue);
+                        setShowDownPaymentWarning(false);
+                        clearTimeout(window.downPaymentWarningTimeout);
+                        if (newValue) {
+                          window.downPaymentWarningTimeout = setTimeout(() => {
+                            setShowDownPaymentWarning(true);
+                          }, 1000);
+                        }
+                      }}
                       className={`rounded-lg ${isFieldInvalid(data.available_cash) ? 'border-red-500 bg-red-50' : ''}`}
                       required
                     />

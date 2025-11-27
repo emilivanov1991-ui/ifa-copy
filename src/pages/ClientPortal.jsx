@@ -21,7 +21,9 @@ import {
   Loader2,
   Lock,
   Eye,
-  EyeOff
+  EyeOff,
+  Moon,
+  Sun
 } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -47,6 +49,21 @@ export default function ClientPortal() {
   const [loginError, setLoginError] = useState('');
   const [isLoggingIn, setIsLoggingIn] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [darkMode, setDarkMode] = useState(() => {
+    if (typeof window !== 'undefined') {
+      return localStorage.getItem('clientPortalTheme') === 'dark';
+    }
+    return false;
+  });
+
+  useEffect(() => {
+    if (darkMode) {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
+    localStorage.setItem('clientPortalTheme', darkMode ? 'dark' : 'light');
+  }, [darkMode]);
 
   // Check for saved session
   useEffect(() => {
@@ -150,28 +167,28 @@ export default function ClientPortal() {
   // Not authenticated - show login form
   if (!isAuthenticated) {
     return (
-      <div className="pt-20 min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
+      <div className={`pt-20 min-h-screen ${darkMode ? 'bg-slate-900' : 'bg-gradient-to-br from-slate-50 to-blue-50'}`}>
         <div className="max-w-md mx-auto px-6 py-24">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="bg-white rounded-2xl shadow-xl p-10"
+            className={`rounded-2xl shadow-xl p-10 ${darkMode ? 'bg-slate-800' : 'bg-white'}`}
           >
             <div className="text-center mb-8">
-              <div className="w-16 h-16 rounded-full bg-blue-100 flex items-center justify-center mx-auto mb-6">
-                <Lock className="h-8 w-8 text-blue-600" />
+              <div className={`w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-6 ${darkMode ? 'bg-blue-900' : 'bg-blue-100'}`}>
+                <Lock className={`h-8 w-8 ${darkMode ? 'text-blue-400' : 'text-blue-600'}`} />
               </div>
-              <h1 className="text-2xl font-semibold text-slate-900 mb-2">
+              <h1 className={`text-2xl font-semibold mb-2 ${darkMode ? 'text-white' : 'text-slate-900'}`}>
                 Клиентски портал
               </h1>
-              <p className="text-slate-600">
+              <p className={darkMode ? 'text-slate-400' : 'text-slate-600'}>
                 Влезте с вашето потребителско име и парола
               </p>
             </div>
 
             <form onSubmit={handleLogin} className="space-y-5">
               <div className="space-y-2">
-                <Label htmlFor="username">Потребителско име (имейл)</Label>
+                <Label htmlFor="username" className={darkMode ? 'text-slate-300' : ''}>Потребителско име (имейл)</Label>
                 <Input
                   id="username"
                   type="email"
@@ -184,7 +201,7 @@ export default function ClientPortal() {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="password">Парола</Label>
+                <Label htmlFor="password" className={darkMode ? 'text-slate-300' : ''}>Парола</Label>
                 <div className="relative">
                   <Input
                     id="password"
@@ -227,19 +244,19 @@ export default function ClientPortal() {
               </Button>
             </form>
 
-            <p className="text-sm text-slate-500 mt-6 text-center">
+            <p className={`text-sm mt-6 text-center ${darkMode ? 'text-slate-500' : 'text-slate-500'}`}>
               Данните за вход са изпратени на вашия имейл след попълване на финансовия анализ
             </p>
-          </motion.div>
-        </div>
-      </div>
-    );
-  }
+            </motion.div>
+            </div>
+            </div>
+            );
+            }
 
   // Authenticated but no client record
   if (!clientLoading && !clientData) {
     return (
-      <div className="pt-20 min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
+      <div className={`pt-20 min-h-screen ${darkMode ? 'bg-slate-900' : 'bg-gradient-to-br from-slate-50 to-blue-50'}`}
         <div className="max-w-md mx-auto px-6 py-24">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -281,7 +298,7 @@ export default function ClientPortal() {
   // Loading client data
   if (clientLoading) {
     return (
-      <div className="pt-20 min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 flex items-center justify-center">
+      <div className={`pt-20 min-h-screen flex items-center justify-center ${darkMode ? 'bg-slate-900' : 'bg-gradient-to-br from-slate-50 to-blue-50'}`}
         <Loader2 className="h-8 w-8 animate-spin text-blue-600" />
       </div>
     );
@@ -302,27 +319,35 @@ export default function ClientPortal() {
   });
 
   return (
-    <div className="pt-20 min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
+    <div className={`pt-20 min-h-screen ${darkMode ? 'bg-slate-900' : 'bg-gradient-to-br from-slate-50 to-blue-50'}`}>
       <div className="max-w-7xl mx-auto px-6 py-8">
         {/* Header */}
         <div className="flex flex-col md:flex-row md:items-center justify-between mb-8 gap-4">
           <div>
-            <h1 className="text-2xl md:text-3xl font-semibold text-slate-900">
+            <h1 className={`text-2xl md:text-3xl font-semibold ${darkMode ? 'text-white' : 'text-slate-900'}`}>
               Здравейте, {clientData.first_name}!
             </h1>
-            <p className="text-slate-600">
+            <p className={darkMode ? 'text-slate-400' : 'text-slate-600'}>
               Вашият личен финансов портал
             </p>
           </div>
           <div className="flex items-center gap-3">
-            <Button variant="outline" className="rounded-full">
+            <Button 
+              variant="outline" 
+              size="icon"
+              onClick={() => setDarkMode(!darkMode)} 
+              className={`rounded-full ${darkMode ? 'border-slate-700 text-slate-300' : ''}`}
+            >
+              {darkMode ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+            </Button>
+            <Button variant="outline" className={`rounded-full ${darkMode ? 'border-slate-700 text-slate-300' : ''}`}>
               <Bell className="h-4 w-4 mr-2" />
               Известия
               {pendingPayments.length > 0 && (
                 <Badge className="ml-2 bg-red-500">{pendingPayments.length}</Badge>
               )}
             </Button>
-            <Button variant="outline" onClick={handleLogout} className="rounded-full">
+            <Button variant="outline" onClick={handleLogout} className={`rounded-full ${darkMode ? 'border-slate-700 text-slate-300' : ''}`}>
               <LogOut className="h-4 w-4 mr-2" />
               Изход
             </Button>
@@ -331,57 +356,57 @@ export default function ClientPortal() {
 
         {/* Stats Cards */}
         <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-          <Card className="bg-white">
+          <Card className={darkMode ? 'bg-slate-800 border-slate-700' : 'bg-white'}>
             <CardContent className="pt-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-slate-600">Стойност на портфолио</p>
-                  <p className="text-2xl font-bold text-slate-900">{totalValue.toLocaleString('bg-BG')} €</p>
+                  <p className={`text-sm ${darkMode ? 'text-slate-400' : 'text-slate-600'}`}>Стойност на портфолио</p>
+                  <p className={`text-2xl font-bold ${darkMode ? 'text-white' : 'text-slate-900'}`}>{totalValue.toLocaleString('bg-BG')} €</p>
                 </div>
-                <div className="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center">
-                  <Wallet className="h-6 w-6 text-blue-600" />
+                <div className={`w-12 h-12 rounded-full flex items-center justify-center ${darkMode ? 'bg-blue-900' : 'bg-blue-100'}`}>
+                  <Wallet className={`h-6 w-6 ${darkMode ? 'text-blue-400' : 'text-blue-600'}`} />
                 </div>
               </div>
             </CardContent>
           </Card>
 
-          <Card className="bg-white">
+          <Card className={darkMode ? 'bg-slate-800 border-slate-700' : 'bg-white'}>
             <CardContent className="pt-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-slate-600">Месечни вноски</p>
-                  <p className="text-2xl font-bold text-slate-900">{totalMonthlyPremium.toLocaleString('bg-BG')} €</p>
+                  <p className={`text-sm ${darkMode ? 'text-slate-400' : 'text-slate-600'}`}>Месечни вноски</p>
+                  <p className={`text-2xl font-bold ${darkMode ? 'text-white' : 'text-slate-900'}`}>{totalMonthlyPremium.toLocaleString('bg-BG')} €</p>
                 </div>
-                <div className="w-12 h-12 rounded-full bg-green-100 flex items-center justify-center">
-                  <TrendingUp className="h-6 w-6 text-green-600" />
+                <div className={`w-12 h-12 rounded-full flex items-center justify-center ${darkMode ? 'bg-green-900' : 'bg-green-100'}`}>
+                  <TrendingUp className={`h-6 w-6 ${darkMode ? 'text-green-400' : 'text-green-600'}`} />
                 </div>
               </div>
             </CardContent>
           </Card>
 
-          <Card className="bg-white">
+          <Card className={darkMode ? 'bg-slate-800 border-slate-700' : 'bg-white'}>
             <CardContent className="pt-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-slate-600">Активни продукти</p>
-                  <p className="text-2xl font-bold text-slate-900">{activeProducts.length}</p>
+                  <p className={`text-sm ${darkMode ? 'text-slate-400' : 'text-slate-600'}`}>Активни продукти</p>
+                  <p className={`text-2xl font-bold ${darkMode ? 'text-white' : 'text-slate-900'}`}>{activeProducts.length}</p>
                 </div>
-                <div className="w-12 h-12 rounded-full bg-purple-100 flex items-center justify-center">
-                  <Shield className="h-6 w-6 text-purple-600" />
+                <div className={`w-12 h-12 rounded-full flex items-center justify-center ${darkMode ? 'bg-purple-900' : 'bg-purple-100'}`}>
+                  <Shield className={`h-6 w-6 ${darkMode ? 'text-purple-400' : 'text-purple-600'}`} />
                 </div>
               </div>
             </CardContent>
           </Card>
 
-          <Card className="bg-white">
+          <Card className={darkMode ? 'bg-slate-800 border-slate-700' : 'bg-white'}>
             <CardContent className="pt-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-slate-600">Предстоящи падежи</p>
-                  <p className="text-2xl font-bold text-slate-900">{upcomingMaturity.length}</p>
+                  <p className={`text-sm ${darkMode ? 'text-slate-400' : 'text-slate-600'}`}>Предстоящи падежи</p>
+                  <p className={`text-2xl font-bold ${darkMode ? 'text-white' : 'text-slate-900'}`}>{upcomingMaturity.length}</p>
                 </div>
-                <div className="w-12 h-12 rounded-full bg-amber-100 flex items-center justify-center">
-                  <Calendar className="h-6 w-6 text-amber-600" />
+                <div className={`w-12 h-12 rounded-full flex items-center justify-center ${darkMode ? 'bg-amber-900' : 'bg-amber-100'}`}>
+                  <Calendar className={`h-6 w-6 ${darkMode ? 'text-amber-400' : 'text-amber-600'}`} />
                 </div>
               </div>
             </CardContent>
@@ -390,7 +415,7 @@ export default function ClientPortal() {
 
         {/* Main Content */}
         <Tabs defaultValue="overview" className="space-y-6">
-          <TabsList className="bg-white p-1 rounded-full flex-wrap">
+          <TabsList className={`p-1 rounded-full flex-wrap ${darkMode ? 'bg-slate-800' : 'bg-white'}`}>
             <TabsTrigger value="overview" className="rounded-full">Преглед</TabsTrigger>
             <TabsTrigger value="products" className="rounded-full">Продукти</TabsTrigger>
             <TabsTrigger value="payments" className="rounded-full">Вноски</TabsTrigger>

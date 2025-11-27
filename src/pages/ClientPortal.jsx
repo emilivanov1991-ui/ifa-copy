@@ -298,7 +298,7 @@ export default function ClientPortal() {
   // Loading client data
   if (clientLoading) {
     return (
-      <div className={`pt-20 min-h-screen flex items-center justify-center ${darkMode ? 'bg-slate-900' : 'bg-gradient-to-br from-slate-50 to-blue-50'}`}
+      <div className={`pt-20 min-h-screen flex items-center justify-center ${darkMode ? 'bg-slate-900' : 'bg-gradient-to-br from-slate-50 to-blue-50'}`}>
         <Loader2 className="h-8 w-8 animate-spin text-blue-600" />
       </div>
     );

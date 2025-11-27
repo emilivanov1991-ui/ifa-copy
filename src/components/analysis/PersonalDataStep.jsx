@@ -325,10 +325,6 @@ export default function PersonalDataStep({ data, onChange, showErrors }) {
                 <Label>Улица</Label>
                 <Input value={data.client_employer_street || ''} onChange={(e) => onChange('client_employer_street', e.target.value)} className="rounded-lg" />
               </div>
-              <div className="space-y-2">
-                <Label>Пощенски код</Label>
-                <Input value={data.client_employer_postal_code || ''} onChange={(e) => onChange('client_employer_postal_code', e.target.value)} className="rounded-lg" />
-              </div>
               <div className="space-y-2" data-invalid={isFieldInvalid(data.client_contract_type) ? "true" : undefined}>
                 <Label>Вид договор <span className="text-red-500">*</span></Label>
                 <Select value={data.client_contract_type || ''} onValueChange={(value) => onChange('client_contract_type', value)}>
@@ -348,6 +344,10 @@ export default function PersonalDataStep({ data, onChange, showErrors }) {
                     <SelectItem value="permanent">Постоянен договор</SelectItem>
                   </SelectContent>
                 </Select>
+              </div>
+              <div className="space-y-2" data-invalid={isFieldInvalid(data.client_contract_start_date) ? "true" : undefined}>
+                <Label>Начало на договора <span className="text-red-500">*</span></Label>
+                <BulgarianDateInput value={data.client_contract_start_date || ''} onChange={(value) => onChange('client_contract_start_date', value)} className={`rounded-lg ${isFieldInvalid(data.client_contract_start_date) ? 'border-red-500 bg-red-50' : ''}`} required />
               </div>
             </div>
           ) : (
@@ -520,10 +520,6 @@ export default function PersonalDataStep({ data, onChange, showErrors }) {
                     <Label>Улица</Label>
                     <Input value={data.partner_employer_street || ''} onChange={(e) => onChange('partner_employer_street', e.target.value)} className="rounded-lg" />
                   </div>
-                  <div className="space-y-2">
-                    <Label>Пощенски код</Label>
-                    <Input value={data.partner_employer_postal_code || ''} onChange={(e) => onChange('partner_employer_postal_code', e.target.value)} className="rounded-lg" />
-                  </div>
                   <div className="space-y-2" data-invalid={isFieldInvalid(data.partner_contract_type) ? "true" : undefined}>
                     <Label>Вид договор <span className="text-red-500">*</span></Label>
                     <Select value={data.partner_contract_type || ''} onValueChange={(value) => onChange('partner_contract_type', value)}>
@@ -543,6 +539,10 @@ export default function PersonalDataStep({ data, onChange, showErrors }) {
                         <SelectItem value="permanent">Постоянен договор</SelectItem>
                       </SelectContent>
                     </Select>
+                  </div>
+                  <div className="space-y-2" data-invalid={isFieldInvalid(data.partner_contract_start_date) ? "true" : undefined}>
+                    <Label>Начало на договора <span className="text-red-500">*</span></Label>
+                    <BulgarianDateInput value={data.partner_contract_start_date || ''} onChange={(value) => onChange('partner_contract_start_date', value)} className={`rounded-lg ${isFieldInvalid(data.partner_contract_start_date) ? 'border-red-500 bg-red-50' : ''}`} required />
                   </div>
                 </div>
               ) : (

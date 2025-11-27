@@ -693,15 +693,6 @@ export default function FinancialAnalysis() {
     }
   };
 
-  const generatePassword = () => {
-    const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz23456789';
-    let password = '';
-    for (let i = 0; i < 10; i++) {
-      password += chars.charAt(Math.floor(Math.random() * chars.length));
-    }
-    return password;
-  };
-
   const handleSubmit = async () => {
     setIsSubmitting(true);
 
@@ -717,42 +708,37 @@ export default function FinancialAnalysis() {
     // Send emails to client and partner
     const clientName = `${formData.client_first_name} ${formData.client_last_name}`;
     const clientEmail = formData.client_email;
-    const clientPassword = generatePassword();
 
     // Email to client
     if (clientEmail) {
+      const portalUrl = `${window.location.origin}/ClientPortal`;
       const clientEmailBody = `
-  Уважаеми/а ${clientName},
+Уважаеми/а ${clientName},
 
-  Благодарим Ви за попълнения персонален финансов анализ!
+Благодарим Ви за попълнения персонален финансов анализ!
 
-  Вашите данни са получени успешно и ще бъдат прегледани от нашия екип. Очаквайте обаждане или имейл в рамките на 24-48 часа за насрочване на Вашата безплатна консултация.
+Вашите данни са получени успешно и ще бъдат прегледани от нашия екип. Очаквайте обаждане или имейл в рамките на 24-48 часа за насрочване на Вашата безплатна консултация.
 
-  За достъп до Вашия клиентски портал, моля използвайте следните данни:
+👉 За достъп до Вашия клиентски портал, моля регистрирайте се на следния линк:
+${portalUrl}
 
-  🔐 Данни за вход:
-  Email: ${clientEmail}
-  Временна парола: ${clientPassword}
+Използвайте имейл адреса: ${clientEmail}
 
-  ⚠️ ВАЖНО: При първото влизане ще бъдете помолени да смените паролата си.
+В клиентския портал можете да:
+• Преглеждате Вашия финансов анализ
+• Видите Вашия персонализиран финансов план (след изготвяне)
+• Следите всички активни продукти
+• Качвате и съхранявате важни документи
 
-  👉 Вход в портала: ${window.location.origin}/ClientPortal
+Очакваме срещата с Вас${formData.next_meeting_datetime ? ` на ${new Date(formData.next_meeting_datetime).toLocaleString('bg-BG')}` : ''}!
 
-  В клиентския портал можете да:
-  • Преглеждате Вашите финансови продукти
-  • Качвате и съхранявате важни документи
-  • Следите предстоящи вноски и падежи
-  • Получавате персонализирани препоръки
-
-  Очакваме срещата с Вас${formData.next_meeting_datetime ? ` на ${new Date(formData.next_meeting_datetime).toLocaleString('bg-BG')}` : ''}!
-
-  С уважение,
-  Екипът на APEX Financial
+С уважение,
+Екипът на APEX Financial
       `;
 
       await base44.integrations.Core.SendEmail({
         to: clientEmail,
-        subject: 'Вашият финансов анализ е получен - Данни за достъп до портала',
+        subject: 'Вашият финансов анализ е получен - Регистрирайте се в портала',
         body: clientEmailBody
       });
     }
@@ -761,40 +747,35 @@ export default function FinancialAnalysis() {
     if (formData.include_partner && formData.partner_email) {
       const partnerName = `${formData.partner_first_name} ${formData.partner_last_name}`;
       const partnerEmail = formData.partner_email;
-      const partnerPassword = generatePassword();
+      const portalUrl = `${window.location.origin}/ClientPortal`;
 
       const partnerEmailBody = `
-  Уважаеми/а ${partnerName},
+Уважаеми/а ${partnerName},
 
-  Благодарим Ви за участието в персоналния финансов анализ заедно с ${formData.client_first_name} ${formData.client_last_name}!
+Благодарим Ви за участието в персоналния финансов анализ заедно с ${formData.client_first_name} ${formData.client_last_name}!
 
-  Вашите данни са получени успешно и ще бъдат прегледани от нашия екип. Очаквайте обаждане или имейл в рамките на 24-48 часа за насрочване на Вашата безплатна консултация.
+Вашите данни са получени успешно и ще бъдат прегледани от нашия екип. Очаквайте обаждане или имейл в рамките на 24-48 часа за насрочване на Вашата безплатна консултация.
 
-  За достъп до Вашия клиентски портал, моля използвайте следните данни:
+👉 За достъп до Вашия клиентски портал, моля регистрирайте се на следния линк:
+${portalUrl}
 
-  🔐 Данни за вход:
-  Email: ${partnerEmail}
-  Временна парола: ${partnerPassword}
+Използвайте имейл адреса: ${partnerEmail}
 
-  ⚠️ ВАЖНО: При първото влизане ще бъдете помолени да смените паролата си.
+В клиентския портал можете да:
+• Преглеждате Вашия финансов анализ
+• Видите Вашия персонализиран финансов план (след изготвяне)
+• Следите всички активни продукти
+• Качвате и съхранявате важни документи
 
-  👉 Вход в портала: ${window.location.origin}/ClientPortal
+Очакваме срещата с Вас${formData.next_meeting_datetime ? ` на ${new Date(formData.next_meeting_datetime).toLocaleString('bg-BG')}` : ''}!
 
-  В клиентския портал можете да:
-  • Преглеждате Вашите финансови продукти
-  • Качвате и съхранявате важни документи
-  • Следите предстоящи вноски и падежи
-  • Получавате персонализирани препоръки
-
-  Очакваме срещата с Вас${formData.next_meeting_datetime ? ` на ${new Date(formData.next_meeting_datetime).toLocaleString('bg-BG')}` : ''}!
-
-  С уважение,
-  Екипът на APEX Financial
+С уважение,
+Екипът на APEX Financial
       `;
 
       await base44.integrations.Core.SendEmail({
         to: partnerEmail,
-        subject: 'Вашият финансов анализ е получен - Данни за достъп до портала',
+        subject: 'Вашият финансов анализ е получен - Регистрирайте се в портала',
         body: partnerEmailBody
       });
     }

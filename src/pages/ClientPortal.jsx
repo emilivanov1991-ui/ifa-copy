@@ -117,14 +117,17 @@ export default function ClientPortal() {
               Клиентски портал
             </h1>
             <p className="text-slate-600 mb-8">
-              Влезте в акаунта си, за да видите вашите финансови продукти, вноски и портфолио.
+              Влезте или се регистрирайте, за да видите вашия финансов анализ, план и продукти.
             </p>
             <Button 
               onClick={handleLogin}
               className="w-full bg-blue-600 hover:bg-blue-700 rounded-full py-6 text-lg"
             >
-              Вход в портала
+              Вход / Регистрация
             </Button>
+            <p className="text-sm text-slate-500 mt-4">
+              Използвайте имейла, с който сте попълнили финансовия анализ
+            </p>
           </motion.div>
         </div>
       </div>

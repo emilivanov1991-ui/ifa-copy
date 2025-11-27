@@ -247,17 +247,11 @@ export default function ReferralsStep({ data, onChange, onComplete, existingName
       {/* Referrals Table */}
       <div className="bg-white rounded-xl border border-slate-200 overflow-hidden">
         <div className="overflow-x-auto">
-          <table className="w-full min-w-[900px]">
+          <table className="w-full">
             <thead className="bg-slate-50 border-b border-slate-200">
               <tr>
                 <th className="text-left text-sm font-medium text-slate-700 px-3 py-3 w-8">#</th>
                 <th className="text-left text-sm font-medium text-slate-700 px-3 py-3">Име и Фамилия</th>
-                <th className="text-left text-sm font-medium text-slate-700 px-3 py-3">Телефонен номер</th>
-                <th className="text-left text-sm font-medium text-slate-700 px-3 py-3">Професия/Дейност</th>
-                <th className="text-left text-sm font-medium text-slate-700 px-3 py-3 w-20">Семеен</th>
-                <th className="text-left text-sm font-medium text-slate-700 px-3 py-3 w-20">Деца</th>
-                <th className="text-left text-sm font-medium text-slate-700 px-3 py-3 w-20">Ипотека</th>
-                <th className="text-left text-sm font-medium text-slate-700 px-3 py-3">Месечен доход</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100">
@@ -269,72 +263,6 @@ export default function ReferralsStep({ data, onChange, onComplete, existingName
                       value={referral.name}
                       onChange={(e) => handleReferralChange(index, 'name', e.target.value)}
                       placeholder="Име Фамилия"
-                      className="h-9 text-sm"
-                    />
-                  </td>
-                  <td className="px-3 py-2">
-                    <Input
-                      value={referral.phone}
-                      onChange={(e) => handleReferralChange(index, 'phone', e.target.value)}
-                      placeholder="+359..."
-                      className="h-9 text-sm"
-                    />
-                  </td>
-                  <td className="px-3 py-2">
-                    <Input
-                      value={referral.profession}
-                      onChange={(e) => handleReferralChange(index, 'profession', e.target.value)}
-                      placeholder="Професия"
-                      className="h-9 text-sm"
-                    />
-                  </td>
-                  <td className="px-3 py-2">
-                    <Select 
-                      value={referral.is_married} 
-                      onValueChange={(value) => handleReferralChange(index, 'is_married', value)}
-                    >
-                      <SelectTrigger className="h-9 text-sm">
-                        <SelectValue placeholder="-" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="yes">Да</SelectItem>
-                        <SelectItem value="no">Не</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </td>
-                  <td className="px-3 py-2">
-                    <Select 
-                      value={referral.has_children} 
-                      onValueChange={(value) => handleReferralChange(index, 'has_children', value)}
-                    >
-                      <SelectTrigger className="h-9 text-sm">
-                        <SelectValue placeholder="-" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="yes">Да</SelectItem>
-                        <SelectItem value="no">Не</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </td>
-                  <td className="px-3 py-2">
-                    <Select 
-                      value={referral.has_mortgage} 
-                      onValueChange={(value) => handleReferralChange(index, 'has_mortgage', value)}
-                    >
-                      <SelectTrigger className="h-9 text-sm">
-                        <SelectValue placeholder="-" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="yes">Да</SelectItem>
-                        <SelectItem value="no">Не</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </td>
-                  <td className="px-3 py-2">
-                    <Input
-                      value={referral.monthly_income}
-                      onChange={(e) => handleReferralChange(index, 'monthly_income', e.target.value)}
-                      placeholder="€"
                       className="h-9 text-sm"
                     />
                   </td>

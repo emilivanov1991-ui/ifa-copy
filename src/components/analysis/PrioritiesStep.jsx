@@ -133,6 +133,7 @@ export default function PrioritiesStep({ data, onChange, showErrors }) {
         {isInvalid && (
           <p className="text-red-500 text-sm mt-2">Моля, задайте приоритет на всички елементи.</p>
         )}
+      </div>
 
       {/* Investment Summary */}
       <div className="bg-slate-50 rounded-xl p-6">

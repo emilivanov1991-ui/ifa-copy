@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider";
-import { Moon, Sun, RotateCcw, Loader2 } from 'lucide-react';
+import { RotateCcw, Loader2 } from 'lucide-react';
 import { cn } from "@/lib/utils";
 import { Link } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
@@ -149,18 +149,7 @@ export default function FinancialPlanner() {
             НАПРЕД
           </button>
           
-          <button
-            onClick={() => setIsDarkMode(!isDarkMode)}
-            className={cn(
-              "flex items-center gap-2 px-4 py-1.5 rounded-full text-sm font-medium transition-all",
-              isDarkMode 
-                ? "bg-slate-800 text-amber-400" 
-                : "bg-slate-100 text-slate-700"
-            )}
-          >
-            {isDarkMode ? <Moon className="w-4 h-4" /> : <Sun className="w-4 h-4" />}
-            {isDarkMode ? 'НОЩ' : 'ДЕН'}
-          </button>
+
         </div>
         
         {/* Current step label */}
@@ -613,176 +602,97 @@ export default function FinancialPlanner() {
               </motion.div>
             )}
 
-            {/* Step 5: Financial Framework */}
+            {/* Step 5: Financial Framework - New Layout */}
             {currentStep === 5 && !isGenerating && (
               <motion.div
                 key="step-5"
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -20 }}
-                className="grid lg:grid-cols-3 gap-8"
+                className="max-w-6xl mx-auto"
               >
-                {/* Main content - 2 columns */}
-                <div className="lg:col-span-2">
-                  <div className={cn("rounded-3xl border p-8", cardClasses)}>
-                    <div className="flex items-center gap-3 mb-6">
-                      <span className={cn("text-xs tracking-widest", mutedTextClasses)}>СИГУРНОСТ</span>
-                      <span className={cn("text-xs", mutedTextClasses)}>•</span>
-                      <span className={cn("text-xs tracking-widest", mutedTextClasses)}>ПЕНСИЯ</span>
-                      <span className={cn("text-xs", mutedTextClasses)}>•</span>
-                      <span className={cn("text-xs tracking-widest", mutedTextClasses)}>ЖИЛИЩЕ</span>
-                      <span className={cn("text-xs", mutedTextClasses)}>•</span>
-                      <span className={cn("text-xs tracking-widest", mutedTextClasses)}>РЕЗЕРВ</span>
-                    </div>
+                <h2 className="text-3xl font-bold mb-8 text-center">Вашият оптимален финансов план</h2>
 
-                    <h2 className="text-3xl font-bold mb-8">Вашият оптимален финансов план</h2>
+                {/* Goals Grid - 4 columns like the image */}
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-8">
+                  {/* Security */}
+                  <div className={cn("rounded-2xl border p-6 text-center", cardClasses)}>
+                    <p className={cn("text-xs tracking-widest mb-4", mutedTextClasses)}>ФИНАНСОВА СИГУРНОСТ</p>
+                    <p className="text-4xl font-bold mb-4">{formatNumber(goals.security)}</p>
+                    <Slider
+                      value={[goals.security]}
+                      onValueChange={(v) => setGoals({...goals, security: v[0]})}
+                      min={10000}
+                      max={200000}
+                      step={1000}
+                      className="mb-2"
+                    />
+                  </div>
 
-                    {/* Goal sliders */}
-                    <div className="space-y-8">
-                      {/* Security */}
-                      <div className={cn("rounded-2xl border p-6", isDarkMode ? "border-slate-800 bg-slate-900/50" : "border-slate-200 bg-slate-50")}>
-                        <p className={cn("text-xs tracking-widest mb-2", mutedTextClasses)}>КАТЕГОРИЯ</p>
-                        <div className="flex items-start justify-between mb-4">
-                          <div>
-                            <h3 className="text-xl font-semibold">Финансова сигурност</h3>
-                            <p className={cn("text-sm", mutedTextClasses)}>Фонд за минимум 6 месеца защита на дохода и извънредни случаи.</p>
-                          </div>
-                          <div className="text-right">
-                            <span className="text-2xl font-bold text-blue-500">{formatNumber((monthlyIncome + (familyType === 'family' ? partnerIncome : 0)) * 6)} лв.</span>
-                          </div>
-                        </div>
-                        <Slider
-                          value={[goals.security]}
-                          onValueChange={(v) => setGoals({...goals, security: v[0]})}
-                          min={10000}
-                          max={200000}
-                          step={1000}
-                          className="mb-2"
-                        />
-                        <div className={cn("flex justify-between text-xs", mutedTextClasses)}>
-                          <span>10 000 лв.</span>
-                          <span>200 000 лв.</span>
-                        </div>
-                      </div>
+                  {/* Pension */}
+                  <div className={cn("rounded-2xl border p-6 text-center", cardClasses)}>
+                    <p className={cn("text-xs tracking-widest mb-4", mutedTextClasses)}>ПЕНСИЯ</p>
+                    <p className="text-4xl font-bold mb-4">{formatNumber(goals.pension)}</p>
+                    <Slider
+                      value={[goals.pension]}
+                      onValueChange={(v) => setGoals({...goals, pension: v[0]})}
+                      min={20000}
+                      max={400000}
+                      step={5000}
+                      className="mb-2"
+                    />
+                  </div>
 
-                      {/* Pension */}
-                      <div className={cn("rounded-2xl border p-6", isDarkMode ? "border-slate-800 bg-slate-900/50" : "border-slate-200 bg-slate-50")}>
-                        <p className={cn("text-xs tracking-widest mb-2", mutedTextClasses)}>КАТЕГОРИЯ</p>
-                        <div className="flex items-start justify-between mb-4">
-                          <div>
-                            <h3 className="text-xl font-semibold">Пенсия</h3>
-                            <p className={cn("text-sm", mutedTextClasses)}>Месечна пенсия</p>
-                          </div>
-                          <div className="text-right">
-                            <span className="text-2xl font-bold text-blue-500">{formatNumber(goals.pension)} лв.</span>
-                          </div>
-                        </div>
-                        <Slider
-                          value={[goals.pension]}
-                          onValueChange={(v) => setGoals({...goals, pension: v[0]})}
-                          min={20000}
-                          max={400000}
-                          step={5000}
-                          className="mb-2"
-                        />
-                        <div className={cn("flex justify-between text-xs", mutedTextClasses)}>
-                          <span>20 000 лв.</span>
-                          <span>400 000 лв.</span>
-                        </div>
-                      </div>
+                  {/* Housing */}
+                  <div className={cn("rounded-2xl border p-6 text-center", cardClasses)}>
+                    <p className={cn("text-xs tracking-widest mb-4", mutedTextClasses)}>ЖИЛИЩЕ</p>
+                    <p className="text-4xl font-bold mb-4">{formatNumber(goals.housing)}</p>
+                    <Slider
+                      value={[goals.housing]}
+                      onValueChange={(v) => setGoals({...goals, housing: v[0]})}
+                      min={30000}
+                      max={500000}
+                      step={5000}
+                      className="mb-2"
+                    />
+                  </div>
 
-                      {/* Housing */}
-                      <div className={cn("rounded-2xl border p-6", isDarkMode ? "border-slate-800 bg-slate-900/50" : "border-slate-200 bg-slate-50")}>
-                        <p className={cn("text-xs tracking-widest mb-2", mutedTextClasses)}>КАТЕГОРИЯ</p>
-                        <div className="flex items-start justify-between mb-4">
-                          <div>
-                            <h3 className="text-xl font-semibold">Жилище</h3>
-                            <p className={cn("text-sm", mutedTextClasses)}>Собственост, ремонт и модернизация на основния дом.</p>
-                          </div>
-                          <div className="text-right">
-                            <span className="text-2xl font-bold text-blue-500">{formatNumber(goals.housing)} лв.</span>
-                          </div>
-                        </div>
-                        <Slider
-                          value={[goals.housing]}
-                          onValueChange={(v) => setGoals({...goals, housing: v[0]})}
-                          min={30000}
-                          max={500000}
-                          step={5000}
-                          className="mb-2"
-                        />
-                        <div className={cn("flex justify-between text-xs", mutedTextClasses)}>
-                          <span>30 000 лв.</span>
-                          <span>500 000 лв.</span>
-                        </div>
-                      </div>
-
-                      {/* Cash / Other */}
-                      <div className={cn("rounded-2xl border p-6", isDarkMode ? "border-slate-800 bg-slate-900/50" : "border-slate-200 bg-slate-50")}>
-                        <p className={cn("text-xs tracking-widest mb-2", mutedTextClasses)}>КАТЕГОРИЯ</p>
-                        <div className="flex items-start justify-between mb-4">
-                          <div>
-                            <h3 className="text-xl font-semibold">Пари в брой / друго</h3>
-                            <p className={cn("text-sm", mutedTextClasses)}>Ликвидни активи и алтернативни инвестиции.</p>
-                          </div>
-                          <div className="text-right">
-                            <span className="text-2xl font-bold text-blue-500">{formatNumber(goals.cash)} лв.</span>
-                          </div>
-                        </div>
-                        <Slider
-                          value={[goals.cash]}
-                          onValueChange={(v) => setGoals({...goals, cash: v[0]})}
-                          min={5000}
-                          max={150000}
-                          step={1000}
-                          className="mb-2"
-                        />
-                        <div className={cn("flex justify-between text-xs", mutedTextClasses)}>
-                          <span>5000 лв.</span>
-                          <span>150 000 лв.</span>
-                        </div>
-                      </div>
-                    </div>
+                  {/* Other Goals */}
+                  <div className={cn("rounded-2xl border p-6 text-center", cardClasses)}>
+                    <p className={cn("text-xs tracking-widest mb-4", mutedTextClasses)}>ДРУГИ ЦЕЛИ</p>
+                    <p className="text-4xl font-bold mb-4">{formatNumber(goals.cash)}</p>
+                    <Slider
+                      value={[goals.cash]}
+                      onValueChange={(v) => setGoals({...goals, cash: v[0]})}
+                      min={5000}
+                      max={150000}
+                      step={1000}
+                      className="mb-2"
+                    />
                   </div>
                 </div>
 
-                {/* Right sidebar */}
-                <div className="space-y-6">
-                  {/* Total wealth card */}
-                  <div className={cn("rounded-3xl border p-6", cardClasses)}>
-                    <p className={cn("text-xs tracking-widest mb-4", mutedTextClasses)}>ОБЩО ИМУЩЕСТВО</p>
-                    <p className="text-4xl font-bold text-blue-500 mb-4">{formatNumber(totalWealth)} лв.</p>
-                    <p className={cn("text-sm", mutedTextClasses)}>
-                      Сумата се обновява автоматично. В презентация можем да запишем стойностите 
-                      и да ги прехвърлим към PDF, CRM или LivePlan.
-                    </p>
-                  </div>
+                {/* Total Wealth - Bottom Center */}
+                <div className={cn("rounded-2xl border p-6 text-center max-w-md mx-auto mb-8", cardClasses)}>
+                  <p className={cn("text-xs tracking-widest mb-2", mutedTextClasses)}>ИМУЩЕСТВОТО ОБЩО</p>
+                  <p className="text-5xl font-bold mb-4">{formatNumber(totalWealth)} BGN</p>
+                  <Button 
+                    onClick={goNext}
+                    className="rounded-full px-8 bg-blue-600 hover:bg-blue-700"
+                  >
+                    Искам да продължа
+                  </Button>
+                </div>
 
-                  {/* Next actions card */}
-                  <div className={cn("rounded-3xl border p-6", cardClasses)}>
-                    <p className={cn("text-xs tracking-widest mb-4", mutedTextClasses)}>СЛЕДВАЩИ ДЕЙСТВИЯ</p>
-                    <ul className={cn("text-sm space-y-2", mutedTextClasses)}>
-                      <li>• Маркираме категориите с най-голяма промяна.</li>
-                      <li>• Готови сме да преминем към системата на работа.</li>
-                    </ul>
-                  </div>
-
-                  {/* Navigation */}
-                  <div className="flex gap-3">
-                    <Button 
-                      variant="outline" 
-                      onClick={goBack}
-                      className={cn("flex-1 rounded-full", isDarkMode ? "border-slate-700 hover:bg-slate-800" : "")}
-                    >
-                      Назад
-                    </Button>
-                    <Button 
-                      onClick={goNext}
-                      className="flex-1 rounded-full bg-blue-600 hover:bg-blue-700"
-                    >
-                      Напред
-                    </Button>
-                  </div>
+                {/* Back button */}
+                <div className="text-center">
+                  <Button 
+                    variant="outline" 
+                    onClick={goBack}
+                    className={cn("rounded-full px-6", isDarkMode ? "border-slate-700 hover:bg-slate-800" : "")}
+                  >
+                    Назад
+                  </Button>
                 </div>
               </motion.div>
             )}

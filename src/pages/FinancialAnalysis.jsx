@@ -20,6 +20,15 @@ import {
   AlertTriangle
 } from 'lucide-react';
 import { cn } from "@/lib/utils";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 
 import ConsentStep from '../components/analysis/ConsentStep';
 import PersonalDataStep from '../components/analysis/PersonalDataStep';

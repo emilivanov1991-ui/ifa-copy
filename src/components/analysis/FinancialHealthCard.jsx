@@ -13,28 +13,478 @@ import {
   XCircle,
   Minus,
   Clock,
-  TrendingDown,
+  HelpCircle,
   Loader2,
   Sparkles,
   AlertCircle
 } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
-import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer, BarChart, Bar, Cell } from 'recharts';
-
-// Status colors and icons
-const STATUS_CONFIG = {
-  excellent: { color: 'bg-green-500', textColor: 'text-green-700', bgLight: 'bg-green-50', label: 'Отлично', icon: CheckCircle },
-  good: { color: 'bg-green-400', textColor: 'text-green-600', bgLight: 'bg-green-50', label: 'Добре', icon: CheckCircle },
-  attention: { color: 'bg-amber-400', textColor: 'text-amber-700', bgLight: 'bg-amber-50', label: 'Внимание', icon: AlertTriangle },
-  warning: { color: 'bg-orange-500', textColor: 'text-orange-700', bgLight: 'bg-orange-50', label: 'Препоръчително', icon: AlertTriangle },
-  critical: { color: 'bg-red-500', textColor: 'text-red-700', bgLight: 'bg-red-50', label: 'Критично', icon: XCircle },
-  inactive: { color: 'bg-slate-300', textColor: 'text-slate-500', bgLight: 'bg-slate-50', label: 'Неактивно', icon: Minus },
-};
+import { AreaChart, Area, XAxis, YAxis, Tooltip as RechartsTooltip, ResponsiveContainer, BarChart, Bar, Cell } from 'recharts';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 export default function FinancialHealthCard({ data }) {
   const [aiAnalysis, setAiAnalysis] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const [hasGenerated, setHasGenerated] = useState(false);
+
+  // Calculate helper values
+  const clientNetIncome = data.client_net_income || data.client_monthly_net_income || 0;
+  const partnerNetIncome = data.include_partner ? (data.partner_net_income || data.partner_monthly_net_income || 0) : 0;
+  const totalMonthlyIncome = clientNetIncome + partnerNetIncome;
+  const sixMonthIncome = totalMonthlyIncome * 6;
+  
+  const checkingAccount = (data.asset_checking_account || 0);
+  const shortTermSavings = (data.asset_short_term_savings || 0);
+  const liquidSavings = checkingAccount + shortTermSavings;
+  
+  const planningHousingChange = data.planning_housing_change !== false;
+  
+  // Total assets calculation
+  const totalAssets = (data.asset_checking_account || 0) + (data.asset_short_term_savings || 0) + 
+    (data.asset_medium_term_savings || 0) + (data.asset_long_term_savings || 0) + 
+    (data.asset_real_estate || 0) + (data.asset_movable_property || 0);
+  const realEstateValue = data.asset_real_estate || 0;
+  const realEstatePercent = totalAssets > 0 ? Math.round((realEstateValue / totalAssets) * 100) : 0;
+  
+  // Monthly debt payments
+  const monthlyDebtPayments = (data.liability_mortgage_monthly || 0) + (data.liability_consumer_loans_monthly || 0) +
+    (data.liability_credit_cards_monthly || 0) + (data.liability_leasing_monthly || 0) + 
+    (data.liability_overdraft_monthly || 0);
+  const totalDebtRemaining = (data.liability_mortgage_remaining || 0) + (data.liability_consumer_loans_remaining || 0) +
+    (data.liability_credit_cards_remaining || 0) + (data.liability_leasing_remaining || 0) + 
+    (data.liability_overdraft_remaining || 0);
+  const debtToIncomeRatio = totalMonthlyIncome > 0 ? (monthlyDebtPayments / totalMonthlyIncome) * 100 : 0;
+  
+  // Savings rate calculation
+  const totalMonthlyExpenses = (data.expense_rent || 0) + (data.expense_utilities || 0) + (data.expense_phone || 0) +
+    (data.expense_internet || 0) + (data.expense_tv || 0) + (data.expense_other_housing || 0) +
+    (data.expense_fuel || 0) + (data.expense_car_maintenance || 0) + (data.expense_car_other || 0) +
+    (data.expense_food || 0) + (data.expense_clothing || 0) + (data.expense_culture || 0) +
+    (data.expense_travel || 0) + (data.expense_children || 0) + (data.expense_cigarettes || 0) +
+    (data.expense_pets || 0) + (data.expense_vacation || 0) + (data.expense_business || 0) +
+    (data.expense_other || 0) + (data.expense_education || 0) + (data.expense_health || 0) +
+    (data.expense_cosmetics || 0) + (data.expense_hobbies || 0) + (data.expense_electronics || 0) +
+    (data.expense_taxes || 0) + monthlyDebtPayments;
+  const monthlySavings = totalMonthlyIncome - totalMonthlyExpenses;
+  const savingsRate = totalMonthlyIncome > 0 ? (monthlySavings / totalMonthlyIncome) * 100 : 0;
+  
+  // Pension gap
+  const clientDesiredPension = data.client_desired_pension || 0;
+  const clientExpectedPension = data.client_expected_state_pension || 0;
+  const pensionGap = Math.max(0, clientDesiredPension - clientExpectedPension);
+  
+  // Children costs
+  const totalChildrenCosts = (data.children_birth_costs || 0) + (data.children_education_costs || 0) + 
+    (data.children_start_life_costs || 0) + (data.children_sport_costs || 0) + (data.children_wedding_costs || 0) +
+    (data.children_other_costs || 0);
+  const childrenCurrentSavings = data.children_current_savings || 0;
+  const childrenGap = totalChildrenCosts - childrenCurrentSavings;
+
+  // =============== STATUS CALCULATIONS ===============
+  
+  // 1. RESERVE STATUS
+  const getReserveStatus = () => {
+    if (sixMonthIncome === 0) return { status: 'inactive', icon: '-', message: 'Няма достатъчно данни за изчисление.' };
+    
+    const ratio = liquidSavings / sixMonthIncome;
+    const difference = liquidSavings - sixMonthIncome;
+    const inflationLoss = Math.abs(difference) * 0.05;
+    
+    if (planningHousingChange) {
+      // Planning housing change scenarios
+      if (ratio > 1.2) {
+        return { 
+          status: 'yellow', 
+          icon: '!',
+          message: `Сумата на спестяванията надвишава необходимия резерв. Тази година ще загубите ${Math.round(inflationLoss).toLocaleString()}€. Предвид това, че средствата ще послужат за закупуване на жилище/ремонт е разумно да предприемете инвестиции в нискорискови, ликвидни инструменти, за да се предпазите от инфлацията до закупуване на имота/ремонта!`
+        };
+      } else if (ratio < 0.8) {
+        return { 
+          status: 'red', 
+          icon: '!',
+          message: `Сумата на спестяванията не отговаря на необходимия резерв. Предвид това, че средствата ще послужат за закупуване на жилище/ремонт е разумно да предприемете действия по по-агресивно спестяване и инвестиции в нискорискови, ликвидни инструменти, за да натрупате достатъчно средства до закупуване на имота/ремонта!`
+        };
+      } else {
+        return { 
+          status: 'yellow', 
+          icon: '!',
+          message: `Сумата на спестяванията ви е адекватна! Но предвид това, че средствата ще послужат за закупуване на жилище/ремонт е разумно да предприемете действия по по-агресивно спестяване и инвестиции в нискорискови, ликвидни инструменти, за да натрупате достатъчно средства до закупуване на имота/ремонта!`
+        };
+      }
+    } else {
+      // Not planning housing change scenarios
+      if (ratio > 1.2) {
+        return { 
+          status: 'yellow', 
+          icon: '!',
+          message: `Сумата на спестяванията надвишава необходимия резерв. Тази година ще загубите ${Math.round(inflationLoss).toLocaleString()}€. Необходимо е да предприемете инвестиции, за да се предпазите от инфлацията!`
+        };
+      } else if (ratio < 0.8) {
+        return { 
+          status: 'red', 
+          icon: '!',
+          message: `Сумата на спестяванията не отговаря на необходимия резерв. Необходимо е да предприемете действия за увеличаване на своя резерв!`
+        };
+      } else {
+        return { 
+          status: 'green', 
+          icon: 'OK!',
+          message: `Сумата на спестяванията ви е адекватна! При продължително допълнително спестяване ще е необходимо е да предприемете инвестиции, за да се предпазите от инфлацията!`
+        };
+      }
+    }
+  };
+
+  // 2. INCOME PROTECTION STATUS
+  const getIncomeProtectionStatus = () => {
+    const hasDisabilityRisk = data.client_risk_disability || (data.include_partner && data.partner_risk_disability);
+    const hasDeathRisk = data.client_risk_death || (data.include_partner && data.partner_risk_death);
+    const hasCriticalRisk = hasDisabilityRisk || hasDeathRisk;
+    
+    const clientProtected = data.client_has_income_protection;
+    const partnerProtected = data.include_partner ? data.partner_has_income_protection : true;
+    const isProtected = clientProtected && partnerProtected;
+    
+    if (!hasCriticalRisk) {
+      return { 
+        status: 'green', 
+        icon: 'OK!',
+        message: `Спрямо посоченото в анализа нямате рискове, които да имат нужда от подсигуряване!`
+      };
+    }
+    
+    if (hasCriticalRisk && !isProtected) {
+      return { 
+        status: 'red', 
+        icon: '!',
+        message: `Вашите доходи и финансовата стабилност на Вашето домакинство не са подсигурени за непредвидени негативни обстоятелства като Заболявания, Инвалидност или Смърт.`
+      };
+    }
+    
+    if (hasCriticalRisk && isProtected) {
+      return { 
+        status: 'yellow', 
+        icon: '?',
+        message: `Вашите доходи и финансовата стабилност на Вашето домакинство са подсигурени със съществуваща застраховка, но над 42% от направените застраховки живот не са адекватни*! Съветваме Ви Вашата застраховка да бъде разгледана!\n*Source: https://www.bankrate.com/insurance/life-insurance/life-insurance-statistics/`
+      };
+    }
+    
+    return { status: 'green', icon: 'OK!', message: '' };
+  };
+
+  // 3. PROPERTY PROTECTION STATUS
+  const getPropertyProtectionStatus = () => {
+    const hasProperty1 = data.has_property_1;
+    const hasProperty2 = data.has_property_2;
+    const hasProperty3 = data.has_property_3;
+    const hasAnyProperty = hasProperty1 || hasProperty2 || hasProperty3;
+    
+    const hasCar1 = data.has_car_1;
+    const hasCar2 = data.has_car_2;
+    const hasCar3 = data.has_car_3;
+    const hasAnyCar = hasCar1 || hasCar2 || hasCar3;
+    
+    if (!hasAnyProperty && !hasAnyCar) {
+      return { 
+        status: 'gray', 
+        icon: '-',
+        message: `Нямате имущество, което да бъде е под риск. Настоящото не е тема на финансово планиране.`
+      };
+    }
+    
+    // Check property insurance
+    const allPropertiesInsured = (!hasProperty1 || data.property_1_has_insurance) && 
+                                  (!hasProperty2 || data.property_2_has_insurance) && 
+                                  (!hasProperty3 || data.property_3_has_insurance);
+    const anyPropertyNotInsured = (hasProperty1 && !data.property_1_has_insurance) || 
+                                   (hasProperty2 && !data.property_2_has_insurance) || 
+                                   (hasProperty3 && !data.property_3_has_insurance);
+    
+    // Check car casco
+    const allCarsInsured = (!hasCar1 || data.car_1_has_casco) && 
+                           (!hasCar2 || data.car_2_has_casco) && 
+                           (!hasCar3 || data.car_3_has_casco);
+    const anyCarNotInsured = (hasCar1 && !data.car_1_has_casco) || 
+                              (hasCar2 && !data.car_2_has_casco) || 
+                              (hasCar3 && !data.car_3_has_casco);
+    
+    // Priority: Property over Car
+    if (hasAnyProperty && anyPropertyNotInsured) {
+      return { 
+        status: 'red', 
+        icon: '!',
+        message: `Вашето недвижимо имущество не е защитено. То представлява ${realEstatePercent}% от всички Ваши активи! Съветваме Ви да обмислите неговото подсигуряване!`
+      };
+    }
+    
+    if (hasAnyProperty && allPropertiesInsured) {
+      return { 
+        status: 'yellow', 
+        icon: '?',
+        message: `Вашето недвижимо имущество е защитено, но много често защитата не е адекватно изготвена. Вашето жилище представлява ${realEstatePercent}% от всички Ваши активи! Предлагаме Ви да разгледаме адекватността на Вашата полица!`
+      };
+    }
+    
+    if (hasAnyCar && anyCarNotInsured) {
+      return { 
+        status: 'yellow', 
+        icon: '!',
+        message: `Вашият автомобил не е защитен. Съветваме Ви да обмислите неговото подсигуряване!`
+      };
+    }
+    
+    if (hasAnyCar && allCarsInsured) {
+      return { 
+        status: 'yellow', 
+        icon: '?',
+        message: `Вашият автомобил е защитен, но много често защитата не е адекватна или е много скъпа! Можем да Ви помогнем с оптимизация на Вашето Каско!`
+      };
+    }
+    
+    return { status: 'green', icon: 'OK!', message: '' };
+  };
+
+  // 4. HOUSING FINANCING STATUS
+  const getHousingStatus = () => {
+    if (data.planning_housing_change === false) {
+      return { 
+        status: 'gray', 
+        icon: '-',
+        message: `Тъй като не планирате промяна в жилищен аспект, настоящото не е тема на финансово планиране.`
+      };
+    }
+    
+    const financingMethod = data.financing_method;
+    const timelineYears = data.planned_housing_timeline_years || 10;
+    
+    if (financingMethod === 'cash') {
+      return { 
+        status: 'yellow', 
+        icon: '!',
+        message: `Предстои Ви закупуване и финансиране на жилище в собствени средства! Това не винаги е най-правилното решение във финансов аспект! Съветваме Ви да потърсите съвет, за възможно най-доброто планиране на Вашата покупка.`
+      };
+    }
+    
+    if (financingMethod === 'cash_and_loan') {
+      if (timelineYears <= 2) {
+        return { 
+          status: 'red', 
+          icon: '!',
+          message: `Предстои Ви закупуване и финансиране на жилище! Съветваме Ви да потърсите съвет, за възможно най-доброто планиране на Вашия кредит!`
+        };
+      } else if (timelineYears <= 5) {
+        return { 
+          status: 'yellow', 
+          icon: '!',
+          message: `Предстои Ви закупуване и финансиране на жилище в средносрочен аспект! Съветваме Ви да потърсите съвет, за възможно най-доброто планиране на Вашия кредит отрано!`
+        };
+      }
+    }
+    
+    return { status: 'green', icon: 'OK!', message: 'Жилищната Ви ситуация е стабилна.' };
+  };
+
+  // 5. PENSION STATUS
+  const getPensionStatus = () => {
+    if (pensionGap < 100) {
+      return { 
+        status: 'green', 
+        icon: 'OK!',
+        message: `Желаната от Вас пенсия ще бъде осигурена от държавата! Съветваме Ви все пак да предприемете действия за дългосрочно инвестиране, за да предпазите своя стандарт на живот!`
+      };
+    } else if (pensionGap <= 350) {
+      return { 
+        status: 'yellow', 
+        icon: '!',
+        message: `Желаната от Вас пенсия е по-висока от това, което държавата ще Ви осигури! Съветваме Ви да предприемете действия по целенасочено дългосрочно инвестиране, за да осигурите липсата и не намалите своя стандарт на живот!`
+      };
+    } else {
+      return { 
+        status: 'red', 
+        icon: '!',
+        message: `Желаната от Вас пенсия е значително по-висока от това, което държавата ще Ви осигури! Съветваме Ви да предприемете действия по целенасочено дългосрочно инвестиране, за да осигурите липсата и не намалите своя стандарт на живот!`
+      };
+    }
+  };
+
+  // 6. CHILDREN STATUS
+  const getChildrenStatus = () => {
+    if (data.skip_children_section || (data.children_count || 0) === 0) {
+      return { 
+        status: 'gray', 
+        icon: '-',
+        message: `В анализа е отбелязано, че финансовото осигуряване на деца не е тема за Вас. В този ред на мисли настоящото не е тема на финансово планиране.`
+      };
+    }
+    
+    if (childrenGap < 2000) {
+      return { 
+        status: 'green', 
+        icon: 'OK!',
+        message: `Желаната от Вас сума за подсигуряване бъдещето на Вашите деца е подсигурена от Ваша страна! Поздравления!`
+      };
+    } else if (childrenGap <= 10000) {
+      return { 
+        status: 'yellow', 
+        icon: '!',
+        message: `Желаната от Вас сума за подсигуряване бъдещето на Вашите деца е по-висока от това, което имате заделено към момента! Съветваме Ви да предприемете действия, за да осигурите желаното бъдеще за своите деца!`
+      };
+    } else {
+      return { 
+        status: 'red', 
+        icon: '!',
+        message: `Желаната от Вас сума за подсигуряване бъдещето на Вашите деца е значително по-висока от това, което имате заделено към момента! Съветваме Ви да предприемете действия, за да осигурите желаното бъдеще за своите деца!`
+      };
+    }
+  };
+
+  // 7. INVESTMENTS STATUS
+  const getInvestmentStatus = () => {
+    const savingsRatioToSixMonth = sixMonthIncome > 0 ? (liquidSavings / sixMonthIncome) : 0;
+    
+    if (savingsRate >= 30) {
+      return { 
+        status: 'red', 
+        icon: '!',
+        message: `Изглежда, че спестявате много висока част от Вашите доходи! Съветваме Ви да предприемете действия, за да осигурите доходност на Вашите спеставяния!`
+      };
+    }
+    
+    if (savingsRate >= 15) {
+      return { 
+        status: 'yellow', 
+        icon: '!',
+        message: `Изглежда, че спестявате разумна част от Вашите доходи! Съветваме Ви да предприемете действия, за да осигурите доходност на Вашите спеставяния!`
+      };
+    }
+    
+    if (savingsRate >= 5 && savingsRate < 15) {
+      if (savingsRatioToSixMonth < 0.5) {
+        return { 
+          status: 'green', 
+          icon: 'Неприложимо',
+          message: `Изглежда, че нямате изграден адекватен резерв и не спестявате достатъчно! Съветваме Ви да предприемете действия по увеличаване на Вашите спестявания и подсигуряване на предходните теми преди да се обърнете към инвестирането!`
+        };
+      } else if (savingsRatioToSixMonth > 1.2) {
+        return { 
+          status: 'red', 
+          icon: '!',
+          message: `Изглежда, че спестявате част от Вашите доходи и имате изграден адекватен резерв! Голяма част от средствата Ви биват "изядени" от инфлацията! Съветваме Ви да предприемете действия, за да осигурите доходност на Вашите спеставяния!`
+        };
+      } else {
+        return { 
+          status: 'yellow', 
+          icon: '!',
+          message: `Изглежда, че спестявате част от Вашите доходи и имате изграден адекватен резерв! Съветваме Ви да предприемете действия, за да осигурите доходност на Вашите спеставяния!`
+        };
+      }
+    }
+    
+    // savingsRate < 5
+    if (savingsRatioToSixMonth < 0.7) {
+      return { 
+        status: 'green', 
+        icon: 'Неприложимо',
+        message: `Изглежда, че нямате изграден адекватен резерв и не спестявате достатъчно! Съветваме Ви да предприемете действия по увеличаване на Вашите спестявания и подсигуряване на предходните теми преди да се обърнете към инвестирането!`
+      };
+    } else if (savingsRatioToSixMonth > 1.3) {
+      return { 
+        status: 'yellow', 
+        icon: '!',
+        message: `Изглежда, че не спестявате достатъчно от Вашите доходи, но изграден адекватен резерв! Голяма част от средствата Ви биват "изядени" от инфлацията! Съветваме Ви да предприемете действия, за да осигурите доходност на Вашите спеставяния, но и да се насочите към по-агресивно спеставяне!`
+      };
+    } else {
+      return { 
+        status: 'yellow', 
+        icon: '!',
+        message: `Изглежда, че спестявате малка част от Вашите доходи и имате изграден адекватен резерв! Съветваме Ви да предприемете действия, за да осигурите доходност на Вашите спеставяния, но и да се насочите към по-агресивно спеставяне!`
+      };
+    }
+  };
+
+  // 8. DEBT STATUS
+  const getDebtStatus = () => {
+    if (totalDebtRemaining === 0) {
+      return { 
+        status: 'gray', 
+        icon: '-',
+        message: `Изглежда, че нямате кредити! Ако в бъдеще предприемате действия по теглене на такива Ви съветваме да направим първоначална консултация с цел оптимизация и олекотяване на семейния бюджет!`
+      };
+    }
+    
+    if (debtToIncomeRatio > 30) {
+      return { 
+        status: 'red', 
+        icon: '!',
+        message: `Изглежда, че кредитната Ви тежест е прекалено висока! Съветваме Ви да разгледаме Вашите кредити с цел оптимизация и олекотяване на семейния бюджет!`
+      };
+    } else if (debtToIncomeRatio > 15) {
+      return { 
+        status: 'yellow', 
+        icon: '!',
+        message: `Изглежда, че кредитната Ви тежест е висока! Съветваме Ви да разгледаме Вашите кредити с цел оптимизация и олекотяване на семейния бюджет!`
+      };
+    } else if (debtToIncomeRatio > 10) {
+      return { 
+        status: 'yellow', 
+        icon: '!',
+        message: `Изглежда, че кредитната Ви тежест не е висока, но търпи оптимизация! Съветваме Ви да разгледаме Вашите кредити с цел оптимизация и олекотяване на семейния бюджет!`
+      };
+    } else {
+      return { 
+        status: 'green', 
+        icon: '!',
+        message: `Изглежда, че кредитната Ви тежест не е висока и нейната оптимизация не е критична! Можем все пак да разгледаме Вашите кредити с цел оптимизация и олекотяване на семейния бюджет!`
+      };
+    }
+  };
+
+  // Get all statuses
+  const reserveInfo = getReserveStatus();
+  const incomeInfo = getIncomeProtectionStatus();
+  const propertyInfo = getPropertyProtectionStatus();
+  const housingInfo = getHousingStatus();
+  const pensionInfo = getPensionStatus();
+  const childrenInfo = getChildrenStatus();
+  const investmentInfo = getInvestmentStatus();
+  const debtInfo = getDebtStatus();
+
+  // Helper to get background color
+  const getBoxBg = (status) => {
+    switch(status) {
+      case 'green': return 'bg-green-100 border-green-400';
+      case 'yellow': return 'bg-amber-100 border-amber-400';
+      case 'red': return 'bg-red-100 border-red-400';
+      case 'gray': return 'bg-slate-100 border-slate-400';
+      default: return 'bg-white border-blue-400';
+    }
+  };
+
+  // Box component with tooltip
+  const StatusBox = ({ label, info, className = '' }) => (
+    <TooltipProvider delayDuration={100}>
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <div className={`border-2 p-3 cursor-help transition-all hover:shadow-md ${getBoxBg(info.status)} ${className}`}>
+            <div className="flex flex-col items-center justify-center h-full">
+              <span className="text-xs sm:text-sm font-medium text-blue-900 text-center leading-tight">{label}</span>
+              <span className={`mt-1 text-xs font-bold ${info.status === 'red' ? 'text-red-600' : info.status === 'yellow' ? 'text-amber-600' : info.status === 'green' ? 'text-green-600' : 'text-slate-500'}`}>
+                {info.icon}
+              </span>
+            </div>
+          </div>
+        </TooltipTrigger>
+        <TooltipContent side="top" className="max-w-sm bg-slate-900 text-white p-3 text-sm">
+          <p className="whitespace-pre-line">{info.message}</p>
+        </TooltipContent>
+      </Tooltip>
+    </TooltipProvider>
+  );
 
   // Generate AI analysis
   const generateAnalysis = async () => {
@@ -48,14 +498,13 @@ export default function FinancialHealthCard({ data }) {
       planningHousingChange: data.planning_housing_change,
       financingMethod: data.financing_method,
       hasMortgage: data.current_housing_has_mortgage,
-      clientNetIncome: data.client_net_income || data.client_monthly_net_income,
-      partnerNetIncome: data.include_partner ? (data.partner_net_income || data.partner_monthly_net_income) : 0,
-      totalSavings: (data.client_checking_account || 0) + (data.client_cash || 0) + (data.client_savings_account || 0) + 
-        (data.include_partner ? ((data.partner_checking_account || 0) + (data.partner_cash || 0)) : 0),
+      clientNetIncome,
+      partnerNetIncome,
+      totalSavings: liquidSavings,
       desiredReserve: data.desired_reserve_amount,
       clientRetirementAge: data.client_retirement_age,
-      clientDesiredPension: data.client_desired_pension,
-      clientExpectedPension: data.client_expected_state_pension,
+      clientDesiredPension,
+      clientExpectedPension,
       hasVoluntaryPension: data.client_pillar_3,
       hasProperty: data.has_property_1 || data.has_property_2 || data.has_property_3,
       hasCar: data.has_car_1 || data.has_car_2 || data.has_car_3,
@@ -63,17 +512,16 @@ export default function FinancialHealthCard({ data }) {
       carInsured: data.car_1_has_casco || data.car_2_has_casco || data.car_3_has_casco,
       hasIncomeProtection: data.client_has_income_protection,
       incomeRisks: {
-        layoff: data.client_risk_layoff,
-        maternity: data.client_risk_maternity,
-        sickLeave: data.client_risk_sick_leave,
         disability: data.client_risk_disability,
         death: data.client_risk_death
       },
       childrenEducationCosts: data.children_education_costs,
       skipChildrenSection: data.skip_children_section,
-      totalDebt: (data.liability_mortgage_remaining || 0) + (data.liability_consumer_loans_remaining || 0) + 
-        (data.liability_credit_cards_remaining || 0),
-      monthlyDebtPayments: (data.liability_mortgage_monthly || 0) + (data.liability_consumer_loans_monthly || 0)
+      totalDebt: totalDebtRemaining,
+      monthlyDebtPayments,
+      savingsRate,
+      pensionGap,
+      childrenGap
     };
 
     try {
@@ -139,264 +587,80 @@ ${JSON.stringify(analysisContext, null, 2)}
       generateAnalysis();
     }
   }, []);
-  // Calculate status for each category
-  const getHousingStatus = () => {
-    if (data.planning_housing_change === false && !data.current_housing_has_mortgage) {
-      if (data.current_housing === 'owned') return 'excellent';
-      return 'inactive';
-    }
-    if (data.current_housing === 'owned' && !data.current_housing_has_mortgage) return 'excellent';
-    if (data.current_housing === 'owned' && data.current_housing_has_mortgage) return 'good';
-    if (data.planning_housing_change && data.financing_method === 'cash') return 'good';
-    if (data.planning_housing_change && data.financing_method === 'cash_and_loan') return 'attention';
-    if (data.planning_housing_change && data.financing_method === 'loan') return 'warning';
-    return 'attention';
-  };
-
-  const getReserveStatus = () => {
-    const clientReserve = (data.client_checking_account || 0) + (data.client_cash || 0) + 
-      (data.client_savings_account || 0) + (data.client_term_deposit || 0);
-    const partnerReserve = data.include_partner ? 
-      ((data.partner_checking_account || 0) + (data.partner_cash || 0) + 
-       (data.partner_savings_account || 0) + (data.partner_term_deposit || 0)) : 0;
-    const totalReserve = clientReserve + partnerReserve;
-    const desiredReserve = data.desired_reserve_amount || 0;
-    
-    if (desiredReserve === 0) return 'attention';
-    const ratio = totalReserve / desiredReserve;
-    if (ratio >= 1) return 'excellent';
-    if (ratio >= 0.7) return 'good';
-    if (ratio >= 0.4) return 'attention';
-    if (ratio >= 0.2) return 'warning';
-    return 'critical';
-  };
-
-  const getPensionStatus = () => {
-    const clientDesired = data.client_desired_pension || 0;
-    const clientExpected = data.client_expected_state_pension || 0;
-    const clientHasVoluntary = data.client_pillar_3;
-    
-    if (clientDesired === 0) return 'attention';
-    
-    const gap = clientDesired - clientExpected;
-    if (gap <= 0) return 'excellent';
-    if (clientHasVoluntary && gap < clientDesired * 0.3) return 'good';
-    if (clientHasVoluntary) return 'attention';
-    if (gap < clientDesired * 0.5) return 'warning';
-    return 'critical';
-  };
-
-  const getChildrenStatus = () => {
-    if (data.skip_children_section) return 'inactive';
-    const childrenCount = data.children_count || 0;
-    if (childrenCount === 0) return 'inactive';
-    
-    const totalNeeded = (data.children_education_costs || 0) + (data.children_birth_costs || 0) + 
-      (data.children_start_life_costs || 0);
-    const currentSavings = data.children_current_savings || 0;
-    
-    if (totalNeeded === 0) return 'attention';
-    const ratio = currentSavings / totalNeeded;
-    if (ratio >= 0.8) return 'excellent';
-    if (ratio >= 0.5) return 'good';
-    if (ratio >= 0.2) return 'attention';
-    return 'warning';
-  };
-
-  const getPropertyProtectionStatus = () => {
-    const hasProperty = data.has_property_1 || data.has_property_2 || data.has_property_3;
-    const hasCar = data.has_car_1 || data.has_car_2 || data.has_car_3;
-    
-    if (!hasProperty && !hasCar) return 'inactive';
-    
-    let insuredCount = 0;
-    let totalCount = 0;
-    
-    if (data.has_property_1) { totalCount++; if (data.property_1_has_insurance) insuredCount++; }
-    if (data.has_property_2) { totalCount++; if (data.property_2_has_insurance) insuredCount++; }
-    if (data.has_property_3) { totalCount++; if (data.property_3_has_insurance) insuredCount++; }
-    if (data.has_car_1) { totalCount++; if (data.car_1_has_casco) insuredCount++; }
-    if (data.has_car_2) { totalCount++; if (data.car_2_has_casco) insuredCount++; }
-    if (data.has_car_3) { totalCount++; if (data.car_3_has_casco) insuredCount++; }
-    
-    if (totalCount === 0) return 'inactive';
-    const ratio = insuredCount / totalCount;
-    if (ratio >= 1) return 'excellent';
-    if (ratio >= 0.7) return 'good';
-    if (ratio >= 0.4) return 'attention';
-    return 'warning';
-  };
-
-  const getIncomeProtectionStatus = () => {
-    const clientHasProtection = data.client_has_income_protection;
-    const partnerHasProtection = data.include_partner ? data.partner_has_income_protection : true;
-    
-    const clientHasRisks = data.client_risk_layoff || data.client_risk_maternity || 
-      data.client_risk_sick_leave || data.client_risk_disability || data.client_risk_death;
-    const partnerHasRisks = data.include_partner ? 
-      (data.partner_risk_layoff || data.partner_risk_maternity || 
-       data.partner_risk_sick_leave || data.partner_risk_disability || data.partner_risk_death) : false;
-    
-    if (!clientHasRisks && !partnerHasRisks) return 'good';
-    
-    if (clientHasProtection && partnerHasProtection) return 'excellent';
-    if (clientHasProtection || partnerHasProtection) return 'attention';
-    if (clientHasRisks || partnerHasRisks) return 'warning';
-    return 'critical';
-  };
-
-  const getInvestmentStatus = () => {
-    const mediumTerm = (data.client_mutual_funds || 0) + (data.client_crypto || 0) + (data.client_gold || 0);
-    const partnerMedium = data.include_partner ? 
-      ((data.partner_mutual_funds || 0) + (data.partner_crypto || 0) + (data.partner_gold || 0)) : 0;
-    const total = mediumTerm + partnerMedium;
-    
-    const monthlyIncome = (data.client_net_income || 0) + 
-      (data.include_partner ? (data.partner_net_income || 0) : 0);
-    
-    if (monthlyIncome === 0) return 'attention';
-    const ratio = total / (monthlyIncome * 12);
-    if (ratio >= 1) return 'excellent';
-    if (ratio >= 0.5) return 'good';
-    if (ratio >= 0.2) return 'attention';
-    if (ratio > 0) return 'warning';
-    return 'critical';
-  };
-
-  const getDebtStatus = () => {
-    const totalDebt = (data.liability_mortgage_remaining || 0) + (data.liability_consumer_loans_remaining || 0) +
-      (data.liability_credit_cards_remaining || 0) + (data.liability_leasing_remaining || 0) + 
-      (data.liability_overdraft_remaining || 0);
-    
-    const monthlyPayments = (data.liability_mortgage_monthly || 0) + (data.liability_consumer_loans_monthly || 0) +
-      (data.liability_credit_cards_monthly || 0) + (data.liability_leasing_monthly || 0) + 
-      (data.liability_overdraft_monthly || 0);
-    
-    const monthlyIncome = (data.client_net_income || 0) + 
-      (data.include_partner ? (data.partner_net_income || 0) : 0);
-    
-    if (totalDebt === 0) return 'excellent';
-    if (monthlyIncome === 0) return 'attention';
-    
-    const debtToIncomeRatio = monthlyPayments / monthlyIncome;
-    if (debtToIncomeRatio <= 0.2) return 'good';
-    if (debtToIncomeRatio <= 0.35) return 'attention';
-    if (debtToIncomeRatio <= 0.5) return 'warning';
-    return 'critical';
-  };
-
-  // Categories organized by house structure
-  const debtStatus = getDebtStatus();
-  const investmentStatus = getInvestmentStatus();
-  const pensionStatus = getPensionStatus();
-  const childrenStatus = getChildrenStatus();
-  const housingStatus = getHousingStatus();
-  const propertyStatus = getPropertyProtectionStatus();
-  const incomeStatus = getIncomeProtectionStatus();
-  const reserveStatus = getReserveStatus();
-
-  const getStatusColor = (status) => {
-    switch(status) {
-      case 'excellent': return 'bg-green-200 border-green-400';
-      case 'good': return 'bg-green-100 border-green-300';
-      case 'attention': return 'bg-amber-100 border-amber-300';
-      case 'warning': return 'bg-orange-100 border-orange-300';
-      case 'critical': return 'bg-red-100 border-red-300';
-      default: return 'bg-slate-100 border-slate-300';
-    }
-  };
-
-  const getBarColor = (status) => {
-    switch(status) {
-      case 'excellent': return 'bg-green-300';
-      case 'good': return 'bg-green-200';
-      case 'attention': return 'bg-amber-200';
-      case 'warning': return 'bg-orange-200';
-      case 'critical': return 'bg-red-200';
-      default: return 'bg-slate-200';
-    }
-  };
-
-  const allStatuses = [debtStatus, investmentStatus, pensionStatus, childrenStatus, housingStatus, propertyStatus, incomeStatus, reserveStatus];
 
   return (
     <div className="bg-white rounded-xl border border-slate-200 p-6">
-      <h3 className="font-semibold text-rose-700 text-center mb-6 text-lg tracking-wide">ВАШЕТО НАСТОЯЩО ПОРТФОЛИО</h3>
+      <h3 className="font-semibold text-blue-800 text-center mb-6 text-lg tracking-wide">ВАШЕТО НАСТОЯЩО ПОРТФОЛИО</h3>
       
-      {/* House visualization */}
-      <div className="relative max-w-lg mx-auto">
-        {/* Background horizontal lines */}
-        <div className="absolute inset-0 flex flex-col justify-between py-4 pointer-events-none">
-          {[...Array(12)].map((_, i) => (
-            <div key={i} className="h-0.5 bg-blue-100 w-full"></div>
-          ))}
+      {/* House visualization - exact match to image */}
+      <div className="max-w-lg mx-auto">
+        {/* Chimney - Debt */}
+        <div className="flex justify-start ml-8 mb-0">
+          <StatusBox 
+            label="Заеми Кредити" 
+            info={debtInfo} 
+            className="w-24 h-16 rounded-t"
+          />
         </div>
 
+        {/* Roof with Investment */}
         <div className="relative">
-          {/* Chimney with smoke - Debt */}
-          <div className="absolute left-16 -top-8 z-10">
-            {/* Smoke */}
-            <div className="absolute -top-6 left-2">
-              <div className={`w-8 h-4 ${getBarColor(debtStatus)} rounded-full opacity-60 mb-1`}></div>
-              <div className={`w-6 h-3 ${getBarColor(debtStatus)} rounded-full opacity-40 ml-1`}></div>
-            </div>
-            {/* Chimney */}
-            <div className={`w-12 h-16 ${getStatusColor(debtStatus)} border-2 rounded-t flex items-center justify-center`}>
-              <span className="text-xs text-slate-600 font-medium text-center leading-tight">Заем/<br/>Кредит</span>
-            </div>
+          {/* Roof triangle shape */}
+          <svg viewBox="0 0 400 80" className="w-full" preserveAspectRatio="none">
+            <polygon points="200,0 400,80 0,80" fill="none" stroke="#3b82f6" strokeWidth="3"/>
+          </svg>
+          {/* Investment box in roof */}
+          <div className="absolute inset-0 flex items-center justify-center pt-6">
+            <StatusBox 
+              label="Инвестиции" 
+              info={investmentInfo} 
+              className="w-40 h-10 rounded"
+            />
+          </div>
+        </div>
+
+        {/* House body */}
+        <div className="border-l-2 border-r-2 border-blue-500">
+          {/* Upper floor - Pension & Children */}
+          <div className="grid grid-cols-2 gap-4 p-4 border-b-2 border-blue-500">
+            <StatusBox 
+              label="Пенсионно осигуряване" 
+              info={pensionInfo} 
+              className="h-20 rounded"
+            />
+            <StatusBox 
+              label="Подсигуряване на децата" 
+              info={childrenInfo} 
+              className="h-20 rounded"
+            />
           </div>
 
-          {/* Roof section */}
-          <div className="relative pt-8">
-            {/* Roof shape */}
-            <div className="relative mx-8">
-              {/* Left roof slope */}
-              <div className="absolute left-0 top-0 w-1/2 h-16 bg-rose-300 origin-bottom-left transform -skew-y-6 rounded-tl-lg"></div>
-              {/* Right roof slope */}
-              <div className="absolute right-0 top-0 w-1/2 h-16 bg-rose-400 origin-bottom-right transform skew-y-6 rounded-tr-lg"></div>
-              
-              {/* Roof content - Investments */}
-              <div className="relative z-10 pt-4 pb-2 px-4">
-                <div className={`${getStatusColor(investmentStatus)} border-2 rounded-lg px-4 py-2 mx-auto max-w-xs text-center`}>
-                  <span className="text-sm text-slate-700 font-medium">Инвестиции</span>
-                </div>
-              </div>
-            </div>
+          {/* Middle - Housing */}
+          <div className="p-4 border-b-2 border-blue-500">
+            <StatusBox 
+              label="Жилищно финансиране" 
+              info={housingInfo} 
+              className="h-16 rounded"
+            />
+          </div>
 
-            {/* House body */}
-            <div className="bg-rose-50 border-l-4 border-r-4 border-rose-300 mx-4 relative">
-              {/* Upper floor - Pension & Children */}
-              <div className="grid grid-cols-2 gap-3 p-4 border-b border-rose-200">
-                <div className={`${getStatusColor(pensionStatus)} border-2 rounded-lg px-3 py-3 text-center`}>
-                  <span className="text-xs text-slate-700 font-medium">Пенсионно<br/>осигуряване</span>
-                </div>
-                <div className={`${getStatusColor(childrenStatus)} border-2 rounded-lg px-3 py-3 text-center`}>
-                  <span className="text-xs text-slate-700 font-medium">Подсигуряване<br/>на децата</span>
-                </div>
-              </div>
-
-              {/* Middle - Housing */}
-              <div className="p-4 border-b border-rose-200">
-                <div className={`${getStatusColor(housingStatus)} border-2 rounded-lg px-4 py-3 text-center mx-auto max-w-xs`}>
-                  <span className="text-sm text-slate-700 font-medium">Жилищно<br/>финансиране</span>
-                </div>
-              </div>
-            </div>
-
-            {/* Foundation */}
-            <div className="bg-slate-200 mx-2 p-4 rounded-b-lg border-b-4 border-slate-400">
-              <div className="grid grid-cols-3 gap-2">
-                <div className={`${getStatusColor(propertyStatus)} border-2 rounded-lg px-2 py-3 text-center`}>
-                  <span className="text-xs text-slate-700 font-medium leading-tight">Защита на собствеността</span>
-                </div>
-                <div className={`${getStatusColor(incomeStatus)} border-2 rounded-lg px-2 py-3 text-center`}>
-                  <span className="text-xs text-slate-700 font-medium leading-tight">Защита на доходите</span>
-                </div>
-                <div className={`${getStatusColor(reserveStatus)} border-2 rounded-lg px-2 py-3 text-center`}>
-                  <span className="text-xs text-slate-700 font-medium leading-tight">Създаване на финансов резерв</span>
-                </div>
-              </div>
-            </div>
+          {/* Foundation - Property, Income, Reserve */}
+          <div className="grid grid-cols-3 gap-3 p-4">
+            <StatusBox 
+              label="Защита на собствеността" 
+              info={propertyInfo} 
+              className="h-20 rounded"
+            />
+            <StatusBox 
+              label="Защита на дохода" 
+              info={incomeInfo} 
+              className="h-20 rounded"
+            />
+            <StatusBox 
+              label="Спестявания" 
+              info={reserveInfo} 
+              className="h-20 rounded"
+            />
           </div>
         </div>
       </div>
@@ -404,20 +668,20 @@ ${JSON.stringify(analysisContext, null, 2)}
       {/* Legend */}
       <div className="flex flex-wrap justify-center gap-4 mt-6 pt-4 border-t border-slate-100 text-xs">
         <div className="flex items-center gap-1">
-          <div className="w-3 h-3 rounded bg-green-300 border border-green-400"></div>
-          <span className="text-slate-600">Отлично/Добре</span>
+          <div className="w-4 h-4 rounded bg-green-100 border-2 border-green-400"></div>
+          <span className="text-slate-600">OK / Добре</span>
         </div>
         <div className="flex items-center gap-1">
-          <div className="w-3 h-3 rounded bg-amber-200 border border-amber-300"></div>
-          <span className="text-slate-600">Внимание</span>
+          <div className="w-4 h-4 rounded bg-amber-100 border-2 border-amber-400"></div>
+          <span className="text-slate-600">Внимание / Преглед</span>
         </div>
         <div className="flex items-center gap-1">
-          <div className="w-3 h-3 rounded bg-orange-200 border border-orange-300"></div>
-          <span className="text-slate-600">Препоръчително</span>
-        </div>
-        <div className="flex items-center gap-1">
-          <div className="w-3 h-3 rounded bg-red-200 border border-red-300"></div>
+          <div className="w-4 h-4 rounded bg-red-100 border-2 border-red-400"></div>
           <span className="text-slate-600">Критично</span>
+        </div>
+        <div className="flex items-center gap-1">
+          <div className="w-4 h-4 rounded bg-slate-100 border-2 border-slate-400"></div>
+          <span className="text-slate-600">Неприложимо</span>
         </div>
       </div>
 
@@ -511,7 +775,7 @@ ${JSON.stringify(analysisContext, null, 2)}
                       }))}>
                         <XAxis dataKey="year" tick={{ fontSize: 10 }} interval={4} />
                         <YAxis tick={{ fontSize: 10 }} tickFormatter={(v) => `€${(v/1000).toFixed(0)}k`} />
-                        <Tooltip formatter={(v) => [`€${v.toLocaleString()}`, 'Натрупана загуба']} />
+                        <RechartsTooltip formatter={(v) => [`€${v.toLocaleString()}`, 'Натрупана загуба']} />
                         <Area type="monotone" dataKey="loss" stroke="#ef4444" fill="#fecaca" />
                       </AreaChart>
                     </ResponsiveContainer>
@@ -532,7 +796,7 @@ ${JSON.stringify(analysisContext, null, 2)}
                       ]}>
                         <XAxis dataKey="name" tick={{ fontSize: 11 }} />
                         <YAxis tick={{ fontSize: 10 }} tickFormatter={(v) => `€${(v/1000).toFixed(0)}k`} />
-                        <Tooltip formatter={(v) => [`€${v.toLocaleString()}`, 'Стойност']} />
+                        <RechartsTooltip formatter={(v) => [`€${v.toLocaleString()}`, 'Стойност']} />
                         <Bar dataKey="value" radius={[4, 4, 0, 0]}>
                           {[
                             { name: 'Без план', value: 0, fill: '#fca5a5' },

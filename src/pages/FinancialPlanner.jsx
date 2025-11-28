@@ -198,10 +198,23 @@ export default function FinancialPlanner() {
     lock: "Заключете цел, за да не се променя автоматично при корекции на други цели."
   };
 
+  // Default allocations for recalculation
+  const DEFAULT_ALLOCATIONS = {
+    security: 10,
+    pension: 5,
+    housing: 30,
+    cash: 5
+  };
+
   // Handle allocation change with redistribution
   const handleAllocationChange = (changedKey, newValue) => {
     const oldValue = allocations[changedKey];
     const difference = newValue - oldValue;
+
+    // Auto-lock the slider being changed
+    if (!lockedGoals[changedKey]) {
+      setLockedGoals(prev => ({ ...prev, [changedKey]: true }));
+    }
 
     // Get unlocked allocations (excluding the one being changed)
     const unlockedKeys = Object.keys(allocations).filter(
@@ -260,9 +273,49 @@ export default function FinancialPlanner() {
     setTimeout(() => setRecentlyChanged(null), 600);
   };
 
-  // Toggle lock on a goal
+  // Toggle lock on a goal - when unlocking, recalculate to default proportions
   const toggleLock = (key) => {
-    setLockedGoals(prev => ({ ...prev, [key]: !prev[key] }));
+    const wasLocked = lockedGoals[key];
+    
+    if (wasLocked) {
+      // Unlocking - recalculate all unlocked values based on locked ones
+      const newLockedGoals = { ...lockedGoals, [key]: false };
+      
+      // Get all keys that will be unlocked after this toggle
+      const unlockedKeys = Object.keys(allocations).filter(k => !newLockedGoals[k]);
+      const lockedKeys = Object.keys(allocations).filter(k => newLockedGoals[k]);
+      
+      // Calculate total locked percentage
+      const lockedTotal = lockedKeys.reduce((sum, k) => sum + allocations[k], 0);
+      
+      // Calculate remaining percentage for unlocked keys
+      const remainingPercent = 50 - lockedTotal;
+      
+      if (unlockedKeys.length > 0 && remainingPercent > 0) {
+        // Calculate proportional defaults for unlocked keys
+        const defaultUnlockedTotal = unlockedKeys.reduce((sum, k) => sum + DEFAULT_ALLOCATIONS[k], 0);
+        
+        const newAllocations = { ...allocations };
+        unlockedKeys.forEach(k => {
+          const proportion = DEFAULT_ALLOCATIONS[k] / defaultUnlockedTotal;
+          newAllocations[k] = Math.round(remainingPercent * proportion);
+        });
+        
+        // Adjust to make sure total is exactly 50
+        const newTotal = Object.values(newAllocations).reduce((a, b) => a + b, 0);
+        if (newTotal !== 50 && unlockedKeys.length > 0) {
+          const diff = 50 - newTotal;
+          newAllocations[unlockedKeys[0]] += diff;
+        }
+        
+        setAllocations(newAllocations);
+      }
+      
+      setLockedGoals(newLockedGoals);
+    } else {
+      // Locking - just lock the current value
+      setLockedGoals(prev => ({ ...prev, [key]: true }));
+    }
   };
 
   // Initialize allocations when entering step 6

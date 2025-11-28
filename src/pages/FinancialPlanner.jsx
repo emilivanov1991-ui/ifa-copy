@@ -443,7 +443,105 @@ export default function FinancialPlanner() {
 
   return (
     <TooltipProvider>
-    <div className={cn("fixed inset-0 overflow-hidden transition-colors duration-500", themeClasses, isGenerating && "overflow-hidden")}>
+    <div className={cn("fixed inset-0 overflow-hidden transition-colors duration-500", themeClasses, (isGenerating || showIntroAnimation) && "overflow-hidden")}>
+      
+      {/* Intro Animation */}
+      <AnimatePresence>
+        {showIntroAnimation && (
+          <motion.div
+            key="intro"
+            initial={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.5 }}
+            className="fixed inset-0 z-[200] flex flex-col items-center justify-center bg-gradient-to-br from-slate-900 via-blue-900 to-indigo-900 overflow-hidden"
+          >
+            {/* Diagonal lines animation */}
+            <div className="absolute inset-0 overflow-hidden">
+              {/* Lines from bottom-right to top-left */}
+              {[0, 1, 2, 3, 4].map((i) => (
+                <motion.div
+                  key={`br-${i}`}
+                  className="absolute bg-white/20 rounded-full"
+                  style={{
+                    width: [3, 5, 2, 4, 3][i],
+                    height: '200%',
+                    transform: 'rotate(-45deg)',
+                    transformOrigin: 'center',
+                  }}
+                  initial={{ 
+                    bottom: '-100%', 
+                    right: `${10 + i * 15}%`,
+                    opacity: 0.6
+                  }}
+                  animate={{ 
+                    bottom: '100%', 
+                    right: `${30 + i * 15}%`,
+                    opacity: [0.6, 0.8, 0.6, 0]
+                  }}
+                  transition={{ 
+                    duration: 2,
+                    delay: i * 0.15,
+                    ease: "easeInOut"
+                  }}
+                />
+              ))}
+              
+              {/* Lines from top-left to bottom-right (offset paths) */}
+              {[0, 1, 2, 3, 4].map((i) => (
+                <motion.div
+                  key={`tl-${i}`}
+                  className="absolute bg-white/15 rounded-full"
+                  style={{
+                    width: [4, 2, 5, 3, 4][i],
+                    height: '200%',
+                    transform: 'rotate(-45deg)',
+                    transformOrigin: 'center',
+                  }}
+                  initial={{ 
+                    top: '-100%', 
+                    left: `${5 + i * 15}%`,
+                    opacity: 0.5
+                  }}
+                  animate={{ 
+                    top: '100%', 
+                    left: `${25 + i * 15}%`,
+                    opacity: [0.5, 0.7, 0.5, 0]
+                  }}
+                  transition={{ 
+                    duration: 2,
+                    delay: i * 0.12,
+                    ease: "easeInOut"
+                  }}
+                />
+              ))}
+            </div>
+
+            {/* Text reveal */}
+            <AnimatePresence>
+              {introPhase === 'text' && (
+                <div className="relative z-10 text-center px-4">
+                  <motion.h1 
+                    className="text-5xl md:text-7xl font-bold text-white mb-4 tracking-tight"
+                    initial={{ opacity: 0, y: 30 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.6, ease: "easeOut" }}
+                  >
+                    Financial Planner
+                  </motion.h1>
+                  <motion.p 
+                    className="text-xl md:text-2xl text-blue-200 font-light"
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.6, delay: 0.3, ease: "easeOut" }}
+                  >
+                    Да планираме Вашето финансово бъдеще заедно!
+                  </motion.p>
+                </div>
+              )}
+            </AnimatePresence>
+          </motion.div>
+        )}
+      </AnimatePresence>
       {/* Global Back Button */}
       {currentStep > 1 && !isGenerating && (
         <button

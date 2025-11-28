@@ -15,8 +15,18 @@ const STEPS = [
   { id: 4, label: 'ПРИОРИТЕТИ' },
   { id: 5, label: 'ФИНАНСОВА РАМКА' },
   { id: 6, label: 'СИСТЕМА НА РАБОТА' },
-  { id: 7, label: 'ПРАВИЛА ЗА СЪТРУДНИЧЕСТВО' },
+  { id: 7, label: 'ПРАВИЛА' },
   { id: 8, label: 'МИКРО ПЛАН' },
+];
+
+// Visual step indicators for progress bar
+const VISUAL_STEPS = [
+  { id: 1, label: 'С КОГО', subLabel: 'ПЛАНИРАМЕ?' },
+  { id: 2, label: 'ВЪЗРАСТ НА', subLabel: 'КЛИЕНТА' },
+  { id: 3, label: 'ВЪЗРАСТ НА', subLabel: 'ПАРТНЬОРА' },
+  { id: 4, label: 'МЕСЕЧЕН', subLabel: 'ДОХОД' },
+  { id: 5, label: 'ОСНОВЕН', subLabel: 'ПРИОРИТЕТ' },
+  { id: 6, label: 'МИКРО', subLabel: 'ПЛАН' },
 ];
 
 export default function FinancialPlanner() {
@@ -66,7 +76,7 @@ export default function FinancialPlanner() {
       setTimeout(() => {
         setIsGenerating(false);
         setCurrentStep(5);
-      }, 3000);
+      }, 6000);
     } else if (currentStep < 8) {
       setCurrentStep(currentStep + 1);
     }
@@ -103,60 +113,62 @@ export default function FinancialPlanner() {
   const accentColor = 'text-blue-400';
 
   return (
-    <div className={cn("min-h-screen transition-colors duration-500", themeClasses)}>
-      {/* Top Navigation Bar */}
-      <div className="fixed top-20 left-1/2 -translate-x-1/2 z-50">
+    <div className={cn("min-h-screen transition-colors duration-500", themeClasses, isGenerating && "overflow-hidden")}>
+      {/* Top Progress Indicator */}
+      <div className="fixed top-20 left-1/2 -translate-x-1/2 z-50 w-full max-w-4xl px-4">
         <div className={cn(
-          "flex items-center gap-4 px-6 py-3 rounded-full border backdrop-blur-xl",
+          "px-6 py-4 rounded-2xl border backdrop-blur-xl",
           isDarkMode ? "bg-slate-900/90 border-slate-700" : "bg-white/90 border-slate-200 shadow-lg"
         )}>
-          <button 
-            onClick={goBack}
-            disabled={currentStep === 1}
-            className={cn(
-              "text-sm font-medium tracking-widest transition-opacity",
-              currentStep === 1 ? "opacity-30 cursor-not-allowed" : "opacity-100 hover:opacity-70"
-            )}
-          >
-            НАЗАД
-          </button>
-          
-          <div className="flex items-center gap-2">
-            {visibleSteps.map((step, index) => (
-              <button
-                key={step.id}
-                onClick={() => setCurrentStep(step.id)}
-                className={cn(
-                  "w-3 h-3 rounded-full transition-all duration-300",
-                  currentStep === step.id 
-                    ? "bg-blue-500 ring-4 ring-blue-500/30" 
-                    : isDarkMode 
-                      ? "bg-slate-700 hover:bg-slate-600" 
-                      : "bg-slate-300 hover:bg-slate-400"
-                )}
+          {/* Progress bar */}
+          <div className="relative mb-4">
+            <div className={cn("h-1 rounded-full", isDarkMode ? "bg-slate-700" : "bg-slate-200")}>
+              <motion.div 
+                className="h-full bg-blue-500 rounded-full"
+                initial={{ width: 0 }}
+                animate={{ width: `${((currentStep - 1) / (STEPS.length - 1)) * 100}%` }}
+                transition={{ duration: 0.3 }}
               />
-            ))}
+            </div>
           </div>
           
-          <button 
-            onClick={goNext}
-            disabled={currentStep === 8}
-            className={cn(
-              "text-sm font-medium tracking-widest transition-opacity",
-              currentStep === 8 ? "opacity-30 cursor-not-allowed" : "opacity-100 hover:opacity-70"
-            )}
-          >
-            НАПРЕД
-          </button>
-          
-
-        </div>
-        
-        {/* Current step label */}
-        <div className="text-center mt-3">
-          <span className={cn("text-xs tracking-widest", mutedTextClasses)}>
-            {STEPS.find(s => s.id === currentStep)?.label}
-          </span>
+          {/* Step indicators */}
+          <div className="flex justify-between items-start">
+            {VISUAL_STEPS.map((step, index) => {
+              const isActive = index < Math.ceil(currentStep * VISUAL_STEPS.length / STEPS.length);
+              const isCurrent = Math.ceil(currentStep * VISUAL_STEPS.length / STEPS.length) === index + 1;
+              return (
+                <div 
+                  key={step.id}
+                  className={cn(
+                    "flex flex-col items-center text-center flex-1 transition-all duration-300",
+                    isActive ? "opacity-100" : "opacity-40"
+                  )}
+                >
+                  <div className={cn(
+                    "w-3 h-3 rounded-full mb-2 transition-all duration-300",
+                    isCurrent 
+                      ? "bg-blue-500 ring-4 ring-blue-500/30" 
+                      : isActive 
+                        ? "bg-blue-500" 
+                        : isDarkMode ? "bg-slate-600" : "bg-slate-300"
+                  )} />
+                  <span className={cn(
+                    "text-[10px] sm:text-xs font-medium tracking-wide leading-tight",
+                    isCurrent ? "text-blue-500" : isDarkMode ? "text-slate-400" : "text-slate-500"
+                  )}>
+                    {step.label}
+                  </span>
+                  <span className={cn(
+                    "text-[10px] sm:text-xs font-medium tracking-wide leading-tight",
+                    isCurrent ? "text-blue-500" : isDarkMode ? "text-slate-400" : "text-slate-500"
+                  )}>
+                    {step.subLabel}
+                  </span>
+                </div>
+              );
+            })}
+          </div>
         </div>
       </div>
 
@@ -526,7 +538,7 @@ export default function FinancialPlanner() {
                           : isDarkMode ? "border-slate-700 hover:border-slate-600" : "border-slate-200 hover:border-slate-300"
                       )}
                     >
-                      <h3 className="font-semibold text-sm mb-2 text-center">Подсигуряване на деца</h3>
+                      <h3 className="font-semibold text-sm mb-2 text-center">Бъдеще на децата</h3>
                       <p className={cn("text-xs text-center flex-1", mutedTextClasses)}>
                         Капитал за бъдещето на децата
                       </p>
@@ -574,39 +586,106 @@ export default function FinancialPlanner() {
               </motion.div>
             )}
 
-            {/* Generating Animation Modal */}
+            {/* Generating Animation - Fullscreen */}
             {isGenerating && (
               <motion.div
                 key="generating"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
-                className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm"
+                className="fixed inset-0 z-[100] flex flex-col items-center justify-center bg-gradient-to-br from-slate-900 via-blue-900 to-indigo-900"
               >
-                <motion.div
-                  initial={{ scale: 0.9, opacity: 0 }}
-                  animate={{ scale: 1, opacity: 1 }}
-                  className="bg-white rounded-3xl shadow-2xl p-12 flex flex-col items-center max-w-md mx-4"
-                >
+                {/* Animated background elements */}
+                <div className="absolute inset-0 overflow-hidden">
+                  <motion.div 
+                    className="absolute -top-40 -right-40 w-96 h-96 bg-blue-500/20 rounded-full blur-3xl"
+                    animate={{ scale: [1, 1.2, 1], opacity: [0.3, 0.5, 0.3] }}
+                    transition={{ duration: 4, repeat: Infinity }}
+                  />
+                  <motion.div 
+                    className="absolute -bottom-40 -left-40 w-96 h-96 bg-indigo-500/20 rounded-full blur-3xl"
+                    animate={{ scale: [1.2, 1, 1.2], opacity: [0.5, 0.3, 0.5] }}
+                    transition={{ duration: 4, repeat: Infinity }}
+                  />
+                  <motion.div 
+                    className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-purple-500/10 rounded-full blur-3xl"
+                    animate={{ scale: [1, 1.3, 1], rotate: [0, 180, 360] }}
+                    transition={{ duration: 8, repeat: Infinity }}
+                  />
+                </div>
+
+                <div className="relative z-10 flex flex-col items-center text-center px-4">
+                  {/* Animated icon */}
                   <motion.div
-                    animate={{ rotate: 360 }}
-                    transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
-                    className="mb-8"
+                    className="mb-8 relative"
+                    initial={{ scale: 0 }}
+                    animate={{ scale: 1 }}
+                    transition={{ type: "spring", bounce: 0.5, delay: 0.2 }}
                   >
-                    <Loader2 className="w-16 h-16 text-blue-500" />
+                    <motion.div
+                      className="w-32 h-32 rounded-full bg-gradient-to-br from-blue-500/30 to-indigo-500/30 flex items-center justify-center"
+                      animate={{ rotate: 360 }}
+                      transition={{ duration: 8, repeat: Infinity, ease: "linear" }}
+                    >
+                      <motion.div
+                        className="w-24 h-24 rounded-full bg-gradient-to-br from-blue-500/40 to-indigo-500/40 flex items-center justify-center"
+                        animate={{ rotate: -360 }}
+                        transition={{ duration: 6, repeat: Infinity, ease: "linear" }}
+                      >
+                        <motion.div
+                          animate={{ rotate: 360 }}
+                          transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
+                        >
+                          <Loader2 className="w-12 h-12 text-white" />
+                        </motion.div>
+                      </motion.div>
+                    </motion.div>
                   </motion.div>
-                  <h2 className="text-2xl font-bold mb-4 text-slate-900">Генериране на финансов план</h2>
-                  <div className="flex items-center gap-1">
-                    {[0, 1, 2].map((i) => (
+
+                  {/* Title */}
+                  <motion.h2 
+                    className="text-3xl md:text-4xl font-bold mb-4 text-white"
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.4 }}
+                  >
+                    Генериране на финансов план
+                  </motion.h2>
+
+                  {/* Subtitle */}
+                  <motion.p 
+                    className="text-blue-200 text-lg mb-8 max-w-md"
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.6 }}
+                  >
+                    Анализираме вашите данни и създаваме персонализиран план
+                  </motion.p>
+
+                  {/* Progress dots */}
+                  <motion.div 
+                    className="flex items-center gap-2"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ delay: 0.8 }}
+                  >
+                    {[0, 1, 2, 3, 4].map((i) => (
                       <motion.span
                         key={i}
-                        className="w-2 h-2 bg-blue-500 rounded-full"
-                        animate={{ opacity: [0.3, 1, 0.3] }}
-                        transition={{ duration: 1.5, repeat: Infinity, delay: i * 0.3 }}
+                        className="w-3 h-3 bg-blue-400 rounded-full"
+                        animate={{ 
+                          scale: [1, 1.5, 1],
+                          opacity: [0.3, 1, 0.3] 
+                        }}
+                        transition={{ 
+                          duration: 1.5, 
+                          repeat: Infinity, 
+                          delay: i * 0.2 
+                        }}
                       />
                     ))}
-                  </div>
-                </motion.div>
+                  </motion.div>
+                </div>
               </motion.div>
             )}
 

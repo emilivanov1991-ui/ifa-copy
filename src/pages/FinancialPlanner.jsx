@@ -458,11 +458,11 @@ export default function FinancialPlanner() {
             {/* Diagonal lines animation - train-like movement */}
             <div className="absolute inset-0 overflow-hidden">
               {/* Lines from bottom-right to top-left */}
-              {[0, 1, 2, 3, 4, 5].map((i) => {
-                const strokeWidths = [2, 3, 1.5, 2.5, 1, 2];
-                const lengths = [250, 180, 300, 220, 280, 200];
-                const delays = [0, 0.4, 0.15, 0.6, 0.3, 0.5];
-                const startPositions = [10, 30, 5, 45, 20, 55];
+              {[0, 1, 2].map((i) => {
+                const strokeWidths = [8, 12, 6];
+                const lengths = [350, 300, 380];
+                const delays = [0, 0.2, 0.1];
+                const startPositions = [5, 15, 25];
                 return (
                   <motion.svg
                     key={`br-${i}`}
@@ -479,10 +479,9 @@ export default function FinancialPlanner() {
                       y: '-150vh',
                     }}
                     transition={{ 
-                      duration: 2.5,
+                      duration: 4,
                       delay: delays[i],
                       ease: "linear",
-                      repeat: 1,
                     }}
                     style={{
                       position: 'absolute',
@@ -493,28 +492,28 @@ export default function FinancialPlanner() {
                     <line
                       x1={lengths[i]}
                       y1={lengths[i]}
-                      x2={lengths[i] * 0.15}
-                      y2={lengths[i] * 0.15}
+                      x2={lengths[i] * 0.1}
+                      y2={lengths[i] * 0.1}
                       stroke="white"
                       strokeWidth={strokeWidths[i]}
                       strokeLinecap="round"
-                      opacity="0.7"
+                      opacity="0.8"
                     />
                     <polygon
-                      points={`${lengths[i] * 0.15},${lengths[i] * 0.15} ${lengths[i] * 0.12},${lengths[i] * 0.18} ${lengths[i] * 0.18},${lengths[i] * 0.12}`}
+                      points={`${lengths[i] * 0.1},${lengths[i] * 0.1} ${lengths[i] * 0.05},${lengths[i] * 0.15} ${lengths[i] * 0.15},${lengths[i] * 0.05}`}
                       fill="white"
-                      opacity="0.7"
+                      opacity="0.8"
                     />
                   </motion.svg>
                 );
               })}
               
               {/* Lines from top-left to bottom-right */}
-              {[0, 1, 2, 3, 4, 5].map((i) => {
-                const strokeWidths = [2.5, 1.5, 3, 2, 1, 2.5];
-                const lengths = [220, 280, 190, 260, 240, 210];
-                const delays = [0.2, 0.5, 0.1, 0.4, 0.7, 0.35];
-                const startPositions = [15, 40, 8, 50, 25, 60];
+              {[0, 1, 2].map((i) => {
+                const strokeWidths = [10, 7, 14];
+                const lengths = [320, 360, 280];
+                const delays = [0.05, 0.15, 0.25];
+                const startPositions = [55, 65, 75];
                 return (
                   <motion.svg
                     key={`tl-${i}`}
@@ -531,10 +530,9 @@ export default function FinancialPlanner() {
                       y: '150vh',
                     }}
                     transition={{ 
-                      duration: 2.5,
+                      duration: 4,
                       delay: delays[i],
                       ease: "linear",
-                      repeat: 1,
                     }}
                     style={{
                       position: 'absolute',
@@ -545,17 +543,17 @@ export default function FinancialPlanner() {
                     <line
                       x1={0}
                       y1={0}
-                      x2={lengths[i] * 0.85}
-                      y2={lengths[i] * 0.85}
+                      x2={lengths[i] * 0.9}
+                      y2={lengths[i] * 0.9}
                       stroke="white"
                       strokeWidth={strokeWidths[i]}
                       strokeLinecap="round"
-                      opacity="0.6"
+                      opacity="0.7"
                     />
                     <polygon
-                      points={`${lengths[i] * 0.85},${lengths[i] * 0.85} ${lengths[i] * 0.82},${lengths[i] * 0.88} ${lengths[i] * 0.88},${lengths[i] * 0.82}`}
+                      points={`${lengths[i] * 0.9},${lengths[i] * 0.9} ${lengths[i] * 0.85},${lengths[i] * 0.95} ${lengths[i] * 0.95},${lengths[i] * 0.85}`}
                       fill="white"
-                      opacity="0.6"
+                      opacity="0.7"
                     />
                   </motion.svg>
                 );

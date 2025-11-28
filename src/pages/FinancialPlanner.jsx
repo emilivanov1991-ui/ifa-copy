@@ -2,7 +2,7 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider";
-import { RotateCcw, Loader2, Lock, Unlock, HelpCircle, ArrowLeft } from 'lucide-react';
+import { RotateCcw, Loader2, Lock, Unlock, HelpCircle, ArrowLeft, ShieldAlert, Shield, ShieldCheck, Frown, Smile, PartyPopper } from 'lucide-react';
 import {
   Tooltip,
   TooltipContent,
@@ -1211,6 +1211,18 @@ export default function FinancialPlanner() {
                       </Tooltip>
                     </div>
                     <p className={cn("text-[10px] tracking-widest mb-2 group-hover:text-blue-100", mutedTextClasses)}>ФИНАНСОВА СИГУРНОСТ</p>
+                    
+                    {/* Security Icon based on percentage */}
+                    <div className="flex justify-center mb-2">
+                      {allocations.security <= 3 ? (
+                        <ShieldAlert className={cn("w-8 h-8 text-red-400 group-hover:text-red-200")} />
+                      ) : allocations.security <= 20 ? (
+                        <Shield className={cn("w-8 h-8 text-emerald-500 group-hover:text-emerald-200")} />
+                      ) : (
+                        <ShieldCheck className={cn("w-8 h-8 text-blue-500 group-hover:text-blue-200")} />
+                      )}
+                    </div>
+                    
                     <motion.p 
                       className="text-2xl md:text-3xl font-bold mb-1 group-hover:text-white"
                       key={calculateGoals.security}
@@ -1259,6 +1271,18 @@ export default function FinancialPlanner() {
                       </Tooltip>
                     </div>
                     <p className={cn("text-[10px] tracking-widest mb-2 group-hover:text-blue-100", mutedTextClasses)}>ПЕНСИЯ</p>
+                    
+                    {/* Pension Icon based on percentage */}
+                    <div className="flex justify-center mb-2">
+                      {allocations.pension <= 2 ? (
+                        <Frown className={cn("w-8 h-8 text-red-400 group-hover:text-red-200")} />
+                      ) : allocations.pension <= 10 ? (
+                        <Smile className={cn("w-8 h-8 text-emerald-500 group-hover:text-emerald-200")} />
+                      ) : (
+                        <PartyPopper className={cn("w-8 h-8 text-amber-500 group-hover:text-amber-200")} />
+                      )}
+                    </div>
+                    
                     <motion.p 
                       className="text-2xl md:text-3xl font-bold mb-1 group-hover:text-white"
                       key={calculateGoals.pension}

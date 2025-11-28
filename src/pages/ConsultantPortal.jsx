@@ -49,14 +49,16 @@ import ConsultantIntegrations from '@/components/consultant/ConsultantIntegratio
 import ConsultantNotifications from '@/components/consultant/ConsultantNotifications';
 import AIAnalyticsDashboard from '@/components/consultant/AIAnalyticsDashboard';
 import RBACManager from '@/components/consultant/RBACManager';
+import CommissionsManager from '@/components/consultant/CommissionsManager';
 
 const menuItems = [
   { id: 'dashboard', label: 'Табло', icon: LayoutDashboard, color: 'from-blue-500 to-blue-600' },
   { id: 'crm', label: 'CRM / Клиенти', icon: Users, color: 'from-violet-500 to-violet-600' },
   { id: 'analysis', label: 'Финансов анализ', icon: FileText, color: 'from-emerald-500 to-emerald-600' },
+  { id: 'commissions', label: 'Комисионни', icon: DollarSign, color: 'from-green-500 to-emerald-600' },
   { id: 'ai-analytics', label: 'AI Аналитика', icon: Brain, badge: 'AI', color: 'from-purple-500 to-pink-500' },
   { id: 'analytics', label: 'Статистики', icon: BarChart3, color: 'from-cyan-500 to-cyan-600' },
-  { id: 'reports', label: 'Отчети', icon: DollarSign, color: 'from-amber-500 to-amber-600' },
+  { id: 'reports', label: 'Отчети', icon: FileText, color: 'from-amber-500 to-amber-600' },
   { id: 'elearning', label: 'E-Learning', icon: GraduationCap, color: 'from-indigo-500 to-indigo-600' },
   { id: 'calendar', label: 'Календар', icon: Calendar, color: 'from-rose-500 to-rose-600' },
   { id: 'mail', label: 'Съобщения', icon: Mail, badge: '3', color: 'from-teal-500 to-teal-600' },
@@ -318,6 +320,7 @@ export default function ConsultantPortal() {
                   </Card>
                 </motion.div>
               )}
+              {activeTab === 'commissions' && <CommissionsManager consultantEmail={currentUser?.email} />}
               {activeTab === 'ai-analytics' && <AIAnalyticsDashboard />}
               {activeTab === 'analytics' && <ConsultantAnalytics />}
               {activeTab === 'reports' && <ConsultantReports />}

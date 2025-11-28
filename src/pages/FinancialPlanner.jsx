@@ -905,17 +905,7 @@ export default function FinancialPlanner() {
                     animate={recentlyChanged === 'security' ? { scale: [1, 1.02, 1], borderColor: ['', '#3b82f6', ''] } : {}}
                     transition={{ duration: 0.3 }}
                   >
-                    <div className="absolute top-2 right-2 flex gap-1">
-                      <Tooltip>
-                        <TooltipTrigger asChild>
-                          <button className={cn("p-1 rounded-lg transition-colors", isDarkMode ? "hover:bg-slate-800 text-slate-500" : "hover:bg-slate-100 text-slate-400 group-hover:text-white group-hover:hover:bg-blue-500")}>
-                            <HelpCircle className="w-3 h-3" />
-                          </button>
-                        </TooltipTrigger>
-                        <TooltipContent side="top" className="max-w-xs">
-                          <p>{tooltips.security}</p>
-                        </TooltipContent>
-                      </Tooltip>
+                    <div className="absolute top-2 right-2">
                       <Tooltip>
                         <TooltipTrigger asChild>
                           <button 
@@ -962,17 +952,7 @@ export default function FinancialPlanner() {
                     animate={recentlyChanged === 'pension' ? { scale: [1, 1.02, 1], borderColor: ['', '#3b82f6', ''] } : {}}
                     transition={{ duration: 0.3 }}
                   >
-                    <div className="absolute top-2 right-2 flex gap-1">
-                      <Tooltip>
-                        <TooltipTrigger asChild>
-                          <button className={cn("p-1 rounded-lg transition-colors", isDarkMode ? "hover:bg-slate-800 text-slate-500" : "hover:bg-slate-100 text-slate-400 group-hover:text-white group-hover:hover:bg-blue-500")}>
-                            <HelpCircle className="w-3 h-3" />
-                          </button>
-                        </TooltipTrigger>
-                        <TooltipContent side="top" className="max-w-xs">
-                          <p>{tooltips.pension}</p>
-                        </TooltipContent>
-                      </Tooltip>
+                    <div className="absolute top-2 right-2">
                       <Tooltip>
                         <TooltipTrigger asChild>
                           <button 
@@ -1019,17 +999,7 @@ export default function FinancialPlanner() {
                     animate={recentlyChanged === 'housing' ? { scale: [1, 1.02, 1], borderColor: ['', '#3b82f6', ''] } : {}}
                     transition={{ duration: 0.3 }}
                   >
-                    <div className="absolute top-2 right-2 flex gap-1">
-                      <Tooltip>
-                        <TooltipTrigger asChild>
-                          <button className={cn("p-1 rounded-lg transition-colors", isDarkMode ? "hover:bg-slate-800 text-slate-500" : "hover:bg-slate-100 text-slate-400 group-hover:text-white group-hover:hover:bg-blue-500")}>
-                            <HelpCircle className="w-3 h-3" />
-                          </button>
-                        </TooltipTrigger>
-                        <TooltipContent side="top" className="max-w-xs">
-                          <p>{tooltips.housing}</p>
-                        </TooltipContent>
-                      </Tooltip>
+                    <div className="absolute top-2 right-2">
                       <Tooltip>
                         <TooltipTrigger asChild>
                           <button 
@@ -1076,17 +1046,7 @@ export default function FinancialPlanner() {
                     animate={recentlyChanged === 'cash' ? { scale: [1, 1.02, 1], borderColor: ['', '#3b82f6', ''] } : {}}
                     transition={{ duration: 0.3 }}
                   >
-                    <div className="absolute top-2 right-2 flex gap-1">
-                      <Tooltip>
-                        <TooltipTrigger asChild>
-                          <button className={cn("p-1 rounded-lg transition-colors", isDarkMode ? "hover:bg-slate-800 text-slate-500" : "hover:bg-slate-100 text-slate-400 group-hover:text-white group-hover:hover:bg-blue-500")}>
-                            <HelpCircle className="w-3 h-3" />
-                          </button>
-                        </TooltipTrigger>
-                        <TooltipContent side="top" className="max-w-xs">
-                          <p>{tooltips.cash}</p>
-                        </TooltipContent>
-                      </Tooltip>
+                    <div className="absolute top-2 right-2">
                       <Tooltip>
                         <TooltipTrigger asChild>
                           <button 
@@ -1130,16 +1090,6 @@ export default function FinancialPlanner() {
 
                 {/* Total Wealth - Bottom Center */}
                 <div className={cn("rounded-2xl border p-4 text-center max-w-sm mx-auto mb-4 relative group transition-all duration-300 hover:border-blue-500 hover:bg-blue-600", cardClasses)}>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <button className={cn("absolute top-2 right-2 p-1 rounded-lg transition-colors", isDarkMode ? "hover:bg-slate-800 text-slate-500" : "hover:bg-slate-100 text-slate-400 group-hover:text-white group-hover:hover:bg-blue-500")}>
-                        <HelpCircle className="w-3 h-3" />
-                      </button>
-                    </TooltipTrigger>
-                    <TooltipContent side="top" className="max-w-xs">
-                      <p>{tooltips.totalWealth}</p>
-                    </TooltipContent>
-                  </Tooltip>
                   <p className={cn("text-[10px] tracking-widest mb-1 group-hover:text-blue-100", mutedTextClasses)}>ИМУЩЕСТВОТО ОБЩО</p>
                   <motion.p 
                     className="text-3xl md:text-4xl font-bold mb-3 group-hover:text-white"

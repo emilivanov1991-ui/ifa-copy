@@ -788,59 +788,107 @@ export default function FinancialPlanner() {
                 {/* Goals Grid - 4 columns like the image */}
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-8">
                   {/* Security */}
-                  <div className={cn("rounded-2xl border p-6 text-center", cardClasses)}>
+                  <div className={cn("rounded-2xl border p-6 text-center relative", cardClasses)}>
+                    <button 
+                      onClick={() => toggleLock('security')}
+                      className={cn(
+                        "absolute top-3 right-3 p-1.5 rounded-lg transition-colors",
+                        lockedGoals.security 
+                          ? "bg-blue-100 text-blue-600" 
+                          : isDarkMode ? "hover:bg-slate-800 text-slate-500" : "hover:bg-slate-100 text-slate-400"
+                      )}
+                    >
+                      {lockedGoals.security ? <Lock className="w-4 h-4" /> : <Unlock className="w-4 h-4" />}
+                    </button>
                     <p className={cn("text-xs tracking-widest mb-4", mutedTextClasses)}>ФИНАНСОВА СИГУРНОСТ</p>
                     <p className="text-4xl font-bold mb-4">{formatNumber(goals.security)}</p>
                     <Slider
                       value={[goals.security]}
-                      onValueChange={(v) => setGoals({...goals, security: v[0]})}
+                      onValueChange={(v) => handleGoalChange('security', v[0])}
                       min={10000}
-                      max={200000}
+                      max={500000}
                       step={1000}
                       className="mb-2"
                     />
+                    <p className={cn("text-xs mt-2", mutedTextClasses)}>6 месеца резерв + защита</p>
                   </div>
 
                   {/* Pension */}
-                  <div className={cn("rounded-2xl border p-6 text-center", cardClasses)}>
+                  <div className={cn("rounded-2xl border p-6 text-center relative", cardClasses)}>
+                    <button 
+                      onClick={() => toggleLock('pension')}
+                      className={cn(
+                        "absolute top-3 right-3 p-1.5 rounded-lg transition-colors",
+                        lockedGoals.pension 
+                          ? "bg-blue-100 text-blue-600" 
+                          : isDarkMode ? "hover:bg-slate-800 text-slate-500" : "hover:bg-slate-100 text-slate-400"
+                      )}
+                    >
+                      {lockedGoals.pension ? <Lock className="w-4 h-4" /> : <Unlock className="w-4 h-4" />}
+                    </button>
                     <p className={cn("text-xs tracking-widest mb-4", mutedTextClasses)}>ПЕНСИЯ</p>
                     <p className="text-4xl font-bold mb-4">{formatNumber(goals.pension)}</p>
                     <Slider
                       value={[goals.pension]}
-                      onValueChange={(v) => setGoals({...goals, pension: v[0]})}
+                      onValueChange={(v) => handleGoalChange('pension', v[0])}
                       min={20000}
-                      max={400000}
+                      max={1000000}
                       step={5000}
                       className="mb-2"
                     />
+                    <p className={cn("text-xs mt-2", mutedTextClasses)}>70% от дохода × {20} г.</p>
                   </div>
 
                   {/* Housing */}
-                  <div className={cn("rounded-2xl border p-6 text-center", cardClasses)}>
+                  <div className={cn("rounded-2xl border p-6 text-center relative", cardClasses)}>
+                    <button 
+                      onClick={() => toggleLock('housing')}
+                      className={cn(
+                        "absolute top-3 right-3 p-1.5 rounded-lg transition-colors",
+                        lockedGoals.housing 
+                          ? "bg-blue-100 text-blue-600" 
+                          : isDarkMode ? "hover:bg-slate-800 text-slate-500" : "hover:bg-slate-100 text-slate-400"
+                      )}
+                    >
+                      {lockedGoals.housing ? <Lock className="w-4 h-4" /> : <Unlock className="w-4 h-4" />}
+                    </button>
                     <p className={cn("text-xs tracking-widest mb-4", mutedTextClasses)}>ЖИЛИЩЕ</p>
                     <p className="text-4xl font-bold mb-4">{formatNumber(goals.housing)}</p>
                     <Slider
                       value={[goals.housing]}
-                      onValueChange={(v) => setGoals({...goals, housing: v[0]})}
+                      onValueChange={(v) => handleGoalChange('housing', v[0])}
                       min={30000}
-                      max={500000}
+                      max={1000000}
                       step={5000}
                       className="mb-2"
                     />
+                    <p className={cn("text-xs mt-2", mutedTextClasses)}>Имот + разходи</p>
                   </div>
 
                   {/* Other Goals */}
-                  <div className={cn("rounded-2xl border p-6 text-center", cardClasses)}>
+                  <div className={cn("rounded-2xl border p-6 text-center relative", cardClasses)}>
+                    <button 
+                      onClick={() => toggleLock('cash')}
+                      className={cn(
+                        "absolute top-3 right-3 p-1.5 rounded-lg transition-colors",
+                        lockedGoals.cash 
+                          ? "bg-blue-100 text-blue-600" 
+                          : isDarkMode ? "hover:bg-slate-800 text-slate-500" : "hover:bg-slate-100 text-slate-400"
+                      )}
+                    >
+                      {lockedGoals.cash ? <Lock className="w-4 h-4" /> : <Unlock className="w-4 h-4" />}
+                    </button>
                     <p className={cn("text-xs tracking-widest mb-4", mutedTextClasses)}>ДРУГИ ЦЕЛИ</p>
                     <p className="text-4xl font-bold mb-4">{formatNumber(goals.cash)}</p>
                     <Slider
                       value={[goals.cash]}
-                      onValueChange={(v) => setGoals({...goals, cash: v[0]})}
+                      onValueChange={(v) => handleGoalChange('cash', v[0])}
                       min={5000}
-                      max={150000}
+                      max={500000}
                       step={1000}
                       className="mb-2"
                     />
+                    <p className={cn("text-xs mt-2", mutedTextClasses)}>Кола, почивки, други</p>
                   </div>
                 </div>
 

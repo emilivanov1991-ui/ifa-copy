@@ -996,20 +996,28 @@ export default function FinancialPlanner() {
                 className="max-w-4xl mx-auto"
               >
                 <div className={cn("rounded-3xl border p-8", cardClasses)}>
-                  <div className="flex items-center gap-3 mb-6">
-                    <span className={cn("text-xs tracking-widest", mutedTextClasses)}>АНАЛИЗ</span>
-                    <span className={cn("text-xs", mutedTextClasses)}>•</span>
-                    <span className={cn("text-xs tracking-widest", mutedTextClasses)}>ОПТИМИЗАЦИЯ</span>
-                    <span className={cn("text-xs", mutedTextClasses)}>•</span>
-                    <span className={cn("text-xs tracking-widest", mutedTextClasses)}>ПРЕДСТАВЯНЕ</span>
-                    <span className={cn("text-xs", mutedTextClasses)}>•</span>
-                    <span className={cn("text-xs tracking-widest", mutedTextClasses)}>СЕРВИЗ</span>
+                  {/* Inline Step Tracker */}
+                  <div className="mb-6 pb-4 border-b border-slate-100">
+                    <div className="flex justify-between items-start">
+                      {VISUAL_STEPS.map((step, index) => {
+                        const stepMapping = [1, 2, 3, 4, 5, 8];
+                        const isActive = currentStep >= stepMapping[index];
+                        const isCurrent = (index === 4 && (currentStep === 5 || currentStep === 6 || currentStep === 7));
+                        return (
+                          <div key={step.id} className={cn("flex flex-col items-center text-center flex-1 transition-all duration-300", isActive ? "opacity-100" : "opacity-40")}>
+                            <div className={cn("w-full h-1 mb-2 rounded-full transition-all duration-300", isCurrent ? "bg-blue-500" : isActive ? "bg-blue-500" : isDarkMode ? "bg-slate-700" : "bg-slate-200")} />
+                            <span className={cn("text-[9px] font-semibold tracking-wider leading-tight uppercase", isCurrent ? "text-slate-900" : "text-slate-400")}>{step.label}</span>
+                            <span className={cn("text-[9px] font-semibold tracking-wider leading-tight uppercase", isCurrent ? "text-slate-900" : "text-slate-400")}>{step.subLabel}</span>
+                          </div>
+                        );
+                      })}
+                    </div>
                   </div>
 
-                  <h2 className="text-3xl font-bold mb-4">Съвременна система на работа</h2>
+                  <h2 className="text-3xl font-bold mb-4">Система на работа</h2>
                   <p className={cn("text-sm mb-8 max-w-2xl", mutedTextClasses)}>
-                    Обновихме последния етап на LifePlanner, за да покаже ясно как комбинираме 
-                    консултантски подход, дигитална среда и личен сервиз.
+                    Нашият структуриран подход гарантира, че всяка стъпка от финансовото планиране 
+                    е ясна, прозрачна и насочена към постигане на Вашите цели.
                   </p>
 
                   <div className="grid md:grid-cols-2 gap-6 mb-8">
@@ -1018,8 +1026,8 @@ export default function FinancialPlanner() {
                       <h3 className="text-xl font-semibold mb-1">Анализ</h3>
                       <p className="text-blue-400 text-sm mb-3">Нужди, цели, желания</p>
                       <p className={cn("text-sm", mutedTextClasses)}>
-                        Събираме детайлите за житейската ситуация и бизнес контекста, 
-                        за да построим правилните рамки.
+                        Анализираме целите на клиента, за да намерим най-подходящите 
+                        финансови решения за неговия живот.
                       </p>
                     </div>
 
@@ -1028,8 +1036,8 @@ export default function FinancialPlanner() {
                       <h3 className="text-xl font-semibold mb-1">Оптимизация</h3>
                       <p className="text-blue-400 text-sm mb-3">Подготовка на финансовия план</p>
                       <p className={cn("text-sm", mutedTextClasses)}>
-                        Комбинираме анализите и моделите в реалистични сценарии, 
-                        които дават поле за избор и финализация.
+                        Разглеждаме вече съществуващи финансови продукти и решения 
+                        с цел оптимизация и спестяване на излишни разходи.
                       </p>
                     </div>
 
@@ -1038,18 +1046,18 @@ export default function FinancialPlanner() {
                       <h3 className="text-xl font-semibold mb-1">Представяне</h3>
                       <p className="text-blue-400 text-sm mb-3">Финансовият план и реализацията</p>
                       <p className={cn("text-sm", mutedTextClasses)}>
-                        Превръщаме данните в визуална история с ясни стъпки, KPI и 
-                        ролеви отговорности.
+                        Представяме финансовия план и привеждаме в действие 
+                        предложените финансови решения.
                       </p>
                     </div>
 
                     <div className={cn("rounded-2xl border p-6", isDarkMode ? "border-slate-800" : "border-slate-200")}>
                       <p className={cn("text-xs tracking-widest mb-2", mutedTextClasses)}>ФАЗА 4</p>
-                      <h3 className="text-xl font-semibold mb-1">Сервиз</h3>
-                      <p className="text-blue-400 text-sm mb-3">Дългосрочен и редовен</p>
+                      <h3 className="text-xl font-semibold mb-1">Дългосрочно обслужване</h3>
+                      <p className="text-blue-400 text-sm mb-3">Дългосрочно и редовно</p>
                       <p className={cn("text-sm", mutedTextClasses)}>
-                        Проследяваме изпълнението чрез прозрачен цикъл на срещи, 
-                        актуализации и навременни действия.
+                        Осигуряваме постоянна подкрепа чрез редовни срещи, 
+                        актуализации на плана и навременни корекции при нужда.
                       </p>
                     </div>
                   </div>

@@ -1331,6 +1331,16 @@ export default function FinancialPlanner() {
                       </Tooltip>
                     </div>
                     <p className={cn("text-[10px] tracking-widest mb-2 group-hover:text-blue-100", mutedTextClasses)}>ЖИЛИЩЕ</p>
+                    
+                    {/* Housing Icon based on value */}
+                    <div className="flex justify-center mb-2">
+                      {calculateGoals.housing >= 100000 ? (
+                        <Home className={cn("w-8 h-8 text-emerald-500 group-hover:text-emerald-200")} />
+                      ) : (
+                        <HomeIcon className={cn("w-8 h-8 text-slate-400 group-hover:text-slate-200")} />
+                      )}
+                    </div>
+                    
                     <motion.p 
                       className="text-2xl md:text-3xl font-bold mb-1 group-hover:text-white"
                       key={calculateGoals.housing}
@@ -1379,6 +1389,18 @@ export default function FinancialPlanner() {
                       </Tooltip>
                     </div>
                     <p className={cn("text-[10px] tracking-widest mb-2 group-hover:text-blue-100", mutedTextClasses)}>ДРУГИ ЦЕЛИ</p>
+                    
+                    {/* Other Goals Icon based on percentage */}
+                    <div className="flex justify-center mb-2">
+                      {allocations.cash === 0 ? (
+                        <Baby className={cn("w-8 h-8 text-amber-400 group-hover:text-amber-200")} />
+                      ) : allocations.cash <= 2 ? (
+                        <Car className={cn("w-8 h-8 text-blue-500 group-hover:text-blue-200")} />
+                      ) : (
+                        <GraduationCap className={cn("w-8 h-8 text-violet-500 group-hover:text-violet-200")} />
+                      )}
+                    </div>
+                    
                     <motion.p 
                       className="text-2xl md:text-3xl font-bold mb-1 group-hover:text-white"
                       key={calculateGoals.cash}

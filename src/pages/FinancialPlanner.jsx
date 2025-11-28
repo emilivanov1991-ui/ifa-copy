@@ -332,16 +332,16 @@ export default function FinancialPlanner() {
                     <button
                       onClick={() => setFamilyType('individual')}
                       className={cn(
-                        "p-6 rounded-2xl border-2 text-left transition-all",
+                        "p-6 rounded-2xl border-2 text-left transition-all duration-300 group",
                         familyType === 'individual'
-                          ? "border-blue-500 bg-blue-500/10"
+                          ? "border-blue-500 bg-blue-600 text-white"
                           : isDarkMode 
-                            ? "border-slate-700 hover:border-slate-600" 
-                            : "border-slate-200 hover:border-slate-300"
+                            ? "border-slate-700 hover:border-blue-500 hover:bg-blue-600 hover:text-white" 
+                            : "border-slate-200 hover:border-blue-500 hover:bg-blue-600 hover:text-white"
                       )}
                     >
-                      <h3 className="font-semibold mb-1">Индивид</h3>
-                      <p className={cn("text-sm", mutedTextClasses)}>
+                      <h3 className={cn("font-semibold mb-1", familyType !== 'individual' && "group-hover:text-white")}>Индивид</h3>
+                      <p className={cn("text-sm", familyType === 'individual' ? "text-blue-100" : mutedTextClasses, familyType !== 'individual' && "group-hover:text-blue-100")}>
                         Един човек, фокус върху лични цели.
                       </p>
                     </button>
@@ -349,16 +349,16 @@ export default function FinancialPlanner() {
                     <button
                       onClick={() => setFamilyType('family')}
                       className={cn(
-                        "p-6 rounded-2xl border-2 text-left transition-all",
+                        "p-6 rounded-2xl border-2 text-left transition-all duration-300 group",
                         familyType === 'family'
-                          ? "border-blue-500 bg-blue-500/10"
+                          ? "border-blue-500 bg-blue-600 text-white"
                           : isDarkMode 
-                            ? "border-slate-700 hover:border-slate-600" 
-                            : "border-slate-200 hover:border-slate-300"
+                            ? "border-slate-700 hover:border-blue-500 hover:bg-blue-600 hover:text-white" 
+                            : "border-slate-200 hover:border-blue-500 hover:bg-blue-600 hover:text-white"
                       )}
                     >
-                      <h3 className="font-semibold mb-1">Семейство</h3>
-                      <p className={cn("text-sm", mutedTextClasses)}>
+                      <h3 className={cn("font-semibold mb-1", familyType !== 'family' && "group-hover:text-white")}>Семейство</h3>
+                      <p className={cn("text-sm", familyType === 'family' ? "text-blue-100" : mutedTextClasses, familyType !== 'family' && "group-hover:text-blue-100")}>
                         Партньорски план и защитени бюджети.
                       </p>
                     </button>

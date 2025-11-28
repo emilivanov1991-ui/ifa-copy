@@ -2,7 +2,7 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider";
-import { RotateCcw, Loader2, Lock, Unlock, HelpCircle, ArrowLeft, ShieldAlert, Shield, ShieldCheck, Frown, Smile, PartyPopper } from 'lucide-react';
+import { RotateCcw, Loader2, Lock, Unlock, HelpCircle, ArrowLeft, ShieldAlert, Shield, ShieldCheck, Frown, Smile, PartyPopper, Home, HomeIcon, Car, Baby, GraduationCap } from 'lucide-react';
 import {
   Tooltip,
   TooltipContent,
@@ -1393,7 +1393,7 @@ export default function FinancialPlanner() {
                       value={[allocations.cash]}
                       onValueChange={(v) => handleAllocationChange('cash', v[0])}
                       min={0}
-                      max={50}
+                      max={25}
                       step={1}
                       className="mb-2"
                     />

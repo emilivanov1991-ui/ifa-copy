@@ -64,11 +64,31 @@ const calculateLoanAmount = (monthlyPayment, annualRate, years) => {
   return monthlyPayment * ((1 - Math.pow(1 + monthlyRate, -months)) / monthlyRate);
 };
 
-const calculateStatePension = (monthlyIncome, numPeople) => {
+const calculateStatePension = (clientIncome, partnerIncome, clientIsEntrepreneur, partnerIsEntrepreneur, isFamily) => {
   // 60% of income, min 630 per person, max 3400 per person
-  const pensionPerPerson = monthlyIncome * 0.6 / numPeople;
-  const clampedPension = Math.max(630, Math.min(3400, pensionPerPerson));
-  return Math.round(clampedPension * numPeople / 10) * 10;
+  // Entrepreneurs always get minimum pension (630)
+  const minPension = 630;
+  const maxPension = 3400;
+  
+  let clientPension;
+  if (clientIsEntrepreneur) {
+    clientPension = minPension;
+  } else {
+    const calculated = clientIncome * 0.6;
+    clientPension = Math.max(minPension, Math.min(maxPension, calculated));
+  }
+  
+  let partnerPension = 0;
+  if (isFamily) {
+    if (partnerIsEntrepreneur) {
+      partnerPension = minPension;
+    } else {
+      const calculated = partnerIncome * 0.6;
+      partnerPension = Math.max(minPension, Math.min(maxPension, calculated));
+    }
+  }
+  
+  return Math.round((clientPension + partnerPension) / 10) * 10;
 };
 
 export default function FinancialPlanner() {
@@ -130,7 +150,13 @@ export default function FinancialPlanner() {
     const monthlyPensionInvestment = totalIncome * (pensionPercent / 100);
     const pensionFundAtRetirement = calculateFutureValue(monthlyPensionInvestment, 0.08, yearsToRetirement);
     const monthlyPensionFromFund = calculateAnnuityPayment(pensionFundAtRetirement, 0.03, 20);
-    const statePension = calculateStatePension(totalIncome, numPeople);
+    const statePension = calculateStatePension(
+      familyType === 'family' ? monthlyIncome : totalIncome,
+      partnerIncome,
+      clientInsuranceType === 'entrepreneur',
+      partnerInsuranceType === 'entrepreneur',
+      familyType === 'family'
+    );
     const totalMonthlyPension = Math.round((monthlyPensionFromFund + statePension) / 10) * 10;
 
     // 3. Housing calculation
@@ -160,7 +186,7 @@ export default function FinancialPlanner() {
       statePension: statePension,
       loanTerm: maxLoanTerm
     };
-  }, [allocations, totalIncome, avgAge, yearsToRetirement, numPeople]);
+  }, [allocations, totalIncome, avgAge, yearsToRetirement, numPeople, familyType, monthlyIncome, partnerIncome, clientInsuranceType, partnerInsuranceType]);
 
   // Tooltips for financial terms
   const tooltips = {

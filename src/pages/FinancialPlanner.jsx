@@ -105,10 +105,10 @@ export default function FinancialPlanner() {
         setIntroPhase('text');
       }, 4000);
       
-      // Hide intro after 9.5 seconds total
+      // Hide intro after 13.5 seconds total (4 + 2 + 2 + 5.5)
       const hideTimer = setTimeout(() => {
         setShowIntroAnimation(false);
-      }, 9500);
+      }, 13500);
       
       return () => {
         clearTimeout(textTimer);

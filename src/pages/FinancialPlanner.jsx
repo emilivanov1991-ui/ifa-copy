@@ -458,84 +458,106 @@ export default function FinancialPlanner() {
             {/* Diagonal lines animation - train-like movement */}
             <div className="absolute inset-0 overflow-hidden">
               {/* Lines from bottom-right to top-left */}
-              {[0, 1, 2, 3, 4, 5, 6].map((i) => {
-                const widths = [8, 4, 12, 6, 10, 5, 7];
-                const heights = [120, 80, 150, 100, 130, 90, 110];
-                const delays = [0, 0.3, 0.1, 0.5, 0.2, 0.6, 0.4];
-                const offsets = [15, 35, 5, 50, 25, 60, 45];
+              {[0, 1, 2, 3, 4, 5].map((i) => {
+                const strokeWidths = [2, 3, 1.5, 2.5, 1, 2];
+                const lengths = [250, 180, 300, 220, 280, 200];
+                const delays = [0, 0.4, 0.15, 0.6, 0.3, 0.5];
+                const startPositions = [10, 30, 5, 45, 20, 55];
                 return (
-                  <motion.div
+                  <motion.svg
                     key={`br-${i}`}
                     className="absolute"
-                    style={{
-                      width: widths[i],
-                      height: heights[i],
-                      background: 'linear-gradient(to top left, transparent 0%, white 20%, white 80%, transparent 100%)',
-                      clipPath: 'polygon(50% 0%, 100% 100%, 0% 100%)',
-                      rotate: '-45deg',
-                    }}
+                    width={lengths[i]}
+                    height={lengths[i]}
+                    viewBox={`0 0 ${lengths[i]} ${lengths[i]}`}
                     initial={{ 
                       x: '100vw',
                       y: '100vh',
                     }}
                     animate={{ 
-                      x: '-100vw',
-                      y: '-100vh',
+                      x: '-150vw',
+                      y: '-150vh',
                     }}
                     transition={{ 
-                      duration: 3,
+                      duration: 2.5,
                       delay: delays[i],
                       ease: "linear",
                       repeat: 1,
                     }}
                     style={{
                       position: 'absolute',
-                      top: `${offsets[i]}%`,
-                      left: `${offsets[i]}%`,
-                      width: widths[i],
-                      height: heights[i],
-                      background: 'linear-gradient(to top, transparent 0%, rgba(255,255,255,0.6) 30%, rgba(255,255,255,0.8) 50%, rgba(255,255,255,0.6) 70%, transparent 100%)',
-                      transform: 'rotate(-45deg)',
-                      borderRadius: '2px 2px 50% 50%',
+                      top: `${startPositions[i]}%`,
+                      left: `${startPositions[i]}%`,
                     }}
-                  />
+                  >
+                    <line
+                      x1={lengths[i]}
+                      y1={lengths[i]}
+                      x2={lengths[i] * 0.15}
+                      y2={lengths[i] * 0.15}
+                      stroke="white"
+                      strokeWidth={strokeWidths[i]}
+                      strokeLinecap="round"
+                      opacity="0.7"
+                    />
+                    <polygon
+                      points={`${lengths[i] * 0.15},${lengths[i] * 0.15} ${lengths[i] * 0.12},${lengths[i] * 0.18} ${lengths[i] * 0.18},${lengths[i] * 0.12}`}
+                      fill="white"
+                      opacity="0.7"
+                    />
+                  </motion.svg>
                 );
               })}
               
               {/* Lines from top-left to bottom-right */}
-              {[0, 1, 2, 3, 4, 5, 6].map((i) => {
-                const widths = [6, 10, 4, 14, 8, 5, 9];
-                const heights = [100, 140, 70, 160, 110, 85, 125];
-                const delays = [0.15, 0.45, 0.05, 0.35, 0.55, 0.25, 0.65];
-                const offsets = [20, 45, 10, 55, 30, 65, 40];
+              {[0, 1, 2, 3, 4, 5].map((i) => {
+                const strokeWidths = [2.5, 1.5, 3, 2, 1, 2.5];
+                const lengths = [220, 280, 190, 260, 240, 210];
+                const delays = [0.2, 0.5, 0.1, 0.4, 0.7, 0.35];
+                const startPositions = [15, 40, 8, 50, 25, 60];
                 return (
-                  <motion.div
+                  <motion.svg
                     key={`tl-${i}`}
+                    className="absolute"
+                    width={lengths[i]}
+                    height={lengths[i]}
+                    viewBox={`0 0 ${lengths[i]} ${lengths[i]}`}
                     initial={{ 
                       x: '-100vw',
                       y: '-100vh',
                     }}
                     animate={{ 
-                      x: '100vw',
-                      y: '100vh',
+                      x: '150vw',
+                      y: '150vh',
                     }}
                     transition={{ 
-                      duration: 3,
+                      duration: 2.5,
                       delay: delays[i],
                       ease: "linear",
                       repeat: 1,
                     }}
                     style={{
                       position: 'absolute',
-                      top: `${offsets[i]}%`,
-                      right: `${offsets[i]}%`,
-                      width: widths[i],
-                      height: heights[i],
-                      background: 'linear-gradient(to bottom, transparent 0%, rgba(255,255,255,0.5) 30%, rgba(255,255,255,0.7) 50%, rgba(255,255,255,0.5) 70%, transparent 100%)',
-                      transform: 'rotate(-45deg)',
-                      borderRadius: '50% 50% 2px 2px',
+                      top: `${startPositions[i]}%`,
+                      right: `${startPositions[i]}%`,
                     }}
-                  />
+                  >
+                    <line
+                      x1={0}
+                      y1={0}
+                      x2={lengths[i] * 0.85}
+                      y2={lengths[i] * 0.85}
+                      stroke="white"
+                      strokeWidth={strokeWidths[i]}
+                      strokeLinecap="round"
+                      opacity="0.6"
+                    />
+                    <polygon
+                      points={`${lengths[i] * 0.85},${lengths[i] * 0.85} ${lengths[i] * 0.82},${lengths[i] * 0.88} ${lengths[i] * 0.88},${lengths[i] * 0.82}`}
+                      fill="white"
+                      opacity="0.6"
+                    />
+                  </motion.svg>
                 );
               })}
             </div>

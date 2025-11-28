@@ -100,15 +100,15 @@ export default function FinancialPlanner() {
   // Intro animation sequence
   useEffect(() => {
     if (showIntroAnimation) {
-      // Lines animation for 2 seconds, then show text
+      // Lines animation for 4 seconds, then show text
       const textTimer = setTimeout(() => {
         setIntroPhase('text');
-      }, 2000);
+      }, 4000);
       
-      // Hide intro after 4.5 seconds total
+      // Hide intro after 9.5 seconds total
       const hideTimer = setTimeout(() => {
         setShowIntroAnimation(false);
-      }, 4500);
+      }, 9500);
       
       return () => {
         clearTimeout(textTimer);
@@ -455,65 +455,89 @@ export default function FinancialPlanner() {
             transition={{ duration: 0.5 }}
             className="fixed inset-0 z-[200] flex flex-col items-center justify-center bg-gradient-to-br from-slate-900 via-blue-900 to-indigo-900 overflow-hidden"
           >
-            {/* Diagonal lines animation */}
+            {/* Diagonal lines animation - train-like movement */}
             <div className="absolute inset-0 overflow-hidden">
               {/* Lines from bottom-right to top-left */}
-              {[0, 1, 2, 3, 4].map((i) => (
-                <motion.div
-                  key={`br-${i}`}
-                  className="absolute bg-white/20 rounded-full"
-                  style={{
-                    width: [3, 5, 2, 4, 3][i],
-                    height: '200%',
-                    transform: 'rotate(-45deg)',
-                    transformOrigin: 'center',
-                  }}
-                  initial={{ 
-                    bottom: '-100%', 
-                    right: `${10 + i * 15}%`,
-                    opacity: 0.6
-                  }}
-                  animate={{ 
-                    bottom: '100%', 
-                    right: `${30 + i * 15}%`,
-                    opacity: [0.6, 0.8, 0.6, 0]
-                  }}
-                  transition={{ 
-                    duration: 2,
-                    delay: i * 0.15,
-                    ease: "easeInOut"
-                  }}
-                />
-              ))}
+              {[0, 1, 2, 3, 4, 5, 6].map((i) => {
+                const widths = [8, 4, 12, 6, 10, 5, 7];
+                const heights = [120, 80, 150, 100, 130, 90, 110];
+                const delays = [0, 0.3, 0.1, 0.5, 0.2, 0.6, 0.4];
+                const offsets = [15, 35, 5, 50, 25, 60, 45];
+                return (
+                  <motion.div
+                    key={`br-${i}`}
+                    className="absolute"
+                    style={{
+                      width: widths[i],
+                      height: heights[i],
+                      background: 'linear-gradient(to top left, transparent 0%, white 20%, white 80%, transparent 100%)',
+                      clipPath: 'polygon(50% 0%, 100% 100%, 0% 100%)',
+                      rotate: '-45deg',
+                    }}
+                    initial={{ 
+                      x: '100vw',
+                      y: '100vh',
+                    }}
+                    animate={{ 
+                      x: '-100vw',
+                      y: '-100vh',
+                    }}
+                    transition={{ 
+                      duration: 3,
+                      delay: delays[i],
+                      ease: "linear",
+                      repeat: 1,
+                    }}
+                    style={{
+                      position: 'absolute',
+                      top: `${offsets[i]}%`,
+                      left: `${offsets[i]}%`,
+                      width: widths[i],
+                      height: heights[i],
+                      background: 'linear-gradient(to top, transparent 0%, rgba(255,255,255,0.6) 30%, rgba(255,255,255,0.8) 50%, rgba(255,255,255,0.6) 70%, transparent 100%)',
+                      transform: 'rotate(-45deg)',
+                      borderRadius: '2px 2px 50% 50%',
+                    }}
+                  />
+                );
+              })}
               
-              {/* Lines from top-left to bottom-right (offset paths) */}
-              {[0, 1, 2, 3, 4].map((i) => (
-                <motion.div
-                  key={`tl-${i}`}
-                  className="absolute bg-white/15 rounded-full"
-                  style={{
-                    width: [4, 2, 5, 3, 4][i],
-                    height: '200%',
-                    transform: 'rotate(-45deg)',
-                    transformOrigin: 'center',
-                  }}
-                  initial={{ 
-                    top: '-100%', 
-                    left: `${5 + i * 15}%`,
-                    opacity: 0.5
-                  }}
-                  animate={{ 
-                    top: '100%', 
-                    left: `${25 + i * 15}%`,
-                    opacity: [0.5, 0.7, 0.5, 0]
-                  }}
-                  transition={{ 
-                    duration: 2,
-                    delay: i * 0.12,
-                    ease: "easeInOut"
-                  }}
-                />
-              ))}
+              {/* Lines from top-left to bottom-right */}
+              {[0, 1, 2, 3, 4, 5, 6].map((i) => {
+                const widths = [6, 10, 4, 14, 8, 5, 9];
+                const heights = [100, 140, 70, 160, 110, 85, 125];
+                const delays = [0.15, 0.45, 0.05, 0.35, 0.55, 0.25, 0.65];
+                const offsets = [20, 45, 10, 55, 30, 65, 40];
+                return (
+                  <motion.div
+                    key={`tl-${i}`}
+                    initial={{ 
+                      x: '-100vw',
+                      y: '-100vh',
+                    }}
+                    animate={{ 
+                      x: '100vw',
+                      y: '100vh',
+                    }}
+                    transition={{ 
+                      duration: 3,
+                      delay: delays[i],
+                      ease: "linear",
+                      repeat: 1,
+                    }}
+                    style={{
+                      position: 'absolute',
+                      top: `${offsets[i]}%`,
+                      right: `${offsets[i]}%`,
+                      width: widths[i],
+                      height: heights[i],
+                      background: 'linear-gradient(to bottom, transparent 0%, rgba(255,255,255,0.5) 30%, rgba(255,255,255,0.7) 50%, rgba(255,255,255,0.5) 70%, transparent 100%)',
+                      transform: 'rotate(-45deg)',
+                      borderRadius: '50% 50% 2px 2px',
+                    }}
+                  />
+                );
+              })}
             </div>
 
             {/* Text reveal */}

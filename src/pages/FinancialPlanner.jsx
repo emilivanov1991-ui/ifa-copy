@@ -1537,7 +1537,7 @@ export default function FinancialPlanner() {
                     {/* Other Goals Icon based on percentage */}
                     <div className="flex justify-center mb-2">
                       {allocations.cash === 0 ? (
-                        <Baby className={cn("w-8 h-8 text-amber-400 group-hover:text-amber-200")} />
+                        <BookX className={cn("w-8 h-8 text-red-400 group-hover:text-red-200")} />
                       ) : allocations.cash <= 2 ? (
                         <Car className={cn("w-8 h-8 text-blue-500 group-hover:text-blue-200")} />
                       ) : (

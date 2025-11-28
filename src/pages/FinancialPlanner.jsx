@@ -1299,42 +1299,42 @@ export default function FinancialPlanner() {
                     Нашите принципи на работа гарантират професионализъм и доверие във всяка стъпка от процеса.
                   </p>
 
-                  <div className="grid md:grid-cols-2 gap-6 mb-8">
-                    <div className={cn("rounded-2xl border p-6", isDarkMode ? "border-slate-800" : "border-slate-200")}>
-                      <p className={cn("text-xs tracking-widest mb-2", mutedTextClasses)}>ПРАВИЛО 1</p>
-                      <h3 className="text-xl font-semibold mb-1">Дискретност</h3>
-                      <p className="text-blue-400 text-sm mb-3">Пълна конфиденциалност</p>
-                      <p className={cn("text-sm", mutedTextClasses)}>
+                  <div className="grid md:grid-cols-2 gap-4 mb-6">
+                    <div className={cn("rounded-2xl border p-5 transition-all duration-300 group hover:border-blue-500 hover:bg-blue-600", isDarkMode ? "border-slate-800" : "border-slate-200")}>
+                      <p className={cn("text-xs tracking-widest mb-2 group-hover:text-blue-100", mutedTextClasses)}>ПРАВИЛО 1</p>
+                      <h3 className="text-lg font-semibold mb-1 group-hover:text-white">Дискретност</h3>
+                      <p className="text-blue-400 text-sm mb-2 group-hover:text-blue-200">Пълна конфиденциалност</p>
+                      <p className={cn("text-sm group-hover:text-blue-100", mutedTextClasses)}>
                         Вашите лични и финансови данни са напълно защитени. 
                         Никога не споделяме информация с трети страни без вашето изрично съгласие.
                       </p>
                     </div>
 
-                    <div className={cn("rounded-2xl border p-6", isDarkMode ? "border-slate-800" : "border-slate-200")}>
-                      <p className={cn("text-xs tracking-widest mb-2", mutedTextClasses)}>ПРАВИЛО 2</p>
-                      <h3 className="text-xl font-semibold mb-1">Коректност</h3>
-                      <p className="text-blue-400 text-sm mb-3">Честни взаимоотношения</p>
-                      <p className={cn("text-sm", mutedTextClasses)}>
+                    <div className={cn("rounded-2xl border p-5 transition-all duration-300 group hover:border-blue-500 hover:bg-blue-600", isDarkMode ? "border-slate-800" : "border-slate-200")}>
+                      <p className={cn("text-xs tracking-widest mb-2 group-hover:text-blue-100", mutedTextClasses)}>ПРАВИЛО 2</p>
+                      <h3 className="text-lg font-semibold mb-1 group-hover:text-white">Коректност</h3>
+                      <p className="text-blue-400 text-sm mb-2 group-hover:text-blue-200">Честни взаимоотношения</p>
+                      <p className={cn("text-sm group-hover:text-blue-100", mutedTextClasses)}>
                         Работим с ясни правила и спазваме всички договорености. 
                         Вашият интерес е винаги на първо място в нашите препоръки.
                       </p>
                     </div>
 
-                    <div className={cn("rounded-2xl border p-6", isDarkMode ? "border-slate-800" : "border-slate-200")}>
-                      <p className={cn("text-xs tracking-widest mb-2", mutedTextClasses)}>ПРАВИЛО 3</p>
-                      <h3 className="text-xl font-semibold mb-1">Прозрачност</h3>
-                      <p className="text-blue-400 text-sm mb-3">Открита комуникация</p>
-                      <p className={cn("text-sm", mutedTextClasses)}>
+                    <div className={cn("rounded-2xl border p-5 transition-all duration-300 group hover:border-blue-500 hover:bg-blue-600", isDarkMode ? "border-slate-800" : "border-slate-200")}>
+                      <p className={cn("text-xs tracking-widest mb-2 group-hover:text-blue-100", mutedTextClasses)}>ПРАВИЛО 3</p>
+                      <h3 className="text-lg font-semibold mb-1 group-hover:text-white">Прозрачност</h3>
+                      <p className="text-blue-400 text-sm mb-2 group-hover:text-blue-200">Открита комуникация</p>
+                      <p className={cn("text-sm group-hover:text-blue-100", mutedTextClasses)}>
                         Обясняваме всяка стъпка и решение. Няма скрити условия или 
                         неясни такси - всичко е ясно от самото начало.
                       </p>
                     </div>
 
-                    <div className={cn("rounded-2xl border p-6", isDarkMode ? "border-slate-800" : "border-slate-200")}>
-                      <p className={cn("text-xs tracking-widest mb-2", mutedTextClasses)}>ПРАВИЛО 4</p>
-                      <h3 className="text-xl font-semibold mb-1">Възнаграждение</h3>
-                      <p className="text-blue-400 text-sm mb-3">Без директни такси от клиенти</p>
-                      <p className={cn("text-sm", mutedTextClasses)}>
+                    <div className={cn("rounded-2xl border p-5 transition-all duration-300 group hover:border-blue-500 hover:bg-blue-600", isDarkMode ? "border-slate-800" : "border-slate-200")}>
+                      <p className={cn("text-xs tracking-widest mb-2 group-hover:text-blue-100", mutedTextClasses)}>ПРАВИЛО 4</p>
+                      <h3 className="text-lg font-semibold mb-1 group-hover:text-white">Възнаграждение</h3>
+                      <p className="text-blue-400 text-sm mb-2 group-hover:text-blue-200">Без директни такси от клиенти</p>
+                      <p className={cn("text-sm group-hover:text-blue-100", mutedTextClasses)}>
                         Не получаваме директно заплащане от вас. Възнаграждението ни идва от 
                         финансовите институции под формата на комисионна за посредничество.
                       </p>

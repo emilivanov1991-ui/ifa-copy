@@ -16,25 +16,27 @@ import { createPageUrl } from '@/utils';
 // Step definitions
 const STEPS = [
   { id: 1, label: 'С КОГО ПЛАНИРАМЕ?' },
-  { id: 2, label: 'ВЪЗРАСТ' },
-  { id: 3, label: 'МЕСЕЧЕН ДОХОД' },
-  { id: 4, label: 'ПРИОРИТЕТИ' },
-  { id: 5, label: 'ФИНАНСОВА РАМКА' },
-  { id: 6, label: 'СИСТЕМА НА РАБОТА' },
-  { id: 7, label: 'ПРАВИЛА' },
-  { id: 8, label: 'МИКРО ПЛАН' },
+  { id: 2, label: 'НАЧИН НА ОСИГУРЯВАНЕ' },
+  { id: 3, label: 'ВЪЗРАСТ' },
+  { id: 4, label: 'МЕСЕЧЕН ДОХОД' },
+  { id: 5, label: 'ПРИОРИТЕТИ' },
+  { id: 6, label: 'ФИНАНСОВА РАМКА' },
+  { id: 7, label: 'СИСТЕМА НА РАБОТА' },
+  { id: 8, label: 'ПРАВИЛА' },
+  { id: 9, label: 'МИКРО ПЛАН' },
 ];
 
 // Visual step indicators for progress bar (matching actual steps)
 const VISUAL_STEPS = [
   { id: 1, label: 'С КОГО', subLabel: 'ПЛАНИРАМЕ?' },
-  { id: 2, label: 'ВЪЗРАСТ НА', subLabel: 'КЛИЕНТА' },
-  { id: 3, label: 'МЕСЕЧЕН', subLabel: 'ДОХОД' },
-  { id: 4, label: 'ОСНОВЕН', subLabel: 'ПРИОРИТЕТ' },
-  { id: 5, label: 'FINANCIAL', subLabel: 'PLANNER' },
-  { id: 6, label: 'СИСТЕМА НА', subLabel: 'РАБОТА' },
-  { id: 7, label: 'ПРАВИЛА НА', subLabel: 'СЪТРУДНИЧЕСТВО' },
-  { id: 8, label: 'ФИНАНСОВ', subLabel: 'АНАЛИЗ' },
+  { id: 2, label: 'НАЧИН НА', subLabel: 'ОСИГУРЯВАНЕ' },
+  { id: 3, label: 'ВЪЗРАСТ НА', subLabel: 'КЛИЕНТА' },
+  { id: 4, label: 'МЕСЕЧЕН', subLabel: 'ДОХОД' },
+  { id: 5, label: 'ОСНОВЕН', subLabel: 'ПРИОРИТЕТ' },
+  { id: 6, label: 'FINANCIAL', subLabel: 'PLANNER' },
+  { id: 7, label: 'СИСТЕМА НА', subLabel: 'РАБОТА' },
+  { id: 8, label: 'ПРАВИЛА НА', subLabel: 'СЪТРУДНИЧЕСТВО' },
+  { id: 9, label: 'ФИНАНСОВ', subLabel: 'АНАЛИЗ' },
 ];
 
 export default function FinancialPlanner() {
@@ -43,6 +45,8 @@ export default function FinancialPlanner() {
   
   // Data states
   const [familyType, setFamilyType] = useState(null); // 'individual' | 'family'
+  const [clientInsuranceType, setClientInsuranceType] = useState(null); // 'employee' | 'entrepreneur'
+  const [partnerInsuranceType, setPartnerInsuranceType] = useState(null); // 'employee' | 'entrepreneur'
   const [clientAge, setClientAge] = useState(35);
   const [partnerAge, setPartnerAge] = useState(35);
   const [monthlyIncome, setMonthlyIncome] = useState(5000);
@@ -154,9 +158,9 @@ export default function FinancialPlanner() {
     setLockedGoals(prev => ({ ...prev, [key]: !prev[key] }));
   };
 
-  // Initialize goals based on user inputs when entering step 5
+  // Initialize goals based on user inputs when entering step 6
   useEffect(() => {
-    if (currentStep === 5 && !isGenerating) {
+    if (currentStep === 6 && !isGenerating) {
       const optimal = calculateOptimalWealth();
       setGoals(optimal);
     }
@@ -178,14 +182,14 @@ export default function FinancialPlanner() {
 
   // Navigation
   const goNext = () => {
-    if (currentStep === 4) {
+    if (currentStep === 5) {
       // Show generating animation before financial framework
       setIsGenerating(true);
       setTimeout(() => {
         setIsGenerating(false);
-        setCurrentStep(5);
+        setCurrentStep(6);
       }, 6000);
-    } else if (currentStep < 8) {
+    } else if (currentStep < 9) {
       setCurrentStep(currentStep + 1);
     }
   };
@@ -199,6 +203,8 @@ export default function FinancialPlanner() {
   const restart = () => {
     setCurrentStep(1);
     setFamilyType(null);
+    setClientInsuranceType(null);
+    setPartnerInsuranceType(null);
     setClientAge(35);
     setPartnerAge(33);
     setMonthlyIncome(5000);
@@ -394,7 +400,7 @@ export default function FinancialPlanner() {
                   </motion.div>
                   )}
 
-                  {/* Step 2: Age (combined) */}
+                  {/* Step 2: Insurance Type */}
             {currentStep === 2 && (
               <motion.div
                 key="step-2"
@@ -405,6 +411,159 @@ export default function FinancialPlanner() {
               >
                 <div className="lg:pr-12">
                   <p className={cn("text-sm tracking-widest mb-4", accentColor)}>СТЪПКА 2</p>
+                  <h1 className="text-4xl md:text-5xl font-bold mb-6">Начин на осигуряване</h1>
+                  <p className={cn("text-lg mb-6", mutedTextClasses)}>
+                    {familyType === 'family' 
+                      ? 'Изберете начина на осигуряване за клиента и партньора.'
+                      : 'Изберете вашия начин на осигуряване.'
+                    }
+                  </p>
+                </div>
+
+                <div className={cn("rounded-3xl border p-6", cardClasses)}>
+                  {/* Inline Step Tracker */}
+                  <div className="mb-6 pb-4 border-b border-slate-100">
+                    <div className="flex justify-between items-start">
+                      {VISUAL_STEPS.map((step, index) => {
+                        const isActive = currentStep >= (index + 1);
+                        const isCurrent = (index === 0 && currentStep === 1) || 
+                                          (index === 1 && currentStep === 2) ||
+                                          (index === 2 && currentStep === 3) ||
+                                          (index === 3 && currentStep === 4) ||
+                                          (index === 4 && currentStep === 5) ||
+                                          (index === 5 && currentStep === 6) ||
+                                          (index === 6 && currentStep === 7) ||
+                                          (index === 7 && currentStep === 8) ||
+                                          (index === 8 && currentStep === 9);
+                        return (
+                          <div key={step.id} className={cn("flex flex-col items-center text-center flex-1 transition-all duration-300", isActive ? "opacity-100" : "opacity-40")}>
+                            <div className={cn("w-full h-1 mb-2 rounded-full transition-all duration-300", isCurrent ? "bg-blue-500" : isActive ? "bg-blue-500" : isDarkMode ? "bg-slate-700" : "bg-slate-200")} />
+                            <span className={cn("text-[9px] font-semibold tracking-wider leading-tight uppercase", isCurrent ? "text-slate-900" : "text-slate-400")}>{step.label}</span>
+                            <span className={cn("text-[9px] font-semibold tracking-wider leading-tight uppercase", isCurrent ? "text-slate-900" : "text-slate-400")}>{step.subLabel}</span>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                  
+                  <div className="flex items-center justify-between mb-4">
+                    <p className={cn("text-sm tracking-widest", mutedTextClasses)}>СТЪПКА 2</p>
+                    <button onClick={restart} className="p-2 rounded-full text-slate-400 hover:text-blue-500 hover:bg-slate-100 transition-colors">
+                      <RotateCcw className="w-4 h-4" />
+                    </button>
+                  </div>
+                  
+                  <h2 className="text-2xl font-bold mb-6">Начин на осигуряване</h2>
+
+                  {/* Insurance type selection */}
+                  <div className={cn("space-y-6", familyType === 'family' && "grid grid-cols-2 gap-6 space-y-0")}>
+                    {/* Client Insurance */}
+                    <div>
+                      {familyType === 'family' && (
+                        <p className={cn("text-sm font-medium mb-3", mutedTextClasses)}>КЛИЕНТ</p>
+                      )}
+                      <div className="grid grid-cols-2 gap-3">
+                        <button
+                          onClick={() => setClientInsuranceType('employee')}
+                          className={cn(
+                            "p-4 rounded-2xl border-2 text-left transition-all duration-300 group",
+                            clientInsuranceType === 'employee'
+                              ? "border-blue-500 bg-blue-600 text-white"
+                              : isDarkMode 
+                                ? "border-slate-700 hover:border-blue-500 hover:bg-blue-600 hover:text-white" 
+                                : "border-slate-200 hover:border-blue-500 hover:bg-blue-600 hover:text-white"
+                          )}
+                        >
+                          <h3 className={cn("font-semibold mb-1 text-sm", clientInsuranceType !== 'employee' && "group-hover:text-white")}>Служител</h3>
+                          <p className={cn("text-xs", clientInsuranceType === 'employee' ? "text-blue-100" : mutedTextClasses, clientInsuranceType !== 'employee' && "group-hover:text-blue-100")}>
+                            Осигуряването съответства на доходите
+                          </p>
+                        </button>
+                        
+                        <button
+                          onClick={() => setClientInsuranceType('entrepreneur')}
+                          className={cn(
+                            "p-4 rounded-2xl border-2 text-left transition-all duration-300 group",
+                            clientInsuranceType === 'entrepreneur'
+                              ? "border-blue-500 bg-blue-600 text-white"
+                              : isDarkMode 
+                                ? "border-slate-700 hover:border-blue-500 hover:bg-blue-600 hover:text-white" 
+                                : "border-slate-200 hover:border-blue-500 hover:bg-blue-600 hover:text-white"
+                          )}
+                        >
+                          <h3 className={cn("font-semibold mb-1 text-sm", clientInsuranceType !== 'entrepreneur' && "group-hover:text-white")}>Предприемач</h3>
+                          <p className={cn("text-xs", clientInsuranceType === 'entrepreneur' ? "text-blue-100" : mutedTextClasses, clientInsuranceType !== 'entrepreneur' && "group-hover:text-blue-100")}>
+                            Осигуряването е по-ниско от доходите
+                          </p>
+                        </button>
+                      </div>
+                    </div>
+
+                    {/* Partner Insurance (only for family) */}
+                    {familyType === 'family' && (
+                      <div>
+                        <p className={cn("text-sm font-medium mb-3", mutedTextClasses)}>ПАРТНЬОР</p>
+                        <div className="grid grid-cols-2 gap-3">
+                          <button
+                            onClick={() => setPartnerInsuranceType('employee')}
+                            className={cn(
+                              "p-4 rounded-2xl border-2 text-left transition-all duration-300 group",
+                              partnerInsuranceType === 'employee'
+                                ? "border-blue-500 bg-blue-600 text-white"
+                                : isDarkMode 
+                                  ? "border-slate-700 hover:border-blue-500 hover:bg-blue-600 hover:text-white" 
+                                  : "border-slate-200 hover:border-blue-500 hover:bg-blue-600 hover:text-white"
+                            )}
+                          >
+                            <h3 className={cn("font-semibold mb-1 text-sm", partnerInsuranceType !== 'employee' && "group-hover:text-white")}>Служител</h3>
+                            <p className={cn("text-xs", partnerInsuranceType === 'employee' ? "text-blue-100" : mutedTextClasses, partnerInsuranceType !== 'employee' && "group-hover:text-blue-100")}>
+                              Осигуряването съответства на доходите
+                            </p>
+                          </button>
+                          
+                          <button
+                            onClick={() => setPartnerInsuranceType('entrepreneur')}
+                            className={cn(
+                              "p-4 rounded-2xl border-2 text-left transition-all duration-300 group",
+                              partnerInsuranceType === 'entrepreneur'
+                                ? "border-blue-500 bg-blue-600 text-white"
+                                : isDarkMode 
+                                  ? "border-slate-700 hover:border-blue-500 hover:bg-blue-600 hover:text-white" 
+                                  : "border-slate-200 hover:border-blue-500 hover:bg-blue-600 hover:text-white"
+                            )}
+                          >
+                            <h3 className={cn("font-semibold mb-1 text-sm", partnerInsuranceType !== 'entrepreneur' && "group-hover:text-white")}>Предприемач</h3>
+                            <p className={cn("text-xs", partnerInsuranceType === 'entrepreneur' ? "text-blue-100" : mutedTextClasses, partnerInsuranceType !== 'entrepreneur' && "group-hover:text-blue-100")}>
+                              Осигуряването е по-ниско от доходите
+                            </p>
+                          </button>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+
+                  <Button 
+                    onClick={goNext}
+                    disabled={!clientInsuranceType || (familyType === 'family' && !partnerInsuranceType)}
+                    className={cn(primaryButtonClass, "w-full mt-6")}
+                  >
+                    СЛЕДВАЩА СТЪПКА
+                  </Button>
+                </div>
+              </motion.div>
+            )}
+
+                  {/* Step 3: Age (combined) */}
+            {currentStep === 3 && (
+              <motion.div
+                key="step-3"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -20 }}
+                className="grid lg:grid-cols-2 gap-8 items-start"
+              >
+                <div className="lg:pr-12">
+                  <p className={cn("text-sm tracking-widest mb-4", accentColor)}>СТЪПКА 3</p>
                   <h1 className="text-4xl md:text-5xl font-bold mb-6">Възраст</h1>
                   <p className={cn("text-lg mb-6", mutedTextClasses)}>
                     {familyType === 'family' 
@@ -440,7 +599,7 @@ export default function FinancialPlanner() {
                   </div>
                   
                   <div className="flex items-center justify-between mb-4">
-                    <p className={cn("text-sm tracking-widest", mutedTextClasses)}>СТЪПКА 2</p>
+                    <p className={cn("text-sm tracking-widest", mutedTextClasses)}>СТЪПКА 3</p>
                     <button onClick={restart} className="p-2 rounded-full text-slate-400 hover:text-blue-500 hover:bg-slate-100 transition-colors">
                       <RotateCcw className="w-4 h-4" />
                     </button>
@@ -504,17 +663,17 @@ export default function FinancialPlanner() {
                   </motion.div>
                   )}
 
-                  {/* Step 3: Monthly Income */}
-            {currentStep === 3 && (
+                  {/* Step 4: Monthly Income */}
+            {currentStep === 4 && (
               <motion.div
-                key="step-3"
+                key="step-4"
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -20 }}
                 className="grid lg:grid-cols-2 gap-8 items-start"
               >
                 <div className="lg:pr-12">
-                  <p className={cn("text-sm tracking-widest mb-4", accentColor)}>СТЪПКА 3</p>
+                  <p className={cn("text-sm tracking-widest mb-4", accentColor)}>СТЪПКА 4</p>
                   <h1 className="text-4xl md:text-5xl font-bold mb-6">Месечен доход</h1>
                   <p className={cn("text-lg mb-6", mutedTextClasses)}>
                     {familyType === 'family' 
@@ -550,7 +709,7 @@ export default function FinancialPlanner() {
                   </div>
                   
                   <div className="flex items-center justify-between mb-4">
-                    <p className={cn("text-sm tracking-widest", mutedTextClasses)}>СТЪПКА 3</p>
+                    <p className={cn("text-sm tracking-widest", mutedTextClasses)}>СТЪПКА 4</p>
                     <button onClick={restart} className="p-2 rounded-full text-slate-400 hover:text-blue-500 hover:bg-slate-100 transition-colors">
                       <RotateCcw className="w-4 h-4" />
                     </button>
@@ -624,17 +783,17 @@ export default function FinancialPlanner() {
                   </motion.div>
                   )}
 
-                  {/* Step 4: Priorities (multi-select) */}
-            {currentStep === 4 && (
+                  {/* Step 5: Priorities (multi-select) */}
+            {currentStep === 5 && (
               <motion.div
-                key="step-4"
+                key="step-5"
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -20 }}
                 className="grid lg:grid-cols-2 gap-8 items-start"
               >
                 <div className="lg:pr-12">
-                  <p className={cn("text-sm tracking-widest mb-4", accentColor)}>СТЪПКА 4</p>
+                  <p className={cn("text-sm tracking-widest mb-4", accentColor)}>СТЪПКА 5</p>
                   <h1 className="text-4xl md:text-5xl font-bold mb-6">Приоритети</h1>
                   <p className={cn("text-lg mb-6", mutedTextClasses)}>
                     Изберете една или повече посоки, които резонират с Вашите мечти.
@@ -667,7 +826,7 @@ export default function FinancialPlanner() {
                   </div>
                   
                   <div className="flex items-center justify-between mb-4">
-                    <p className={cn("text-sm tracking-widest", mutedTextClasses)}>СТЪПКА 4</p>
+                    <p className={cn("text-sm tracking-widest", mutedTextClasses)}>СТЪПКА 5</p>
                     <button onClick={restart} className="p-2 rounded-full text-slate-400 hover:text-blue-500 hover:bg-slate-100 transition-colors">
                       <RotateCcw className="w-4 h-4" />
                     </button>
@@ -860,8 +1019,8 @@ export default function FinancialPlanner() {
               </motion.div>
             )}
 
-            {/* Step 5: Financial Framework - New Layout */}
-            {currentStep === 5 && !isGenerating && (
+            {/* Step 6: Financial Framework - New Layout */}
+            {currentStep === 6 && !isGenerating && (
               <motion.div
                 key="step-5"
                 initial={{ opacity: 0, y: 20 }}
@@ -1113,8 +1272,8 @@ export default function FinancialPlanner() {
                 </motion.div>
                 )}
 
-            {/* Step 6: Work System */}
-            {currentStep === 6 && (
+            {/* Step 7: Work System */}
+            {currentStep === 7 && (
               <motion.div
                 key="step-6"
                 initial={{ opacity: 0, y: 20 }}
@@ -1205,8 +1364,8 @@ export default function FinancialPlanner() {
                   </motion.div>
                   )}
 
-                  {/* Step 7: Cooperation Rules */}
-            {currentStep === 7 && (
+                  {/* Step 8: Cooperation Rules */}
+            {currentStep === 8 && (
               <motion.div
                 key="step-7"
                 initial={{ opacity: 0, y: 20 }}
@@ -1296,8 +1455,8 @@ export default function FinancialPlanner() {
                   </motion.div>
                   )}
 
-                  {/* Step 8: Final / Redirect */}
-            {currentStep === 8 && (
+                  {/* Step 9: Final / Redirect */}
+            {currentStep === 9 && (
               <motion.div
                 key="step-8"
                 initial={{ opacity: 0, y: 20 }}
@@ -1309,8 +1468,8 @@ export default function FinancialPlanner() {
                 <div className={cn("rounded-2xl border p-4 mb-6", cardClasses)}>
                   <div className="flex justify-between items-start">
                     {VISUAL_STEPS.map((step, index) => {
-                      const isActive = index <= 7;
-                      const isCurrent = index === 7;
+                      const isActive = index <= 8;
+                      const isCurrent = index === 8;
                       return (
                         <div key={step.id} className={cn("flex flex-col items-center text-center flex-1 transition-all duration-300", isActive ? "opacity-100" : "opacity-40")}>
                           <div className={cn("w-full h-1 mb-2 rounded-full transition-all duration-300", isCurrent ? "bg-blue-500" : isActive ? "bg-blue-500" : isDarkMode ? "bg-slate-700" : "bg-slate-200")} />

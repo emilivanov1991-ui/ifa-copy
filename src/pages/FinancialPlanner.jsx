@@ -2,7 +2,13 @@ import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider";
-import { RotateCcw, Loader2, Lock, Unlock } from 'lucide-react';
+import { RotateCcw, Loader2, Lock, Unlock, HelpCircle } from 'lucide-react';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
 import { Link } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
@@ -58,6 +64,17 @@ export default function FinancialPlanner() {
   });
 
   const [isGenerating, setIsGenerating] = useState(false);
+  const [recentlyChanged, setRecentlyChanged] = useState(null);
+
+  // Tooltips for financial terms
+  const tooltips = {
+    security: "Финансова сигурност покрива 6 месеца разходи като резерв при непредвидени ситуации, както и защита на дохода.",
+    pension: "Пенсионен капитал, който ще осигури 70% от текущия Ви доход след пенсиониране за около 20 години.",
+    housing: "Средства за закупуване на имот, ремонт или подобрения на текущото жилище.",
+    cash: "Капитал за други цели като автомобил, почивки, образование и лични проекти.",
+    totalWealth: "Общата сума на всички финансови цели, която трябва да натрупате.",
+    lock: "Заключете цел, за да не се променя автоматично при корекции на други цели."
+  };
 
   // Calculate total wealth based on inputs
   const calculateOptimalWealth = () => {
@@ -124,6 +141,10 @@ export default function FinancialPlanner() {
     });
 
     setGoals(newGoals);
+    
+    // Visual feedback for change
+    setRecentlyChanged(changedKey);
+    setTimeout(() => setRecentlyChanged(null), 600);
   };
 
   // Toggle lock on a goal
@@ -197,7 +218,12 @@ export default function FinancialPlanner() {
   const mutedTextClasses = isDarkMode ? 'text-slate-400' : 'text-slate-500';
   const accentColor = 'text-blue-400';
 
+  // Common button styles
+  const primaryButtonClass = "rounded-full px-6 bg-blue-600 hover:bg-blue-700 text-white font-medium transition-all duration-200 hover:shadow-lg hover:shadow-blue-500/25";
+  const outlineButtonClass = cn("rounded-full px-6 font-medium transition-all duration-200", isDarkMode ? "border-slate-700 hover:bg-slate-800" : "border-slate-300 hover:bg-slate-50");
+
   return (
+    <TooltipProvider>
     <div className={cn("min-h-screen transition-colors duration-500", themeClasses, isGenerating && "overflow-hidden")}>
       {/* Main Content */}
       <div className="pt-24 pb-12 px-4 md:px-8">
@@ -322,26 +348,23 @@ export default function FinancialPlanner() {
                     <Button 
                       variant="outline" 
                       onClick={goBack}
-                      className={cn(
-                        "rounded-full px-6",
-                        isDarkMode ? "border-slate-700 hover:bg-slate-800" : ""
-                      )}
+                      className={outlineButtonClass}
                     >
                       Назад
                     </Button>
                     <Button 
                       onClick={goNext}
                       disabled={!familyType}
-                      className="rounded-full px-6 bg-blue-600 hover:bg-blue-700"
+                      className={primaryButtonClass}
                     >
                       СЛЕДВАЩА СТЪПКА
                     </Button>
                   </div>
-                </div>
-              </motion.div>
-            )}
+                  </div>
+                  </motion.div>
+                  )}
 
-            {/* Step 2: Age (combined) */}
+                  {/* Step 2: Age (combined) */}
             {currentStep === 2 && (
               <motion.div
                 key="step-2"
@@ -445,19 +468,19 @@ export default function FinancialPlanner() {
                     <Button 
                       variant="outline" 
                       onClick={goBack}
-                      className={cn("rounded-full px-6", isDarkMode ? "border-slate-700 hover:bg-slate-800" : "")}
+                      className={outlineButtonClass}
                     >
                       Назад
                     </Button>
-                    <Button onClick={goNext} className="rounded-full px-6 bg-blue-600 hover:bg-blue-700">
+                    <Button onClick={goNext} className={primaryButtonClass}>
                       СЛЕДВАЩА СТЪПКА
                     </Button>
                   </div>
-                </div>
-              </motion.div>
-            )}
+                  </div>
+                  </motion.div>
+                  )}
 
-            {/* Step 3: Monthly Income */}
+                  {/* Step 3: Monthly Income */}
             {currentStep === 3 && (
               <motion.div
                 key="step-3"
@@ -571,19 +594,19 @@ export default function FinancialPlanner() {
                     <Button 
                       variant="outline" 
                       onClick={goBack}
-                      className={cn("rounded-full px-6", isDarkMode ? "border-slate-700 hover:bg-slate-800" : "")}
+                      className={outlineButtonClass}
                     >
                       Назад
                     </Button>
-                    <Button onClick={goNext} className="rounded-full px-6 bg-blue-600 hover:bg-blue-700">
+                    <Button onClick={goNext} className={primaryButtonClass}>
                       СЛЕДВАЩА СТЪПКА
                     </Button>
                   </div>
-                </div>
-              </motion.div>
-            )}
+                  </div>
+                  </motion.div>
+                  )}
 
-            {/* Step 4: Priorities (multi-select) */}
+                  {/* Step 4: Priorities (multi-select) */}
             {currentStep === 4 && (
               <motion.div
                 key="step-4"
@@ -706,23 +729,23 @@ export default function FinancialPlanner() {
                     <Button 
                       variant="outline" 
                       onClick={goBack}
-                      className={cn("rounded-full px-6", isDarkMode ? "border-slate-700 hover:bg-slate-800" : "")}
+                      className={outlineButtonClass}
                     >
                       Назад
                     </Button>
                     <Button 
                       onClick={goNext}
                       disabled={selectedPriorities.length === 0}
-                      className="rounded-full px-6 bg-blue-600 hover:bg-blue-700"
+                      className={primaryButtonClass}
                     >
                       СЛЕДВАЩА СТЪПКА
                     </Button>
                   </div>
-                </div>
-              </motion.div>
-            )}
+                  </div>
+                  </motion.div>
+                  )}
 
-            {/* Generating Animation - Fullscreen */}
+                  {/* Generating Animation - Fullscreen */}
             {isGenerating && (
               <motion.div
                 key="generating"
@@ -857,20 +880,51 @@ export default function FinancialPlanner() {
                 {/* Goals Grid - 4 columns like the image */}
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-8">
                   {/* Security */}
-                  <div className={cn("rounded-2xl border p-6 text-center relative", cardClasses)}>
-                    <button 
-                      onClick={() => toggleLock('security')}
-                      className={cn(
-                        "absolute top-3 right-3 p-1.5 rounded-lg transition-colors",
-                        lockedGoals.security 
-                          ? "bg-blue-100 text-blue-600" 
-                          : isDarkMode ? "hover:bg-slate-800 text-slate-500" : "hover:bg-slate-100 text-slate-400"
-                      )}
-                    >
-                      {lockedGoals.security ? <Lock className="w-4 h-4" /> : <Unlock className="w-4 h-4" />}
-                    </button>
+                  <motion.div 
+                    className={cn("rounded-2xl border p-6 text-center relative transition-all duration-300", cardClasses)}
+                    animate={recentlyChanged === 'security' ? { scale: [1, 1.02, 1], borderColor: ['', '#3b82f6', ''] } : {}}
+                    transition={{ duration: 0.3 }}
+                  >
+                    <div className="absolute top-3 right-3 flex gap-1">
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <button className={cn("p-1.5 rounded-lg transition-colors", isDarkMode ? "hover:bg-slate-800 text-slate-500" : "hover:bg-slate-100 text-slate-400")}>
+                            <HelpCircle className="w-4 h-4" />
+                          </button>
+                        </TooltipTrigger>
+                        <TooltipContent side="top" className="max-w-xs">
+                          <p>{tooltips.security}</p>
+                        </TooltipContent>
+                      </Tooltip>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <button 
+                            onClick={() => toggleLock('security')}
+                            className={cn(
+                              "p-1.5 rounded-lg transition-colors",
+                              lockedGoals.security 
+                                ? "bg-blue-100 text-blue-600" 
+                                : isDarkMode ? "hover:bg-slate-800 text-slate-500" : "hover:bg-slate-100 text-slate-400"
+                            )}
+                          >
+                            {lockedGoals.security ? <Lock className="w-4 h-4" /> : <Unlock className="w-4 h-4" />}
+                          </button>
+                        </TooltipTrigger>
+                        <TooltipContent side="top">
+                          <p>{tooltips.lock}</p>
+                        </TooltipContent>
+                      </Tooltip>
+                    </div>
                     <p className={cn("text-xs tracking-widest mb-4", mutedTextClasses)}>ФИНАНСОВА СИГУРНОСТ</p>
-                    <p className="text-4xl font-bold mb-4">{formatNumber(goals.security)}</p>
+                    <motion.p 
+                      className="text-4xl font-bold mb-4"
+                      key={goals.security}
+                      initial={{ scale: 1.1 }}
+                      animate={{ scale: 1 }}
+                      transition={{ duration: 0.2 }}
+                    >
+                      {formatNumber(goals.security)}
+                    </motion.p>
                     <Slider
                       value={[goals.security]}
                       onValueChange={(v) => handleGoalChange('security', v[0])}
@@ -880,23 +934,54 @@ export default function FinancialPlanner() {
                       className="mb-2"
                     />
                     <p className={cn("text-xs mt-2", mutedTextClasses)}>6 месеца резерв + защита</p>
-                  </div>
+                  </motion.div>
 
                   {/* Pension */}
-                  <div className={cn("rounded-2xl border p-6 text-center relative", cardClasses)}>
-                    <button 
-                      onClick={() => toggleLock('pension')}
-                      className={cn(
-                        "absolute top-3 right-3 p-1.5 rounded-lg transition-colors",
-                        lockedGoals.pension 
-                          ? "bg-blue-100 text-blue-600" 
-                          : isDarkMode ? "hover:bg-slate-800 text-slate-500" : "hover:bg-slate-100 text-slate-400"
-                      )}
-                    >
-                      {lockedGoals.pension ? <Lock className="w-4 h-4" /> : <Unlock className="w-4 h-4" />}
-                    </button>
+                  <motion.div 
+                    className={cn("rounded-2xl border p-6 text-center relative transition-all duration-300", cardClasses)}
+                    animate={recentlyChanged === 'pension' ? { scale: [1, 1.02, 1], borderColor: ['', '#3b82f6', ''] } : {}}
+                    transition={{ duration: 0.3 }}
+                  >
+                    <div className="absolute top-3 right-3 flex gap-1">
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <button className={cn("p-1.5 rounded-lg transition-colors", isDarkMode ? "hover:bg-slate-800 text-slate-500" : "hover:bg-slate-100 text-slate-400")}>
+                            <HelpCircle className="w-4 h-4" />
+                          </button>
+                        </TooltipTrigger>
+                        <TooltipContent side="top" className="max-w-xs">
+                          <p>{tooltips.pension}</p>
+                        </TooltipContent>
+                      </Tooltip>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <button 
+                            onClick={() => toggleLock('pension')}
+                            className={cn(
+                              "p-1.5 rounded-lg transition-colors",
+                              lockedGoals.pension 
+                                ? "bg-blue-100 text-blue-600" 
+                                : isDarkMode ? "hover:bg-slate-800 text-slate-500" : "hover:bg-slate-100 text-slate-400"
+                            )}
+                          >
+                            {lockedGoals.pension ? <Lock className="w-4 h-4" /> : <Unlock className="w-4 h-4" />}
+                          </button>
+                        </TooltipTrigger>
+                        <TooltipContent side="top">
+                          <p>{tooltips.lock}</p>
+                        </TooltipContent>
+                      </Tooltip>
+                    </div>
                     <p className={cn("text-xs tracking-widest mb-4", mutedTextClasses)}>ПЕНСИЯ</p>
-                    <p className="text-4xl font-bold mb-4">{formatNumber(goals.pension)}</p>
+                    <motion.p 
+                      className="text-4xl font-bold mb-4"
+                      key={goals.pension}
+                      initial={{ scale: 1.1 }}
+                      animate={{ scale: 1 }}
+                      transition={{ duration: 0.2 }}
+                    >
+                      {formatNumber(goals.pension)}
+                    </motion.p>
                     <Slider
                       value={[goals.pension]}
                       onValueChange={(v) => handleGoalChange('pension', v[0])}
@@ -905,24 +990,55 @@ export default function FinancialPlanner() {
                       step={5000}
                       className="mb-2"
                     />
-                    <p className={cn("text-xs mt-2", mutedTextClasses)}>70% от дохода × {20} г.</p>
-                  </div>
+                    <p className={cn("text-xs mt-2", mutedTextClasses)}>70% от дохода × 20 г.</p>
+                  </motion.div>
 
                   {/* Housing */}
-                  <div className={cn("rounded-2xl border p-6 text-center relative", cardClasses)}>
-                    <button 
-                      onClick={() => toggleLock('housing')}
-                      className={cn(
-                        "absolute top-3 right-3 p-1.5 rounded-lg transition-colors",
-                        lockedGoals.housing 
-                          ? "bg-blue-100 text-blue-600" 
-                          : isDarkMode ? "hover:bg-slate-800 text-slate-500" : "hover:bg-slate-100 text-slate-400"
-                      )}
-                    >
-                      {lockedGoals.housing ? <Lock className="w-4 h-4" /> : <Unlock className="w-4 h-4" />}
-                    </button>
+                  <motion.div 
+                    className={cn("rounded-2xl border p-6 text-center relative transition-all duration-300", cardClasses)}
+                    animate={recentlyChanged === 'housing' ? { scale: [1, 1.02, 1], borderColor: ['', '#3b82f6', ''] } : {}}
+                    transition={{ duration: 0.3 }}
+                  >
+                    <div className="absolute top-3 right-3 flex gap-1">
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <button className={cn("p-1.5 rounded-lg transition-colors", isDarkMode ? "hover:bg-slate-800 text-slate-500" : "hover:bg-slate-100 text-slate-400")}>
+                            <HelpCircle className="w-4 h-4" />
+                          </button>
+                        </TooltipTrigger>
+                        <TooltipContent side="top" className="max-w-xs">
+                          <p>{tooltips.housing}</p>
+                        </TooltipContent>
+                      </Tooltip>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <button 
+                            onClick={() => toggleLock('housing')}
+                            className={cn(
+                              "p-1.5 rounded-lg transition-colors",
+                              lockedGoals.housing 
+                                ? "bg-blue-100 text-blue-600" 
+                                : isDarkMode ? "hover:bg-slate-800 text-slate-500" : "hover:bg-slate-100 text-slate-400"
+                            )}
+                          >
+                            {lockedGoals.housing ? <Lock className="w-4 h-4" /> : <Unlock className="w-4 h-4" />}
+                          </button>
+                        </TooltipTrigger>
+                        <TooltipContent side="top">
+                          <p>{tooltips.lock}</p>
+                        </TooltipContent>
+                      </Tooltip>
+                    </div>
                     <p className={cn("text-xs tracking-widest mb-4", mutedTextClasses)}>ЖИЛИЩЕ</p>
-                    <p className="text-4xl font-bold mb-4">{formatNumber(goals.housing)}</p>
+                    <motion.p 
+                      className="text-4xl font-bold mb-4"
+                      key={goals.housing}
+                      initial={{ scale: 1.1 }}
+                      animate={{ scale: 1 }}
+                      transition={{ duration: 0.2 }}
+                    >
+                      {formatNumber(goals.housing)}
+                    </motion.p>
                     <Slider
                       value={[goals.housing]}
                       onValueChange={(v) => handleGoalChange('housing', v[0])}
@@ -932,23 +1048,54 @@ export default function FinancialPlanner() {
                       className="mb-2"
                     />
                     <p className={cn("text-xs mt-2", mutedTextClasses)}>Имот + разходи</p>
-                  </div>
+                  </motion.div>
 
                   {/* Other Goals */}
-                  <div className={cn("rounded-2xl border p-6 text-center relative", cardClasses)}>
-                    <button 
-                      onClick={() => toggleLock('cash')}
-                      className={cn(
-                        "absolute top-3 right-3 p-1.5 rounded-lg transition-colors",
-                        lockedGoals.cash 
-                          ? "bg-blue-100 text-blue-600" 
-                          : isDarkMode ? "hover:bg-slate-800 text-slate-500" : "hover:bg-slate-100 text-slate-400"
-                      )}
-                    >
-                      {lockedGoals.cash ? <Lock className="w-4 h-4" /> : <Unlock className="w-4 h-4" />}
-                    </button>
+                  <motion.div 
+                    className={cn("rounded-2xl border p-6 text-center relative transition-all duration-300", cardClasses)}
+                    animate={recentlyChanged === 'cash' ? { scale: [1, 1.02, 1], borderColor: ['', '#3b82f6', ''] } : {}}
+                    transition={{ duration: 0.3 }}
+                  >
+                    <div className="absolute top-3 right-3 flex gap-1">
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <button className={cn("p-1.5 rounded-lg transition-colors", isDarkMode ? "hover:bg-slate-800 text-slate-500" : "hover:bg-slate-100 text-slate-400")}>
+                            <HelpCircle className="w-4 h-4" />
+                          </button>
+                        </TooltipTrigger>
+                        <TooltipContent side="top" className="max-w-xs">
+                          <p>{tooltips.cash}</p>
+                        </TooltipContent>
+                      </Tooltip>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <button 
+                            onClick={() => toggleLock('cash')}
+                            className={cn(
+                              "p-1.5 rounded-lg transition-colors",
+                              lockedGoals.cash 
+                                ? "bg-blue-100 text-blue-600" 
+                                : isDarkMode ? "hover:bg-slate-800 text-slate-500" : "hover:bg-slate-100 text-slate-400"
+                            )}
+                          >
+                            {lockedGoals.cash ? <Lock className="w-4 h-4" /> : <Unlock className="w-4 h-4" />}
+                          </button>
+                        </TooltipTrigger>
+                        <TooltipContent side="top">
+                          <p>{tooltips.lock}</p>
+                        </TooltipContent>
+                      </Tooltip>
+                    </div>
                     <p className={cn("text-xs tracking-widest mb-4", mutedTextClasses)}>ДРУГИ ЦЕЛИ</p>
-                    <p className="text-4xl font-bold mb-4">{formatNumber(goals.cash)}</p>
+                    <motion.p 
+                      className="text-4xl font-bold mb-4"
+                      key={goals.cash}
+                      initial={{ scale: 1.1 }}
+                      animate={{ scale: 1 }}
+                      transition={{ duration: 0.2 }}
+                    >
+                      {formatNumber(goals.cash)}
+                    </motion.p>
                     <Slider
                       value={[goals.cash]}
                       onValueChange={(v) => handleGoalChange('cash', v[0])}
@@ -958,16 +1105,34 @@ export default function FinancialPlanner() {
                       className="mb-2"
                     />
                     <p className={cn("text-xs mt-2", mutedTextClasses)}>Кола, почивки, други</p>
-                  </div>
+                  </motion.div>
                 </div>
 
                 {/* Total Wealth - Bottom Center */}
-                <div className={cn("rounded-2xl border p-6 text-center max-w-md mx-auto mb-8", cardClasses)}>
+                <div className={cn("rounded-2xl border p-6 text-center max-w-md mx-auto mb-8 relative", cardClasses)}>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <button className={cn("absolute top-3 right-3 p-1.5 rounded-lg transition-colors", isDarkMode ? "hover:bg-slate-800 text-slate-500" : "hover:bg-slate-100 text-slate-400")}>
+                        <HelpCircle className="w-4 h-4" />
+                      </button>
+                    </TooltipTrigger>
+                    <TooltipContent side="top" className="max-w-xs">
+                      <p>{tooltips.totalWealth}</p>
+                    </TooltipContent>
+                  </Tooltip>
                   <p className={cn("text-xs tracking-widest mb-2", mutedTextClasses)}>ИМУЩЕСТВОТО ОБЩО</p>
-                  <p className="text-5xl font-bold mb-4">{formatNumber(totalWealth)} BGN</p>
+                  <motion.p 
+                    className="text-5xl font-bold mb-4"
+                    key={totalWealth}
+                    initial={{ scale: 1.05 }}
+                    animate={{ scale: 1 }}
+                    transition={{ duration: 0.2 }}
+                  >
+                    {formatNumber(totalWealth)} BGN
+                  </motion.p>
                   <Button 
                     onClick={goNext}
-                    className="rounded-full px-8 bg-blue-600 hover:bg-blue-700"
+                    className={primaryButtonClass}
                   >
                     Искам да продължа
                   </Button>
@@ -978,13 +1143,13 @@ export default function FinancialPlanner() {
                   <Button 
                     variant="outline" 
                     onClick={goBack}
-                    className={cn("rounded-full px-6", isDarkMode ? "border-slate-700 hover:bg-slate-800" : "")}
+                    className={outlineButtonClass}
                   >
                     Назад
                   </Button>
                 </div>
-              </motion.div>
-            )}
+                </motion.div>
+                )}
 
             {/* Step 6: Work System */}
             {currentStep === 6 && (
@@ -1066,22 +1231,22 @@ export default function FinancialPlanner() {
                     <Button 
                       variant="outline" 
                       onClick={goBack}
-                      className={cn("rounded-full px-6", isDarkMode ? "border-slate-700 hover:bg-slate-800" : "")}
+                      className={outlineButtonClass}
                     >
                       Назад
                     </Button>
                     <Button 
                       onClick={goNext}
-                      className="rounded-full px-6 bg-blue-600 hover:bg-blue-700"
+                      className={primaryButtonClass}
                     >
                       Напред
                     </Button>
                   </div>
-                </div>
-              </motion.div>
-            )}
+                  </div>
+                  </motion.div>
+                  )}
 
-            {/* Step 7: Cooperation Rules */}
+                  {/* Step 7: Cooperation Rules */}
             {currentStep === 7 && (
               <motion.div
                 key="step-7"
@@ -1160,22 +1325,22 @@ export default function FinancialPlanner() {
                     <Button 
                       variant="outline" 
                       onClick={goBack}
-                      className={cn("rounded-full px-6", isDarkMode ? "border-slate-700 hover:bg-slate-800" : "")}
+                      className={outlineButtonClass}
                     >
                       Назад
                     </Button>
                     <Button 
                       onClick={goNext}
-                      className="rounded-full px-6 bg-blue-600 hover:bg-blue-700"
+                      className={primaryButtonClass}
                     >
                       Напред
                     </Button>
                   </div>
-                </div>
-              </motion.div>
-            )}
+                  </div>
+                  </motion.div>
+                  )}
 
-            {/* Step 8: Final / Redirect */}
+                  {/* Step 8: Final / Redirect */}
             {currentStep === 8 && (
               <motion.div
                 key="step-8"
@@ -1206,19 +1371,20 @@ export default function FinancialPlanner() {
                     <Button 
                       variant="outline" 
                       onClick={restart}
-                      className={cn("w-full rounded-full", isDarkMode ? "border-slate-700 hover:bg-slate-800" : "")}
+                      className={cn("w-full", outlineButtonClass)}
                     >
                       <RotateCcw className="mr-2 h-4 w-4" />
                       Започни отначало
                     </Button>
-                  </div>
-                </div>
-              </motion.div>
-            )}
+                    </div>
+                    </div>
+                    </motion.div>
+                    )}
 
-          </AnimatePresence>
-        </div>
-      </div>
-    </div>
-  );
-}
+                    </AnimatePresence>
+                    </div>
+                    </div>
+                    </div>
+                    </TooltipProvider>
+                    );
+                    }

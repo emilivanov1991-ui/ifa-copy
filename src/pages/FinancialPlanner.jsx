@@ -1132,7 +1132,14 @@ export default function FinancialPlanner() {
                       {VISUAL_STEPS.map((step, index) => {
                         const stepMapping = [1, 2, 3, 4, 5, 8];
                         const isActive = currentStep >= stepMapping[index];
-                        const isCurrent = (index === 5 && (currentStep === 6 || currentStep === 7 || currentStep === 8));
+                        const isCurrent = (index === 0 && currentStep === 1) || 
+                                          (index === 1 && currentStep === 2) ||
+                                          (index === 2 && currentStep === 3) ||
+                                          (index === 3 && currentStep === 4) ||
+                                          (index === 4 && currentStep === 5) ||
+                                          (index === 5 && currentStep === 6) ||
+                                          (index === 6 && currentStep === 7) ||
+                                          (index === 7 && currentStep === 8);
                         return (
                           <div key={step.id} className={cn("flex flex-col items-center text-center flex-1 transition-all duration-300", isActive ? "opacity-100" : "opacity-40")}>
                             <div className={cn("w-full h-1 mb-2 rounded-full transition-all duration-300", isCurrent ? "bg-blue-500" : isActive ? "bg-blue-500" : isDarkMode ? "bg-slate-700" : "bg-slate-200")} />
@@ -1218,7 +1225,14 @@ export default function FinancialPlanner() {
                       {VISUAL_STEPS.map((step, index) => {
                         const stepMapping = [1, 2, 3, 4, 5, 8];
                         const isActive = currentStep >= stepMapping[index];
-                        const isCurrent = (index === 5 && (currentStep === 6 || currentStep === 7 || currentStep === 8));
+                        const isCurrent = (index === 0 && currentStep === 1) || 
+                                          (index === 1 && currentStep === 2) ||
+                                          (index === 2 && currentStep === 3) ||
+                                          (index === 3 && currentStep === 4) ||
+                                          (index === 4 && currentStep === 5) ||
+                                          (index === 5 && currentStep === 6) ||
+                                          (index === 6 && currentStep === 7) ||
+                                          (index === 7 && currentStep === 8);
                         return (
                           <div key={step.id} className={cn("flex flex-col items-center text-center flex-1 transition-all duration-300", isActive ? "opacity-100" : "opacity-40")}>
                             <div className={cn("w-full h-1 mb-2 rounded-full transition-all duration-300", isCurrent ? "bg-blue-500" : isActive ? "bg-blue-500" : isDarkMode ? "bg-slate-700" : "bg-slate-200")} />

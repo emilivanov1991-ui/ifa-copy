@@ -297,8 +297,10 @@ export default function FinancialPlanner() {
                                           (index === 1 && currentStep === 2) ||
                                           (index === 2 && currentStep === 3) ||
                                           (index === 3 && currentStep === 4) ||
-                                          (index === 4 && (currentStep === 5 || currentStep === 6 || currentStep === 7)) ||
-                                          (index === 5 && currentStep === 8);
+                                          (index === 4 && currentStep === 5) ||
+                                          (index === 5 && currentStep === 6) ||
+                                          (index === 6 && currentStep === 7) ||
+                                          (index === 7 && currentStep === 8);
                         return (
                           <div 
                             key={step.id}
@@ -335,8 +337,8 @@ export default function FinancialPlanner() {
                   
                   <div className="flex items-center justify-between mb-4">
                     <p className={cn("text-sm tracking-widest", mutedTextClasses)}>СТЪПКА 1</p>
-                    <button onClick={restart} className={cn("text-xs text-slate-400 hover:text-blue-500 transition-colors")}>
-                      рестарт
+                    <button onClick={restart} className={cn("p-2 rounded-full text-slate-400 hover:text-blue-500 hover:bg-slate-100 transition-colors")}>
+                      <RotateCcw className="w-4 h-4" />
                     </button>
                   </div>
                   
@@ -357,9 +359,9 @@ export default function FinancialPlanner() {
                             : "border-slate-200 hover:border-blue-500 hover:bg-blue-600 hover:text-white"
                       )}
                     >
-                      <h3 className={cn("font-semibold mb-1", familyType !== 'individual' && "group-hover:text-white")}>Индивид</h3>
+                      <h3 className={cn("font-semibold mb-1", familyType !== 'individual' && "group-hover:text-white")}>Отделен индивид</h3>
                       <p className={cn("text-sm", familyType === 'individual' ? "text-blue-100" : mutedTextClasses, familyType !== 'individual' && "group-hover:text-blue-100")}>
-                        Един човек, фокус върху лични цели.
+                        Фокус върху Вашите лични цели
                       </p>
                     </button>
                     
@@ -376,7 +378,7 @@ export default function FinancialPlanner() {
                     >
                       <h3 className={cn("font-semibold mb-1", familyType !== 'family' && "group-hover:text-white")}>Семейство</h3>
                       <p className={cn("text-sm", familyType === 'family' ? "text-blue-100" : mutedTextClasses, familyType !== 'family' && "group-hover:text-blue-100")}>
-                        Партньорски план и защитени бюджети.
+                        Да планираме Вашия общ семеен бюджет!
                       </p>
                     </button>
                   </div>
@@ -423,8 +425,10 @@ export default function FinancialPlanner() {
                                           (index === 1 && currentStep === 2) ||
                                           (index === 2 && currentStep === 3) ||
                                           (index === 3 && currentStep === 4) ||
-                                          (index === 4 && (currentStep === 5 || currentStep === 6 || currentStep === 7)) ||
-                                          (index === 5 && currentStep === 8);
+                                          (index === 4 && currentStep === 5) ||
+                                          (index === 5 && currentStep === 6) ||
+                                          (index === 6 && currentStep === 7) ||
+                                          (index === 7 && currentStep === 8);
                         return (
                           <div key={step.id} className={cn("flex flex-col items-center text-center flex-1 transition-all duration-300", isActive ? "opacity-100" : "opacity-40")}>
                             <div className={cn("w-full h-1 mb-2 rounded-full transition-all duration-300", isCurrent ? "bg-blue-500" : isActive ? "bg-blue-500" : isDarkMode ? "bg-slate-700" : "bg-slate-200")} />
@@ -438,7 +442,9 @@ export default function FinancialPlanner() {
                   
                   <div className="flex items-center justify-between mb-4">
                     <p className={cn("text-sm tracking-widest", mutedTextClasses)}>СТЪПКА 2</p>
-                    <button onClick={restart} className="text-xs text-slate-400 hover:text-blue-500 transition-colors">рестарт</button>
+                    <button onClick={restart} className="p-2 rounded-full text-slate-400 hover:text-blue-500 hover:bg-slate-100 transition-colors">
+                      <RotateCcw className="w-4 h-4" />
+                    </button>
                   </div>
                   
                   <h2 className="text-2xl font-bold mb-6">Възраст</h2>
@@ -530,8 +536,10 @@ export default function FinancialPlanner() {
                                           (index === 1 && currentStep === 2) ||
                                           (index === 2 && currentStep === 3) ||
                                           (index === 3 && currentStep === 4) ||
-                                          (index === 4 && (currentStep === 5 || currentStep === 6 || currentStep === 7)) ||
-                                          (index === 5 && currentStep === 8);
+                                          (index === 4 && currentStep === 5) ||
+                                          (index === 5 && currentStep === 6) ||
+                                          (index === 6 && currentStep === 7) ||
+                                          (index === 7 && currentStep === 8);
                         return (
                           <div key={step.id} className={cn("flex flex-col items-center text-center flex-1 transition-all duration-300", isActive ? "opacity-100" : "opacity-40")}>
                             <div className={cn("w-full h-1 mb-2 rounded-full transition-all duration-300", isCurrent ? "bg-blue-500" : isActive ? "bg-blue-500" : isDarkMode ? "bg-slate-700" : "bg-slate-200")} />
@@ -545,7 +553,9 @@ export default function FinancialPlanner() {
                   
                   <div className="flex items-center justify-between mb-4">
                     <p className={cn("text-sm tracking-widest", mutedTextClasses)}>СТЪПКА 3</p>
-                    <button onClick={restart} className="text-xs text-slate-400 hover:text-blue-500 transition-colors">рестарт</button>
+                    <button onClick={restart} className="p-2 rounded-full text-slate-400 hover:text-blue-500 hover:bg-slate-100 transition-colors">
+                      <RotateCcw className="w-4 h-4" />
+                    </button>
                   </div>
                   
                   <h2 className="text-2xl font-bold mb-6">Месечен доход</h2>
@@ -644,8 +654,10 @@ export default function FinancialPlanner() {
                                           (index === 1 && currentStep === 2) ||
                                           (index === 2 && currentStep === 3) ||
                                           (index === 3 && currentStep === 4) ||
-                                          (index === 4 && (currentStep === 5 || currentStep === 6 || currentStep === 7)) ||
-                                          (index === 5 && currentStep === 8);
+                                          (index === 4 && currentStep === 5) ||
+                                          (index === 5 && currentStep === 6) ||
+                                          (index === 6 && currentStep === 7) ||
+                                          (index === 7 && currentStep === 8);
                         return (
                           <div key={step.id} className={cn("flex flex-col items-center text-center flex-1 transition-all duration-300", isActive ? "opacity-100" : "opacity-40")}>
                             <div className={cn("w-full h-1 mb-2 rounded-full transition-all duration-300", isCurrent ? "bg-blue-500" : isActive ? "bg-blue-500" : isDarkMode ? "bg-slate-700" : "bg-slate-200")} />
@@ -659,7 +671,9 @@ export default function FinancialPlanner() {
                   
                   <div className="flex items-center justify-between mb-4">
                     <p className={cn("text-sm tracking-widest", mutedTextClasses)}>СТЪПКА 4</p>
-                    <button onClick={restart} className="text-xs text-slate-400 hover:text-blue-500 transition-colors">рестарт</button>
+                    <button onClick={restart} className="p-2 rounded-full text-slate-400 hover:text-blue-500 hover:bg-slate-100 transition-colors">
+                      <RotateCcw className="w-4 h-4" />
+                    </button>
                   </div>
                   
                   <h2 className="text-2xl font-bold mb-2">Основен приоритет</h2>
@@ -1282,6 +1296,23 @@ export default function FinancialPlanner() {
                 exit={{ opacity: 0, y: -20 }}
                 className="max-w-2xl mx-auto text-center"
               >
+                {/* Inline Step Tracker */}
+                <div className={cn("rounded-2xl border p-4 mb-6", cardClasses)}>
+                  <div className="flex justify-between items-start">
+                    {VISUAL_STEPS.map((step, index) => {
+                      const isActive = index <= 7;
+                      const isCurrent = index === 7;
+                      return (
+                        <div key={step.id} className={cn("flex flex-col items-center text-center flex-1 transition-all duration-300", isActive ? "opacity-100" : "opacity-40")}>
+                          <div className={cn("w-full h-1 mb-2 rounded-full transition-all duration-300", isCurrent ? "bg-blue-500" : isActive ? "bg-blue-500" : isDarkMode ? "bg-slate-700" : "bg-slate-200")} />
+                          <span className={cn("text-[9px] font-semibold tracking-wider leading-tight uppercase", isCurrent ? "text-slate-900" : "text-slate-400")}>{step.label}</span>
+                          <span className={cn("text-[9px] font-semibold tracking-wider leading-tight uppercase", isCurrent ? "text-slate-900" : "text-slate-400")}>{step.subLabel}</span>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+
                 <div className={cn("rounded-3xl border p-12", cardClasses)}>
                   <div className="w-20 h-20 mx-auto mb-6 rounded-full bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center">
                     <svg className="w-10 h-10 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">

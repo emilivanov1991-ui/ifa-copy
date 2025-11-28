@@ -1159,7 +1159,7 @@ export default function FinancialPlanner() {
                 </div>
 
                 {/* Back button */}
-                <div className="text-center">
+                <div className="text-center mt-2">
                   <Button 
                     variant="outline" 
                     onClick={goBack}

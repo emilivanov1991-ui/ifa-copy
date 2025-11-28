@@ -199,66 +199,8 @@ export default function FinancialPlanner() {
 
   return (
     <div className={cn("min-h-screen transition-colors duration-500", themeClasses, isGenerating && "overflow-hidden")}>
-      {/* Top Progress Indicator */}
-      <div className="fixed top-20 left-1/2 -translate-x-1/2 z-50 w-full max-w-4xl px-4">
-        <div className={cn(
-          "px-6 py-4 rounded-2xl border backdrop-blur-xl",
-          isDarkMode ? "bg-slate-900/90 border-slate-700" : "bg-white/90 border-slate-200 shadow-lg"
-        )}>
-          {/* Progress bar */}
-          <div className="relative mb-4">
-            <div className={cn("h-1 rounded-full", isDarkMode ? "bg-slate-700" : "bg-slate-200")}>
-              <motion.div 
-                className="h-full bg-blue-500 rounded-full"
-                initial={{ width: 0 }}
-                animate={{ width: `${((currentStep - 1) / (STEPS.length - 1)) * 100}%` }}
-                transition={{ duration: 0.3 }}
-              />
-            </div>
-          </div>
-          
-          {/* Step indicators */}
-          <div className="flex justify-between items-start">
-            {VISUAL_STEPS.map((step, index) => {
-              const isActive = index < Math.ceil(currentStep * VISUAL_STEPS.length / STEPS.length);
-              const isCurrent = Math.ceil(currentStep * VISUAL_STEPS.length / STEPS.length) === index + 1;
-              return (
-                <div 
-                  key={step.id}
-                  className={cn(
-                    "flex flex-col items-center text-center flex-1 transition-all duration-300",
-                    isActive ? "opacity-100" : "opacity-40"
-                  )}
-                >
-                  <div className={cn(
-                    "w-3 h-3 rounded-full mb-2 transition-all duration-300",
-                    isCurrent 
-                      ? "bg-blue-500 ring-4 ring-blue-500/30" 
-                      : isActive 
-                        ? "bg-blue-500" 
-                        : isDarkMode ? "bg-slate-600" : "bg-slate-300"
-                  )} />
-                  <span className={cn(
-                    "text-[10px] sm:text-xs font-medium tracking-wide leading-tight",
-                    isCurrent ? "text-blue-500" : isDarkMode ? "text-slate-400" : "text-slate-500"
-                  )}>
-                    {step.label}
-                  </span>
-                  <span className={cn(
-                    "text-[10px] sm:text-xs font-medium tracking-wide leading-tight",
-                    isCurrent ? "text-blue-500" : isDarkMode ? "text-slate-400" : "text-slate-500"
-                  )}>
-                    {step.subLabel}
-                  </span>
-                </div>
-              );
-            })}
-          </div>
-        </div>
-      </div>
-
       {/* Main Content */}
-      <div className="pt-44 pb-12 px-4 md:px-8">
+      <div className="pt-24 pb-12 px-4 md:px-8">
         <div className="max-w-7xl mx-auto">
           <AnimatePresence mode="wait">
             

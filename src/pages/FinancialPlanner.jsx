@@ -681,14 +681,14 @@ export default function FinancialPlanner() {
                     <button
                       onClick={() => togglePriority('stability')}
                       className={cn(
-                        "p-4 rounded-2xl border-2 transition-all flex flex-col h-full",
+                        "p-4 rounded-2xl border-2 transition-all duration-300 flex flex-col h-full group",
                         selectedPriorities.includes('stability')
-                          ? "border-blue-500 bg-blue-500/10"
-                          : isDarkMode ? "border-slate-700 hover:border-slate-600" : "border-slate-200 hover:border-slate-300"
+                          ? "border-blue-500 bg-blue-600 text-white"
+                          : isDarkMode ? "border-slate-700 hover:border-blue-500 hover:bg-blue-600" : "border-slate-200 hover:border-blue-500 hover:bg-blue-600"
                       )}
                     >
-                      <h3 className="font-semibold text-sm mb-2 text-center">Финансова стабилност</h3>
-                      <p className={cn("text-xs text-center flex-1", mutedTextClasses)}>
+                      <h3 className={cn("font-semibold text-sm mb-2 text-center", !selectedPriorities.includes('stability') && "group-hover:text-white")}>Финансова стабилност</h3>
+                      <p className={cn("text-xs text-center flex-1", selectedPriorities.includes('stability') ? "text-blue-100" : mutedTextClasses, !selectedPriorities.includes('stability') && "group-hover:text-blue-100")}>
                         Фонд за спокойствие и защита на дохода
                       </p>
                     </button>
@@ -696,14 +696,14 @@ export default function FinancialPlanner() {
                     <button
                       onClick={() => togglePriority('investments')}
                       className={cn(
-                        "p-4 rounded-2xl border-2 transition-all flex flex-col h-full",
+                        "p-4 rounded-2xl border-2 transition-all duration-300 flex flex-col h-full group",
                         selectedPriorities.includes('investments')
-                          ? "border-blue-500 bg-blue-500/10"
-                          : isDarkMode ? "border-slate-700 hover:border-slate-600" : "border-slate-200 hover:border-slate-300"
+                          ? "border-blue-500 bg-blue-600 text-white"
+                          : isDarkMode ? "border-slate-700 hover:border-blue-500 hover:bg-blue-600" : "border-slate-200 hover:border-blue-500 hover:bg-blue-600"
                       )}
                     >
-                      <h3 className="font-semibold text-sm mb-2 text-center">Инвестиции</h3>
-                      <p className={cn("text-xs text-center flex-1", mutedTextClasses)}>
+                      <h3 className={cn("font-semibold text-sm mb-2 text-center", !selectedPriorities.includes('investments') && "group-hover:text-white")}>Инвестиции</h3>
+                      <p className={cn("text-xs text-center flex-1", selectedPriorities.includes('investments') ? "text-blue-100" : mutedTextClasses, !selectedPriorities.includes('investments') && "group-hover:text-blue-100")}>
                         Ускорени инвестиции и възвръщаемост
                       </p>
                     </button>
@@ -711,14 +711,14 @@ export default function FinancialPlanner() {
                     <button
                       onClick={() => togglePriority('children')}
                       className={cn(
-                        "p-4 rounded-2xl border-2 transition-all flex flex-col h-full",
+                        "p-4 rounded-2xl border-2 transition-all duration-300 flex flex-col h-full group",
                         selectedPriorities.includes('children')
-                          ? "border-blue-500 bg-blue-500/10"
-                          : isDarkMode ? "border-slate-700 hover:border-slate-600" : "border-slate-200 hover:border-slate-300"
+                          ? "border-blue-500 bg-blue-600 text-white"
+                          : isDarkMode ? "border-slate-700 hover:border-blue-500 hover:bg-blue-600" : "border-slate-200 hover:border-blue-500 hover:bg-blue-600"
                       )}
                     >
-                      <h3 className="font-semibold text-sm mb-2 text-center">Бъдеще на децата</h3>
-                      <p className={cn("text-xs text-center flex-1", mutedTextClasses)}>
+                      <h3 className={cn("font-semibold text-sm mb-2 text-center", !selectedPriorities.includes('children') && "group-hover:text-white")}>Бъдеще на децата</h3>
+                      <p className={cn("text-xs text-center flex-1", selectedPriorities.includes('children') ? "text-blue-100" : mutedTextClasses, !selectedPriorities.includes('children') && "group-hover:text-blue-100")}>
                         Капитал за бъдещето на децата
                       </p>
                     </button>
@@ -726,14 +726,14 @@ export default function FinancialPlanner() {
                     <button
                       onClick={() => togglePriority('housing')}
                       className={cn(
-                        "p-4 rounded-2xl border-2 transition-all flex flex-col h-full",
+                        "p-4 rounded-2xl border-2 transition-all duration-300 flex flex-col h-full group",
                         selectedPriorities.includes('housing')
-                          ? "border-blue-500 bg-blue-500/10"
-                          : isDarkMode ? "border-slate-700 hover:border-slate-600" : "border-slate-200 hover:border-slate-300"
+                          ? "border-blue-500 bg-blue-600 text-white"
+                          : isDarkMode ? "border-slate-700 hover:border-blue-500 hover:bg-blue-600" : "border-slate-200 hover:border-blue-500 hover:bg-blue-600"
                       )}
                     >
-                      <h3 className="font-semibold text-sm mb-2 text-center">Ново жилище</h3>
-                      <p className={cn("text-xs text-center flex-1", mutedTextClasses)}>
+                      <h3 className={cn("font-semibold text-sm mb-2 text-center", !selectedPriorities.includes('housing') && "group-hover:text-white")}>Ново жилище</h3>
+                      <p className={cn("text-xs text-center flex-1", selectedPriorities.includes('housing') ? "text-blue-100" : mutedTextClasses, !selectedPriorities.includes('housing') && "group-hover:text-blue-100")}>
                         Собственост, ремонт или ново жилище
                       </p>
                     </button>

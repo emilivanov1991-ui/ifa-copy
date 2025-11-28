@@ -19,13 +19,13 @@ const STEPS = [
   { id: 8, label: 'МИКРО ПЛАН' },
 ];
 
-// Visual step indicators for progress bar
+// Visual step indicators for progress bar (matching actual steps)
 const VISUAL_STEPS = [
   { id: 1, label: 'С КОГО', subLabel: 'ПЛАНИРАМЕ?' },
   { id: 2, label: 'ВЪЗРАСТ НА', subLabel: 'КЛИЕНТА' },
-  { id: 3, label: 'ВЪЗРАСТ НА', subLabel: 'ПАРТНЬОРА' },
-  { id: 4, label: 'МЕСЕЧЕН', subLabel: 'ДОХОД' },
-  { id: 5, label: 'ОСНОВЕН', subLabel: 'ПРИОРИТЕТ' },
+  { id: 3, label: 'МЕСЕЧЕН', subLabel: 'ДОХОД' },
+  { id: 4, label: 'ОСНОВЕН', subLabel: 'ПРИОРИТЕТ' },
+  { id: 5, label: 'ФИНАНСОВА', subLabel: 'РАМКА' },
   { id: 6, label: 'МИКРО', subLabel: 'ПЛАН' },
 ];
 

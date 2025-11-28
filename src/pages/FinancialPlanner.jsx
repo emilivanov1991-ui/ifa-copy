@@ -48,11 +48,96 @@ export default function FinancialPlanner() {
     housing: 220000,
     cash: 45000
   });
-  
+
+  // Locked goals (can't be auto-adjusted)
+  const [lockedGoals, setLockedGoals] = useState({
+    security: false,
+    pension: false,
+    housing: false,
+    cash: false
+  });
+
   const [isGenerating, setIsGenerating] = useState(false);
+
+  // Calculate total wealth based on inputs
+  const calculateOptimalWealth = () => {
+    const totalIncome = familyType === 'family' 
+      ? monthlyIncome + partnerIncome 
+      : monthlyIncome;
+    const avgAge = familyType === 'family' 
+      ? (clientAge + partnerAge) / 2 
+      : clientAge;
+    const yearsToRetirement = Math.max(0, 65 - avgAge);
+    const yearsInRetirement = 20; // Assumed life expectancy post-retirement
+
+    // Financial Security = 6 months expenses (estimated as 70% of income)
+    const monthlyExpenses = totalIncome * 0.7;
+    const securityBase = monthlyExpenses * 6;
+
+    // Pension = desired monthly pension * 12 * years in retirement
+    // Desired pension = 70% of current income
+    const desiredPension = totalIncome * 0.7;
+    const pensionBase = desiredPension * 12 * yearsInRetirement;
+
+    // Housing = based on income and years to save
+    const housingBase = totalIncome * 12 * Math.min(yearsToRetirement, 15) * 0.3;
+
+    // Other goals = 10% of lifetime earning potential
+    const cashBase = totalIncome * 12 * yearsToRetirement * 0.05;
+
+    return {
+      security: Math.round(securityBase / 1000) * 1000,
+      pension: Math.round(pensionBase / 1000) * 1000,
+      housing: Math.round(housingBase / 1000) * 1000,
+      cash: Math.round(cashBase / 1000) * 1000
+    };
+  };
 
   // Calculate total wealth
   const totalWealth = Object.values(goals).reduce((a, b) => a + b, 0);
+
+  // Handle goal change with redistribution
+  const handleGoalChange = (changedKey, newValue) => {
+    const oldValue = goals[changedKey];
+    const difference = newValue - oldValue;
+
+    // Get unlocked goals (excluding the one being changed)
+    const unlockedKeys = Object.keys(goals).filter(
+      key => key !== changedKey && !lockedGoals[key]
+    );
+
+    if (unlockedKeys.length === 0) {
+      // No unlocked goals to redistribute to, just update the changed one
+      setGoals(prev => ({ ...prev, [changedKey]: newValue }));
+      return;
+    }
+
+    // Distribute the difference among unlocked goals proportionally
+    const unlockedTotal = unlockedKeys.reduce((sum, key) => sum + goals[key], 0);
+
+    const newGoals = { ...goals, [changedKey]: newValue };
+
+    unlockedKeys.forEach(key => {
+      const proportion = goals[key] / unlockedTotal;
+      const adjustment = Math.round(difference * proportion);
+      newGoals[key] = Math.max(0, goals[key] - adjustment);
+    });
+
+    setGoals(newGoals);
+  };
+
+  // Toggle lock on a goal
+  const toggleLock = (key) => {
+    setLockedGoals(prev => ({ ...prev, [key]: !prev[key] }));
+  };
+
+  // Initialize goals based on user inputs when entering step 5
+  useEffect(() => {
+    if (currentStep === 5 && !isGenerating) {
+      const optimal = calculateOptimalWealth();
+      setGoals(optimal);
+    }
+  }, [currentStep, isGenerating]);
 
   // Format number with spaces
   const formatNumber = (num) => {

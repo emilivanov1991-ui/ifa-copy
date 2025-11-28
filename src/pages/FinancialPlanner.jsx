@@ -601,14 +601,35 @@ export default function FinancialPlanner() {
                 </div>
 
                 <div className={cn("rounded-3xl border p-6", cardClasses)}>
-                  <div className="flex items-center justify-between mb-4">
-                    <p className={cn("text-sm tracking-widest", mutedTextClasses)}>СТЪПКА 4</p>
-                    <button onClick={restart} className={cn("p-2 rounded-lg transition-colors", isDarkMode ? "hover:bg-slate-800" : "hover:bg-slate-100")}>
-                      <RotateCcw className={cn("w-4 h-4", mutedTextClasses, "hover:text-blue-400")} />
-                    </button>
+                  {/* Inline Step Tracker */}
+                  <div className="mb-6 pb-4 border-b border-slate-100">
+                    <div className="flex justify-between items-start">
+                      {VISUAL_STEPS.map((step, index) => {
+                        const stepMapping = [1, 2, 3, 4, 5, 8];
+                        const isActive = currentStep >= stepMapping[index];
+                        const isCurrent = (index === 0 && currentStep === 1) || 
+                                          (index === 1 && currentStep === 2) ||
+                                          (index === 2 && currentStep === 3) ||
+                                          (index === 3 && currentStep === 4) ||
+                                          (index === 4 && (currentStep === 5 || currentStep === 6 || currentStep === 7)) ||
+                                          (index === 5 && currentStep === 8);
+                        return (
+                          <div key={step.id} className={cn("flex flex-col items-center text-center flex-1 transition-all duration-300", isActive ? "opacity-100" : "opacity-40")}>
+                            <div className={cn("w-full h-1 mb-2 rounded-full transition-all duration-300", isCurrent ? "bg-blue-500" : isActive ? "bg-blue-500" : isDarkMode ? "bg-slate-700" : "bg-slate-200")} />
+                            <span className={cn("text-[9px] font-semibold tracking-wider leading-tight uppercase", isCurrent ? "text-slate-900" : "text-slate-400")}>{step.label}</span>
+                            <span className={cn("text-[9px] font-semibold tracking-wider leading-tight uppercase", isCurrent ? "text-slate-900" : "text-slate-400")}>{step.subLabel}</span>
+                          </div>
+                        );
+                      })}
+                    </div>
                   </div>
                   
-                  <h2 className="text-2xl font-bold mb-2">Приоритети</h2>
+                  <div className="flex items-center justify-between mb-4">
+                    <p className={cn("text-sm tracking-widest", mutedTextClasses)}>СТЪПКА 4</p>
+                    <button onClick={restart} className="text-xs text-slate-400 hover:text-blue-500 transition-colors">рестарт</button>
+                  </div>
+                  
+                  <h2 className="text-2xl font-bold mb-2">Основен приоритет</h2>
                   <p className={cn("text-sm mb-4", mutedTextClasses)}>
                     Изберете една или повече посоки, които резонират с Вашите мечти.
                   </p>

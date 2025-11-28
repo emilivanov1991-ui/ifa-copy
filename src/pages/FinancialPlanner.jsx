@@ -898,18 +898,18 @@ export default function FinancialPlanner() {
                 <h2 className="text-3xl font-bold mb-8 text-center">Вашият оптимален финансов план</h2>
 
                 {/* Goals Grid - 4 columns like the image */}
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-8">
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
                   {/* Security */}
                   <motion.div 
-                    className={cn("rounded-2xl border p-6 text-center relative transition-all duration-300", cardClasses)}
+                    className={cn("rounded-2xl border p-4 text-center relative transition-all duration-300 group hover:border-blue-500 hover:bg-blue-600", cardClasses)}
                     animate={recentlyChanged === 'security' ? { scale: [1, 1.02, 1], borderColor: ['', '#3b82f6', ''] } : {}}
                     transition={{ duration: 0.3 }}
                   >
-                    <div className="absolute top-3 right-3 flex gap-1">
+                    <div className="absolute top-2 right-2 flex gap-1">
                       <Tooltip>
                         <TooltipTrigger asChild>
-                          <button className={cn("p-1.5 rounded-lg transition-colors", isDarkMode ? "hover:bg-slate-800 text-slate-500" : "hover:bg-slate-100 text-slate-400")}>
-                            <HelpCircle className="w-4 h-4" />
+                          <button className={cn("p-1 rounded-lg transition-colors", isDarkMode ? "hover:bg-slate-800 text-slate-500" : "hover:bg-slate-100 text-slate-400 group-hover:text-white group-hover:hover:bg-blue-500")}>
+                            <HelpCircle className="w-3 h-3" />
                           </button>
                         </TooltipTrigger>
                         <TooltipContent side="top" className="max-w-xs">
@@ -921,13 +921,13 @@ export default function FinancialPlanner() {
                           <button 
                             onClick={() => toggleLock('security')}
                             className={cn(
-                              "p-1.5 rounded-lg transition-colors",
+                              "p-1 rounded-lg transition-colors",
                               lockedGoals.security 
-                                ? "bg-blue-100 text-blue-600" 
-                                : isDarkMode ? "hover:bg-slate-800 text-slate-500" : "hover:bg-slate-100 text-slate-400"
+                                ? "bg-blue-100 text-blue-600 group-hover:bg-white group-hover:text-blue-600" 
+                                : isDarkMode ? "hover:bg-slate-800 text-slate-500" : "hover:bg-slate-100 text-slate-400 group-hover:text-white group-hover:hover:bg-blue-500"
                             )}
                           >
-                            {lockedGoals.security ? <Lock className="w-4 h-4" /> : <Unlock className="w-4 h-4" />}
+                            {lockedGoals.security ? <Lock className="w-3 h-3" /> : <Unlock className="w-3 h-3" />}
                           </button>
                         </TooltipTrigger>
                         <TooltipContent side="top">
@@ -935,9 +935,9 @@ export default function FinancialPlanner() {
                         </TooltipContent>
                       </Tooltip>
                     </div>
-                    <p className={cn("text-xs tracking-widest mb-4", mutedTextClasses)}>ФИНАНСОВА СИГУРНОСТ</p>
+                    <p className={cn("text-[10px] tracking-widest mb-2 group-hover:text-blue-100", mutedTextClasses)}>ФИНАНСОВА СИГУРНОСТ</p>
                     <motion.p 
-                      className="text-4xl font-bold mb-4"
+                      className="text-2xl md:text-3xl font-bold mb-3 group-hover:text-white"
                       key={goals.security}
                       initial={{ scale: 1.1 }}
                       animate={{ scale: 1 }}
@@ -953,20 +953,20 @@ export default function FinancialPlanner() {
                       step={1000}
                       className="mb-2"
                     />
-                    <p className={cn("text-xs mt-2", mutedTextClasses)}>6 месеца резерв + защита</p>
+                    <p className={cn("text-[10px] mt-1 group-hover:text-blue-100", mutedTextClasses)}>6 месеца резерв + защита</p>
                   </motion.div>
 
                   {/* Pension */}
                   <motion.div 
-                    className={cn("rounded-2xl border p-6 text-center relative transition-all duration-300", cardClasses)}
+                    className={cn("rounded-2xl border p-4 text-center relative transition-all duration-300 group hover:border-blue-500 hover:bg-blue-600", cardClasses)}
                     animate={recentlyChanged === 'pension' ? { scale: [1, 1.02, 1], borderColor: ['', '#3b82f6', ''] } : {}}
                     transition={{ duration: 0.3 }}
                   >
-                    <div className="absolute top-3 right-3 flex gap-1">
+                    <div className="absolute top-2 right-2 flex gap-1">
                       <Tooltip>
                         <TooltipTrigger asChild>
-                          <button className={cn("p-1.5 rounded-lg transition-colors", isDarkMode ? "hover:bg-slate-800 text-slate-500" : "hover:bg-slate-100 text-slate-400")}>
-                            <HelpCircle className="w-4 h-4" />
+                          <button className={cn("p-1 rounded-lg transition-colors", isDarkMode ? "hover:bg-slate-800 text-slate-500" : "hover:bg-slate-100 text-slate-400 group-hover:text-white group-hover:hover:bg-blue-500")}>
+                            <HelpCircle className="w-3 h-3" />
                           </button>
                         </TooltipTrigger>
                         <TooltipContent side="top" className="max-w-xs">
@@ -978,13 +978,13 @@ export default function FinancialPlanner() {
                           <button 
                             onClick={() => toggleLock('pension')}
                             className={cn(
-                              "p-1.5 rounded-lg transition-colors",
+                              "p-1 rounded-lg transition-colors",
                               lockedGoals.pension 
-                                ? "bg-blue-100 text-blue-600" 
-                                : isDarkMode ? "hover:bg-slate-800 text-slate-500" : "hover:bg-slate-100 text-slate-400"
+                                ? "bg-blue-100 text-blue-600 group-hover:bg-white group-hover:text-blue-600" 
+                                : isDarkMode ? "hover:bg-slate-800 text-slate-500" : "hover:bg-slate-100 text-slate-400 group-hover:text-white group-hover:hover:bg-blue-500"
                             )}
                           >
-                            {lockedGoals.pension ? <Lock className="w-4 h-4" /> : <Unlock className="w-4 h-4" />}
+                            {lockedGoals.pension ? <Lock className="w-3 h-3" /> : <Unlock className="w-3 h-3" />}
                           </button>
                         </TooltipTrigger>
                         <TooltipContent side="top">
@@ -992,9 +992,9 @@ export default function FinancialPlanner() {
                         </TooltipContent>
                       </Tooltip>
                     </div>
-                    <p className={cn("text-xs tracking-widest mb-4", mutedTextClasses)}>ПЕНСИЯ</p>
+                    <p className={cn("text-[10px] tracking-widest mb-2 group-hover:text-blue-100", mutedTextClasses)}>ПЕНСИЯ</p>
                     <motion.p 
-                      className="text-4xl font-bold mb-4"
+                      className="text-2xl md:text-3xl font-bold mb-3 group-hover:text-white"
                       key={goals.pension}
                       initial={{ scale: 1.1 }}
                       animate={{ scale: 1 }}
@@ -1010,20 +1010,20 @@ export default function FinancialPlanner() {
                       step={5000}
                       className="mb-2"
                     />
-                    <p className={cn("text-xs mt-2", mutedTextClasses)}>70% от дохода × 20 г.</p>
+                    <p className={cn("text-[10px] mt-1 group-hover:text-blue-100", mutedTextClasses)}>70% от дохода × 20 г.</p>
                   </motion.div>
 
                   {/* Housing */}
                   <motion.div 
-                    className={cn("rounded-2xl border p-6 text-center relative transition-all duration-300", cardClasses)}
+                    className={cn("rounded-2xl border p-4 text-center relative transition-all duration-300 group hover:border-blue-500 hover:bg-blue-600", cardClasses)}
                     animate={recentlyChanged === 'housing' ? { scale: [1, 1.02, 1], borderColor: ['', '#3b82f6', ''] } : {}}
                     transition={{ duration: 0.3 }}
                   >
-                    <div className="absolute top-3 right-3 flex gap-1">
+                    <div className="absolute top-2 right-2 flex gap-1">
                       <Tooltip>
                         <TooltipTrigger asChild>
-                          <button className={cn("p-1.5 rounded-lg transition-colors", isDarkMode ? "hover:bg-slate-800 text-slate-500" : "hover:bg-slate-100 text-slate-400")}>
-                            <HelpCircle className="w-4 h-4" />
+                          <button className={cn("p-1 rounded-lg transition-colors", isDarkMode ? "hover:bg-slate-800 text-slate-500" : "hover:bg-slate-100 text-slate-400 group-hover:text-white group-hover:hover:bg-blue-500")}>
+                            <HelpCircle className="w-3 h-3" />
                           </button>
                         </TooltipTrigger>
                         <TooltipContent side="top" className="max-w-xs">
@@ -1035,13 +1035,13 @@ export default function FinancialPlanner() {
                           <button 
                             onClick={() => toggleLock('housing')}
                             className={cn(
-                              "p-1.5 rounded-lg transition-colors",
+                              "p-1 rounded-lg transition-colors",
                               lockedGoals.housing 
-                                ? "bg-blue-100 text-blue-600" 
-                                : isDarkMode ? "hover:bg-slate-800 text-slate-500" : "hover:bg-slate-100 text-slate-400"
+                                ? "bg-blue-100 text-blue-600 group-hover:bg-white group-hover:text-blue-600" 
+                                : isDarkMode ? "hover:bg-slate-800 text-slate-500" : "hover:bg-slate-100 text-slate-400 group-hover:text-white group-hover:hover:bg-blue-500"
                             )}
                           >
-                            {lockedGoals.housing ? <Lock className="w-4 h-4" /> : <Unlock className="w-4 h-4" />}
+                            {lockedGoals.housing ? <Lock className="w-3 h-3" /> : <Unlock className="w-3 h-3" />}
                           </button>
                         </TooltipTrigger>
                         <TooltipContent side="top">
@@ -1049,9 +1049,9 @@ export default function FinancialPlanner() {
                         </TooltipContent>
                       </Tooltip>
                     </div>
-                    <p className={cn("text-xs tracking-widest mb-4", mutedTextClasses)}>ЖИЛИЩЕ</p>
+                    <p className={cn("text-[10px] tracking-widest mb-2 group-hover:text-blue-100", mutedTextClasses)}>ЖИЛИЩЕ</p>
                     <motion.p 
-                      className="text-4xl font-bold mb-4"
+                      className="text-2xl md:text-3xl font-bold mb-3 group-hover:text-white"
                       key={goals.housing}
                       initial={{ scale: 1.1 }}
                       animate={{ scale: 1 }}
@@ -1067,20 +1067,20 @@ export default function FinancialPlanner() {
                       step={5000}
                       className="mb-2"
                     />
-                    <p className={cn("text-xs mt-2", mutedTextClasses)}>Имот + разходи</p>
+                    <p className={cn("text-[10px] mt-1 group-hover:text-blue-100", mutedTextClasses)}>Имот + разходи</p>
                   </motion.div>
 
                   {/* Other Goals */}
                   <motion.div 
-                    className={cn("rounded-2xl border p-6 text-center relative transition-all duration-300", cardClasses)}
+                    className={cn("rounded-2xl border p-4 text-center relative transition-all duration-300 group hover:border-blue-500 hover:bg-blue-600", cardClasses)}
                     animate={recentlyChanged === 'cash' ? { scale: [1, 1.02, 1], borderColor: ['', '#3b82f6', ''] } : {}}
                     transition={{ duration: 0.3 }}
                   >
-                    <div className="absolute top-3 right-3 flex gap-1">
+                    <div className="absolute top-2 right-2 flex gap-1">
                       <Tooltip>
                         <TooltipTrigger asChild>
-                          <button className={cn("p-1.5 rounded-lg transition-colors", isDarkMode ? "hover:bg-slate-800 text-slate-500" : "hover:bg-slate-100 text-slate-400")}>
-                            <HelpCircle className="w-4 h-4" />
+                          <button className={cn("p-1 rounded-lg transition-colors", isDarkMode ? "hover:bg-slate-800 text-slate-500" : "hover:bg-slate-100 text-slate-400 group-hover:text-white group-hover:hover:bg-blue-500")}>
+                            <HelpCircle className="w-3 h-3" />
                           </button>
                         </TooltipTrigger>
                         <TooltipContent side="top" className="max-w-xs">
@@ -1092,13 +1092,13 @@ export default function FinancialPlanner() {
                           <button 
                             onClick={() => toggleLock('cash')}
                             className={cn(
-                              "p-1.5 rounded-lg transition-colors",
+                              "p-1 rounded-lg transition-colors",
                               lockedGoals.cash 
-                                ? "bg-blue-100 text-blue-600" 
-                                : isDarkMode ? "hover:bg-slate-800 text-slate-500" : "hover:bg-slate-100 text-slate-400"
+                                ? "bg-blue-100 text-blue-600 group-hover:bg-white group-hover:text-blue-600" 
+                                : isDarkMode ? "hover:bg-slate-800 text-slate-500" : "hover:bg-slate-100 text-slate-400 group-hover:text-white group-hover:hover:bg-blue-500"
                             )}
                           >
-                            {lockedGoals.cash ? <Lock className="w-4 h-4" /> : <Unlock className="w-4 h-4" />}
+                            {lockedGoals.cash ? <Lock className="w-3 h-3" /> : <Unlock className="w-3 h-3" />}
                           </button>
                         </TooltipTrigger>
                         <TooltipContent side="top">
@@ -1106,9 +1106,9 @@ export default function FinancialPlanner() {
                         </TooltipContent>
                       </Tooltip>
                     </div>
-                    <p className={cn("text-xs tracking-widest mb-4", mutedTextClasses)}>ДРУГИ ЦЕЛИ</p>
+                    <p className={cn("text-[10px] tracking-widest mb-2 group-hover:text-blue-100", mutedTextClasses)}>ДРУГИ ЦЕЛИ</p>
                     <motion.p 
-                      className="text-4xl font-bold mb-4"
+                      className="text-2xl md:text-3xl font-bold mb-3 group-hover:text-white"
                       key={goals.cash}
                       initial={{ scale: 1.1 }}
                       animate={{ scale: 1 }}
@@ -1124,25 +1124,25 @@ export default function FinancialPlanner() {
                       step={1000}
                       className="mb-2"
                     />
-                    <p className={cn("text-xs mt-2", mutedTextClasses)}>Кола, почивки, други</p>
+                    <p className={cn("text-[10px] mt-1 group-hover:text-blue-100", mutedTextClasses)}>Кола, почивки, други</p>
                   </motion.div>
                 </div>
 
                 {/* Total Wealth - Bottom Center */}
-                <div className={cn("rounded-2xl border p-6 text-center max-w-md mx-auto mb-8 relative", cardClasses)}>
+                <div className={cn("rounded-2xl border p-4 text-center max-w-sm mx-auto mb-4 relative group transition-all duration-300 hover:border-blue-500 hover:bg-blue-600", cardClasses)}>
                   <Tooltip>
                     <TooltipTrigger asChild>
-                      <button className={cn("absolute top-3 right-3 p-1.5 rounded-lg transition-colors", isDarkMode ? "hover:bg-slate-800 text-slate-500" : "hover:bg-slate-100 text-slate-400")}>
-                        <HelpCircle className="w-4 h-4" />
+                      <button className={cn("absolute top-2 right-2 p-1 rounded-lg transition-colors", isDarkMode ? "hover:bg-slate-800 text-slate-500" : "hover:bg-slate-100 text-slate-400 group-hover:text-white group-hover:hover:bg-blue-500")}>
+                        <HelpCircle className="w-3 h-3" />
                       </button>
                     </TooltipTrigger>
                     <TooltipContent side="top" className="max-w-xs">
                       <p>{tooltips.totalWealth}</p>
                     </TooltipContent>
                   </Tooltip>
-                  <p className={cn("text-xs tracking-widest mb-2", mutedTextClasses)}>ИМУЩЕСТВОТО ОБЩО</p>
+                  <p className={cn("text-[10px] tracking-widest mb-1 group-hover:text-blue-100", mutedTextClasses)}>ИМУЩЕСТВОТО ОБЩО</p>
                   <motion.p 
-                    className="text-5xl font-bold mb-4"
+                    className="text-3xl md:text-4xl font-bold mb-3 group-hover:text-white"
                     key={totalWealth}
                     initial={{ scale: 1.05 }}
                     animate={{ scale: 1 }}

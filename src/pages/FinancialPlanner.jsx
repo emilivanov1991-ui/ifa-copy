@@ -31,8 +31,8 @@ const VISUAL_STEPS = [
   { id: 2, label: 'ВЪЗРАСТ НА', subLabel: 'КЛИЕНТА' },
   { id: 3, label: 'МЕСЕЧЕН', subLabel: 'ДОХОД' },
   { id: 4, label: 'ОСНОВЕН', subLabel: 'ПРИОРИТЕТ' },
-  { id: 5, label: 'ФИНАНСОВА', subLabel: 'РАМКА' },
-  { id: 6, label: 'МИКРО', subLabel: 'ПЛАН' },
+  { id: 5, label: 'FINANCIAL', subLabel: 'PLANNER' },
+  { id: 6, label: 'СИСТЕМА НА', subLabel: 'РАБОТА' },
 ];
 
 export default function FinancialPlanner() {
@@ -862,7 +862,7 @@ export default function FinancialPlanner() {
                     {VISUAL_STEPS.map((step, index) => {
                       const stepMapping = [1, 2, 3, 4, 5, 8];
                       const isActive = currentStep >= stepMapping[index];
-                      const isCurrent = (index === 4 && (currentStep === 5 || currentStep === 6 || currentStep === 7));
+                      const isCurrent = (index === 4 && currentStep === 5) || (index === 5 && (currentStep === 6 || currentStep === 7 || currentStep === 8));
                       return (
                         <div key={step.id} className={cn("flex flex-col items-center text-center flex-1 transition-all duration-300", isActive ? "opacity-100" : "opacity-40")}>
                           <div className={cn("w-full h-1 mb-2 rounded-full transition-all duration-300", isCurrent ? "bg-blue-500" : isActive ? "bg-blue-500" : isDarkMode ? "bg-slate-700" : "bg-slate-200")} />
@@ -1100,16 +1100,16 @@ export default function FinancialPlanner() {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -20 }}
-                className="max-w-5xl mx-auto h-full flex flex-col justify-center"
+                className="max-w-4xl mx-auto"
               >
-                <div className={cn("rounded-3xl border p-4 md:p-6", cardClasses)}>
+                <div className={cn("rounded-3xl border p-6 md:p-8", cardClasses)}>
                   {/* Inline Step Tracker */}
-                  <div className="mb-4 pb-3 border-b border-slate-100">
+                  <div className="mb-6 pb-4 border-b border-slate-100">
                     <div className="flex justify-between items-start">
                       {VISUAL_STEPS.map((step, index) => {
                         const stepMapping = [1, 2, 3, 4, 5, 8];
                         const isActive = currentStep >= stepMapping[index];
-                        const isCurrent = (index === 4 && (currentStep === 5 || currentStep === 6 || currentStep === 7));
+                        const isCurrent = (index === 5 && (currentStep === 6 || currentStep === 7 || currentStep === 8));
                         return (
                           <div key={step.id} className={cn("flex flex-col items-center text-center flex-1 transition-all duration-300", isActive ? "opacity-100" : "opacity-40")}>
                             <div className={cn("w-full h-1 mb-2 rounded-full transition-all duration-300", isCurrent ? "bg-blue-500" : isActive ? "bg-blue-500" : isDarkMode ? "bg-slate-700" : "bg-slate-200")} />
@@ -1121,45 +1121,50 @@ export default function FinancialPlanner() {
                     </div>
                   </div>
 
-                  <h2 className="text-2xl md:text-3xl font-bold mb-2">Система на работа</h2>
-                  <p className={cn("text-xs md:text-sm mb-4", mutedTextClasses)}>
-                    Нашият структуриран подход гарантира ясен и прозрачен процес.
+                  <h2 className="text-3xl font-bold mb-4">Система на работа</h2>
+                  <p className={cn("text-sm mb-6 max-w-2xl", mutedTextClasses)}>
+                    Нашият структуриран подход гарантира, че всяка стъпка от финансовото планиране 
+                    е ясна, прозрачна и насочена към постигане на Вашите цели.
                   </p>
 
-                  <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-4">
-                    <div className={cn("rounded-xl border p-3 transition-all duration-300 group hover:border-blue-500 hover:bg-blue-600", isDarkMode ? "border-slate-800" : "border-slate-200")}>
-                      <p className={cn("text-[10px] tracking-widest mb-1 group-hover:text-blue-100", mutedTextClasses)}>ФАЗА 1</p>
-                      <h3 className="text-sm font-semibold mb-1 group-hover:text-white">Анализ</h3>
-                      <p className="text-blue-400 text-xs mb-1 group-hover:text-blue-200">Нужди и цели</p>
-                      <p className={cn("text-xs group-hover:text-blue-100 line-clamp-2", mutedTextClasses)}>
-                        Анализираме целите на клиента
+                  <div className="grid md:grid-cols-2 gap-4 mb-6">
+                    <div className={cn("rounded-2xl border p-5 transition-all duration-300 group hover:border-blue-500 hover:bg-blue-600", isDarkMode ? "border-slate-800" : "border-slate-200")}>
+                      <p className={cn("text-xs tracking-widest mb-2 group-hover:text-blue-100", mutedTextClasses)}>ФАЗА 1</p>
+                      <h3 className="text-lg font-semibold mb-1 group-hover:text-white">Анализ</h3>
+                      <p className="text-blue-400 text-sm mb-2 group-hover:text-blue-200">Нужди, цели, желания</p>
+                      <p className={cn("text-sm group-hover:text-blue-100", mutedTextClasses)}>
+                        Анализираме целите на клиента, за да намерим най-подходящите 
+                        финансови решения за неговия живот.
                       </p>
                     </div>
 
-                    <div className={cn("rounded-xl border p-3 transition-all duration-300 group hover:border-blue-500 hover:bg-blue-600", isDarkMode ? "border-slate-800" : "border-slate-200")}>
-                      <p className={cn("text-[10px] tracking-widest mb-1 group-hover:text-blue-100", mutedTextClasses)}>ФАЗА 2</p>
-                      <h3 className="text-sm font-semibold mb-1 group-hover:text-white">Оптимизация</h3>
-                      <p className="text-blue-400 text-xs mb-1 group-hover:text-blue-200">Подготовка</p>
-                      <p className={cn("text-xs group-hover:text-blue-100 line-clamp-2", mutedTextClasses)}>
-                        Оптимизираме продукти и разходи
+                    <div className={cn("rounded-2xl border p-5 transition-all duration-300 group hover:border-blue-500 hover:bg-blue-600", isDarkMode ? "border-slate-800" : "border-slate-200")}>
+                      <p className={cn("text-xs tracking-widest mb-2 group-hover:text-blue-100", mutedTextClasses)}>ФАЗА 2</p>
+                      <h3 className="text-lg font-semibold mb-1 group-hover:text-white">Оптимизация</h3>
+                      <p className="text-blue-400 text-sm mb-2 group-hover:text-blue-200">Подготовка на финансовия план</p>
+                      <p className={cn("text-sm group-hover:text-blue-100", mutedTextClasses)}>
+                        Разглеждаме вече съществуващи финансови продукти и решения 
+                        с цел оптимизация и спестяване на излишни разходи.
                       </p>
                     </div>
 
-                    <div className={cn("rounded-xl border p-3 transition-all duration-300 group hover:border-blue-500 hover:bg-blue-600", isDarkMode ? "border-slate-800" : "border-slate-200")}>
-                      <p className={cn("text-[10px] tracking-widest mb-1 group-hover:text-blue-100", mutedTextClasses)}>ФАЗА 3</p>
-                      <h3 className="text-sm font-semibold mb-1 group-hover:text-white">Представяне</h3>
-                      <p className="text-blue-400 text-xs mb-1 group-hover:text-blue-200">Реализация</p>
-                      <p className={cn("text-xs group-hover:text-blue-100 line-clamp-2", mutedTextClasses)}>
-                        Представяме и изпълняваме плана
+                    <div className={cn("rounded-2xl border p-5 transition-all duration-300 group hover:border-blue-500 hover:bg-blue-600", isDarkMode ? "border-slate-800" : "border-slate-200")}>
+                      <p className={cn("text-xs tracking-widest mb-2 group-hover:text-blue-100", mutedTextClasses)}>ФАЗА 3</p>
+                      <h3 className="text-lg font-semibold mb-1 group-hover:text-white">Представяне</h3>
+                      <p className="text-blue-400 text-sm mb-2 group-hover:text-blue-200">Финансовият план и реализацията</p>
+                      <p className={cn("text-sm group-hover:text-blue-100", mutedTextClasses)}>
+                        Представяме финансовия план и привеждаме в действие 
+                        предложените финансови решения.
                       </p>
                     </div>
 
-                    <div className={cn("rounded-xl border p-3 transition-all duration-300 group hover:border-blue-500 hover:bg-blue-600", isDarkMode ? "border-slate-800" : "border-slate-200")}>
-                      <p className={cn("text-[10px] tracking-widest mb-1 group-hover:text-blue-100", mutedTextClasses)}>ФАЗА 4</p>
-                      <h3 className="text-sm font-semibold mb-1 group-hover:text-white">Обслужване</h3>
-                      <p className="text-blue-400 text-xs mb-1 group-hover:text-blue-200">Дългосрочно</p>
-                      <p className={cn("text-xs group-hover:text-blue-100 line-clamp-2", mutedTextClasses)}>
-                        Редовна подкрепа и корекции
+                    <div className={cn("rounded-2xl border p-5 transition-all duration-300 group hover:border-blue-500 hover:bg-blue-600", isDarkMode ? "border-slate-800" : "border-slate-200")}>
+                      <p className={cn("text-xs tracking-widest mb-2 group-hover:text-blue-100", mutedTextClasses)}>ФАЗА 4</p>
+                      <h3 className="text-lg font-semibold mb-1 group-hover:text-white">Дългосрочно обслужване</h3>
+                      <p className="text-blue-400 text-sm mb-2 group-hover:text-blue-200">Дългосрочно и редовно</p>
+                      <p className={cn("text-sm group-hover:text-blue-100", mutedTextClasses)}>
+                        Осигуряваме постоянна подкрепа чрез редовни срещи, 
+                        актуализации на плана и навременни корекции при нужда.
                       </p>
                     </div>
                   </div>
@@ -1181,16 +1186,16 @@ export default function FinancialPlanner() {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -20 }}
-                className="max-w-5xl mx-auto h-full flex flex-col justify-center"
+                className="max-w-4xl mx-auto"
               >
-                <div className={cn("rounded-3xl border p-4 md:p-6", cardClasses)}>
+                <div className={cn("rounded-3xl border p-6 md:p-8", cardClasses)}>
                   {/* Inline Step Tracker */}
-                  <div className="mb-4 pb-3 border-b border-slate-100">
+                  <div className="mb-6 pb-4 border-b border-slate-100">
                     <div className="flex justify-between items-start">
                       {VISUAL_STEPS.map((step, index) => {
                         const stepMapping = [1, 2, 3, 4, 5, 8];
                         const isActive = currentStep >= stepMapping[index];
-                        const isCurrent = (index === 4 && (currentStep === 5 || currentStep === 6 || currentStep === 7));
+                        const isCurrent = (index === 5 && (currentStep === 6 || currentStep === 7 || currentStep === 8));
                         return (
                           <div key={step.id} className={cn("flex flex-col items-center text-center flex-1 transition-all duration-300", isActive ? "opacity-100" : "opacity-40")}>
                             <div className={cn("w-full h-1 mb-2 rounded-full transition-all duration-300", isCurrent ? "bg-blue-500" : isActive ? "bg-blue-500" : isDarkMode ? "bg-slate-700" : "bg-slate-200")} />
@@ -1202,45 +1207,49 @@ export default function FinancialPlanner() {
                     </div>
                   </div>
 
-                  <h2 className="text-2xl md:text-3xl font-bold mb-2">Правила за сътрудничество</h2>
-                  <p className={cn("text-xs md:text-sm mb-4", mutedTextClasses)}>
-                    Нашите принципи гарантират професионализъм и доверие.
+                  <h2 className="text-3xl font-bold mb-4">Правила за сътрудничество</h2>
+                  <p className={cn("text-sm mb-6 max-w-2xl", mutedTextClasses)}>
+                    Нашите принципи на работа гарантират професионализъм и доверие във всяка стъпка от процеса.
                   </p>
 
-                  <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-4">
-                    <div className={cn("rounded-xl border p-3 transition-all duration-300 group hover:border-blue-500 hover:bg-blue-600", isDarkMode ? "border-slate-800" : "border-slate-200")}>
-                      <p className={cn("text-[10px] tracking-widest mb-1 group-hover:text-blue-100", mutedTextClasses)}>ПРАВИЛО 1</p>
-                      <h3 className="text-sm font-semibold mb-1 group-hover:text-white">Дискретност</h3>
-                      <p className="text-blue-400 text-xs mb-1 group-hover:text-blue-200">Конфиденциалност</p>
-                      <p className={cn("text-xs group-hover:text-blue-100 line-clamp-2", mutedTextClasses)}>
-                        Данните Ви са защитени
+                  <div className="grid md:grid-cols-2 gap-4 mb-6">
+                    <div className={cn("rounded-2xl border p-5 transition-all duration-300 group hover:border-blue-500 hover:bg-blue-600", isDarkMode ? "border-slate-800" : "border-slate-200")}>
+                      <p className={cn("text-xs tracking-widest mb-2 group-hover:text-blue-100", mutedTextClasses)}>ПРАВИЛО 1</p>
+                      <h3 className="text-lg font-semibold mb-1 group-hover:text-white">Дискретност</h3>
+                      <p className="text-blue-400 text-sm mb-2 group-hover:text-blue-200">Пълна конфиденциалност</p>
+                      <p className={cn("text-sm group-hover:text-blue-100", mutedTextClasses)}>
+                        Вашите лични и финансови данни са напълно защитени. 
+                        Никога не споделяме информация с трети страни без вашето изрично съгласие.
                       </p>
                     </div>
 
-                    <div className={cn("rounded-xl border p-3 transition-all duration-300 group hover:border-blue-500 hover:bg-blue-600", isDarkMode ? "border-slate-800" : "border-slate-200")}>
-                      <p className={cn("text-[10px] tracking-widest mb-1 group-hover:text-blue-100", mutedTextClasses)}>ПРАВИЛО 2</p>
-                      <h3 className="text-sm font-semibold mb-1 group-hover:text-white">Коректност</h3>
-                      <p className="text-blue-400 text-xs mb-1 group-hover:text-blue-200">Честност</p>
-                      <p className={cn("text-xs group-hover:text-blue-100 line-clamp-2", mutedTextClasses)}>
-                        Вашият интерес е на първо място
+                    <div className={cn("rounded-2xl border p-5 transition-all duration-300 group hover:border-blue-500 hover:bg-blue-600", isDarkMode ? "border-slate-800" : "border-slate-200")}>
+                      <p className={cn("text-xs tracking-widest mb-2 group-hover:text-blue-100", mutedTextClasses)}>ПРАВИЛО 2</p>
+                      <h3 className="text-lg font-semibold mb-1 group-hover:text-white">Коректност</h3>
+                      <p className="text-blue-400 text-sm mb-2 group-hover:text-blue-200">Честни взаимоотношения</p>
+                      <p className={cn("text-sm group-hover:text-blue-100", mutedTextClasses)}>
+                        Работим с ясни правила и спазваме всички договорености. 
+                        Вашият интерес е винаги на първо място в нашите препоръки.
                       </p>
                     </div>
 
-                    <div className={cn("rounded-xl border p-3 transition-all duration-300 group hover:border-blue-500 hover:bg-blue-600", isDarkMode ? "border-slate-800" : "border-slate-200")}>
-                      <p className={cn("text-[10px] tracking-widest mb-1 group-hover:text-blue-100", mutedTextClasses)}>ПРАВИЛО 3</p>
-                      <h3 className="text-sm font-semibold mb-1 group-hover:text-white">Прозрачност</h3>
-                      <p className="text-blue-400 text-xs mb-1 group-hover:text-blue-200">Откритост</p>
-                      <p className={cn("text-xs group-hover:text-blue-100 line-clamp-2", mutedTextClasses)}>
-                        Няма скрити условия
+                    <div className={cn("rounded-2xl border p-5 transition-all duration-300 group hover:border-blue-500 hover:bg-blue-600", isDarkMode ? "border-slate-800" : "border-slate-200")}>
+                      <p className={cn("text-xs tracking-widest mb-2 group-hover:text-blue-100", mutedTextClasses)}>ПРАВИЛО 3</p>
+                      <h3 className="text-lg font-semibold mb-1 group-hover:text-white">Прозрачност</h3>
+                      <p className="text-blue-400 text-sm mb-2 group-hover:text-blue-200">Открита комуникация</p>
+                      <p className={cn("text-sm group-hover:text-blue-100", mutedTextClasses)}>
+                        Обясняваме всяка стъпка и решение. Няма скрити условия или 
+                        неясни такси - всичко е ясно от самото начало.
                       </p>
                     </div>
 
-                    <div className={cn("rounded-xl border p-3 transition-all duration-300 group hover:border-blue-500 hover:bg-blue-600", isDarkMode ? "border-slate-800" : "border-slate-200")}>
-                      <p className={cn("text-[10px] tracking-widest mb-1 group-hover:text-blue-100", mutedTextClasses)}>ПРАВИЛО 4</p>
-                      <h3 className="text-sm font-semibold mb-1 group-hover:text-white">Възнаграждение</h3>
-                      <p className="text-blue-400 text-xs mb-1 group-hover:text-blue-200">Без такси</p>
-                      <p className={cn("text-xs group-hover:text-blue-100 line-clamp-2", mutedTextClasses)}>
-                        Без директно заплащане от Вас
+                    <div className={cn("rounded-2xl border p-5 transition-all duration-300 group hover:border-blue-500 hover:bg-blue-600", isDarkMode ? "border-slate-800" : "border-slate-200")}>
+                      <p className={cn("text-xs tracking-widest mb-2 group-hover:text-blue-100", mutedTextClasses)}>ПРАВИЛО 4</p>
+                      <h3 className="text-lg font-semibold mb-1 group-hover:text-white">Възнаграждение</h3>
+                      <p className="text-blue-400 text-sm mb-2 group-hover:text-blue-200">Без директни такси от клиенти</p>
+                      <p className={cn("text-sm group-hover:text-blue-100", mutedTextClasses)}>
+                        Не получаваме директно заплащане от вас. Възнаграждението ни идва от 
+                        финансовите институции под формата на комисионна за посредничество.
                       </p>
                     </div>
                   </div>

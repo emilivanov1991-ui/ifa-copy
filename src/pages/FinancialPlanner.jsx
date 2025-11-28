@@ -1297,7 +1297,7 @@ export default function FinancialPlanner() {
                       value={[allocations.pension]}
                       onValueChange={(v) => handleAllocationChange('pension', v[0])}
                       min={0}
-                      max={50}
+                      max={20}
                       step={1}
                       className="mb-2"
                     />

@@ -94,6 +94,28 @@ const calculateStatePension = (clientIncome, partnerIncome, clientIsEntrepreneur
 export default function FinancialPlanner() {
   const [currentStep, setCurrentStep] = useState(1);
   const [isDarkMode, setIsDarkMode] = useState(false);
+  const [showIntroAnimation, setShowIntroAnimation] = useState(true);
+  const [introPhase, setIntroPhase] = useState('lines'); // 'lines' | 'text'
+
+  // Intro animation sequence
+  useEffect(() => {
+    if (showIntroAnimation) {
+      // Lines animation for 2 seconds, then show text
+      const textTimer = setTimeout(() => {
+        setIntroPhase('text');
+      }, 2000);
+      
+      // Hide intro after 4.5 seconds total
+      const hideTimer = setTimeout(() => {
+        setShowIntroAnimation(false);
+      }, 4500);
+      
+      return () => {
+        clearTimeout(textTimer);
+        clearTimeout(hideTimer);
+      };
+    }
+  }, [showIntroAnimation]);
   
   // Data states
   const [familyType, setFamilyType] = useState(null); // 'individual' | 'family'

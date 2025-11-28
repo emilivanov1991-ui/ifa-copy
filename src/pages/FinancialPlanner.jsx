@@ -419,8 +419,7 @@ export default function FinancialPlanner() {
                   <div className="mb-6 pb-4 border-b border-slate-100">
                     <div className="flex justify-between items-start">
                       {VISUAL_STEPS.map((step, index) => {
-                        const stepMapping = [1, 2, 3, 4, 5, 8];
-                        const isActive = currentStep >= stepMapping[index];
+                        const isActive = currentStep >= (index + 1);
                         const isCurrent = (index === 0 && currentStep === 1) || 
                                           (index === 1 && currentStep === 2) ||
                                           (index === 2 && currentStep === 3) ||
@@ -530,8 +529,7 @@ export default function FinancialPlanner() {
                   <div className="mb-6 pb-4 border-b border-slate-100">
                     <div className="flex justify-between items-start">
                       {VISUAL_STEPS.map((step, index) => {
-                        const stepMapping = [1, 2, 3, 4, 5, 8];
-                        const isActive = currentStep >= stepMapping[index];
+                        const isActive = currentStep >= (index + 1);
                         const isCurrent = (index === 0 && currentStep === 1) || 
                                           (index === 1 && currentStep === 2) ||
                                           (index === 2 && currentStep === 3) ||
@@ -648,8 +646,7 @@ export default function FinancialPlanner() {
                   <div className="mb-6 pb-4 border-b border-slate-100">
                     <div className="flex justify-between items-start">
                       {VISUAL_STEPS.map((step, index) => {
-                        const stepMapping = [1, 2, 3, 4, 5, 8];
-                        const isActive = currentStep >= stepMapping[index];
+                        const isActive = currentStep >= (index + 1);
                         const isCurrent = (index === 0 && currentStep === 1) || 
                                           (index === 1 && currentStep === 2) ||
                                           (index === 2 && currentStep === 3) ||
@@ -1130,8 +1127,7 @@ export default function FinancialPlanner() {
                   <div className="mb-6 pb-4 border-b border-slate-100">
                     <div className="flex justify-between items-start">
                       {VISUAL_STEPS.map((step, index) => {
-                        const stepMapping = [1, 2, 3, 4, 5, 8];
-                        const isActive = currentStep >= stepMapping[index];
+                        const isActive = currentStep >= (index + 1);
                         const isCurrent = (index === 0 && currentStep === 1) || 
                                           (index === 1 && currentStep === 2) ||
                                           (index === 2 && currentStep === 3) ||
@@ -1223,8 +1219,7 @@ export default function FinancialPlanner() {
                   <div className="mb-6 pb-4 border-b border-slate-100">
                     <div className="flex justify-between items-start">
                       {VISUAL_STEPS.map((step, index) => {
-                        const stepMapping = [1, 2, 3, 4, 5, 8];
-                        const isActive = currentStep >= stepMapping[index];
+                        const isActive = currentStep >= (index + 1);
                         const isCurrent = (index === 0 && currentStep === 1) || 
                                           (index === 1 && currentStep === 2) ||
                                           (index === 2 && currentStep === 3) ||

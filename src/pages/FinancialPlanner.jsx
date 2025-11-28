@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider";
-import { RotateCcw, Loader2 } from 'lucide-react';
+import { RotateCcw, Loader2, Lock, Unlock } from 'lucide-react';
 import { cn } from "@/lib/utils";
 import { Link } from 'react-router-dom';
 import { createPageUrl } from '@/utils';

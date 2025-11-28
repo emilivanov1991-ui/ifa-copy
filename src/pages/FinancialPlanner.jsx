@@ -222,12 +222,32 @@ export default function FinancialPlanner() {
   const primaryButtonClass = "rounded-full px-6 bg-blue-600 hover:bg-blue-700 text-white font-medium transition-all duration-200 hover:shadow-lg hover:shadow-blue-500/25";
   const outlineButtonClass = cn("rounded-full px-6 font-medium transition-all duration-200", isDarkMode ? "border-slate-700 hover:bg-slate-800" : "border-slate-300 hover:bg-slate-50");
 
+  // Hide header/footer when in Financial Planner
+  useEffect(() => {
+    document.body.style.overflow = 'hidden';
+    const header = document.querySelector('header');
+    const footer = document.querySelector('footer');
+    if (header) header.style.display = 'none';
+    if (footer) footer.style.display = 'none';
+    
+    return () => {
+      document.body.style.overflow = '';
+      if (header) header.style.display = '';
+      if (footer) footer.style.display = '';
+    };
+  }, []);
+
+  // Hover card class for interactive elements
+  const hoverCardClass = "transition-all duration-300 hover:border-blue-500 hover:bg-blue-600 hover:text-white group cursor-pointer";
+  const hoverTextClass = "group-hover:text-white";
+  const hoverMutedClass = "group-hover:text-blue-100";
+
   return (
     <TooltipProvider>
-    <div className={cn("min-h-screen transition-colors duration-500", themeClasses, isGenerating && "overflow-hidden")}>
+    <div className={cn("fixed inset-0 overflow-hidden transition-colors duration-500", themeClasses, isGenerating && "overflow-hidden")}>
       {/* Main Content */}
-      <div className="pt-24 pb-12 px-4 md:px-8">
-        <div className="max-w-7xl mx-auto">
+      <div className="h-full overflow-y-auto px-4 md:px-8 py-6">
+        <div className="max-w-7xl mx-auto h-full flex flex-col justify-center">
           <AnimatePresence mode="wait">
             
             {/* Step 1: Family Type */}

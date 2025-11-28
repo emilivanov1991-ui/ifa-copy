@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider";
@@ -39,6 +39,38 @@ const VISUAL_STEPS = [
   { id: 9, label: 'ФИНАНСОВ', subLabel: 'АНАЛИЗ' },
 ];
 
+// Financial calculation functions
+const calculateFutureValue = (monthlyPayment, annualRate, years) => {
+  // Future Value of an ordinary annuity (monthly payments)
+  const monthlyRate = annualRate / 12;
+  const months = years * 12;
+  if (monthlyRate === 0) return monthlyPayment * months;
+  return monthlyPayment * ((Math.pow(1 + monthlyRate, months) - 1) / monthlyRate);
+};
+
+const calculateAnnuityPayment = (principal, annualRate, years) => {
+  // Calculate monthly payment that depletes principal over years with interest
+  const monthlyRate = annualRate / 12;
+  const months = years * 12;
+  if (monthlyRate === 0) return principal / months;
+  return principal * (monthlyRate * Math.pow(1 + monthlyRate, months)) / (Math.pow(1 + monthlyRate, months) - 1);
+};
+
+const calculateLoanAmount = (monthlyPayment, annualRate, years) => {
+  // Present Value of an ordinary annuity (what loan can we afford with this payment)
+  const monthlyRate = annualRate / 12;
+  const months = years * 12;
+  if (monthlyRate === 0) return monthlyPayment * months;
+  return monthlyPayment * ((1 - Math.pow(1 + monthlyRate, -months)) / monthlyRate);
+};
+
+const calculateStatePension = (monthlyIncome, numPeople) => {
+  // 60% of income, min 630 per person, max 3400 per person
+  const pensionPerPerson = monthlyIncome * 0.6 / numPeople;
+  const clampedPension = Math.max(630, Math.min(3400, pensionPerPerson));
+  return Math.round(clampedPension * numPeople / 10) * 10;
+};
+
 export default function FinancialPlanner() {
   const [currentStep, setCurrentStep] = useState(1);
   const [isDarkMode, setIsDarkMode] = useState(false);
@@ -53,12 +85,12 @@ export default function FinancialPlanner() {
   const [selectedPriorities, setSelectedPriorities] = useState([]); // multi-select
   const [partnerIncome, setPartnerIncome] = useState(5000);
   
-  // Financial framework values
-  const [goals, setGoals] = useState({
-    security: 65000,
-    pension: 180000,
-    housing: 220000,
-    cash: 45000
+  // Percentage allocations (default: 10% reserve, 5% pension, 30% housing, 5% other = 50% total)
+  const [allocations, setAllocations] = useState({
+    security: 10,
+    pension: 5,
+    housing: 30,
+    cash: 5
   });
 
   // Locked goals (can't be auto-adjusted)
@@ -72,81 +104,130 @@ export default function FinancialPlanner() {
   const [isGenerating, setIsGenerating] = useState(false);
   const [recentlyChanged, setRecentlyChanged] = useState(null);
 
+  // Derived values
+  const totalIncome = familyType === 'family' ? monthlyIncome + partnerIncome : monthlyIncome;
+  const avgAge = familyType === 'family' ? (clientAge + partnerAge) / 2 : clientAge;
+  const yearsToRetirement = Math.max(0, 65 - avgAge);
+  const numPeople = familyType === 'family' ? 2 : 1;
+
+  // Calculate financial values based on allocations
+  const calculateGoals = useMemo(() => {
+    const securityPercent = allocations.security;
+    const pensionPercent = allocations.pension;
+    const housingPercent = allocations.housing;
+    const cashPercent = allocations.cash;
+
+    // 1. Reserve = securityPercent% of income * 6 months (scaled by percentage)
+    // At 10% allocation -> 6 months of income
+    // At 50% allocation -> 30 months of income (5x)
+    // At 0% allocation -> 0
+    const reserveMonths = (securityPercent / 10) * 6;
+    const securityValue = Math.round(totalIncome * reserveMonths / 100) * 100;
+
+    // 2. Pension calculation
+    // pensionPercent% of income invested monthly at 8% until retirement
+    // Then moved to 3% fund and withdrawn over 20 years
+    const monthlyPensionInvestment = totalIncome * (pensionPercent / 100);
+    const pensionFundAtRetirement = calculateFutureValue(monthlyPensionInvestment, 0.08, yearsToRetirement);
+    const monthlyPensionFromFund = calculateAnnuityPayment(pensionFundAtRetirement, 0.03, 20);
+    const statePension = calculateStatePension(totalIncome, numPeople);
+    const totalMonthlyPension = Math.round((monthlyPensionFromFund + statePension) / 10) * 10;
+
+    // 3. Housing calculation
+    // housingPercent% of income goes to mortgage payment
+    // 3% interest, max 30 year term (adjusted if age + term > 70)
+    const maxLoanTerm = Math.min(30, Math.max(5, 70 - avgAge));
+    const monthlyMortgagePayment = totalIncome * (housingPercent / 100);
+    const loanAmount = calculateLoanAmount(monthlyMortgagePayment, 0.03, maxLoanTerm);
+    // Loan is 85% of property value, so property = loan / 0.85 = loan * 1.176
+    const housingValue = Math.round(loanAmount * 1.176 / 100) * 100;
+
+    // 4. Other goals calculation
+    // cashPercent% of income invested monthly at 5% until retirement
+    const monthlyOtherInvestment = totalIncome * (cashPercent / 100);
+    const otherGoalsValue = Math.round(calculateFutureValue(monthlyOtherInvestment, 0.05, yearsToRetirement) / 100) * 100;
+
+    // Total wealth = Reserve + Pension Fund at retirement + Housing Value + Other Goals
+    const totalWealth = securityValue + Math.round(pensionFundAtRetirement / 100) * 100 + housingValue + otherGoalsValue;
+
+    return {
+      security: securityValue,
+      pension: totalMonthlyPension, // This shows monthly pension income
+      pensionFund: Math.round(pensionFundAtRetirement / 100) * 100, // For total wealth calculation
+      housing: housingValue,
+      cash: otherGoalsValue,
+      totalWealth: totalWealth,
+      statePension: statePension,
+      loanTerm: maxLoanTerm
+    };
+  }, [allocations, totalIncome, avgAge, yearsToRetirement, numPeople]);
+
   // Tooltips for financial terms
   const tooltips = {
-    security: "Финансова сигурност покрива 6 месеца разходи като резерв при непредвидени ситуации, както и защита на дохода.",
-    pension: "Пенсионен капитал, който ще осигури 70% от текущия Ви доход след пенсиониране за около 20 години.",
-    housing: "Средства за закупуване на имот, ремонт или подобрения на текущото жилище.",
-    cash: "Капитал за други цели като автомобил, почивки, образование и лични проекти.",
-    totalWealth: "Общата сума на всички финансови цели, която трябва да натрупате.",
+    security: "Финансова сигурност - резерв при непредвидени ситуации, базиран на месечните доходи.",
+    pension: "Месечен пенсионен доход = държавна пенсия + доход от инвестиционен фонд.",
+    housing: "Максимална стойност на жилище при текущото разпределение на бюджета.",
+    cash: "Капитал за други цели натрупан до пенсия.",
+    totalWealth: "Общата сума на всички финансови активи.",
     lock: "Заключете цел, за да не се променя автоматично при корекции на други цели."
   };
 
-  // Calculate total wealth based on inputs
-  const calculateOptimalWealth = () => {
-    const totalIncome = familyType === 'family' 
-      ? monthlyIncome + partnerIncome 
-      : monthlyIncome;
-    const avgAge = familyType === 'family' 
-      ? (clientAge + partnerAge) / 2 
-      : clientAge;
-    const yearsToRetirement = Math.max(0, 65 - avgAge);
-    const yearsInRetirement = 20; // Assumed life expectancy post-retirement
-
-    // Financial Security = 6 months expenses (estimated as 70% of income)
-    const monthlyExpenses = totalIncome * 0.7;
-    const securityBase = monthlyExpenses * 6;
-
-    // Pension = desired monthly pension * 12 * years in retirement
-    // Desired pension = 70% of current income
-    const desiredPension = totalIncome * 0.7;
-    const pensionBase = desiredPension * 12 * yearsInRetirement;
-
-    // Housing = based on income and years to save
-    const housingBase = totalIncome * 12 * Math.min(yearsToRetirement, 15) * 0.3;
-
-    // Other goals = 10% of lifetime earning potential
-    const cashBase = totalIncome * 12 * yearsToRetirement * 0.05;
-
-    return {
-      security: Math.round(securityBase / 1000) * 1000,
-      pension: Math.round(pensionBase / 1000) * 1000,
-      housing: Math.round(housingBase / 1000) * 1000,
-      cash: Math.round(cashBase / 1000) * 1000
-    };
-  };
-
-  // Calculate total wealth
-  const totalWealth = Object.values(goals).reduce((a, b) => a + b, 0);
-
-  // Handle goal change with redistribution
-  const handleGoalChange = (changedKey, newValue) => {
-    const oldValue = goals[changedKey];
+  // Handle allocation change with redistribution
+  const handleAllocationChange = (changedKey, newValue) => {
+    const oldValue = allocations[changedKey];
     const difference = newValue - oldValue;
 
-    // Get unlocked goals (excluding the one being changed)
-    const unlockedKeys = Object.keys(goals).filter(
+    // Get unlocked allocations (excluding the one being changed)
+    const unlockedKeys = Object.keys(allocations).filter(
       key => key !== changedKey && !lockedGoals[key]
     );
 
     if (unlockedKeys.length === 0) {
-      // No unlocked goals to redistribute to, just update the changed one
-      setGoals(prev => ({ ...prev, [changedKey]: newValue }));
+      // No unlocked goals to redistribute to, just update the changed one if within bounds
+      const totalOthers = Object.entries(allocations)
+        .filter(([key]) => key !== changedKey)
+        .reduce((sum, [, val]) => sum + val, 0);
+      if (newValue + totalOthers <= 50) {
+        setAllocations(prev => ({ ...prev, [changedKey]: newValue }));
+      }
       return;
     }
 
-    // Distribute the difference among unlocked goals proportionally
-    const unlockedTotal = unlockedKeys.reduce((sum, key) => sum + goals[key], 0);
+    // Calculate how much the unlocked allocations currently have
+    const unlockedTotal = unlockedKeys.reduce((sum, key) => sum + allocations[key], 0);
 
-    const newGoals = { ...goals, [changedKey]: newValue };
+    // Check if we can redistribute
+    if (difference > 0 && unlockedTotal < difference) {
+      // Not enough to take from unlocked keys
+      const maxPossible = oldValue + unlockedTotal;
+      if (newValue > maxPossible) {
+        newValue = maxPossible;
+      }
+    }
 
-    unlockedKeys.forEach(key => {
-      const proportion = goals[key] / unlockedTotal;
-      const adjustment = Math.round(difference * proportion);
-      newGoals[key] = Math.max(0, goals[key] - adjustment);
-    });
+    const actualDifference = newValue - oldValue;
+    const newAllocations = { ...allocations, [changedKey]: newValue };
 
-    setGoals(newGoals);
+    // Distribute the difference among unlocked allocations proportionally
+    if (actualDifference !== 0 && unlockedTotal > 0) {
+      unlockedKeys.forEach(key => {
+        const proportion = allocations[key] / unlockedTotal;
+        const adjustment = actualDifference * proportion;
+        newAllocations[key] = Math.max(0, Math.round((allocations[key] - adjustment) * 100) / 100);
+      });
+    } else if (actualDifference !== 0) {
+      // Distribute equally if no proportions
+      const perKey = actualDifference / unlockedKeys.length;
+      unlockedKeys.forEach(key => {
+        newAllocations[key] = Math.max(0, allocations[key] - perKey);
+      });
+    }
+
+    // Ensure total doesn't exceed 50%
+    const total = Object.values(newAllocations).reduce((a, b) => a + b, 0);
+    if (total <= 50) {
+      setAllocations(newAllocations);
+    }
     
     // Visual feedback for change
     setRecentlyChanged(changedKey);
@@ -158,17 +239,21 @@ export default function FinancialPlanner() {
     setLockedGoals(prev => ({ ...prev, [key]: !prev[key] }));
   };
 
-  // Initialize goals based on user inputs when entering step 6
+  // Initialize allocations when entering step 6
   useEffect(() => {
     if (currentStep === 6 && !isGenerating) {
-      const optimal = calculateOptimalWealth();
-      setGoals(optimal);
+      setAllocations({
+        security: 10,
+        pension: 5,
+        housing: 30,
+        cash: 5
+      });
     }
   }, [currentStep, isGenerating]);
 
   // Format number with spaces
   const formatNumber = (num) => {
-    return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
+    return Math.round(num).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
   };
 
   // Toggle priority selection
@@ -210,9 +295,19 @@ export default function FinancialPlanner() {
     setMonthlyIncome(5000);
     setPartnerIncome(3000);
     setSelectedPriorities([]);
+    setAllocations({
+      security: 10,
+      pension: 5,
+      housing: 30,
+      cash: 5
+    });
+    setLockedGoals({
+      security: false,
+      pension: false,
+      housing: false,
+      cash: false
+    });
   };
-
-  const visibleSteps = STEPS;
 
   // Theme classes
   const themeClasses = isDarkMode 
@@ -244,11 +339,6 @@ export default function FinancialPlanner() {
       if (footer) footer.style.display = '';
     };
   }, []);
-
-  // Hover card class for interactive elements
-  const hoverCardClass = "transition-all duration-300 hover:border-blue-500 hover:bg-blue-600 hover:text-white group cursor-pointer";
-  const hoverTextClass = "group-hover:text-white";
-  const hoverMutedClass = "group-hover:text-blue-100";
 
   return (
     <TooltipProvider>
@@ -297,16 +387,8 @@ export default function FinancialPlanner() {
                   <div className="mb-6 pb-4 border-b border-slate-100">
                     <div className="flex justify-between items-start">
                       {VISUAL_STEPS.map((step, index) => {
-                        const stepMapping = [1, 2, 3, 4, 5, 8]; // Map visual steps to actual steps
-                        const isActive = currentStep >= stepMapping[index];
-                        const isCurrent = (index === 0 && currentStep === 1) || 
-                                          (index === 1 && currentStep === 2) ||
-                                          (index === 2 && currentStep === 3) ||
-                                          (index === 3 && currentStep === 4) ||
-                                          (index === 4 && currentStep === 5) ||
-                                          (index === 5 && currentStep === 6) ||
-                                          (index === 6 && currentStep === 7) ||
-                                          (index === 7 && currentStep === 8);
+                        const isActive = currentStep >= (index + 1);
+                        const isCurrent = index === 0;
                         return (
                           <div 
                             key={step.id}
@@ -426,15 +508,7 @@ export default function FinancialPlanner() {
                     <div className="flex justify-between items-start">
                       {VISUAL_STEPS.map((step, index) => {
                         const isActive = currentStep >= (index + 1);
-                        const isCurrent = (index === 0 && currentStep === 1) || 
-                                          (index === 1 && currentStep === 2) ||
-                                          (index === 2 && currentStep === 3) ||
-                                          (index === 3 && currentStep === 4) ||
-                                          (index === 4 && currentStep === 5) ||
-                                          (index === 5 && currentStep === 6) ||
-                                          (index === 6 && currentStep === 7) ||
-                                          (index === 7 && currentStep === 8) ||
-                                          (index === 8 && currentStep === 9);
+                        const isCurrent = index === 1;
                         return (
                           <div key={step.id} className={cn("flex flex-col items-center text-center flex-1 transition-all duration-300", isActive ? "opacity-100" : "opacity-40")}>
                             <div className={cn("w-full h-1 mb-2 rounded-full transition-all duration-300", isCurrent ? "bg-blue-500" : isActive ? "bg-blue-500" : isDarkMode ? "bg-slate-700" : "bg-slate-200")} />
@@ -579,14 +653,7 @@ export default function FinancialPlanner() {
                     <div className="flex justify-between items-start">
                       {VISUAL_STEPS.map((step, index) => {
                         const isActive = currentStep >= (index + 1);
-                        const isCurrent = (index === 0 && currentStep === 1) || 
-                                          (index === 1 && currentStep === 2) ||
-                                          (index === 2 && currentStep === 3) ||
-                                          (index === 3 && currentStep === 4) ||
-                                          (index === 4 && currentStep === 5) ||
-                                          (index === 5 && currentStep === 6) ||
-                                          (index === 6 && currentStep === 7) ||
-                                          (index === 7 && currentStep === 8);
+                        const isCurrent = index === 2;
                         return (
                           <div key={step.id} className={cn("flex flex-col items-center text-center flex-1 transition-all duration-300", isActive ? "opacity-100" : "opacity-40")}>
                             <div className={cn("w-full h-1 mb-2 rounded-full transition-all duration-300", isCurrent ? "bg-blue-500" : isActive ? "bg-blue-500" : isDarkMode ? "bg-slate-700" : "bg-slate-200")} />
@@ -689,14 +756,7 @@ export default function FinancialPlanner() {
                     <div className="flex justify-between items-start">
                       {VISUAL_STEPS.map((step, index) => {
                         const isActive = currentStep >= (index + 1);
-                        const isCurrent = (index === 0 && currentStep === 1) || 
-                                          (index === 1 && currentStep === 2) ||
-                                          (index === 2 && currentStep === 3) ||
-                                          (index === 3 && currentStep === 4) ||
-                                          (index === 4 && currentStep === 5) ||
-                                          (index === 5 && currentStep === 6) ||
-                                          (index === 6 && currentStep === 7) ||
-                                          (index === 7 && currentStep === 8);
+                        const isCurrent = index === 3;
                         return (
                           <div key={step.id} className={cn("flex flex-col items-center text-center flex-1 transition-all duration-300", isActive ? "opacity-100" : "opacity-40")}>
                             <div className={cn("w-full h-1 mb-2 rounded-full transition-all duration-300", isCurrent ? "bg-blue-500" : isActive ? "bg-blue-500" : isDarkMode ? "bg-slate-700" : "bg-slate-200")} />
@@ -806,14 +866,7 @@ export default function FinancialPlanner() {
                     <div className="flex justify-between items-start">
                       {VISUAL_STEPS.map((step, index) => {
                         const isActive = currentStep >= (index + 1);
-                        const isCurrent = (index === 0 && currentStep === 1) || 
-                                          (index === 1 && currentStep === 2) ||
-                                          (index === 2 && currentStep === 3) ||
-                                          (index === 3 && currentStep === 4) ||
-                                          (index === 4 && currentStep === 5) ||
-                                          (index === 5 && currentStep === 6) ||
-                                          (index === 6 && currentStep === 7) ||
-                                          (index === 7 && currentStep === 8);
+                        const isCurrent = index === 4;
                         return (
                           <div key={step.id} className={cn("flex flex-col items-center text-center flex-1 transition-all duration-300", isActive ? "opacity-100" : "opacity-40")}>
                             <div className={cn("w-full h-1 mb-2 rounded-full transition-all duration-300", isCurrent ? "bg-blue-500" : isActive ? "bg-blue-500" : isDarkMode ? "bg-slate-700" : "bg-slate-200")} />
@@ -1022,7 +1075,7 @@ export default function FinancialPlanner() {
             {/* Step 6: Financial Framework - New Layout */}
             {currentStep === 6 && !isGenerating && (
               <motion.div
-                key="step-5"
+                key="step-6"
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -20 }}
@@ -1032,16 +1085,8 @@ export default function FinancialPlanner() {
                 <div className={cn("rounded-2xl border p-4 mb-6", cardClasses)}>
                   <div className="flex justify-between items-start">
                     {VISUAL_STEPS.map((step, index) => {
-                      const stepMapping = [1, 2, 3, 4, 5, 8];
-                      const isActive = currentStep >= stepMapping[index];
-                      const isCurrent = (index === 0 && currentStep === 1) || 
-                                        (index === 1 && currentStep === 2) ||
-                                        (index === 2 && currentStep === 3) ||
-                                        (index === 3 && currentStep === 4) ||
-                                        (index === 4 && currentStep === 5) ||
-                                        (index === 5 && currentStep === 6) ||
-                                        (index === 6 && currentStep === 7) ||
-                                        (index === 7 && currentStep === 8);
+                      const isActive = currentStep >= (index + 1);
+                      const isCurrent = index === 5;
                       return (
                         <div key={step.id} className={cn("flex flex-col items-center text-center flex-1 transition-all duration-300", isActive ? "opacity-100" : "opacity-40")}>
                           <div className={cn("w-full h-1 mb-2 rounded-full transition-all duration-300", isCurrent ? "bg-blue-500" : isActive ? "bg-blue-500" : isDarkMode ? "bg-slate-700" : "bg-slate-200")} />
@@ -1053,7 +1098,10 @@ export default function FinancialPlanner() {
                   </div>
                 </div>
 
-                <h2 className="text-3xl font-bold mb-8 text-center">Вашият оптимален финансов план</h2>
+                <h2 className="text-3xl font-bold mb-2 text-center">Вашият оптимален финансов план</h2>
+                <p className={cn("text-center mb-6 text-sm", mutedTextClasses)}>
+                  Разпределение: {allocations.security + allocations.pension + allocations.housing + allocations.cash}% от дохода
+                </p>
 
                 {/* Goals Grid - 4 columns like the image */}
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
@@ -1085,23 +1133,24 @@ export default function FinancialPlanner() {
                     </div>
                     <p className={cn("text-[10px] tracking-widest mb-2 group-hover:text-blue-100", mutedTextClasses)}>ФИНАНСОВА СИГУРНОСТ</p>
                     <motion.p 
-                      className="text-2xl md:text-3xl font-bold mb-3 group-hover:text-white"
-                      key={goals.security}
+                      className="text-2xl md:text-3xl font-bold mb-1 group-hover:text-white"
+                      key={calculateGoals.security}
                       initial={{ scale: 1.1 }}
                       animate={{ scale: 1 }}
                       transition={{ duration: 0.2 }}
                     >
-                      {formatNumber(goals.security)}
+                      {formatNumber(calculateGoals.security)}
                     </motion.p>
+                    <p className={cn("text-xs mb-3 group-hover:text-blue-200", accentColor)}>{allocations.security}%</p>
                     <Slider
-                      value={[goals.security]}
-                      onValueChange={(v) => handleGoalChange('security', v[0])}
-                      min={10000}
-                      max={500000}
-                      step={1000}
+                      value={[allocations.security]}
+                      onValueChange={(v) => handleAllocationChange('security', v[0])}
+                      min={0}
+                      max={50}
+                      step={1}
                       className="mb-2"
                     />
-                    <p className={cn("text-[10px] mt-1 group-hover:text-blue-100", mutedTextClasses)}>6 месеца резерв + защита</p>
+                    <p className={cn("text-[10px] mt-1 group-hover:text-blue-100", mutedTextClasses)}>Резерв за {Math.round((allocations.security / 10) * 6)} месеца</p>
                   </motion.div>
 
                   {/* Pension */}
@@ -1132,23 +1181,24 @@ export default function FinancialPlanner() {
                     </div>
                     <p className={cn("text-[10px] tracking-widest mb-2 group-hover:text-blue-100", mutedTextClasses)}>ПЕНСИЯ</p>
                     <motion.p 
-                      className="text-2xl md:text-3xl font-bold mb-3 group-hover:text-white"
-                      key={goals.pension}
+                      className="text-2xl md:text-3xl font-bold mb-1 group-hover:text-white"
+                      key={calculateGoals.pension}
                       initial={{ scale: 1.1 }}
                       animate={{ scale: 1 }}
                       transition={{ duration: 0.2 }}
                     >
-                      {formatNumber(goals.pension)}
+                      {formatNumber(calculateGoals.pension)}
                     </motion.p>
+                    <p className={cn("text-xs mb-3 group-hover:text-blue-200", accentColor)}>{allocations.pension}%</p>
                     <Slider
-                      value={[goals.pension]}
-                      onValueChange={(v) => handleGoalChange('pension', v[0])}
-                      min={20000}
-                      max={1000000}
-                      step={5000}
+                      value={[allocations.pension]}
+                      onValueChange={(v) => handleAllocationChange('pension', v[0])}
+                      min={0}
+                      max={50}
+                      step={1}
                       className="mb-2"
                     />
-                    <p className={cn("text-[10px] mt-1 group-hover:text-blue-100", mutedTextClasses)}>70% от дохода × 20 г.</p>
+                    <p className={cn("text-[10px] mt-1 group-hover:text-blue-100", mutedTextClasses)}>лв./месец при пенсия</p>
                   </motion.div>
 
                   {/* Housing */}
@@ -1179,23 +1229,24 @@ export default function FinancialPlanner() {
                     </div>
                     <p className={cn("text-[10px] tracking-widest mb-2 group-hover:text-blue-100", mutedTextClasses)}>ЖИЛИЩЕ</p>
                     <motion.p 
-                      className="text-2xl md:text-3xl font-bold mb-3 group-hover:text-white"
-                      key={goals.housing}
+                      className="text-2xl md:text-3xl font-bold mb-1 group-hover:text-white"
+                      key={calculateGoals.housing}
                       initial={{ scale: 1.1 }}
                       animate={{ scale: 1 }}
                       transition={{ duration: 0.2 }}
                     >
-                      {formatNumber(goals.housing)}
+                      {formatNumber(calculateGoals.housing)}
                     </motion.p>
+                    <p className={cn("text-xs mb-3 group-hover:text-blue-200", accentColor)}>{allocations.housing}%</p>
                     <Slider
-                      value={[goals.housing]}
-                      onValueChange={(v) => handleGoalChange('housing', v[0])}
-                      min={30000}
-                      max={1000000}
-                      step={5000}
+                      value={[allocations.housing]}
+                      onValueChange={(v) => handleAllocationChange('housing', v[0])}
+                      min={0}
+                      max={50}
+                      step={1}
                       className="mb-2"
                     />
-                    <p className={cn("text-[10px] mt-1 group-hover:text-blue-100", mutedTextClasses)}>Имот + разходи</p>
+                    <p className={cn("text-[10px] mt-1 group-hover:text-blue-100", mutedTextClasses)}>Кредит {calculateGoals.loanTerm}г. @ 3%</p>
                   </motion.div>
 
                   {/* Other Goals */}
@@ -1226,23 +1277,24 @@ export default function FinancialPlanner() {
                     </div>
                     <p className={cn("text-[10px] tracking-widest mb-2 group-hover:text-blue-100", mutedTextClasses)}>ДРУГИ ЦЕЛИ</p>
                     <motion.p 
-                      className="text-2xl md:text-3xl font-bold mb-3 group-hover:text-white"
-                      key={goals.cash}
+                      className="text-2xl md:text-3xl font-bold mb-1 group-hover:text-white"
+                      key={calculateGoals.cash}
                       initial={{ scale: 1.1 }}
                       animate={{ scale: 1 }}
                       transition={{ duration: 0.2 }}
                     >
-                      {formatNumber(goals.cash)}
+                      {formatNumber(calculateGoals.cash)}
                     </motion.p>
+                    <p className={cn("text-xs mb-3 group-hover:text-blue-200", accentColor)}>{allocations.cash}%</p>
                     <Slider
-                      value={[goals.cash]}
-                      onValueChange={(v) => handleGoalChange('cash', v[0])}
-                      min={5000}
-                      max={500000}
-                      step={1000}
+                      value={[allocations.cash]}
+                      onValueChange={(v) => handleAllocationChange('cash', v[0])}
+                      min={0}
+                      max={50}
+                      step={1}
                       className="mb-2"
                     />
-                    <p className={cn("text-[10px] mt-1 group-hover:text-blue-100", mutedTextClasses)}>Кола, почивки, други</p>
+                    <p className={cn("text-[10px] mt-1 group-hover:text-blue-100", mutedTextClasses)}>Капитал до пенсия</p>
                   </motion.div>
                 </div>
 
@@ -1251,12 +1303,12 @@ export default function FinancialPlanner() {
                   <p className={cn("text-[10px] tracking-widest mb-1 group-hover:text-blue-100", mutedTextClasses)}>ИМУЩЕСТВОТО ОБЩО</p>
                   <motion.p 
                     className="text-3xl md:text-4xl font-bold group-hover:text-white"
-                    key={totalWealth}
+                    key={calculateGoals.totalWealth}
                     initial={{ scale: 1.05 }}
                     animate={{ scale: 1 }}
                     transition={{ duration: 0.2 }}
                   >
-                    {formatNumber(totalWealth)} BGN
+                    {formatNumber(calculateGoals.totalWealth)} BGN
                   </motion.p>
                 </div>
 
@@ -1275,7 +1327,7 @@ export default function FinancialPlanner() {
             {/* Step 7: Work System */}
             {currentStep === 7 && (
               <motion.div
-                key="step-6"
+                key="step-7"
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -20 }}
@@ -1287,14 +1339,7 @@ export default function FinancialPlanner() {
                     <div className="flex justify-between items-start">
                       {VISUAL_STEPS.map((step, index) => {
                         const isActive = currentStep >= (index + 1);
-                        const isCurrent = (index === 0 && currentStep === 1) || 
-                                          (index === 1 && currentStep === 2) ||
-                                          (index === 2 && currentStep === 3) ||
-                                          (index === 3 && currentStep === 4) ||
-                                          (index === 4 && currentStep === 5) ||
-                                          (index === 5 && currentStep === 6) ||
-                                          (index === 6 && currentStep === 7) ||
-                                          (index === 7 && currentStep === 8);
+                        const isCurrent = index === 6;
                         return (
                           <div key={step.id} className={cn("flex flex-col items-center text-center flex-1 transition-all duration-300", isActive ? "opacity-100" : "opacity-40")}>
                             <div className={cn("w-full h-1 mb-2 rounded-full transition-all duration-300", isCurrent ? "bg-blue-500" : isActive ? "bg-blue-500" : isDarkMode ? "bg-slate-700" : "bg-slate-200")} />
@@ -1367,7 +1412,7 @@ export default function FinancialPlanner() {
                   {/* Step 8: Cooperation Rules */}
             {currentStep === 8 && (
               <motion.div
-                key="step-7"
+                key="step-8"
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -20 }}
@@ -1379,14 +1424,7 @@ export default function FinancialPlanner() {
                     <div className="flex justify-between items-start">
                       {VISUAL_STEPS.map((step, index) => {
                         const isActive = currentStep >= (index + 1);
-                        const isCurrent = (index === 0 && currentStep === 1) || 
-                                          (index === 1 && currentStep === 2) ||
-                                          (index === 2 && currentStep === 3) ||
-                                          (index === 3 && currentStep === 4) ||
-                                          (index === 4 && currentStep === 5) ||
-                                          (index === 5 && currentStep === 6) ||
-                                          (index === 6 && currentStep === 7) ||
-                                          (index === 7 && currentStep === 8);
+                        const isCurrent = index === 7;
                         return (
                           <div key={step.id} className={cn("flex flex-col items-center text-center flex-1 transition-all duration-300", isActive ? "opacity-100" : "opacity-40")}>
                             <div className={cn("w-full h-1 mb-2 rounded-full transition-all duration-300", isCurrent ? "bg-blue-500" : isActive ? "bg-blue-500" : isDarkMode ? "bg-slate-700" : "bg-slate-200")} />
@@ -1458,7 +1496,7 @@ export default function FinancialPlanner() {
                   {/* Step 9: Final / Redirect */}
             {currentStep === 9 && (
               <motion.div
-                key="step-8"
+                key="step-9"
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -20 }}

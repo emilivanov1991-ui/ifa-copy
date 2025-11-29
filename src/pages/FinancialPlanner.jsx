@@ -1178,10 +1178,11 @@ export default function FinancialPlanner() {
                       СЛЕДВАЩА СТЪПКА
                     </Button>
                   </div>
-                  </motion.div>
-                  )}
+                </div>
+              </motion.div>
+            )}
 
-                  {/* Step 5: Priorities (multi-select) */}
+            {/* Step 5: Priorities (multi-select) */}
             {currentStep === 5 && (
               <motion.div
                 key="step-5"

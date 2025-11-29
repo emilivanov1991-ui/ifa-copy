@@ -2076,14 +2076,14 @@ export default function FinancialPlanner() {
               </motion.div>
             )}
 
-                  {/* Step 9: Final / Redirect */}
+                  {/* Step 9: Summary & Next Steps */}
             {currentStep === 9 && (
               <motion.div
                 key="step-9"
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -20 }}
-                className="max-w-2xl mx-auto text-center"
+                className="w-full px-4"
               >
                 {/* Inline Step Tracker */}
                 <div className={cn("rounded-2xl border p-4 mb-6", cardClasses)}>
@@ -2102,37 +2102,145 @@ export default function FinancialPlanner() {
                   </div>
                 </div>
 
-                <div className={cn("rounded-3xl border p-6 md:p-8", cardClasses)}>
-                  <div className="w-20 h-20 mx-auto mb-6 rounded-full bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center">
-                    <svg className="w-10 h-10 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                    </svg>
+                <div className="max-w-4xl mx-auto">
+                  {/* Success Header */}
+                  <div className="text-center mb-6">
+                    <div className="w-20 h-20 mx-auto mb-4 rounded-full bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center">
+                      <CheckCircle2 className="w-10 h-10 text-white" />
+                    </div>
+                    <h2 className="text-3xl font-bold mb-2">Вашият финансов план е готов!</h2>
+                    <p className={cn("text-sm max-w-lg mx-auto", mutedTextClasses)}>
+                      Обобщение на вашите финансови цели и следващи стъпки за постигането им.
+                    </p>
                   </div>
 
-                  <h2 className="text-3xl font-bold mb-4">Готови сте!</h2>
-                  <p className={cn("text-sm mb-6 max-w-2xl mx-auto", mutedTextClasses)}>
-                    Вече знаете какъв е вашият финансов потенциал. Нека преминем към детайлния анализ!
-                  </p>
+                  {/* Summary Cards */}
+                  <div className="grid md:grid-cols-2 gap-4 mb-6">
+                    {/* Personal Info Summary */}
+                    <div className={cn("rounded-2xl border p-5", cardClasses)}>
+                      <div className="flex items-center gap-2 mb-4">
+                        <Users className="w-5 h-5 text-blue-500" />
+                        <h3 className="font-semibold">Лична информация</h3>
+                      </div>
+                      <div className="space-y-2 text-sm">
+                        <div className="flex justify-between">
+                          <span className={mutedTextClasses}>Тип планиране:</span>
+                          <span className="font-medium">{familyType === 'family' ? 'Семейство' : 'Индивидуално'}</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className={mutedTextClasses}>Възраст:</span>
+                          <span className="font-medium">
+                            {familyType === 'family' 
+                              ? `${clientAgeNum} / ${partnerAgeNum} години` 
+                              : `${clientAgeNum} години`
+                            }
+                          </span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className={mutedTextClasses}>Години до пенсия:</span>
+                          <span className="font-medium">{Math.round(yearsToRetirement)} години</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className={mutedTextClasses}>Месечен доход:</span>
+                          <span className="font-medium text-blue-500">{formatNumber(totalIncome)} €</span>
+                        </div>
+                      </div>
+                    </div>
 
-                  <div className="space-y-4">
+                    {/* Financial Goals Summary */}
+                    <div className={cn("rounded-2xl border p-5", cardClasses)}>
+                      <div className="flex items-center gap-2 mb-4">
+                        <Target className="w-5 h-5 text-blue-500" />
+                        <h3 className="font-semibold">Финансови цели</h3>
+                      </div>
+                      <div className="space-y-2 text-sm">
+                        <div className="flex justify-between">
+                          <span className={mutedTextClasses}>Резерв ({allocations.security}%):</span>
+                          <span className="font-medium">{formatNumber(calculateGoals.security)} €</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className={mutedTextClasses}>Пенсия ({allocations.pension}%):</span>
+                          <span className="font-medium">{formatNumber(calculateGoals.pension)} €/мес</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className={mutedTextClasses}>Жилище ({allocations.housing}%):</span>
+                          <span className="font-medium">{formatNumber(calculateGoals.housing)} €</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className={mutedTextClasses}>Други цели ({allocations.cash}%):</span>
+                          <span className="font-medium">{formatNumber(calculateGoals.cash)} €</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Total Wealth Card */}
+                  <div className={cn("rounded-2xl border p-6 mb-6 text-center bg-gradient-to-br from-blue-50 to-indigo-50", isDarkMode ? "border-slate-700 bg-slate-800" : "border-blue-200")}>
+                    <p className={cn("text-sm tracking-widest mb-2", mutedTextClasses)}>ОБЩО ИМУЩЕСТВО ПРИ ПЕНСИОНИРАНЕ</p>
+                    <p className="text-4xl md:text-5xl font-bold text-blue-600 mb-2">{formatNumber(calculateGoals.totalWealth)} €</p>
+                    <p className={cn("text-sm", mutedTextClasses)}>
+                      При спестяване на {allocations.security + allocations.pension + allocations.housing + allocations.cash}% от месечния доход
+                    </p>
+                  </div>
+
+                  {/* Next Steps */}
+                  <div className={cn("rounded-2xl border p-5 mb-6", cardClasses)}>
+                    <div className="flex items-center gap-2 mb-4">
+                      <Calendar className="w-5 h-5 text-blue-500" />
+                      <h3 className="font-semibold">Следващи стъпки</h3>
+                    </div>
+                    <div className="grid md:grid-cols-3 gap-4">
+                      <div className="flex items-start gap-3">
+                        <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center flex-shrink-0">
+                          <span className="text-blue-600 font-semibold text-sm">1</span>
+                        </div>
+                        <div>
+                          <p className="font-medium text-sm">Детайлен анализ</p>
+                          <p className={cn("text-xs", mutedTextClasses)}>Попълнете пълния финансов анализ за персонализиран план.</p>
+                        </div>
+                      </div>
+                      <div className="flex items-start gap-3">
+                        <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center flex-shrink-0">
+                          <span className="text-blue-600 font-semibold text-sm">2</span>
+                        </div>
+                        <div>
+                          <p className="font-medium text-sm">Среща с консултант</p>
+                          <p className={cn("text-xs", mutedTextClasses)}>Обсъдете резултатите с наш финансов експерт.</p>
+                        </div>
+                      </div>
+                      <div className="flex items-start gap-3">
+                        <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center flex-shrink-0">
+                          <span className="text-blue-600 font-semibold text-sm">3</span>
+                        </div>
+                        <div>
+                          <p className="font-medium text-sm">Реализация</p>
+                          <p className={cn("text-xs", mutedTextClasses)}>Стартирайте изпълнението на вашия финансов план.</p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Action Buttons */}
+                  <div className="flex flex-col sm:flex-row gap-4 justify-center">
                     <Link to={createPageUrl('FinancialAnalysis')}>
-                      <Button className="w-full rounded-full py-6 text-lg bg-blue-600 hover:bg-blue-700">
-                        Към финансовия анализ
+                      <Button className="w-full sm:w-auto rounded-full px-8 py-6 text-lg bg-blue-600 hover:bg-blue-700">
+                        <FileText className="w-5 h-5 mr-2" />
+                        Към детайлния анализ
                       </Button>
                     </Link>
                     
                     <Button 
                       variant="outline" 
                       onClick={restart}
-                      className={cn("w-full", outlineButtonClass)}
+                      className={cn("w-full sm:w-auto py-6", outlineButtonClass)}
                     >
                       <RotateCcw className="mr-2 h-4 w-4" />
                       Започни отначало
                     </Button>
-          </div>
-        </div>
-      </motion.div>
-    )}
+                  </div>
+                </div>
+              </motion.div>
+            )}
 
     </AnimatePresence>
     </div>

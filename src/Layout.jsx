@@ -16,6 +16,7 @@ const navLinks = [
   { name: 'За нас', page: 'About' },
   { name: 'Услуги', page: 'Services' },
   { name: 'Калкулатори', page: 'Calculators' },
+  { name: 'Помощни средства', page: 'AuxiliaryTools' },
   { name: 'Financial Planner', page: 'FinancialPlanner' },
   { name: 'Безплатен анализ', page: 'FinancialAnalysis' },
   { name: 'Контакти', page: 'Contact' },

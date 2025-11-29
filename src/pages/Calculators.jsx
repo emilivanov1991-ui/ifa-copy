@@ -1,12 +1,16 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Calculator, Home, Plus, Trash2, ArrowRight, TrendingUp, PiggyBank } from 'lucide-react';
+import { Calculator, Home, Plus, Trash2, ArrowRight, TrendingUp, PiggyBank, Percent, TrendingDown } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { cn } from "@/lib/utils";
+import TermDepositCalculator from '../components/calculators/TermDepositCalculator';
+import SavingsCalculator from '../components/calculators/SavingsCalculator';
+import InvestmentCalculator from '../components/calculators/InvestmentCalculator';
+import InflationCalculator from '../components/calculators/InflationCalculator';
 
 const MortgageCalculator = () => {
   const [offers, setOffers] = useState([
@@ -245,15 +249,43 @@ export default function Calculators() {
           className="bg-white rounded-2xl shadow-xl p-6 md:p-10"
         >
           <Tabs defaultValue="mortgage" className="space-y-6">
-            <TabsList className="grid w-full max-w-md mx-auto grid-cols-1">
+            <TabsList className="grid w-full max-w-4xl mx-auto grid-cols-2 md:grid-cols-5 gap-2">
               <TabsTrigger value="mortgage" className="gap-2">
                 <Home className="h-4 w-4" />
-                Ипотечни кредити
+                Ипотечен
+              </TabsTrigger>
+              <TabsTrigger value="deposit" className="gap-2">
+                <Percent className="h-4 w-4" />
+                Депозит
+              </TabsTrigger>
+              <TabsTrigger value="investment" className="gap-2">
+                <TrendingUp className="h-4 w-4" />
+                Инвестиции
+              </TabsTrigger>
+              <TabsTrigger value="savings" className="gap-2">
+                <PiggyBank className="h-4 w-4" />
+                Спестявания
+              </TabsTrigger>
+              <TabsTrigger value="inflation" className="gap-2">
+                <TrendingDown className="h-4 w-4" />
+                Инфлация
               </TabsTrigger>
             </TabsList>
 
             <TabsContent value="mortgage">
               <MortgageCalculator />
+            </TabsContent>
+            <TabsContent value="deposit">
+              <TermDepositCalculator />
+            </TabsContent>
+            <TabsContent value="investment">
+              <InvestmentCalculator />
+            </TabsContent>
+            <TabsContent value="savings">
+              <SavingsCalculator />
+            </TabsContent>
+            <TabsContent value="inflation">
+              <InflationCalculator />
             </TabsContent>
           </Tabs>
         </motion.div>

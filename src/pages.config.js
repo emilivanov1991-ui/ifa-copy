@@ -8,6 +8,7 @@ import ClientPortal from './pages/ClientPortal';
 import ConsultantPortal from './pages/ConsultantPortal';
 import Calculators from './pages/Calculators';
 import FinancialPlanner from './pages/FinancialPlanner';
+import AuxiliaryTools from './pages/AuxiliaryTools';
 import __Layout from './Layout.jsx';
 
 
@@ -22,6 +23,7 @@ export const PAGES = {
     "ConsultantPortal": ConsultantPortal,
     "Calculators": Calculators,
     "FinancialPlanner": FinancialPlanner,
+    "AuxiliaryTools": AuxiliaryTools,
 }
 
 export const pagesConfig = {

@@ -1198,7 +1198,39 @@ export default function FinancialPlanner() {
                           <span className={cn("text-xl ml-2", mutedTextClasses)}>€</span>
                         </div>
                         <Slider
-                          value={[typeof
+                          value={[typeof partnerIncome === 'number' ? partnerIncome : 1000]}
+                          onValueChange={(v) => setPartnerIncome(v[0])}
+                          min={400}
+                          max={15000}
+                          step={100}
+                          className="mb-2"
+                        />
+                        <div className={cn("flex justify-between text-sm", mutedTextClasses)}>
+                          <span>400 €</span>
+                          <span>15 000 €</span>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Total (for family) */}
+                  {familyType === 'family' && (
+                    <div className={cn("p-4 rounded-xl mb-6", isDarkMode ? "bg-slate-800" : "bg-slate-100")}>
+                      <div className="flex justify-between items-center">
+                        <span className={cn("text-base", mutedTextClasses)}>Общо месечен доход:</span>
+                        <span className="text-2xl font-bold text-blue-500">{formatNumber((typeof monthlyIncome === 'number' ? monthlyIncome : 0) + (typeof partnerIncome === 'number' ? partnerIncome : 0))} €</span>
+                      </div>
+                    </div>
+                  )}
+
+                  <div className="flex justify-center">
+                    <Button onClick={goNext} className={cn(primaryButtonClass, "px-16 py-6 text-lg")}>
+                      СЛЕДВАЩА СТЪПКА
+                    </Button>
+                  </div>
+                </div>
+              </motion.div>
+            )}
 
             {/* Step 5: Priorities (multi-select with icons) */}
             {currentStep === 5 && (

@@ -166,20 +166,19 @@ export default function FinancialPlanner() {
     const housingPercent = allocations.housing;
     const cashPercent = allocations.cash;
 
-    // 1. Reserve = securityPercent% of income * 6 months (scaled by percentage)
+    // 1. Reserve = 6 months of total income (scaled by percentage)
     // At 10% allocation -> 6 months of income
     // At 50% allocation -> 30 months of income (5x)
     // At 0% allocation -> 0
     const reserveMonths = (securityPercent / 10) * 6;
-    const securityValueBGN = totalIncome * reserveMonths;
-    const securityValue = toEuro(securityValueBGN);
+    const securityValue = roundTo100(totalIncome * reserveMonths);
 
-    // 2. Pension calculation
+    // 2. Pension calculation (all in EUR)
     // pensionPercent% of income invested monthly at 8% until retirement
     // Then moved to 3% fund and withdrawn over 20 years
     const monthlyPensionInvestment = totalIncome * (pensionPercent / 100);
     const pensionFundAtRetirement = calculateFutureValue(monthlyPensionInvestment, 0.08, yearsToRetirement);
-    const monthlyPensionFromFundBGN = calculateAnnuityPayment(pensionFundAtRetirement, 0.03, 20);
+    const monthlyPensionFromFund = calculateAnnuityPayment(pensionFundAtRetirement, 0.03, 20);
     const statePension = calculateStatePension(
       familyType === 'family' ? monthlyIncome : totalIncome,
       partnerIncome,
@@ -187,33 +186,31 @@ export default function FinancialPlanner() {
       partnerInsuranceType === 'entrepreneur',
       familyType === 'family'
     );
-    // statePension is already in EUR, monthlyPensionFromFund needs conversion
-    const totalMonthlyPension = toEuro(monthlyPensionFromFundBGN) + statePension;
+    // Both values now in EUR
+    const totalMonthlyPension = roundTo10(monthlyPensionFromFund + statePension);
 
-    // 3. Housing calculation
+    // 3. Housing calculation (all in EUR)
     // housingPercent% of income goes to mortgage payment
     // 3% interest, max 30 year term (adjusted if age + term > 70)
     const maxLoanTerm = Math.min(30, Math.max(5, 70 - avgAge));
     const monthlyMortgagePayment = totalIncome * (housingPercent / 100);
     const loanAmount = calculateLoanAmount(monthlyMortgagePayment, 0.03, maxLoanTerm);
     // Loan is 85% of property value, so property = loan / 0.85 = loan * 1.176
-    const housingValueBGN = loanAmount * 1.176;
-    const housingValue = toEuro(housingValueBGN);
+    const housingValue = roundTo100(loanAmount * 1.176);
 
-    // 4. Other goals calculation
+    // 4. Other goals calculation (all in EUR)
     // cashPercent% of income invested monthly at 5% until retirement
     const monthlyOtherInvestment = totalIncome * (cashPercent / 100);
-    const otherGoalsValueBGN = calculateFutureValue(monthlyOtherInvestment, 0.05, yearsToRetirement);
-    const otherGoalsValue = toEuro(otherGoalsValueBGN);
+    const otherGoalsValue = roundTo100(calculateFutureValue(monthlyOtherInvestment, 0.05, yearsToRetirement));
 
     // Total wealth = Reserve + Pension Fund at retirement + Housing Value + Other Goals (all in EUR)
-    const pensionFundEUR = toEuro(pensionFundAtRetirement);
-    const totalWealth = securityValue + pensionFundEUR + housingValue + otherGoalsValue;
+    const pensionFundRounded = roundTo100(pensionFundAtRetirement);
+    const totalWealth = securityValue + pensionFundRounded + housingValue + otherGoalsValue;
 
     return {
       security: securityValue,
       pension: totalMonthlyPension, // This shows monthly pension income in EUR
-      pensionFund: pensionFundEUR, // For total wealth calculation
+      pensionFund: pensionFundRounded, // For total wealth calculation
       housing: housingValue,
       cash: otherGoalsValue,
       totalWealth: totalWealth,

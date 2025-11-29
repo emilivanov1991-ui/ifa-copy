@@ -7,6 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { cn } from "@/lib/utils";
+import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import TermDepositCalculator from '../components/calculators/TermDepositCalculator';
 import SavingsCalculator from '../components/calculators/SavingsCalculator';
 import InvestmentCalculator from '../components/calculators/InvestmentCalculator';

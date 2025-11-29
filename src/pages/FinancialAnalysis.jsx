@@ -455,19 +455,17 @@ export default function FinancialAnalysis() {
 
         return true;
       
-      case 8: // Financial Flow - all fields required
-        // Client income fields
+      case 8: // Financial Flow - required fields only
+        // Client income fields (required)
         if (formData.client_gross_income === undefined || formData.client_gross_income === '') return false;
         if (formData.client_net_income === undefined || formData.client_net_income === '') return false;
-        if (formData.client_annual_bonus === undefined || formData.client_annual_bonus === '') return false;
-        if (formData.client_other_monthly_income === undefined || formData.client_other_monthly_income === '') return false;
+        // client_annual_bonus and client_other_monthly_income default to 0, not required
         
         // Partner income fields (if included)
         if (formData.include_partner) {
           if (formData.partner_gross_income === undefined || formData.partner_gross_income === '') return false;
           if (formData.partner_net_income === undefined || formData.partner_net_income === '') return false;
-          if (formData.partner_annual_bonus === undefined || formData.partner_annual_bonus === '') return false;
-          if (formData.partner_other_monthly_income === undefined || formData.partner_other_monthly_income === '') return false;
+          // partner_annual_bonus and partner_other_monthly_income default to 0, not required
         }
         
         // Housing expenses
@@ -496,21 +494,12 @@ export default function FinancialAnalysis() {
           if (formData[field] === undefined || formData[field] === '') return false;
         }
         
-        // Liabilities
-        const liabilityFields = ['liability_mortgage_monthly', 'liability_mortgage_remaining', 
-          'liability_consumer_loans_monthly', 'liability_consumer_loans_remaining',
-          'liability_credit_cards_monthly', 'liability_credit_cards_remaining',
-          'liability_leasing_monthly', 'liability_leasing_remaining',
-          'liability_overdraft_monthly', 'liability_overdraft_remaining'];
-        for (const field of liabilityFields) {
-          if (formData[field] === undefined || formData[field] === '') return false;
-        }
+        // Liabilities - only mortgage is required, others default to 0
+        if (formData.liability_mortgage_monthly === undefined || formData.liability_mortgage_monthly === '') return false;
+        if (formData.liability_mortgage_remaining === undefined || formData.liability_mortgage_remaining === '') return false;
+        // consumer loans, credit cards, leasing, overdraft default to 0, not required
         
-        // Insurance
-        const insuranceFields = ['insurance_life', 'insurance_property', 'insurance_movable', 'insurance_civil', 'insurance_casco', 'insurance_other'];
-        for (const field of insuranceFields) {
-          if (formData[field] === undefined || formData[field] === '') return false;
-        }
+        // Insurance - all default to 0, not required
         
         return true;
       

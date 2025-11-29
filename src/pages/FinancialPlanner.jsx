@@ -769,9 +769,9 @@ export default function FinancialPlanner() {
                       СЛЕДВАЩА СТЪПКА
                     </Button>
                   </div>
-                  </div>
-                  </motion.div>
-                  )}
+                </div>
+              </motion.div>
+            )}
 
                   {/* Step 2: Insurance Type */}
             {currentStep === 2 && (
@@ -1303,9 +1303,9 @@ export default function FinancialPlanner() {
                       СЛЕДВАЩА СТЪПКА
                     </Button>
                   </div>
-                  </div>
-                  </motion.div>
-                  )}
+                </div>
+              </motion.div>
+            )}
 
                   {/* Generating Animation - Fullscreen */}
             {isGenerating && (
@@ -1707,8 +1707,8 @@ export default function FinancialPlanner() {
                     Искам да продължа
                   </Button>
                 </div>
-                </motion.div>
-                )}
+              </motion.div>
+            )}
 
             {/* Step 7: Work System */}
             {currentStep === 7 && (
@@ -1936,15 +1936,15 @@ export default function FinancialPlanner() {
                       <RotateCcw className="mr-2 h-4 w-4" />
                       Започни отначало
                     </Button>
-                    </div>
-                    </div>
-                    </motion.div>
-                    )}
+          </div>
+        </div>
+      </motion.div>
+    )}
 
-                    </AnimatePresence>
-                    </div>
-                    </div>
-                    </div>
-                    </TooltipProvider>
-                    );
-                    }
+    </AnimatePresence>
+    </div>
+    </div>
+    </div>
+    </TooltipProvider>
+  );
+}

@@ -153,21 +153,21 @@ export default function FinancialFlowStep({ data, onChange, showErrors }) {
                   onChange={(e) => onChange('client_net_income', e.target.value === '' ? '' : parseInt(e.target.value))} 
                   className={`rounded-lg w-28 ${isFieldInvalid(data.client_net_income) ? 'border-red-500 bg-red-50' : ''}`} />
               </div>
-              <div className="flex items-center justify-between gap-4">
-                <Label className="text-sm">Годишен бонус</Label>
+              <div className="flex items-center justify-between gap-4" data-invalid={isFieldInvalid(data.client_annual_bonus) ? "true" : undefined}>
+                <Label className="text-sm">Годишен бонус <span className="text-red-500">*</span></Label>
                 <div className="flex items-center gap-2">
-                  <Input type="number" min="0" value={data.client_annual_bonus ?? 0}
-                    onChange={(e) => onChange('client_annual_bonus', e.target.value === '' ? 0 : parseInt(e.target.value))} 
-                    className="rounded-lg w-28" />
+                  <Input type="number" min="0" value={data.client_annual_bonus ?? ''}
+                    onChange={(e) => onChange('client_annual_bonus', e.target.value === '' ? '' : parseInt(e.target.value))} 
+                    className={`rounded-lg w-28 ${isFieldInvalid(data.client_annual_bonus) ? 'border-red-500 bg-red-50' : ''}`} />
                   <Input type="number" min="0" value={clientAnnualBonusMonthly}
                     readOnly className="rounded-lg w-28 bg-slate-100" />
                 </div>
               </div>
-              <div className="flex items-center justify-between gap-4">
-                <Label className="text-sm">Други месечни доходи</Label>
-                <Input type="number" min="0" value={data.client_other_monthly_income ?? 0}
-                  onChange={(e) => onChange('client_other_monthly_income', e.target.value === '' ? 0 : parseInt(e.target.value))} 
-                  className="rounded-lg w-28" />
+              <div className="flex items-center justify-between gap-4" data-invalid={isFieldInvalid(data.client_other_monthly_income) ? "true" : undefined}>
+                <Label className="text-sm">Други месечни доходи <span className="text-red-500">*</span></Label>
+                <Input type="number" min="0" value={data.client_other_monthly_income ?? ''}
+                  onChange={(e) => onChange('client_other_monthly_income', e.target.value === '' ? '' : parseInt(e.target.value))} 
+                  className={`rounded-lg w-28 ${isFieldInvalid(data.client_other_monthly_income) ? 'border-red-500 bg-red-50' : ''}`} />
               </div>
             </div>
           </div>
@@ -189,21 +189,21 @@ export default function FinancialFlowStep({ data, onChange, showErrors }) {
                     onChange={(e) => onChange('partner_net_income', e.target.value === '' ? '' : parseInt(e.target.value))} 
                     className={`rounded-lg w-28 ${isFieldInvalid(data.partner_net_income) ? 'border-red-500 bg-red-50' : ''}`} />
                 </div>
-                <div className="flex items-center justify-between gap-4">
-                  <Label className="text-sm">Годишен бонус</Label>
+                <div className="flex items-center justify-between gap-4" data-invalid={isFieldInvalid(data.partner_annual_bonus) ? "true" : undefined}>
+                  <Label className="text-sm">Годишен бонус <span className="text-red-500">*</span></Label>
                   <div className="flex items-center gap-2">
-                    <Input type="number" min="0" value={data.partner_annual_bonus ?? 0}
-                      onChange={(e) => onChange('partner_annual_bonus', e.target.value === '' ? 0 : parseInt(e.target.value))} 
-                      className="rounded-lg w-28" />
+                    <Input type="number" min="0" value={data.partner_annual_bonus ?? ''}
+                      onChange={(e) => onChange('partner_annual_bonus', e.target.value === '' ? '' : parseInt(e.target.value))} 
+                      className={`rounded-lg w-28 ${isFieldInvalid(data.partner_annual_bonus) ? 'border-red-500 bg-red-50' : ''}`} />
                     <Input type="number" min="0" value={partnerAnnualBonusMonthly}
                       readOnly className="rounded-lg w-28 bg-slate-100" />
                   </div>
                 </div>
-                <div className="flex items-center justify-between gap-4">
-                  <Label className="text-sm">Други месечни доходи</Label>
-                  <Input type="number" min="0" value={data.partner_other_monthly_income ?? 0}
-                    onChange={(e) => onChange('partner_other_monthly_income', e.target.value === '' ? 0 : parseInt(e.target.value))} 
-                    className="rounded-lg w-28" />
+                <div className="flex items-center justify-between gap-4" data-invalid={isFieldInvalid(data.partner_other_monthly_income) ? "true" : undefined}>
+                  <Label className="text-sm">Други месечни доходи <span className="text-red-500">*</span></Label>
+                  <Input type="number" min="0" value={data.partner_other_monthly_income ?? ''}
+                    onChange={(e) => onChange('partner_other_monthly_income', e.target.value === '' ? '' : parseInt(e.target.value))} 
+                    className={`rounded-lg w-28 ${isFieldInvalid(data.partner_other_monthly_income) ? 'border-red-500 bg-red-50' : ''}`} />
                 </div>
               </div>
             </div>
@@ -409,47 +409,47 @@ export default function FinancialFlowStep({ data, onChange, showErrors }) {
           </div>
           
           {/* Consumer loans */}
-          <div className="grid grid-cols-[1fr_auto_auto] gap-2 items-center">
-            <Label className="text-sm">Потребителски кредити</Label>
-            <Input type="number" min="0" value={data.liability_consumer_loans_monthly ?? 0}
-              onChange={(e) => onChange('liability_consumer_loans_monthly', e.target.value === '' ? 0 : parseInt(e.target.value))} 
-              className="rounded-lg w-28" />
-            <Input type="number" min="0" value={data.liability_consumer_loans_remaining ?? 0}
-              onChange={(e) => onChange('liability_consumer_loans_remaining', e.target.value === '' ? 0 : parseInt(e.target.value))} 
-              className="rounded-lg w-28" />
+          <div className="grid grid-cols-[1fr_auto_auto] gap-2 items-center" data-invalid={isFieldInvalid(data.liability_consumer_loans_monthly) || isFieldInvalid(data.liability_consumer_loans_remaining) ? "true" : undefined}>
+            <Label className="text-sm">Потребителски кредити <span className="text-red-500">*</span></Label>
+            <Input type="number" min="0" value={data.liability_consumer_loans_monthly ?? ''}
+              onChange={(e) => onChange('liability_consumer_loans_monthly', e.target.value === '' ? '' : parseInt(e.target.value))} 
+              className={`rounded-lg w-28 ${isFieldInvalid(data.liability_consumer_loans_monthly) ? 'border-red-500 bg-red-50' : ''}`} />
+            <Input type="number" min="0" value={data.liability_consumer_loans_remaining ?? ''}
+              onChange={(e) => onChange('liability_consumer_loans_remaining', e.target.value === '' ? '' : parseInt(e.target.value))} 
+              className={`rounded-lg w-28 ${isFieldInvalid(data.liability_consumer_loans_remaining) ? 'border-red-500 bg-red-50' : ''}`} />
           </div>
           
           {/* Credit cards */}
-          <div className="grid grid-cols-[1fr_auto_auto] gap-2 items-center">
-            <Label className="text-sm">Кредитни карти</Label>
-            <Input type="number" min="0" value={data.liability_credit_cards_monthly ?? 0}
-              onChange={(e) => onChange('liability_credit_cards_monthly', e.target.value === '' ? 0 : parseInt(e.target.value))} 
-              className="rounded-lg w-28" />
-            <Input type="number" min="0" value={data.liability_credit_cards_remaining ?? 0}
-              onChange={(e) => onChange('liability_credit_cards_remaining', e.target.value === '' ? 0 : parseInt(e.target.value))} 
-              className="rounded-lg w-28" />
+          <div className="grid grid-cols-[1fr_auto_auto] gap-2 items-center" data-invalid={isFieldInvalid(data.liability_credit_cards_monthly) || isFieldInvalid(data.liability_credit_cards_remaining) ? "true" : undefined}>
+            <Label className="text-sm">Кредитни карти <span className="text-red-500">*</span></Label>
+            <Input type="number" min="0" value={data.liability_credit_cards_monthly ?? ''}
+              onChange={(e) => onChange('liability_credit_cards_monthly', e.target.value === '' ? '' : parseInt(e.target.value))} 
+              className={`rounded-lg w-28 ${isFieldInvalid(data.liability_credit_cards_monthly) ? 'border-red-500 bg-red-50' : ''}`} />
+            <Input type="number" min="0" value={data.liability_credit_cards_remaining ?? ''}
+              onChange={(e) => onChange('liability_credit_cards_remaining', e.target.value === '' ? '' : parseInt(e.target.value))} 
+              className={`rounded-lg w-28 ${isFieldInvalid(data.liability_credit_cards_remaining) ? 'border-red-500 bg-red-50' : ''}`} />
           </div>
           
           {/* Leasing */}
-          <div className="grid grid-cols-[1fr_auto_auto] gap-2 items-center">
-            <Label className="text-sm">Лизинг</Label>
-            <Input type="number" min="0" value={data.liability_leasing_monthly ?? 0}
-              onChange={(e) => onChange('liability_leasing_monthly', e.target.value === '' ? 0 : parseInt(e.target.value))} 
-              className="rounded-lg w-28" />
-            <Input type="number" min="0" value={data.liability_leasing_remaining ?? 0}
-              onChange={(e) => onChange('liability_leasing_remaining', e.target.value === '' ? 0 : parseInt(e.target.value))} 
-              className="rounded-lg w-28" />
+          <div className="grid grid-cols-[1fr_auto_auto] gap-2 items-center" data-invalid={isFieldInvalid(data.liability_leasing_monthly) || isFieldInvalid(data.liability_leasing_remaining) ? "true" : undefined}>
+            <Label className="text-sm">Лизинг <span className="text-red-500">*</span></Label>
+            <Input type="number" min="0" value={data.liability_leasing_monthly ?? ''}
+              onChange={(e) => onChange('liability_leasing_monthly', e.target.value === '' ? '' : parseInt(e.target.value))} 
+              className={`rounded-lg w-28 ${isFieldInvalid(data.liability_leasing_monthly) ? 'border-red-500 bg-red-50' : ''}`} />
+            <Input type="number" min="0" value={data.liability_leasing_remaining ?? ''}
+              onChange={(e) => onChange('liability_leasing_remaining', e.target.value === '' ? '' : parseInt(e.target.value))} 
+              className={`rounded-lg w-28 ${isFieldInvalid(data.liability_leasing_remaining) ? 'border-red-500 bg-red-50' : ''}`} />
           </div>
           
           {/* Overdraft */}
-          <div className="grid grid-cols-[1fr_auto_auto] gap-2 items-center">
-            <Label className="text-sm">Овърдрафт</Label>
-            <Input type="number" min="0" value={data.liability_overdraft_monthly ?? 0}
-              onChange={(e) => onChange('liability_overdraft_monthly', e.target.value === '' ? 0 : parseInt(e.target.value))} 
-              className="rounded-lg w-28" />
-            <Input type="number" min="0" value={data.liability_overdraft_remaining ?? 0}
-              onChange={(e) => onChange('liability_overdraft_remaining', e.target.value === '' ? 0 : parseInt(e.target.value))} 
-              className="rounded-lg w-28" />
+          <div className="grid grid-cols-[1fr_auto_auto] gap-2 items-center" data-invalid={isFieldInvalid(data.liability_overdraft_monthly) || isFieldInvalid(data.liability_overdraft_remaining) ? "true" : undefined}>
+            <Label className="text-sm">Овърдрафт <span className="text-red-500">*</span></Label>
+            <Input type="number" min="0" value={data.liability_overdraft_monthly ?? ''}
+              onChange={(e) => onChange('liability_overdraft_monthly', e.target.value === '' ? '' : parseInt(e.target.value))} 
+              className={`rounded-lg w-28 ${isFieldInvalid(data.liability_overdraft_monthly) ? 'border-red-500 bg-red-50' : ''}`} />
+            <Input type="number" min="0" value={data.liability_overdraft_remaining ?? ''}
+              onChange={(e) => onChange('liability_overdraft_remaining', e.target.value === '' ? '' : parseInt(e.target.value))} 
+              className={`rounded-lg w-28 ${isFieldInvalid(data.liability_overdraft_remaining) ? 'border-red-500 bg-red-50' : ''}`} />
           </div>
         </div>
         
@@ -475,11 +475,11 @@ export default function FinancialFlowStep({ data, onChange, showErrors }) {
             ['Автокаско', 'insurance_casco'],
             ['Други', 'insurance_other'],
           ].map(([label, key]) => (
-            <div key={key} className="flex items-center justify-between gap-2">
-              <Label className="text-sm">{label}</Label>
-              <Input type="number" min="0" value={data[key] ?? 0}
-                onChange={(e) => onChange(key, e.target.value === '' ? 0 : parseInt(e.target.value))} 
-                className="rounded-lg w-24" />
+            <div key={key} className="flex items-center justify-between gap-2" data-invalid={isFieldInvalid(data[key]) ? "true" : undefined}>
+              <Label className="text-sm">{label} <span className="text-red-500">*</span></Label>
+              <Input type="number" min="0" value={data[key] ?? ''}
+                onChange={(e) => onChange(key, e.target.value === '' ? '' : parseInt(e.target.value))} 
+                className={`rounded-lg w-24 ${isFieldInvalid(data[key]) ? 'border-red-500 bg-red-50' : ''}`} />
             </div>
           ))}
         </div>

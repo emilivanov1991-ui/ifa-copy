@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Input } from "@/components/ui/input";
 import { Calendar } from "lucide-react";
 
-export default function BulgarianDateInput({ value, onChange, className, placeholder = "дд.мм.гггг", ...props }) {
+export default function BulgarianDateInput({ value, onChange, className, placeholder = "дд.мм.гггг", minDate, ...props }) {
   const [displayValue, setDisplayValue] = useState('');
 
   // Convert ISO date (YYYY-MM-DD) to Bulgarian format (DD.MM.YYYY)
@@ -37,7 +37,17 @@ export default function BulgarianDateInput({ value, onChange, className, placeho
     if (month < 1 || month > 12) return false;
     if (day < 1 || day > 31) return false;
     const date = new Date(year, month - 1, day);
-    return date.getFullYear() === year && date.getMonth() === month - 1 && date.getDate() === day;
+    const isDateValid = date.getFullYear() === year && date.getMonth() === month - 1 && date.getDate() === day;
+    
+    // Check minDate if provided
+    if (isDateValid && minDate) {
+      const minDateObj = new Date(minDate);
+      minDateObj.setHours(0, 0, 0, 0);
+      date.setHours(0, 0, 0, 0);
+      if (date < minDateObj) return false;
+    }
+    
+    return isDateValid;
   };
 
   useEffect(() => {

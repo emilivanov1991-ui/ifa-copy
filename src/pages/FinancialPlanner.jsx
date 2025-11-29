@@ -1837,9 +1837,46 @@ export default function FinancialPlanner() {
                   </motion.div>
                 </div>
 
+                {/* Detailed Info Section */}
+                <div className={cn("rounded-2xl border p-4 mb-4", cardClasses)}>
+                  <div className="grid md:grid-cols-4 gap-4 text-sm">
+                    <div className="flex items-start gap-2">
+                      <Info className="w-4 h-4 text-blue-500 mt-0.5 flex-shrink-0" />
+                      <div>
+                        <p className="font-medium mb-1">Финансова сигурност</p>
+                        <p className={mutedTextClasses}>Резерв от {Math.round((allocations.security / 10) * 6)} месеца доходи за непредвидени ситуации.</p>
+                      </div>
+                    </div>
+                    <div className="flex items-start gap-2">
+                      <Info className="w-4 h-4 text-blue-500 mt-0.5 flex-shrink-0" />
+                      <div>
+                        <p className="font-medium mb-1">Пенсия</p>
+                        <p className={mutedTextClasses}>Държавна пенсия {formatNumber(calculateGoals.statePension)}€ + лични спестявания при 8% годишна доходност.</p>
+                      </div>
+                    </div>
+                    <div className="flex items-start gap-2">
+                      <Info className="w-4 h-4 text-blue-500 mt-0.5 flex-shrink-0" />
+                      <div>
+                        <p className="font-medium mb-1">Жилище</p>
+                        <p className={mutedTextClasses}>Ипотечен кредит {calculateGoals.loanTerm} години при 3% лихва, 85% финансиране.</p>
+                      </div>
+                    </div>
+                    <div className="flex items-start gap-2">
+                      <Info className="w-4 h-4 text-blue-500 mt-0.5 flex-shrink-0" />
+                      <div>
+                        <p className="font-medium mb-1">Други цели</p>
+                        <p className={mutedTextClasses}>Инвестиции при 5% годишна доходност до пенсиониране ({Math.round(yearsToRetirement)} години).</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
                 {/* Total Wealth - Bottom Center */}
-                <div className={cn("rounded-2xl border p-4 text-center max-w-sm mx-auto mb-4 relative group transition-all duration-300 hover:border-blue-500 hover:bg-blue-600", cardClasses)}>
-                  <p className={cn("text-[10px] tracking-widest mb-1 group-hover:text-blue-100", mutedTextClasses)}>ИМУЩЕСТВОТО ОБЩО</p>
+                <div className={cn("rounded-2xl border p-4 text-center max-w-lg mx-auto mb-4 relative group transition-all duration-300 hover:border-blue-500 hover:bg-blue-600", cardClasses)}>
+                  <div className="flex items-center justify-center gap-2 mb-2">
+                    <Wallet className="w-6 h-6 text-blue-500 group-hover:text-white" />
+                    <p className={cn("text-[10px] tracking-widest group-hover:text-blue-100", mutedTextClasses)}>ОБЩО ИМУЩЕСТВО ПРИ ПЕНСИОНИРАНЕ</p>
+                  </div>
                   <motion.p 
                     className="text-3xl md:text-4xl font-bold group-hover:text-white"
                     key={calculateGoals.totalWealth}
@@ -1847,8 +1884,11 @@ export default function FinancialPlanner() {
                     animate={{ scale: 1 }}
                     transition={{ duration: 0.2 }}
                   >
-                    {formatNumber(calculateGoals.totalWealth)} EUR
+                    {formatNumber(calculateGoals.totalWealth)} €
                   </motion.p>
+                  <p className={cn("text-xs mt-1 group-hover:text-blue-100", mutedTextClasses)}>
+                    Резерв + Пенсионен фонд + Жилище + Други спестявания
+                  </p>
                 </div>
 
                 {/* Continue button */}

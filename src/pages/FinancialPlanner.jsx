@@ -1253,7 +1253,7 @@ export default function FinancialPlanner() {
                     <button
                       onClick={() => togglePriority('stability')}
                       className={cn(
-                        "p-4 rounded-2xl border-2 transition-all duration-300 flex flex-col items-center h-full group",
+                        "p-6 rounded-2xl border-2 transition-all duration-300 flex flex-col items-center justify-center h-full group",
                         selectedPriorities.includes('stability')
                           ? "border-blue-500 bg-blue-600 text-white"
                           : isDarkMode ? "border-slate-700 hover:border-blue-500 hover:bg-blue-600" : "border-slate-200 hover:border-blue-500 hover:bg-blue-600"
@@ -1531,32 +1531,8 @@ export default function FinancialPlanner() {
                   </div>
                 </div>
 
-                <div className="text-center mb-4">
-                  <h2 className="text-3xl font-bold mb-2">Вашият оптимален финансов план</h2>
-                  <p className={cn("text-sm max-w-2xl mx-auto", mutedTextClasses)}>
-                    Разпределете 50% от дохода си между четири ключови области. Плъзгачите автоматично балансират останалите категории.
-                  </p>
-                </div>
-
-                {/* Allocation Summary Bar */}
-                <div className={cn("rounded-xl border p-3 mb-4 flex items-center justify-between", cardClasses)}>
-                  <div className="flex items-center gap-2">
-                    <Target className="w-5 h-5 text-blue-500" />
-                    <span className={cn("text-sm font-medium", mutedTextClasses)}>Общо разпределение:</span>
-                  </div>
-                  <div className="flex items-center gap-4">
-                    <div className="flex items-center gap-1">
-                      <div className="w-3 h-3 rounded-full bg-blue-500"></div>
-                      <span className="text-sm font-semibold">{allocations.security + allocations.pension + allocations.housing + allocations.cash}%</span>
-                      <span className={cn("text-sm", mutedTextClasses)}>/ 50%</span>
-                    </div>
-                    <div className="w-32 h-2 bg-slate-200 rounded-full overflow-hidden">
-                      <div 
-                        className="h-full bg-blue-500 rounded-full transition-all duration-300"
-                        style={{ width: `${((allocations.security + allocations.pension + allocations.housing + allocations.cash) / 50) * 100}%` }}
-                      />
-                    </div>
-                  </div>
+                <div className="text-center mb-3">
+                  <h2 className="text-3xl md:text-4xl font-bold mb-2">Вашият оптимален финансов план</h2>
                 </div>
 
                 {/* Goals Grid - 4 columns like the image */}
@@ -1813,7 +1789,7 @@ export default function FinancialPlanner() {
                 </div>
 
                 {/* Detailed Info Section */}
-                <div className={cn("rounded-2xl border p-4 mb-4", cardClasses)}>
+                <div className={cn("rounded-2xl border p-4 mb-3", cardClasses)}>
                   <div className="grid md:grid-cols-4 gap-4 text-sm">
                     <div className="flex items-start gap-2">
                       <Info className="w-4 h-4 text-blue-500 mt-0.5 flex-shrink-0" />
@@ -1826,7 +1802,7 @@ export default function FinancialPlanner() {
                       <Info className="w-4 h-4 text-blue-500 mt-0.5 flex-shrink-0" />
                       <div>
                         <p className="font-medium mb-1">Пенсия</p>
-                        <p className={mutedTextClasses}>Държавна пенсия {formatNumber(calculateGoals.statePension)}€ + лични спестявания при 8% годишна доходност.</p>
+                        <p className={mutedTextClasses}>Държавна пенсия + лични инвестиции при прогнозна 8% годишна доходност.</p>
                       </div>
                     </div>
                     <div className="flex items-start gap-2">
@@ -1840,20 +1816,17 @@ export default function FinancialPlanner() {
                       <Info className="w-4 h-4 text-blue-500 mt-0.5 flex-shrink-0" />
                       <div>
                         <p className="font-medium mb-1">Други цели</p>
-                        <p className={mutedTextClasses}>Инвестиции при 5% годишна доходност до пенсиониране ({Math.round(yearsToRetirement)} години).</p>
+                        <p className={mutedTextClasses}>Сума за важните неща в живота. Автомобил, образование за Вашите деца и др.</p>
                       </div>
                     </div>
                   </div>
                 </div>
 
                 {/* Total Wealth - Bottom Center */}
-                <div className={cn("rounded-2xl border p-4 text-center max-w-lg mx-auto mb-4 relative group transition-all duration-300 hover:border-blue-500 hover:bg-blue-600", cardClasses)}>
-                  <div className="flex items-center justify-center gap-2 mb-2">
-                    <Wallet className="w-6 h-6 text-blue-500 group-hover:text-white" />
-                    <p className={cn("text-[10px] tracking-widest group-hover:text-blue-100", mutedTextClasses)}>ОБЩО ИМУЩЕСТВО ПРИ ПЕНСИОНИРАНЕ</p>
-                  </div>
+                <div className={cn("rounded-2xl border p-5 text-center max-w-lg mx-auto mb-3 relative group transition-all duration-300 hover:border-blue-500 hover:bg-blue-600", cardClasses)}>
+                  <p className={cn("text-xs tracking-widest mb-2 group-hover:text-blue-100", mutedTextClasses)}>ОБЩО ИМУЩЕСТВО</p>
                   <motion.p 
-                    className="text-3xl md:text-4xl font-bold group-hover:text-white"
+                    className="text-4xl md:text-5xl font-bold group-hover:text-white"
                     key={calculateGoals.totalWealth}
                     initial={{ scale: 1.05 }}
                     animate={{ scale: 1 }}
@@ -1861,9 +1834,6 @@ export default function FinancialPlanner() {
                   >
                     {formatNumber(calculateGoals.totalWealth)} €
                   </motion.p>
-                  <p className={cn("text-xs mt-1 group-hover:text-blue-100", mutedTextClasses)}>
-                    Резерв + Пенсионен фонд + Жилище + Други спестявания
-                  </p>
                 </div>
 
                 {/* Continue button */}
@@ -2083,9 +2053,9 @@ export default function FinancialPlanner() {
                     <div className="w-20 h-20 mx-auto mb-4 rounded-full bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center">
                       <CheckCircle2 className="w-10 h-10 text-white" />
                     </div>
-                    <h2 className="text-3xl font-bold mb-2">Вашият финансов план е готов!</h2>
-                    <p className={cn("text-sm max-w-lg mx-auto", mutedTextClasses)}>
-                      Обобщение на вашите финансови цели и следващи стъпки за постигането им.
+                    <h2 className="text-3xl font-bold mb-4">Готови сте!</h2>
+                    <p className={cn("text-base max-w-lg mx-auto", mutedTextClasses)}>
+                      Вече знаете какъв е вашият финансов потенциал. Нека преминем към детайлния анализ!
                     </p>
                   </div>
 

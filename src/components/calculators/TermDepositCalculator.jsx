@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent } from "@/components/ui/card";
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, Cell } from 'recharts';
 
 export default function TermDepositCalculator() {
   const [amount, setAmount] = useState(10000);
@@ -14,6 +15,18 @@ export default function TermDepositCalculator() {
   };
 
   const totalAmount = amount + calculateInterest();
+
+  // Comparison data for different rates
+  const comparisonData = useMemo(() => {
+    return [1, 2, 3, 4, 5, 6].map(r => {
+      const interest = (amount * r * term) / (12 * 100);
+      return {
+        rate: `${r}%`,
+        'Лихва': interest,
+        'Обща сума': amount + interest
+      };
+    });
+  }, [amount, term]);
 
   return (
     <div className="space-y-6">
@@ -78,6 +91,32 @@ export default function TermDepositCalculator() {
           </CardContent>
         </Card>
       </div>
+
+      {/* Comparison Chart */}
+      <Card>
+        <CardContent className="pt-6">
+          <h3 className="font-semibold mb-4 text-slate-900">Сравнение при различни лихви</h3>
+          <ResponsiveContainer width="100%" height={300}>
+            <BarChart data={comparisonData}>
+              <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
+              <XAxis dataKey="rate" />
+              <YAxis label={{ value: 'Сума (€)', angle: -90, position: 'insideLeft' }} />
+              <Tooltip 
+                formatter={(value) => value.toLocaleString('bg-BG', { maximumFractionDigits: 2 }) + ' €'}
+              />
+              <Legend />
+              <Bar dataKey="Лихва" stackId="a" fill="#10b981">
+                {comparisonData.map((entry, index) => (
+                  <Cell key={index} fill={entry.rate === `${rate}%` ? '#059669' : '#86efac'} />
+                ))}
+              </Bar>
+            </BarChart>
+          </ResponsiveContainer>
+          <p className="text-xs text-slate-500 mt-3 text-center">
+            Тъмнозеленият стълб показва избраната от вас лихва
+          </p>
+        </CardContent>
+      </Card>
     </div>
   );
 }

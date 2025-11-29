@@ -1,21 +1,37 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent } from "@/components/ui/card";
 import { AlertTriangle } from 'lucide-react';
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 
 export default function InflationCalculator() {
   const [amount, setAmount] = useState(10000);
   const [years, setYears] = useState(10);
   const [inflationRate, setInflationRate] = useState(3);
 
-  const calculateFutureValue = () => {
-    return amount / Math.pow(1 + inflationRate / 100, years);
+  const calculateFutureValue = (year) => {
+    return amount / Math.pow(1 + inflationRate / 100, year);
   };
 
-  const futureValue = calculateFutureValue();
+  const futureValue = calculateFutureValue(years);
   const loss = amount - futureValue;
   const lossPercent = (loss / amount) * 100;
+
+  // Generate chart data
+  const chartData = useMemo(() => {
+    const data = [];
+    for (let year = 0; year <= years; year++) {
+      const realValue = calculateFutureValue(year);
+      data.push({
+        year,
+        'Номинална стойност': amount,
+        'Реална стойност': realValue,
+        'Загуба': amount - realValue
+      });
+    }
+    return data;
+  }, [amount, years, inflationRate]);
 
   return (
     <div className="space-y-6">
@@ -96,6 +112,30 @@ export default function InflationCalculator() {
           </CardContent>
         </Card>
       </div>
+
+      {/* Inflation Impact Chart */}
+      <Card>
+        <CardContent className="pt-6">
+          <h3 className="font-semibold mb-4 text-slate-900">Ерозия на покупателната способност</h3>
+          <ResponsiveContainer width="100%" height={300}>
+            <LineChart data={chartData}>
+              <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
+              <XAxis dataKey="year" label={{ value: 'Години', position: 'insideBottom', offset: -5 }} />
+              <YAxis label={{ value: 'Стойност (€)', angle: -90, position: 'insideLeft' }} />
+              <Tooltip 
+                formatter={(value) => value.toLocaleString('bg-BG', { maximumFractionDigits: 2 }) + ' €'}
+                labelFormatter={(label) => `Година ${label}`}
+              />
+              <Legend />
+              <Line type="monotone" dataKey="Номинална стойност" stroke="#94a3b8" strokeWidth={2} strokeDasharray="5 5" />
+              <Line type="monotone" dataKey="Реална стойност" stroke="#f97316" strokeWidth={3} />
+            </LineChart>
+          </ResponsiveContainer>
+          <p className="text-xs text-slate-500 mt-3 text-center">
+            Пунктираната линия показва номиналната стойност, оранжевата - реалната покупателна способност
+          </p>
+        </CardContent>
+      </Card>
     </div>
   );
 }

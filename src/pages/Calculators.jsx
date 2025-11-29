@@ -16,6 +16,7 @@ const MortgageCalculator = () => {
   const [offers, setOffers] = useState([
     { id: 1, name: 'Оферта 1', amount: 100000, term: 20, rate: 3.5 }
   ]);
+  const [selectedOfferId, setSelectedOfferId] = useState(1);
 
   const calculateMonthlyPayment = (amount, termYears, annualRate) => {
     const monthlyRate = annualRate / 100 / 12;
@@ -28,6 +29,35 @@ const MortgageCalculator = () => {
     const monthlyPayment = calculateMonthlyPayment(amount, termYears, annualRate);
     const totalPaid = monthlyPayment * termYears * 12;
     return totalPaid - amount;
+  };
+
+  // Generate amortization schedule for selected offer
+  const generateAmortizationSchedule = (offer) => {
+    const monthlyPayment = calculateMonthlyPayment(offer.amount, offer.term, offer.rate);
+    const schedule = [];
+    let balance = offer.amount;
+    const monthlyRate = offer.rate / 100 / 12;
+    
+    for (let year = 1; year <= offer.term; year++) {
+      let yearlyInterest = 0;
+      let yearlyPrincipal = 0;
+      
+      for (let month = 1; month <= 12; month++) {
+        const interest = balance * monthlyRate;
+        const principal = monthlyPayment - interest;
+        balance -= principal;
+        yearlyInterest += interest;
+        yearlyPrincipal += principal;
+      }
+      
+      schedule.push({
+        year,
+        'Главница': yearlyPrincipal,
+        'Лихва': yearlyInterest,
+        'Остатък': Math.max(0, balance)
+      });
+    }
+    return schedule;
   };
 
   const addOffer = () => {
@@ -60,6 +90,8 @@ const MortgageCalculator = () => {
   };
 
   const bestOfferId = getBestOffer();
+  const selectedOffer = offers.find(o => o.id === selectedOfferId) || offers[0];
+  const amortizationData = generateAmortizationSchedule(selectedOffer);
 
   return (
     <div className="space-y-6">
@@ -96,6 +128,7 @@ const MortgageCalculator = () => {
                   <Input
                     value={offer.name}
                     onChange={(e) => updateOffer(offer.id, 'name', e.target.value)}
+                    onFocus={() => setSelectedOfferId(offer.id)}
                     className="font-semibold text-lg border-0 p-0 h-auto focus-visible:ring-0 bg-transparent"
                   />
                   {offers.length > 1 && (
@@ -218,6 +251,39 @@ const MortgageCalculator = () => {
           </CardContent>
         </Card>
       )}
+
+      {/* Amortization Chart for selected offer */}
+      <Card>
+        <CardContent className="pt-6">
+          <h3 className="font-semibold mb-4 text-slate-900">
+            График на погасяване - {selectedOffer.name}
+          </h3>
+          <ResponsiveContainer width="100%" height={350}>
+            <AreaChart data={amortizationData}>
+              <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
+              <XAxis dataKey="year" label={{ value: 'Година', position: 'insideBottom', offset: -5 }} />
+              <YAxis label={{ value: 'Сума (€)', angle: -90, position: 'insideLeft' }} />
+              <Tooltip 
+                formatter={(value) => value.toLocaleString('bg-BG', { maximumFractionDigits: 2 }) + ' €'}
+                labelFormatter={(label) => `Година ${label}`}
+              />
+              <Legend />
+              <Area type="monotone" dataKey="Главница" stackId="1" stroke="#3b82f6" fill="#93c5fd" />
+              <Area type="monotone" dataKey="Лихва" stackId="1" stroke="#f59e0b" fill="#fcd34d" />
+            </AreaChart>
+          </ResponsiveContainer>
+          <div className="mt-4 grid grid-cols-2 gap-3 text-sm">
+            <div className="flex items-center gap-2">
+              <div className="w-3 h-3 rounded bg-blue-400" />
+              <span className="text-slate-600">Главница (погасен дълг)</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="w-3 h-3 rounded bg-amber-400" />
+              <span className="text-slate-600">Лихва (цена на кредита)</span>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
     </div>
   );
 };

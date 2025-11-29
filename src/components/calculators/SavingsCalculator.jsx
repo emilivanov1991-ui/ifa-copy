@@ -1,16 +1,16 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent } from "@/components/ui/card";
+import { LineChart, Line, AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 
 export default function SavingsCalculator() {
   const [monthlyAmount, setMonthlyAmount] = useState(50);
   const [years, setYears] = useState(10);
   const [rate, setRate] = useState(5);
 
-  const calculateFutureValue = () => {
+  const calculateFutureValue = (months, rate) => {
     const monthlyRate = rate / 100 / 12;
-    const months = years * 12;
     
     if (monthlyRate === 0) {
       return monthlyAmount * months;
@@ -21,8 +21,25 @@ export default function SavingsCalculator() {
   };
 
   const totalInvested = monthlyAmount * years * 12;
-  const futureValue = calculateFutureValue();
+  const futureValue = calculateFutureValue(years * 12, rate);
   const earnings = futureValue - totalInvested;
+
+  // Generate chart data
+  const chartData = useMemo(() => {
+    const data = [];
+    for (let year = 0; year <= years; year++) {
+      const months = year * 12;
+      const invested = monthlyAmount * months;
+      const value = calculateFutureValue(months, rate);
+      data.push({
+        year,
+        'Инвестирано': invested,
+        'Обща стойност': value,
+        'Печалба': value - invested
+      });
+    }
+    return data;
+  }, [monthlyAmount, years, rate]);
 
   return (
     <div className="space-y-6">
@@ -90,6 +107,27 @@ export default function SavingsCalculator() {
           </CardContent>
         </Card>
       </div>
+
+      {/* Chart */}
+      <Card>
+        <CardContent className="pt-6">
+          <h3 className="font-semibold mb-4 text-slate-900">Растеж на инвестицията във времето</h3>
+          <ResponsiveContainer width="100%" height={300}>
+            <AreaChart data={chartData}>
+              <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
+              <XAxis dataKey="year" label={{ value: 'Години', position: 'insideBottom', offset: -5 }} />
+              <YAxis label={{ value: 'Сума (€)', angle: -90, position: 'insideLeft' }} />
+              <Tooltip 
+                formatter={(value) => value.toLocaleString('bg-BG', { maximumFractionDigits: 2 }) + ' €'}
+                labelFormatter={(label) => `Година ${label}`}
+              />
+              <Legend />
+              <Area type="monotone" dataKey="Инвестирано" stackId="1" stroke="#94a3b8" fill="#cbd5e1" />
+              <Area type="monotone" dataKey="Печалба" stackId="1" stroke="#10b981" fill="#86efac" />
+            </AreaChart>
+          </ResponsiveContainer>
+        </CardContent>
+      </Card>
     </div>
   );
 }

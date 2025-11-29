@@ -4,6 +4,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Building2, TrendingUp, Calculator, Users, AlertTriangle } from 'lucide-react';
 import { cn } from "@/lib/utils";
+import { BarChart, Bar, LineChart, Line, AreaChart, Area, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 
 // Page 10 - Pension Demographics
 const PensionDemographics = () => {
@@ -67,12 +68,14 @@ const PensionDemographics = () => {
 // Page 11 - How Rich People Invest
 const RichInvestmentStrategy = () => {
   const portfolioData = [
-    { category: 'Паричен пазар', percent: 25.6, color: 'bg-red-500' },
-    { category: 'Облигации', percent: 16.9, color: 'bg-slate-400' },
-    { category: 'Акции', percent: 26.8, color: 'bg-blue-400' },
-    { category: 'Недвижими имоти', percent: 17.6, color: 'bg-slate-600' },
-    { category: 'Алтернативи (други)', percent: 13.1, color: 'bg-slate-800' },
+    { category: 'Паричен пазар', percent: 25.6, color: '#ef4444' },
+    { category: 'Облигации', percent: 16.9, color: '#94a3b8' },
+    { category: 'Акции', percent: 26.8, color: '#60a5fa' },
+    { category: 'Недвижими имоти', percent: 17.6, color: '#475569' },
+    { category: 'Алтернативи (други)', percent: 13.1, color: '#1e293b' },
   ];
+
+  const pieData = portfolioData.map(item => ({ name: item.category, value: item.percent }));
 
   return (
     <div className="space-y-6">
@@ -80,22 +83,36 @@ const RichInvestmentStrategy = () => {
       <p className="text-slate-600">Разнообразие на портфейла</p>
       
       <div className="grid md:grid-cols-2 gap-6">
-        {/* Bar chart */}
+        {/* Pie chart */}
         <Card>
           <CardContent className="pt-6">
-            <div className="space-y-3">
+            <ResponsiveContainer width="100%" height={300}>
+              <PieChart>
+                <Pie
+                  data={pieData}
+                  cx="50%"
+                  cy="50%"
+                  labelLine={false}
+                  label={({ name, percent }) => `${(percent * 100).toFixed(1)}%`}
+                  outerRadius={100}
+                  fill="#8884d8"
+                  dataKey="value"
+                >
+                  {pieData.map((entry, index) => (
+                    <Cell key={`cell-${index}`} fill={portfolioData[index].color} />
+                  ))}
+                </Pie>
+                <Tooltip formatter={(value) => `${value.toFixed(1)}%`} />
+              </PieChart>
+            </ResponsiveContainer>
+            <div className="space-y-2 mt-4">
               {portfolioData.map((item) => (
-                <div key={item.category}>
-                  <div className="flex justify-between items-center mb-1">
+                <div key={item.category} className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <div className="w-3 h-3 rounded" style={{ backgroundColor: item.color }} />
                     <span className="text-sm text-slate-700">{item.category}</span>
-                    <span className="text-sm font-semibold">{item.percent}%</span>
                   </div>
-                  <div className="h-8 bg-slate-100 rounded-lg overflow-hidden">
-                    <div 
-                      className={cn("h-full transition-all duration-500", item.color)}
-                      style={{ width: `${item.percent * 3.3}%` }}
-                    />
-                  </div>
+                  <span className="text-sm font-semibold">{item.percent}%</span>
                 </div>
               ))}
             </div>
@@ -211,6 +228,7 @@ const RegularInvestmentPower = () => {
 
 // Page 13 - Monthly Savings Table
 const MonthlySavingsTable = () => {
+  const [selectedRate, setSelectedRate] = useState(8);
   const rates = [1, 3, 5, 6, 8, 10];
   const years = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 15, 20, 25, 30, 35, 40];
   
@@ -221,10 +239,52 @@ const MonthlySavingsTable = () => {
     return monthlyAmount * ((Math.pow(1 + monthlyRate, months) - 1) / monthlyRate);
   };
 
+  // Generate chart data for selected rate
+  const chartData = years.map(year => ({
+    year: `${year}г`,
+    'Стойност': calculateSavings(50, selectedRate, year)
+  }));
+
   return (
     <div className="space-y-6">
       <h2 className="text-2xl font-bold text-slate-900">Редовен месечен депозит от 50 лв.</h2>
       <p className="text-slate-600">Резултат при различни годишни доходности</p>
+      
+      {/* Interactive Rate Selector */}
+      <div className="flex gap-2 flex-wrap justify-center">
+        {rates.map(r => (
+          <button
+            key={r}
+            onClick={() => setSelectedRate(r)}
+            className={cn(
+              "px-4 py-2 rounded-lg font-semibold transition-all",
+              selectedRate === r 
+                ? "bg-blue-600 text-white shadow-lg" 
+                : "bg-slate-100 text-slate-600 hover:bg-slate-200"
+            )}
+          >
+            {r}%
+          </button>
+        ))}
+      </div>
+
+      {/* Chart */}
+      <Card>
+        <CardContent className="pt-6">
+          <h3 className="font-semibold mb-4 text-slate-900">Растеж при {selectedRate}% годишна доходност</h3>
+          <ResponsiveContainer width="100%" height={300}>
+            <BarChart data={chartData}>
+              <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
+              <XAxis dataKey="year" />
+              <YAxis label={{ value: 'Сума (лв)', angle: -90, position: 'insideLeft' }} />
+              <Tooltip 
+                formatter={(value) => value.toLocaleString('bg-BG', { maximumFractionDigits: 0 }) + ' лв'}
+              />
+              <Bar dataKey="Стойност" fill="#3b82f6" />
+            </BarChart>
+          </ResponsiveContainer>
+        </CardContent>
+      </Card>
       
       <div className="overflow-x-auto">
         <table className="w-full text-sm border border-slate-200">
@@ -335,10 +395,60 @@ const WhyInvestRegularly = () => {
 
 // Page 15 - Compound Interest
 const CompoundInterestVisual = () => {
+  const earlyStartData = [];
+  const lateStartData = [];
+  
+  // Early start: age 20-59
+  for (let age = 20; age <= 59; age++) {
+    const years = age - 20;
+    const months = years * 12;
+    const rate8 = 0.08 / 12;
+    const value = 50 * ((Math.pow(1 + rate8, months) - 1) / rate8) * (1 + rate8);
+    earlyStartData.push({ age, value });
+  }
+  
+  // Late start: age 30-59
+  for (let age = 30; age <= 59; age++) {
+    const years = age - 30;
+    const months = years * 12;
+    const rate8 = 0.08 / 12;
+    const value = 50 * ((Math.pow(1 + rate8, months) - 1) / rate8) * (1 + rate8);
+    lateStartData.push({ age, value: age < 30 ? 0 : value });
+  }
+
   return (
     <div className="space-y-6">
       <h2 className="text-2xl font-bold text-slate-900">Сложна лихва - Натрупване</h2>
       <p className="text-slate-600">Силата на ранното инвестиране</p>
+      
+      {/* Comparison Chart */}
+      <Card>
+        <CardContent className="pt-6">
+          <h3 className="font-semibold mb-4 text-slate-900">Започнали на 20 год. vs 30 год. (при 8% доходност)</h3>
+          <ResponsiveContainer width="100%" height={300}>
+            <LineChart>
+              <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
+              <XAxis 
+                type="number" 
+                dataKey="age" 
+                domain={[20, 59]} 
+                label={{ value: 'Възраст', position: 'insideBottom', offset: -5 }}
+              />
+              <YAxis label={{ value: 'Стойност (лв)', angle: -90, position: 'insideLeft' }} />
+              <Tooltip 
+                formatter={(value) => value.toLocaleString('bg-BG', { maximumFractionDigits: 0 }) + ' лв'}
+                labelFormatter={(label) => `Възраст ${label}`}
+              />
+              <Legend />
+              <Line data={earlyStartData} type="monotone" dataKey="value" stroke="#10b981" strokeWidth={3} name="Започнали на 20 год." />
+              <Line data={lateStartData} type="monotone" dataKey="value" stroke="#ef4444" strokeWidth={3} name="Започнали на 30 год." />
+            </LineChart>
+          </ResponsiveContainer>
+          <p className="text-xs text-slate-500 mt-3 text-center">
+            При еднаква месечна вноска от 50 лв и 8% годишна доходност
+          </p>
+        </CardContent>
+      </Card>
       
       <div className="grid md:grid-cols-2 gap-6">
         {/* Early Start */}
@@ -725,13 +835,15 @@ export default function AuxiliaryTools() {
           className="bg-white rounded-2xl shadow-xl p-6 md:p-10"
         >
           <Tabs defaultValue="pension" className="space-y-6">
-            <TabsList className="grid w-full grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-2">
+            <TabsList className="grid w-full grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-2">
               <TabsTrigger value="pension" className="text-xs">Пенсия</TabsTrigger>
-              <TabsTrigger value="rich" className="text-xs">Богати инвеститори</TabsTrigger>
+              <TabsTrigger value="rich" className="text-xs">Богати</TabsTrigger>
               <TabsTrigger value="pioneer" className="text-xs">Pioneer Fund</TabsTrigger>
-              <TabsTrigger value="monthly" className="text-xs">Месечно спестяване</TabsTrigger>
+              <TabsTrigger value="monthly" className="text-xs">Таблица</TabsTrigger>
+              <TabsTrigger value="why" className="text-xs">Защо редовно</TabsTrigger>
               <TabsTrigger value="compound" className="text-xs">Сложна лихва</TabsTrigger>
               <TabsTrigger value="rule72" className="text-xs">Правило 72</TabsTrigger>
+              <TabsTrigger value="income" className="text-xs">Обезщетения</TabsTrigger>
             </TabsList>
 
             <TabsContent value="pension"><PensionDemographics /></TabsContent>
@@ -740,7 +852,6 @@ export default function AuxiliaryTools() {
             <TabsContent value="monthly"><MonthlySavingsTable /></TabsContent>
             <TabsContent value="why"><WhyInvestRegularly /></TabsContent>
             <TabsContent value="compound"><CompoundInterestVisual /></TabsContent>
-            <TabsContent value="dax"><DAXTriangle /></TabsContent>
             <TabsContent value="rule72"><Rule72 /></TabsContent>
             <TabsContent value="income"><IncomeProtectionTable /></TabsContent>
           </Tabs>

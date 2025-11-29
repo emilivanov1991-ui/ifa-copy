@@ -2,7 +2,7 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider";
-import { RotateCcw, Loader2, Lock, Unlock, HelpCircle, ArrowLeft, ShieldAlert, Shield, ShieldCheck, Frown, Smile, PartyPopper, Home, HomeIcon, Car, GraduationCap, BookX } from 'lucide-react';
+import { RotateCcw, Loader2, Lock, Unlock, HelpCircle, ArrowLeft, ShieldAlert, Shield, ShieldCheck, Frown, Smile, PartyPopper, Home, HomeIcon, Car, GraduationCap, Wallet } from 'lucide-react';
 import {
   Tooltip,
   TooltipContent,
@@ -644,24 +644,24 @@ export default function FinancialPlanner() {
             
             {/* Step 1: Family Type */}
             {currentStep === 1 && (
-              <motion.div
-                key="step-1"
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -20 }}
-                className="grid lg:grid-cols-2 gap-8 items-start"
-              >
-                {/* Left side - description */}
-                <div className="lg:pr-12">
-                  <p className={cn("text-sm tracking-widest mb-4", accentColor)}>СТЪПКА 1</p>
-                  <h1 className="text-4xl md:text-5xl font-bold mb-6">С кого планираме?</h1>
-                  <p className={cn("text-lg mb-6", mutedTextClasses)}>
-                    Изберете дали работим с един клиент или с домакинство.
-                  </p>
-                </div>
+            <motion.div
+            key="step-1"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            className="grid lg:grid-cols-4 gap-8 items-start"
+            >
+            {/* Left side - description (25%) */}
+            <div className="lg:col-span-1">
+              <p className={cn("text-sm tracking-widest mb-4", accentColor)}>СТЪПКА 1</p>
+              <h1 className="text-3xl md:text-4xl font-bold mb-4">С кого планираме?</h1>
+              <p className={cn("text-base mb-6", mutedTextClasses)}>
+                Изберете дали работим с един клиент или с домакинство.
+              </p>
+            </div>
 
-                {/* Right side - card */}
-                <div className={cn("rounded-3xl border p-6", cardClasses)}>
+            {/* Right side - card (75%) */}
+            <div className={cn("lg:col-span-3 rounded-3xl border p-6", cardClasses)}>
                   {/* Inline Step Tracker */}
                   <div className="mb-6 pb-4 border-b border-slate-100">
                     <div className="flex justify-between items-start">
@@ -768,12 +768,12 @@ export default function FinancialPlanner() {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -20 }}
-                className="grid lg:grid-cols-2 gap-8 items-start"
+                className="grid lg:grid-cols-4 gap-8 items-start"
               >
-                <div className="lg:pr-12">
+                <div className="lg:col-span-1">
                   <p className={cn("text-sm tracking-widest mb-4", accentColor)}>СТЪПКА 2</p>
-                  <h1 className="text-4xl md:text-5xl font-bold mb-6">Начин на осигуряване</h1>
-                  <p className={cn("text-lg mb-6", mutedTextClasses)}>
+                  <h1 className="text-3xl md:text-4xl font-bold mb-4">Начин на осигуряване</h1>
+                  <p className={cn("text-base mb-6", mutedTextClasses)}>
                     {familyType === 'family' 
                       ? 'Изберете начина на осигуряване за клиента и партньора.'
                       : 'Изберете вашия начин на осигуряване.'
@@ -781,7 +781,7 @@ export default function FinancialPlanner() {
                   </p>
                 </div>
 
-                <div className={cn("rounded-3xl border p-6", cardClasses)}>
+                <div className={cn("lg:col-span-3 rounded-3xl border p-6", cardClasses)}>
                   {/* Inline Step Tracker */}
                   <div className="mb-6 pb-4 border-b border-slate-100">
                     <div className="flex justify-between items-start">
@@ -913,12 +913,12 @@ export default function FinancialPlanner() {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -20 }}
-                className="grid lg:grid-cols-2 gap-8 items-start"
+                className="grid lg:grid-cols-4 gap-8 items-start"
               >
-                <div className="lg:pr-12">
+                <div className="lg:col-span-1">
                   <p className={cn("text-sm tracking-widest mb-4", accentColor)}>СТЪПКА 3</p>
-                  <h1 className="text-4xl md:text-5xl font-bold mb-6">Възраст</h1>
-                  <p className={cn("text-lg mb-6", mutedTextClasses)}>
+                  <h1 className="text-3xl md:text-4xl font-bold mb-4">Възраст</h1>
+                  <p className={cn("text-base mb-6", mutedTextClasses)}>
                     {familyType === 'family' 
                       ? 'Въведете възрастта на клиента и партньора.'
                       : 'Въведете вашата възраст.'
@@ -926,7 +926,7 @@ export default function FinancialPlanner() {
                   </p>
                 </div>
 
-                <div className={cn("rounded-3xl border p-6", cardClasses)}>
+                <div className={cn("lg:col-span-3 rounded-3xl border p-6", cardClasses)}>
                   {/* Inline Step Tracker */}
                   <div className="mb-6 pb-4 border-b border-slate-100">
                     <div className="flex justify-between items-start">
@@ -1016,12 +1016,12 @@ export default function FinancialPlanner() {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -20 }}
-                className="grid lg:grid-cols-2 gap-8 items-start"
+                className="grid lg:grid-cols-4 gap-8 items-start"
               >
-                <div className="lg:pr-12">
+                <div className="lg:col-span-1">
                   <p className={cn("text-sm tracking-widest mb-4", accentColor)}>СТЪПКА 4</p>
-                  <h1 className="text-4xl md:text-5xl font-bold mb-6">Месечен доход</h1>
-                  <p className={cn("text-lg mb-6", mutedTextClasses)}>
+                  <h1 className="text-3xl md:text-4xl font-bold mb-4">Месечен доход</h1>
+                  <p className={cn("text-base mb-6", mutedTextClasses)}>
                     {familyType === 'family' 
                       ? 'Въведете месечния доход на клиента и партньора.'
                       : 'Въведете вашия месечен доход.'
@@ -1029,7 +1029,7 @@ export default function FinancialPlanner() {
                   </p>
                 </div>
 
-                <div className={cn("rounded-3xl border p-6", cardClasses)}>
+                <div className={cn("lg:col-span-3 rounded-3xl border p-6", cardClasses)}>
                   {/* Inline Step Tracker */}
                   <div className="mb-6 pb-4 border-b border-slate-100">
                     <div className="flex justify-between items-start">
@@ -1129,17 +1129,17 @@ export default function FinancialPlanner() {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -20 }}
-                className="grid lg:grid-cols-2 gap-8 items-start"
+                className="grid lg:grid-cols-4 gap-8 items-start"
               >
-                <div className="lg:pr-12">
+                <div className="lg:col-span-1">
                   <p className={cn("text-sm tracking-widest mb-4", accentColor)}>СТЪПКА 5</p>
-                  <h1 className="text-4xl md:text-5xl font-bold mb-6">Приоритети</h1>
-                  <p className={cn("text-lg mb-6", mutedTextClasses)}>
+                  <h1 className="text-3xl md:text-4xl font-bold mb-4">Приоритети</h1>
+                  <p className={cn("text-base mb-6", mutedTextClasses)}>
                     Изберете една или повече посоки, които резонират с Вашите мечти.
                   </p>
                 </div>
 
-                <div className={cn("rounded-3xl border p-6", cardClasses)}>
+                <div className={cn("lg:col-span-3 rounded-3xl border p-6", cardClasses)}>
                   {/* Inline Step Tracker */}
                   <div className="mb-6 pb-4 border-b border-slate-100">
                     <div className="flex justify-between items-start">
@@ -1351,14 +1351,14 @@ export default function FinancialPlanner() {
               </motion.div>
             )}
 
-            {/* Step 6: Financial Framework - New Layout */}
+            {/* Step 6: Financial Framework - Full Screen Layout */}
             {currentStep === 6 && !isGenerating && (
               <motion.div
                 key="step-6"
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -20 }}
-                className="max-w-6xl mx-auto"
+                className="w-full px-4"
               >
                 {/* Inline Step Tracker */}
                 <div className={cn("rounded-2xl border p-4 mb-6", cardClasses)}>
@@ -1377,10 +1377,7 @@ export default function FinancialPlanner() {
                   </div>
                 </div>
 
-                <h2 className="text-3xl font-bold mb-2 text-center">Вашият оптимален финансов план</h2>
-                <p className={cn("text-center mb-6 text-sm", mutedTextClasses)}>
-                  Разпределение: {allocations.security + allocations.pension + allocations.housing + allocations.cash}% от дохода
-                </p>
+                <h2 className="text-3xl font-bold mb-6 text-center">Вашият оптимален финансов план</h2>
 
                 {/* Goals Grid - 4 columns like the image */}
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
@@ -1415,11 +1412,11 @@ export default function FinancialPlanner() {
                     {/* Security Icon based on percentage */}
                     <div className="flex justify-center mb-2">
                       {allocations.security <= 3 ? (
-                        <ShieldAlert className={cn("w-8 h-8 text-red-400 group-hover:text-red-200")} />
+                        <ShieldAlert className={cn("w-12 h-12 md:w-14 md:h-14 text-red-400 group-hover:text-red-200")} />
                       ) : allocations.security <= 20 ? (
-                        <Shield className={cn("w-8 h-8 text-emerald-500 group-hover:text-emerald-200")} />
+                        <Shield className={cn("w-12 h-12 md:w-14 md:h-14 text-emerald-500 group-hover:text-emerald-200")} />
                       ) : (
-                        <ShieldCheck className={cn("w-8 h-8 text-blue-500 group-hover:text-blue-200")} />
+                        <ShieldCheck className={cn("w-12 h-12 md:w-14 md:h-14 text-blue-500 group-hover:text-blue-200")} />
                       )}
                     </div>
                     
@@ -1475,11 +1472,11 @@ export default function FinancialPlanner() {
                     {/* Pension Icon based on percentage */}
                     <div className="flex justify-center mb-2">
                       {allocations.pension <= 2 ? (
-                        <Frown className={cn("w-8 h-8 text-red-400 group-hover:text-red-200")} />
+                        <Frown className={cn("w-12 h-12 md:w-14 md:h-14 text-red-400 group-hover:text-red-200")} />
                       ) : allocations.pension <= 10 ? (
-                        <Smile className={cn("w-8 h-8 text-emerald-500 group-hover:text-emerald-200")} />
+                        <Smile className={cn("w-12 h-12 md:w-14 md:h-14 text-emerald-500 group-hover:text-emerald-200")} />
                       ) : (
-                        <PartyPopper className={cn("w-8 h-8 text-amber-500 group-hover:text-amber-200")} />
+                        <PartyPopper className={cn("w-12 h-12 md:w-14 md:h-14 text-amber-500 group-hover:text-amber-200")} />
                       )}
                     </div>
                     
@@ -1535,9 +1532,9 @@ export default function FinancialPlanner() {
                     {/* Housing Icon based on value */}
                     <div className="flex justify-center mb-2">
                       {calculateGoals.housing >= 100000 ? (
-                        <Home className={cn("w-8 h-8 text-emerald-500 group-hover:text-emerald-200")} />
+                        <Home className={cn("w-12 h-12 md:w-14 md:h-14 text-emerald-500 group-hover:text-emerald-200")} />
                       ) : (
-                        <HomeIcon className={cn("w-8 h-8 text-slate-400 group-hover:text-slate-200")} />
+                        <HomeIcon className={cn("w-12 h-12 md:w-14 md:h-14 text-slate-400 group-hover:text-slate-200")} />
                       )}
                     </div>
                     
@@ -1590,14 +1587,19 @@ export default function FinancialPlanner() {
                     </div>
                     <p className={cn("text-[10px] tracking-widest mb-2 group-hover:text-blue-100", mutedTextClasses)}>ДРУГИ ЦЕЛИ</p>
                     
-                    {/* Other Goals Icon based on percentage */}
+                    {/* Other Goals Icon - Car icon with slash when 0 */}
                     <div className="flex justify-center mb-2">
                       {allocations.cash === 0 ? (
-                        <BookX className={cn("w-8 h-8 text-red-400 group-hover:text-red-200")} />
+                        <div className="relative">
+                          <Car className={cn("w-12 h-12 md:w-14 md:h-14 text-red-400 group-hover:text-red-200")} />
+                          <div className="absolute inset-0 flex items-center justify-center">
+                            <div className="w-16 h-0.5 bg-red-400 group-hover:bg-red-200 rotate-45 transform origin-center"></div>
+                          </div>
+                        </div>
                       ) : allocations.cash <= 2 ? (
-                        <Car className={cn("w-8 h-8 text-blue-500 group-hover:text-blue-200")} />
+                        <Car className={cn("w-12 h-12 md:w-14 md:h-14 text-blue-500 group-hover:text-blue-200")} />
                       ) : (
-                        <GraduationCap className={cn("w-8 h-8 text-violet-500 group-hover:text-violet-200")} />
+                        <Wallet className={cn("w-12 h-12 md:w-14 md:h-14 text-violet-500 group-hover:text-violet-200")} />
                       )}
                     </div>
                     
@@ -1619,7 +1621,7 @@ export default function FinancialPlanner() {
                       step={1}
                       className="mb-2"
                     />
-                    <p className={cn("text-[10px] mt-1 group-hover:text-blue-100", mutedTextClasses)}>Капитал до пенсия</p>
+                    <p className={cn("text-[10px] mt-1 group-hover:text-blue-100", mutedTextClasses)}>Пари за важните цели</p>
                   </motion.div>
                 </div>
 
@@ -1656,7 +1658,7 @@ export default function FinancialPlanner() {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -20 }}
-                className="max-w-4xl mx-auto"
+                className="w-full px-4"
               >
                 <div className={cn("rounded-3xl border p-6 md:p-8", cardClasses)}>
                   {/* Inline Step Tracker */}
@@ -1741,7 +1743,7 @@ export default function FinancialPlanner() {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -20 }}
-                className="max-w-4xl mx-auto"
+                className="w-full px-4"
               >
                 <div className={cn("rounded-3xl border p-6 md:p-8", cardClasses)}>
                   {/* Inline Step Tracker */}

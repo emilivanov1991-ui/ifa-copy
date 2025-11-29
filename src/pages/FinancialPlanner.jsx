@@ -185,8 +185,8 @@ export default function FinancialPlanner() {
     const pensionFundAtRetirement = calculateFutureValue(monthlyPensionInvestment, 0.08, yearsToRetirement);
     const monthlyPensionFromFund = calculateAnnuityPayment(pensionFundAtRetirement, 0.03, 20);
     const statePension = calculateStatePension(
-      familyType === 'family' ? monthlyIncome : totalIncome,
-      partnerIncome,
+      familyType === 'family' ? clientIncomeNum : totalIncome,
+      partnerIncomeNum,
       clientInsuranceType === 'entrepreneur',
       partnerInsuranceType === 'entrepreneur',
       familyType === 'family'

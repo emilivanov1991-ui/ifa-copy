@@ -1121,30 +1121,39 @@ export default function FinancialPlanner() {
                       </p>
                       <div className="text-center mb-3">
                         <input
-                          type="number"
-                          min={1000}
-                          max={20000}
-                          step={100}
+                          type="text"
+                          inputMode="numeric"
                           value={monthlyIncome}
                           onChange={(e) => {
-                            const val = Math.min(20000, Math.max(1000, parseInt(e.target.value) || 1000));
-                            setMonthlyIncome(val);
+                            const inputVal = e.target.value;
+                            if (inputVal === '') {
+                              setMonthlyIncome('');
+                              return;
+                            }
+                            const numVal = parseInt(inputVal);
+                            if (!isNaN(numVal)) {
+                              setMonthlyIncome(numVal);
+                            }
+                          }}
+                          onBlur={() => {
+                            if (monthlyIncome === '' || monthlyIncome < 400) setMonthlyIncome(400);
+                            else if (monthlyIncome > 15000) setMonthlyIncome(15000);
                           }}
                           className={cn("text-3xl font-bold text-blue-500 bg-transparent border-none text-center w-32 outline-none focus:ring-2 focus:ring-blue-500 rounded")}
                         />
-                        <span className={cn("text-lg ml-2", mutedTextClasses)}>лв.</span>
+                        <span className={cn("text-lg ml-2", mutedTextClasses)}>€</span>
                       </div>
                       <Slider
-                        value={[monthlyIncome]}
+                        value={[typeof monthlyIncome === 'number' ? monthlyIncome : 1000]}
                         onValueChange={(v) => setMonthlyIncome(v[0])}
-                        min={1000}
-                        max={20000}
+                        min={400}
+                        max={15000}
                         step={100}
                         className="mb-2"
                       />
                       <div className={cn("flex justify-between text-xs", mutedTextClasses)}>
-                        <span>1 000 лв.</span>
-                        <span>20 000 лв.</span>
+                        <span>400 €</span>
+                        <span>15 000 €</span>
                       </div>
                     </div>
 
@@ -1154,30 +1163,39 @@ export default function FinancialPlanner() {
                         <p className={cn("text-sm font-medium mb-3", mutedTextClasses)}>ПАРТНЬОР</p>
                         <div className="text-center mb-3">
                           <input
-                            type="number"
-                            min={1000}
-                            max={20000}
-                            step={100}
+                            type="text"
+                            inputMode="numeric"
                             value={partnerIncome}
                             onChange={(e) => {
-                              const val = Math.min(20000, Math.max(1000, parseInt(e.target.value) || 1000));
-                              setPartnerIncome(val);
+                              const inputVal = e.target.value;
+                              if (inputVal === '') {
+                                setPartnerIncome('');
+                                return;
+                              }
+                              const numVal = parseInt(inputVal);
+                              if (!isNaN(numVal)) {
+                                setPartnerIncome(numVal);
+                              }
+                            }}
+                            onBlur={() => {
+                              if (partnerIncome === '' || partnerIncome < 400) setPartnerIncome(400);
+                              else if (partnerIncome > 15000) setPartnerIncome(15000);
                             }}
                             className={cn("text-3xl font-bold text-blue-500 bg-transparent border-none text-center w-32 outline-none focus:ring-2 focus:ring-blue-500 rounded")}
                           />
-                          <span className={cn("text-lg ml-2", mutedTextClasses)}>лв.</span>
+                          <span className={cn("text-lg ml-2", mutedTextClasses)}>€</span>
                         </div>
                         <Slider
-                          value={[partnerIncome]}
+                          value={[typeof partnerIncome === 'number' ? partnerIncome : 1000]}
                           onValueChange={(v) => setPartnerIncome(v[0])}
-                          min={1000}
-                          max={20000}
+                          min={400}
+                          max={15000}
                           step={100}
                           className="mb-2"
                         />
                         <div className={cn("flex justify-between text-xs", mutedTextClasses)}>
-                          <span>1 000 лв.</span>
-                          <span>20 000 лв.</span>
+                          <span>400 €</span>
+                          <span>15 000 €</span>
                         </div>
                       </div>
                     )}
@@ -1188,7 +1206,7 @@ export default function FinancialPlanner() {
                     <div className={cn("p-3 rounded-xl mb-4", isDarkMode ? "bg-slate-800" : "bg-slate-100")}>
                       <div className="flex justify-between items-center">
                         <span className={mutedTextClasses}>Общо месечен доход:</span>
-                        <span className="text-xl font-bold text-blue-500">{formatNumber(monthlyIncome + partnerIncome)} лв.</span>
+                        <span className="text-xl font-bold text-blue-500">{formatNumber((typeof monthlyIncome === 'number' ? monthlyIncome : 0) + (typeof partnerIncome === 'number' ? partnerIncome : 0))} €</span>
                       </div>
                     </div>
                   )}

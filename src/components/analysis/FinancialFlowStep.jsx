@@ -89,6 +89,37 @@ export default function FinancialFlowStep({ data, onChange, showErrors }) {
     }
   }, [data.current_mortgage_monthly_payment, data.current_mortgage_remaining]);
 
+  // Auto-populate fields with default 0 if undefined
+  useEffect(() => {
+    // Client income fields
+    if (data.client_annual_bonus === undefined) onChange('client_annual_bonus', 0);
+    if (data.client_other_monthly_income === undefined) onChange('client_other_monthly_income', 0);
+    
+    // Partner income fields (if partner included)
+    if (includePartner) {
+      if (data.partner_annual_bonus === undefined) onChange('partner_annual_bonus', 0);
+      if (data.partner_other_monthly_income === undefined) onChange('partner_other_monthly_income', 0);
+    }
+    
+    // Liabilities (except mortgage which comes from Housing step)
+    if (data.liability_consumer_loans_monthly === undefined) onChange('liability_consumer_loans_monthly', 0);
+    if (data.liability_consumer_loans_remaining === undefined) onChange('liability_consumer_loans_remaining', 0);
+    if (data.liability_credit_cards_monthly === undefined) onChange('liability_credit_cards_monthly', 0);
+    if (data.liability_credit_cards_remaining === undefined) onChange('liability_credit_cards_remaining', 0);
+    if (data.liability_leasing_monthly === undefined) onChange('liability_leasing_monthly', 0);
+    if (data.liability_leasing_remaining === undefined) onChange('liability_leasing_remaining', 0);
+    if (data.liability_overdraft_monthly === undefined) onChange('liability_overdraft_monthly', 0);
+    if (data.liability_overdraft_remaining === undefined) onChange('liability_overdraft_remaining', 0);
+    
+    // Insurance
+    if (data.insurance_life === undefined) onChange('insurance_life', 0);
+    if (data.insurance_property === undefined) onChange('insurance_property', 0);
+    if (data.insurance_movable === undefined) onChange('insurance_movable', 0);
+    if (data.insurance_civil === undefined) onChange('insurance_civil', 0);
+    if (data.insurance_casco === undefined) onChange('insurance_casco', 0);
+    if (data.insurance_other === undefined) onChange('insurance_other', 0);
+  }, [includePartner]);
+
   // Calculate annual bonus as monthly
   const clientAnnualBonusMonthly = Math.round((data.client_annual_bonus || 0) / 12);
   const partnerAnnualBonusMonthly = Math.round((data.partner_annual_bonus || 0) / 12);

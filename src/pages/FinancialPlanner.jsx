@@ -153,9 +153,14 @@ export default function FinancialPlanner() {
   const [isGenerating, setIsGenerating] = useState(false);
   const [recentlyChanged, setRecentlyChanged] = useState(null);
 
-  // Derived values
-  const totalIncome = familyType === 'family' ? monthlyIncome + partnerIncome : monthlyIncome;
-  const avgAge = familyType === 'family' ? (clientAge + partnerAge) / 2 : clientAge;
+  // Derived values (handle empty string values)
+  const clientIncomeNum = typeof monthlyIncome === 'number' ? monthlyIncome : 400;
+  const partnerIncomeNum = typeof partnerIncome === 'number' ? partnerIncome : 400;
+  const clientAgeNum = typeof clientAge === 'number' ? clientAge : 35;
+  const partnerAgeNum = typeof partnerAge === 'number' ? partnerAge : 35;
+  
+  const totalIncome = familyType === 'family' ? clientIncomeNum + partnerIncomeNum : clientIncomeNum;
+  const avgAge = familyType === 'family' ? (clientAgeNum + partnerAgeNum) / 2 : clientAgeNum;
   const yearsToRetirement = Math.max(0, 65 - avgAge);
   const numPeople = familyType === 'family' ? 2 : 1;
 

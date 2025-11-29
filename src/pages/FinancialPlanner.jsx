@@ -1225,7 +1225,7 @@ export default function FinancialPlanner() {
               </motion.div>
             )}
 
-            {/* Step 5: Priorities (multi-select) */}
+            {/* Step 5: Priorities (multi-select with icons) */}
             {currentStep === 5 && (
               <motion.div
                 key="step-5"
@@ -1238,7 +1238,7 @@ export default function FinancialPlanner() {
                   <p className={cn("text-sm tracking-widest mb-4", accentColor)}>СТЪПКА 5</p>
                   <h1 className="text-3xl md:text-4xl font-bold mb-4">Приоритети</h1>
                   <p className={cn("text-base mb-6", mutedTextClasses)}>
-                    Изберете една или повече посоки, които резонират с Вашите мечти.
+                    Изберете една или повече посоки, които резонират с Вашите мечти и финансови цели.
                   </p>
                 </div>
 
@@ -1267,77 +1267,151 @@ export default function FinancialPlanner() {
                     </button>
                   </div>
                   
-                  <h2 className="text-2xl font-bold mb-2">Основен приоритет</h2>
+                  <h2 className="text-2xl font-bold mb-2">Вашите финансови приоритети</h2>
                   <p className={cn("text-sm mb-4", mutedTextClasses)}>
-                    Изберете една или повече посоки, които резонират с Вашите мечти.
+                    Изберете всички области, които са важни за Вас. Можете да изберете повече от една.
                   </p>
 
-                  <div className="grid grid-cols-4 gap-3 mb-6">
+                  {/* Priority Grid - 4 columns, 2 rows */}
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-4">
+                    {/* Row 1 */}
                     <button
                       onClick={() => togglePriority('stability')}
                       className={cn(
-                        "p-4 rounded-2xl border-2 transition-all duration-300 flex flex-col h-full group",
+                        "p-4 rounded-2xl border-2 transition-all duration-300 flex flex-col items-center h-full group",
                         selectedPriorities.includes('stability')
                           ? "border-blue-500 bg-blue-600 text-white"
                           : isDarkMode ? "border-slate-700 hover:border-blue-500 hover:bg-blue-600" : "border-slate-200 hover:border-blue-500 hover:bg-blue-600"
                       )}
                     >
-                      <h3 className={cn("font-semibold text-sm mb-2 text-center", !selectedPriorities.includes('stability') && "group-hover:text-white")}>Финансова стабилност</h3>
-                      <p className={cn("text-xs text-center flex-1", selectedPriorities.includes('stability') ? "text-blue-100" : mutedTextClasses, !selectedPriorities.includes('stability') && "group-hover:text-blue-100")}>
-                        Фонд за спокойствие и защита на дохода
+                      <Shield className={cn("w-8 h-8 mb-2", selectedPriorities.includes('stability') ? "text-white" : "text-blue-500 group-hover:text-white")} />
+                      <h3 className={cn("font-semibold text-sm mb-1 text-center", !selectedPriorities.includes('stability') && "group-hover:text-white")}>Финансова сигурност</h3>
+                      <p className={cn("text-xs text-center", selectedPriorities.includes('stability') ? "text-blue-100" : mutedTextClasses, !selectedPriorities.includes('stability') && "group-hover:text-blue-100")}>
+                        Резерв и защита
                       </p>
                     </button>
                     
                     <button
                       onClick={() => togglePriority('investments')}
                       className={cn(
-                        "p-4 rounded-2xl border-2 transition-all duration-300 flex flex-col h-full group",
+                        "p-4 rounded-2xl border-2 transition-all duration-300 flex flex-col items-center h-full group",
                         selectedPriorities.includes('investments')
                           ? "border-blue-500 bg-blue-600 text-white"
                           : isDarkMode ? "border-slate-700 hover:border-blue-500 hover:bg-blue-600" : "border-slate-200 hover:border-blue-500 hover:bg-blue-600"
                       )}
                     >
-                      <h3 className={cn("font-semibold text-sm mb-2 text-center", !selectedPriorities.includes('investments') && "group-hover:text-white")}>Инвестиции</h3>
-                      <p className={cn("text-xs text-center flex-1", selectedPriorities.includes('investments') ? "text-blue-100" : mutedTextClasses, !selectedPriorities.includes('investments') && "group-hover:text-blue-100")}>
-                        Ускорени инвестиции и възвръщаемост
+                      <TrendingUp className={cn("w-8 h-8 mb-2", selectedPriorities.includes('investments') ? "text-white" : "text-emerald-500 group-hover:text-white")} />
+                      <h3 className={cn("font-semibold text-sm mb-1 text-center", !selectedPriorities.includes('investments') && "group-hover:text-white")}>Инвестиции</h3>
+                      <p className={cn("text-xs text-center", selectedPriorities.includes('investments') ? "text-blue-100" : mutedTextClasses, !selectedPriorities.includes('investments') && "group-hover:text-blue-100")}>
+                        Растеж на капитала
                       </p>
                     </button>
                     
                     <button
-                      onClick={() => togglePriority('children')}
+                      onClick={() => togglePriority('pension')}
                       className={cn(
-                        "p-4 rounded-2xl border-2 transition-all duration-300 flex flex-col h-full group",
-                        selectedPriorities.includes('children')
+                        "p-4 rounded-2xl border-2 transition-all duration-300 flex flex-col items-center h-full group",
+                        selectedPriorities.includes('pension')
                           ? "border-blue-500 bg-blue-600 text-white"
                           : isDarkMode ? "border-slate-700 hover:border-blue-500 hover:bg-blue-600" : "border-slate-200 hover:border-blue-500 hover:bg-blue-600"
                       )}
                     >
-                      <h3 className={cn("font-semibold text-sm mb-2 text-center", !selectedPriorities.includes('children') && "group-hover:text-white")}>Бъдеще на децата</h3>
-                      <p className={cn("text-xs text-center flex-1", selectedPriorities.includes('children') ? "text-blue-100" : mutedTextClasses, !selectedPriorities.includes('children') && "group-hover:text-blue-100")}>
-                        Капитал за бъдещето на децата
+                      <PiggyBank className={cn("w-8 h-8 mb-2", selectedPriorities.includes('pension') ? "text-white" : "text-amber-500 group-hover:text-white")} />
+                      <h3 className={cn("font-semibold text-sm mb-1 text-center", !selectedPriorities.includes('pension') && "group-hover:text-white")}>Пенсия</h3>
+                      <p className={cn("text-xs text-center", selectedPriorities.includes('pension') ? "text-blue-100" : mutedTextClasses, !selectedPriorities.includes('pension') && "group-hover:text-blue-100")}>
+                        Спокойна старост
                       </p>
                     </button>
                     
                     <button
                       onClick={() => togglePriority('housing')}
                       className={cn(
-                        "p-4 rounded-2xl border-2 transition-all duration-300 flex flex-col h-full group",
+                        "p-4 rounded-2xl border-2 transition-all duration-300 flex flex-col items-center h-full group",
                         selectedPriorities.includes('housing')
                           ? "border-blue-500 bg-blue-600 text-white"
                           : isDarkMode ? "border-slate-700 hover:border-blue-500 hover:bg-blue-600" : "border-slate-200 hover:border-blue-500 hover:bg-blue-600"
                       )}
                     >
-                      <h3 className={cn("font-semibold text-sm mb-2 text-center", !selectedPriorities.includes('housing') && "group-hover:text-white")}>Ново жилище</h3>
-                      <p className={cn("text-xs text-center flex-1", selectedPriorities.includes('housing') ? "text-blue-100" : mutedTextClasses, !selectedPriorities.includes('housing') && "group-hover:text-blue-100")}>
-                        Собственост, ремонт или ново жилище
+                      <Home className={cn("w-8 h-8 mb-2", selectedPriorities.includes('housing') ? "text-white" : "text-violet-500 group-hover:text-white")} />
+                      <h3 className={cn("font-semibold text-sm mb-1 text-center", !selectedPriorities.includes('housing') && "group-hover:text-white")}>Ново жилище</h3>
+                      <p className={cn("text-xs text-center", selectedPriorities.includes('housing') ? "text-blue-100" : mutedTextClasses, !selectedPriorities.includes('housing') && "group-hover:text-blue-100")}>
+                        Собствен дом
+                      </p>
+                    </button>
+                    
+                    {/* Row 2 */}
+                    <button
+                      onClick={() => togglePriority('children')}
+                      className={cn(
+                        "p-4 rounded-2xl border-2 transition-all duration-300 flex flex-col items-center h-full group",
+                        selectedPriorities.includes('children')
+                          ? "border-blue-500 bg-blue-600 text-white"
+                          : isDarkMode ? "border-slate-700 hover:border-blue-500 hover:bg-blue-600" : "border-slate-200 hover:border-blue-500 hover:bg-blue-600"
+                      )}
+                    >
+                      <Baby className={cn("w-8 h-8 mb-2", selectedPriorities.includes('children') ? "text-white" : "text-pink-500 group-hover:text-white")} />
+                      <h3 className={cn("font-semibold text-sm mb-1 text-center", !selectedPriorities.includes('children') && "group-hover:text-white")}>Бъдеще на децата</h3>
+                      <p className={cn("text-xs text-center", selectedPriorities.includes('children') ? "text-blue-100" : mutedTextClasses, !selectedPriorities.includes('children') && "group-hover:text-blue-100")}>
+                        Образование и старт
+                      </p>
+                    </button>
+                    
+                    <button
+                      onClick={() => togglePriority('travel')}
+                      className={cn(
+                        "p-4 rounded-2xl border-2 transition-all duration-300 flex flex-col items-center h-full group",
+                        selectedPriorities.includes('travel')
+                          ? "border-blue-500 bg-blue-600 text-white"
+                          : isDarkMode ? "border-slate-700 hover:border-blue-500 hover:bg-blue-600" : "border-slate-200 hover:border-blue-500 hover:bg-blue-600"
+                      )}
+                    >
+                      <Plane className={cn("w-8 h-8 mb-2", selectedPriorities.includes('travel') ? "text-white" : "text-cyan-500 group-hover:text-white")} />
+                      <h3 className={cn("font-semibold text-sm mb-1 text-center", !selectedPriorities.includes('travel') && "group-hover:text-white")}>Пътувания</h3>
+                      <p className={cn("text-xs text-center", selectedPriorities.includes('travel') ? "text-blue-100" : mutedTextClasses, !selectedPriorities.includes('travel') && "group-hover:text-blue-100")}>
+                        Преживявания
+                      </p>
+                    </button>
+                    
+                    <button
+                      onClick={() => togglePriority('health')}
+                      className={cn(
+                        "p-4 rounded-2xl border-2 transition-all duration-300 flex flex-col items-center h-full group",
+                        selectedPriorities.includes('health')
+                          ? "border-blue-500 bg-blue-600 text-white"
+                          : isDarkMode ? "border-slate-700 hover:border-blue-500 hover:bg-blue-600" : "border-slate-200 hover:border-blue-500 hover:bg-blue-600"
+                      )}
+                    >
+                      <Heart className={cn("w-8 h-8 mb-2", selectedPriorities.includes('health') ? "text-white" : "text-red-500 group-hover:text-white")} />
+                      <h3 className={cn("font-semibold text-sm mb-1 text-center", !selectedPriorities.includes('health') && "group-hover:text-white")}>Здраве</h3>
+                      <p className={cn("text-xs text-center", selectedPriorities.includes('health') ? "text-blue-100" : mutedTextClasses, !selectedPriorities.includes('health') && "group-hover:text-blue-100")}>
+                        Застраховки и грижа
+                      </p>
+                    </button>
+                    
+                    <button
+                      onClick={() => togglePriority('business')}
+                      className={cn(
+                        "p-4 rounded-2xl border-2 transition-all duration-300 flex flex-col items-center h-full group",
+                        selectedPriorities.includes('business')
+                          ? "border-blue-500 bg-blue-600 text-white"
+                          : isDarkMode ? "border-slate-700 hover:border-blue-500 hover:bg-blue-600" : "border-slate-200 hover:border-blue-500 hover:bg-blue-600"
+                      )}
+                    >
+                      <Briefcase className={cn("w-8 h-8 mb-2", selectedPriorities.includes('business') ? "text-white" : "text-orange-500 group-hover:text-white")} />
+                      <h3 className={cn("font-semibold text-sm mb-1 text-center", !selectedPriorities.includes('business') && "group-hover:text-white")}>Бизнес</h3>
+                      <p className={cn("text-xs text-center", selectedPriorities.includes('business') ? "text-blue-100" : mutedTextClasses, !selectedPriorities.includes('business') && "group-hover:text-blue-100")}>
+                        Собствен бизнес
                       </p>
                     </button>
                   </div>
 
                   {selectedPriorities.length > 0 && (
-                    <p className={cn("text-sm mb-4", accentColor)}>
-                      Избрани: {selectedPriorities.length} приоритет{selectedPriorities.length > 1 ? 'а' : ''}
-                    </p>
+                    <div className={cn("p-3 rounded-xl mb-4 flex items-center gap-2", isDarkMode ? "bg-slate-800" : "bg-blue-50")}>
+                      <CheckCircle2 className="w-5 h-5 text-blue-500" />
+                      <p className={cn("text-sm", accentColor)}>
+                        Избрани: {selectedPriorities.length} {selectedPriorities.length === 1 ? 'приоритет' : 'приоритета'}
+                      </p>
+                    </div>
                   )}
 
                   <div className="flex justify-center">

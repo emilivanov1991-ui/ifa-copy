@@ -64,15 +64,11 @@ const calculateLoanAmount = (monthlyPayment, annualRate, years) => {
   return monthlyPayment * ((1 - Math.pow(1 + monthlyRate, -months)) / monthlyRate);
 };
 
-const BGN_TO_EUR = 1.95583;
-
-const toEuro = (bgnValue) => Math.round(bgnValue / BGN_TO_EUR / 10) * 10;
-
+// All calculations now in EUR directly (no BGN conversion needed)
+// State pension: 60% of income, min 320€, max 1740€ per person
 const calculateStatePension = (clientIncome, partnerIncome, clientIsEntrepreneur, partnerIsEntrepreneur, isFamily) => {
-  // 60% of income, min 630 per person, max 3400 per person (in BGN)
-  // Entrepreneurs always get minimum pension (630)
-  const minPension = 630;
-  const maxPension = 3400;
+  const minPension = 320; // EUR
+  const maxPension = 1740; // EUR
   
   let clientPension;
   if (clientIsEntrepreneur) {
@@ -92,9 +88,15 @@ const calculateStatePension = (clientIncome, partnerIncome, clientIsEntrepreneur
     }
   }
   
-  // Convert to EUR and round to 10
-  return toEuro(clientPension + partnerPension);
+  // Round to 10
+  return Math.round((clientPension + partnerPension) / 10) * 10;
 };
+
+// Round to nearest 100
+const roundTo100 = (value) => Math.round(value / 100) * 100;
+
+// Round to nearest 10
+const roundTo10 = (value) => Math.round(value / 10) * 10;
 
 export default function FinancialPlanner() {
   const [currentStep, setCurrentStep] = useState(1);

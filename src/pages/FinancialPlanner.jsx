@@ -1785,15 +1785,17 @@ export default function FinancialPlanner() {
                     </div>
                   </div>
 
-                  <Button 
-                    onClick={goNext}
-                    className={cn(primaryButtonClass, "w-full")}
-                  >
-                    Напред
-                  </Button>
+                  <div className="flex justify-center">
+                    <Button 
+                      onClick={goNext}
+                      className={cn(primaryButtonClass, "px-12")}
+                    >
+                      Напред
+                    </Button>
                   </div>
-                  </motion.div>
-                  )}
+                </div>
+              </motion.div>
+            )}
 
                   {/* Step 8: Cooperation Rules */}
             {currentStep === 8 && (
@@ -1869,15 +1871,17 @@ export default function FinancialPlanner() {
                     </div>
                   </div>
 
-                  <Button 
-                    onClick={goNext}
-                    className={cn(primaryButtonClass, "w-full")}
-                  >
-                    Напред
-                  </Button>
+                  <div className="flex justify-center">
+                    <Button 
+                      onClick={goNext}
+                      className={cn(primaryButtonClass, "px-12")}
+                    >
+                      Напред
+                    </Button>
                   </div>
-                  </motion.div>
-                  )}
+                </div>
+              </motion.div>
+            )}
 
                   {/* Step 9: Final / Redirect */}
             {currentStep === 9 && (
@@ -1905,7 +1909,7 @@ export default function FinancialPlanner() {
                   </div>
                 </div>
 
-                <div className={cn("rounded-3xl border p-12", cardClasses)}>
+                <div className={cn("rounded-3xl border p-6 md:p-8", cardClasses)}>
                   <div className="w-20 h-20 mx-auto mb-6 rounded-full bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center">
                     <svg className="w-10 h-10 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />

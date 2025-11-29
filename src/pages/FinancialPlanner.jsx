@@ -975,20 +975,30 @@ export default function FinancialPlanner() {
                       </p>
                       <div className="text-center mb-3">
                         <input
-                          type="number"
-                          min={18}
-                          max={70}
+                          type="text"
+                          inputMode="numeric"
                           value={clientAge}
                           onChange={(e) => {
-                            const val = Math.min(70, Math.max(18, parseInt(e.target.value) || 18));
-                            setClientAge(val);
+                            const inputVal = e.target.value;
+                            if (inputVal === '') {
+                              setClientAge('');
+                              return;
+                            }
+                            const numVal = parseInt(inputVal);
+                            if (!isNaN(numVal)) {
+                              setClientAge(numVal);
+                            }
+                          }}
+                          onBlur={() => {
+                            if (clientAge === '' || clientAge < 18) setClientAge(18);
+                            else if (clientAge > 70) setClientAge(70);
                           }}
                           className={cn("text-4xl font-bold text-blue-500 bg-transparent border-none text-center w-20 outline-none focus:ring-2 focus:ring-blue-500 rounded")}
                         />
                         <span className={cn("text-lg ml-2", mutedTextClasses)}>години</span>
                       </div>
                       <Slider
-                        value={[clientAge]}
+                        value={[typeof clientAge === 'number' ? clientAge : 35]}
                         onValueChange={(v) => setClientAge(v[0])}
                         min={18}
                         max={70}
@@ -1007,20 +1017,30 @@ export default function FinancialPlanner() {
                         <p className={cn("text-sm font-medium mb-3", mutedTextClasses)}>ПАРТНЬОР</p>
                         <div className="text-center mb-3">
                           <input
-                            type="number"
-                            min={18}
-                            max={70}
+                            type="text"
+                            inputMode="numeric"
                             value={partnerAge}
                             onChange={(e) => {
-                              const val = Math.min(70, Math.max(18, parseInt(e.target.value) || 18));
-                              setPartnerAge(val);
+                              const inputVal = e.target.value;
+                              if (inputVal === '') {
+                                setPartnerAge('');
+                                return;
+                              }
+                              const numVal = parseInt(inputVal);
+                              if (!isNaN(numVal)) {
+                                setPartnerAge(numVal);
+                              }
+                            }}
+                            onBlur={() => {
+                              if (partnerAge === '' || partnerAge < 18) setPartnerAge(18);
+                              else if (partnerAge > 70) setPartnerAge(70);
                             }}
                             className={cn("text-4xl font-bold text-blue-500 bg-transparent border-none text-center w-20 outline-none focus:ring-2 focus:ring-blue-500 rounded")}
                           />
                           <span className={cn("text-lg ml-2", mutedTextClasses)}>години</span>
                         </div>
                         <Slider
-                          value={[partnerAge]}
+                          value={[typeof partnerAge === 'number' ? partnerAge : 35]}
                           onValueChange={(v) => setPartnerAge(v[0])}
                           min={18}
                           max={70}

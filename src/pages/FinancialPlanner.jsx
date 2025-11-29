@@ -469,142 +469,149 @@ export default function FinancialPlanner() {
             transition={{ duration: 0.5 }}
             className="fixed inset-0 z-[200] flex flex-col items-center justify-center bg-gradient-to-br from-slate-900 via-blue-900 to-indigo-900 overflow-hidden"
           >
-            {/* Diagonal lines animation - 3 waves */}
+            {/* Diagonal lines animation - Many lines across entire screen */}
             <div className="absolute inset-0 overflow-hidden">
-              {/* Wave 1: Before text (0-4s) */}
-              {[0, 1, 2].map((i) => {
-                const strokeWidths = [8, 12, 6];
-                const lengths = [350, 300, 380];
-                const delays = [0, 0.2, 0.1];
-                const startPositions = [5, 15, 25];
+              {/* Wave 1: Before text (0-4s) - Bottom right to top left */}
+              {Array.from({ length: 12 }).map((_, i) => {
+                const strokeWidth = 4 + Math.random() * 10;
+                const length = 200 + Math.random() * 200;
+                const delay = Math.random() * 0.5;
+                const topPos = Math.random() * 100;
+                const leftPos = Math.random() * 100;
                 return (
                   <motion.svg
                     key={`w1-br-${i}`}
                     className="absolute"
-                    width={lengths[i]}
-                    height={lengths[i]}
-                    viewBox={`0 0 ${lengths[i]} ${lengths[i]}`}
-                    initial={{ x: '100vw', y: '100vh' }}
-                    animate={{ x: '-150vw', y: '-150vh' }}
-                    transition={{ duration: 4, delay: delays[i], ease: "linear" }}
-                    style={{ position: 'absolute', top: `${startPositions[i]}%`, left: `${startPositions[i]}%` }}
+                    width={length}
+                    height={length}
+                    viewBox={`0 0 ${length} ${length}`}
+                    initial={{ x: '120vw', y: '120vh' }}
+                    animate={{ x: '-120vw', y: '-120vh' }}
+                    transition={{ duration: 3 + Math.random() * 2, delay: delay, ease: "linear" }}
+                    style={{ position: 'absolute', top: `${topPos}%`, left: `${leftPos}%` }}
                   >
-                    <line x1={lengths[i]} y1={lengths[i]} x2={lengths[i] * 0.1} y2={lengths[i] * 0.1} stroke="white" strokeWidth={strokeWidths[i]} strokeLinecap="round" opacity="0.8" />
-                    <polygon points={`${lengths[i] * 0.1},${lengths[i] * 0.1} ${lengths[i] * 0.05},${lengths[i] * 0.15} ${lengths[i] * 0.15},${lengths[i] * 0.05}`} fill="white" opacity="0.8" />
+                    <line x1={length} y1={length} x2={length * 0.1} y2={length * 0.1} stroke="white" strokeWidth={strokeWidth} strokeLinecap="round" opacity={0.3 + Math.random() * 0.5} />
+                    <polygon points={`${length * 0.1},${length * 0.1} ${length * 0.05},${length * 0.15} ${length * 0.15},${length * 0.05}`} fill="white" opacity={0.3 + Math.random() * 0.5} />
                   </motion.svg>
                 );
               })}
-              {[0, 1, 2].map((i) => {
-                const strokeWidths = [10, 7, 14];
-                const lengths = [320, 360, 280];
-                const delays = [0.05, 0.15, 0.25];
-                const startPositions = [55, 65, 75];
+              {/* Wave 1: Top left to bottom right */}
+              {Array.from({ length: 12 }).map((_, i) => {
+                const strokeWidth = 4 + Math.random() * 10;
+                const length = 200 + Math.random() * 200;
+                const delay = Math.random() * 0.5;
+                const topPos = Math.random() * 100;
+                const rightPos = Math.random() * 100;
                 return (
                   <motion.svg
                     key={`w1-tl-${i}`}
                     className="absolute"
-                    width={lengths[i]}
-                    height={lengths[i]}
-                    viewBox={`0 0 ${lengths[i]} ${lengths[i]}`}
-                    initial={{ x: '-100vw', y: '-100vh' }}
-                    animate={{ x: '150vw', y: '150vh' }}
-                    transition={{ duration: 4, delay: delays[i], ease: "linear" }}
-                    style={{ position: 'absolute', top: `${startPositions[i]}%`, right: `${startPositions[i]}%` }}
+                    width={length}
+                    height={length}
+                    viewBox={`0 0 ${length} ${length}`}
+                    initial={{ x: '-120vw', y: '-120vh' }}
+                    animate={{ x: '120vw', y: '120vh' }}
+                    transition={{ duration: 3 + Math.random() * 2, delay: delay, ease: "linear" }}
+                    style={{ position: 'absolute', top: `${topPos}%`, right: `${rightPos}%` }}
                   >
-                    <line x1={0} y1={0} x2={lengths[i] * 0.9} y2={lengths[i] * 0.9} stroke="white" strokeWidth={strokeWidths[i]} strokeLinecap="round" opacity="0.7" />
-                    <polygon points={`${lengths[i] * 0.9},${lengths[i] * 0.9} ${lengths[i] * 0.85},${lengths[i] * 0.95} ${lengths[i] * 0.95},${lengths[i] * 0.85}`} fill="white" opacity="0.7" />
+                    <line x1={0} y1={0} x2={length * 0.9} y2={length * 0.9} stroke="white" strokeWidth={strokeWidth} strokeLinecap="round" opacity={0.3 + Math.random() * 0.4} />
+                    <polygon points={`${length * 0.9},${length * 0.9} ${length * 0.85},${length * 0.95} ${length * 0.95},${length * 0.85}`} fill="white" opacity={0.3 + Math.random() * 0.4} />
                   </motion.svg>
                 );
               })}
 
               {/* Wave 2: Behind text (4-8s) */}
-              {[0, 1, 2].map((i) => {
-                const strokeWidths = [6, 10, 8];
-                const lengths = [320, 380, 290];
-                const delays = [4, 4.15, 4.3];
-                const startPositions = [10, 20, 30];
+              {Array.from({ length: 12 }).map((_, i) => {
+                const strokeWidth = 4 + Math.random() * 10;
+                const length = 200 + Math.random() * 200;
+                const delay = 4 + Math.random() * 0.5;
+                const topPos = Math.random() * 100;
+                const leftPos = Math.random() * 100;
                 return (
                   <motion.svg
                     key={`w2-br-${i}`}
                     className="absolute"
-                    width={lengths[i]}
-                    height={lengths[i]}
-                    viewBox={`0 0 ${lengths[i]} ${lengths[i]}`}
-                    initial={{ x: '100vw', y: '100vh' }}
-                    animate={{ x: '-150vw', y: '-150vh' }}
-                    transition={{ duration: 4, delay: delays[i], ease: "linear" }}
-                    style={{ position: 'absolute', top: `${startPositions[i]}%`, left: `${startPositions[i]}%` }}
+                    width={length}
+                    height={length}
+                    viewBox={`0 0 ${length} ${length}`}
+                    initial={{ x: '120vw', y: '120vh' }}
+                    animate={{ x: '-120vw', y: '-120vh' }}
+                    transition={{ duration: 3 + Math.random() * 2, delay: delay, ease: "linear" }}
+                    style={{ position: 'absolute', top: `${topPos}%`, left: `${leftPos}%` }}
                   >
-                    <line x1={lengths[i]} y1={lengths[i]} x2={lengths[i] * 0.1} y2={lengths[i] * 0.1} stroke="white" strokeWidth={strokeWidths[i]} strokeLinecap="round" opacity="0.5" />
-                    <polygon points={`${lengths[i] * 0.1},${lengths[i] * 0.1} ${lengths[i] * 0.05},${lengths[i] * 0.15} ${lengths[i] * 0.15},${lengths[i] * 0.05}`} fill="white" opacity="0.5" />
+                    <line x1={length} y1={length} x2={length * 0.1} y2={length * 0.1} stroke="white" strokeWidth={strokeWidth} strokeLinecap="round" opacity={0.2 + Math.random() * 0.4} />
+                    <polygon points={`${length * 0.1},${length * 0.1} ${length * 0.05},${length * 0.15} ${length * 0.15},${length * 0.05}`} fill="white" opacity={0.2 + Math.random() * 0.4} />
                   </motion.svg>
                 );
               })}
-              {[0, 1, 2].map((i) => {
-                const strokeWidths = [12, 5, 9];
-                const lengths = [350, 300, 330];
-                const delays = [4.1, 4.25, 4.4];
-                const startPositions = [50, 60, 70];
+              {Array.from({ length: 12 }).map((_, i) => {
+                const strokeWidth = 4 + Math.random() * 10;
+                const length = 200 + Math.random() * 200;
+                const delay = 4 + Math.random() * 0.5;
+                const topPos = Math.random() * 100;
+                const rightPos = Math.random() * 100;
                 return (
                   <motion.svg
                     key={`w2-tl-${i}`}
                     className="absolute"
-                    width={lengths[i]}
-                    height={lengths[i]}
-                    viewBox={`0 0 ${lengths[i]} ${lengths[i]}`}
-                    initial={{ x: '-100vw', y: '-100vh' }}
-                    animate={{ x: '150vw', y: '150vh' }}
-                    transition={{ duration: 4, delay: delays[i], ease: "linear" }}
-                    style={{ position: 'absolute', top: `${startPositions[i]}%`, right: `${startPositions[i]}%` }}
+                    width={length}
+                    height={length}
+                    viewBox={`0 0 ${length} ${length}`}
+                    initial={{ x: '-120vw', y: '-120vh' }}
+                    animate={{ x: '120vw', y: '120vh' }}
+                    transition={{ duration: 3 + Math.random() * 2, delay: delay, ease: "linear" }}
+                    style={{ position: 'absolute', top: `${topPos}%`, right: `${rightPos}%` }}
                   >
-                    <line x1={0} y1={0} x2={lengths[i] * 0.9} y2={lengths[i] * 0.9} stroke="white" strokeWidth={strokeWidths[i]} strokeLinecap="round" opacity="0.4" />
-                    <polygon points={`${lengths[i] * 0.9},${lengths[i] * 0.9} ${lengths[i] * 0.85},${lengths[i] * 0.95} ${lengths[i] * 0.95},${lengths[i] * 0.85}`} fill="white" opacity="0.4" />
+                    <line x1={0} y1={0} x2={length * 0.9} y2={length * 0.9} stroke="white" strokeWidth={strokeWidth} strokeLinecap="round" opacity={0.2 + Math.random() * 0.3} />
+                    <polygon points={`${length * 0.9},${length * 0.9} ${length * 0.85},${length * 0.95} ${length * 0.95},${length * 0.85}`} fill="white" opacity={0.2 + Math.random() * 0.3} />
                   </motion.svg>
                 );
               })}
 
               {/* Wave 3: Behind text (8-12s) */}
-              {[0, 1, 2].map((i) => {
-                const strokeWidths = [9, 7, 11];
-                const lengths = [340, 290, 370];
-                const delays = [8, 8.2, 8.1];
-                const startPositions = [8, 18, 28];
+              {Array.from({ length: 12 }).map((_, i) => {
+                const strokeWidth = 4 + Math.random() * 10;
+                const length = 200 + Math.random() * 200;
+                const delay = 8 + Math.random() * 0.5;
+                const topPos = Math.random() * 100;
+                const leftPos = Math.random() * 100;
                 return (
                   <motion.svg
                     key={`w3-br-${i}`}
                     className="absolute"
-                    width={lengths[i]}
-                    height={lengths[i]}
-                    viewBox={`0 0 ${lengths[i]} ${lengths[i]}`}
-                    initial={{ x: '100vw', y: '100vh' }}
-                    animate={{ x: '-150vw', y: '-150vh' }}
-                    transition={{ duration: 4, delay: delays[i], ease: "linear" }}
-                    style={{ position: 'absolute', top: `${startPositions[i]}%`, left: `${startPositions[i]}%` }}
+                    width={length}
+                    height={length}
+                    viewBox={`0 0 ${length} ${length}`}
+                    initial={{ x: '120vw', y: '120vh' }}
+                    animate={{ x: '-120vw', y: '-120vh' }}
+                    transition={{ duration: 3 + Math.random() * 2, delay: delay, ease: "linear" }}
+                    style={{ position: 'absolute', top: `${topPos}%`, left: `${leftPos}%` }}
                   >
-                    <line x1={lengths[i]} y1={lengths[i]} x2={lengths[i] * 0.1} y2={lengths[i] * 0.1} stroke="white" strokeWidth={strokeWidths[i]} strokeLinecap="round" opacity="0.45" />
-                    <polygon points={`${lengths[i] * 0.1},${lengths[i] * 0.1} ${lengths[i] * 0.05},${lengths[i] * 0.15} ${lengths[i] * 0.15},${lengths[i] * 0.05}`} fill="white" opacity="0.45" />
+                    <line x1={length} y1={length} x2={length * 0.1} y2={length * 0.1} stroke="white" strokeWidth={strokeWidth} strokeLinecap="round" opacity={0.2 + Math.random() * 0.35} />
+                    <polygon points={`${length * 0.1},${length * 0.1} ${length * 0.05},${length * 0.15} ${length * 0.15},${length * 0.05}`} fill="white" opacity={0.2 + Math.random() * 0.35} />
                   </motion.svg>
                 );
               })}
-              {[0, 1, 2].map((i) => {
-                const strokeWidths = [8, 13, 6];
-                const lengths = [310, 360, 340];
-                const delays = [8.05, 8.15, 8.3];
-                const startPositions = [52, 62, 72];
+              {Array.from({ length: 12 }).map((_, i) => {
+                const strokeWidth = 4 + Math.random() * 10;
+                const length = 200 + Math.random() * 200;
+                const delay = 8 + Math.random() * 0.5;
+                const topPos = Math.random() * 100;
+                const rightPos = Math.random() * 100;
                 return (
                   <motion.svg
                     key={`w3-tl-${i}`}
                     className="absolute"
-                    width={lengths[i]}
-                    height={lengths[i]}
-                    viewBox={`0 0 ${lengths[i]} ${lengths[i]}`}
-                    initial={{ x: '-100vw', y: '-100vh' }}
-                    animate={{ x: '150vw', y: '150vh' }}
-                    transition={{ duration: 4, delay: delays[i], ease: "linear" }}
-                    style={{ position: 'absolute', top: `${startPositions[i]}%`, right: `${startPositions[i]}%` }}
+                    width={length}
+                    height={length}
+                    viewBox={`0 0 ${length} ${length}`}
+                    initial={{ x: '-120vw', y: '-120vh' }}
+                    animate={{ x: '120vw', y: '120vh' }}
+                    transition={{ duration: 3 + Math.random() * 2, delay: delay, ease: "linear" }}
+                    style={{ position: 'absolute', top: `${topPos}%`, right: `${rightPos}%` }}
                   >
-                    <line x1={0} y1={0} x2={lengths[i] * 0.9} y2={lengths[i] * 0.9} stroke="white" strokeWidth={strokeWidths[i]} strokeLinecap="round" opacity="0.35" />
-                    <polygon points={`${lengths[i] * 0.9},${lengths[i] * 0.9} ${lengths[i] * 0.85},${lengths[i] * 0.95} ${lengths[i] * 0.95},${lengths[i] * 0.85}`} fill="white" opacity="0.35" />
+                    <line x1={0} y1={0} x2={length * 0.9} y2={length * 0.9} stroke="white" strokeWidth={strokeWidth} strokeLinecap="round" opacity={0.2 + Math.random() * 0.25} />
+                    <polygon points={`${length * 0.9},${length * 0.9} ${length * 0.85},${length * 0.95} ${length * 0.95},${length * 0.85}`} fill="white" opacity={0.2 + Math.random() * 0.25} />
                   </motion.svg>
                 );
               })}
@@ -663,19 +670,19 @@ export default function FinancialPlanner() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
-            className="grid lg:grid-cols-4 gap-8 items-start"
+            className="grid lg:grid-cols-4 gap-8 items-center h-full"
             >
             {/* Left side - description (25%) */}
             <div className="lg:col-span-1">
-              <p className={cn("text-sm tracking-widest mb-4", accentColor)}>СТЪПКА 1</p>
-              <h1 className="text-3xl md:text-4xl font-bold mb-4">С кого планираме?</h1>
-              <p className={cn("text-base mb-6", mutedTextClasses)}>
+              <p className={cn("text-base tracking-widest mb-4", accentColor)}>СТЪПКА 1</p>
+              <h1 className="text-4xl md:text-5xl font-bold mb-4">С кого планираме?</h1>
+              <p className={cn("text-lg mb-6", mutedTextClasses)}>
                 Изберете дали работим с един клиент или с домакинство.
               </p>
             </div>
 
             {/* Right side - card (75%) */}
-            <div className={cn("lg:col-span-3 rounded-3xl border p-6 min-h-[450px]", cardClasses)}>
+            <div className={cn("lg:col-span-3 rounded-3xl border p-8 min-h-[500px] flex flex-col", cardClasses)}>
               {/* Inline Step Tracker */}
               <div className="mb-6 pb-4 border-b border-slate-100">
                     <div className="flex justify-between items-start">
@@ -716,23 +723,23 @@ export default function FinancialPlanner() {
                     </div>
                   </div>
                   
-                  <div className="flex items-center justify-between mb-4">
-                    <p className={cn("text-sm tracking-widest", mutedTextClasses)}>СТЪПКА 1</p>
+                  <div className="flex items-center justify-between mb-6">
+                    <p className={cn("text-base tracking-widest", mutedTextClasses)}>СТЪПКА 1</p>
                     <button onClick={restart} className={cn("p-2 rounded-full text-slate-400 hover:text-blue-500 hover:bg-slate-100 transition-colors")}>
-                      <RotateCcw className="w-4 h-4" />
+                      <RotateCcw className="w-5 h-5" />
                     </button>
                   </div>
                   
-                  <h2 className="text-2xl font-bold mb-2">С кого планираме?</h2>
-                  <p className={cn("text-sm mb-6", mutedTextClasses)}>
+                  <h2 className="text-3xl font-bold mb-3">С кого планираме?</h2>
+                  <p className={cn("text-base mb-8", mutedTextClasses)}>
                     Изберете дали работим с един клиент или с домакинство.
                   </p>
 
-                  <div className="grid grid-cols-2 gap-4 mb-6">
+                  <div className="grid grid-cols-2 gap-6 mb-8 flex-1">
                     <button
                       onClick={() => setFamilyType('individual')}
                       className={cn(
-                        "p-6 rounded-2xl border-2 text-left transition-all duration-300 group",
+                        "p-8 rounded-2xl border-2 text-left transition-all duration-300 group flex flex-col justify-center",
                         familyType === 'individual'
                           ? "border-blue-500 bg-blue-600 text-white"
                           : isDarkMode 
@@ -740,8 +747,8 @@ export default function FinancialPlanner() {
                             : "border-slate-200 hover:border-blue-500 hover:bg-blue-600 hover:text-white"
                       )}
                     >
-                      <h3 className={cn("font-semibold mb-1", familyType !== 'individual' && "group-hover:text-white")}>Отделен индивид</h3>
-                      <p className={cn("text-sm", familyType === 'individual' ? "text-blue-100" : mutedTextClasses, familyType !== 'individual' && "group-hover:text-blue-100")}>
+                      <h3 className={cn("font-semibold text-xl mb-2", familyType !== 'individual' && "group-hover:text-white")}>Отделен индивид</h3>
+                      <p className={cn("text-base", familyType === 'individual' ? "text-blue-100" : mutedTextClasses, familyType !== 'individual' && "group-hover:text-blue-100")}>
                         Фокус върху Вашите лични цели
                       </p>
                     </button>
@@ -749,7 +756,7 @@ export default function FinancialPlanner() {
                     <button
                       onClick={() => setFamilyType('family')}
                       className={cn(
-                        "p-6 rounded-2xl border-2 text-left transition-all duration-300 group",
+                        "p-8 rounded-2xl border-2 text-left transition-all duration-300 group flex flex-col justify-center",
                         familyType === 'family'
                           ? "border-blue-500 bg-blue-600 text-white"
                           : isDarkMode 
@@ -757,8 +764,8 @@ export default function FinancialPlanner() {
                             : "border-slate-200 hover:border-blue-500 hover:bg-blue-600 hover:text-white"
                       )}
                     >
-                      <h3 className={cn("font-semibold mb-1", familyType !== 'family' && "group-hover:text-white")}>Семейство</h3>
-                      <p className={cn("text-sm", familyType === 'family' ? "text-blue-100" : mutedTextClasses, familyType !== 'family' && "group-hover:text-blue-100")}>
+                      <h3 className={cn("font-semibold text-xl mb-2", familyType !== 'family' && "group-hover:text-white")}>Семейство</h3>
+                      <p className={cn("text-base", familyType === 'family' ? "text-blue-100" : mutedTextClasses, familyType !== 'family' && "group-hover:text-blue-100")}>
                         Да планираме Вашия общ семеен бюджет!
                       </p>
                     </button>
@@ -768,7 +775,7 @@ export default function FinancialPlanner() {
                     <Button 
                       onClick={goNext}
                       disabled={!familyType}
-                      className={cn(primaryButtonClass, "px-12")}
+                      className={cn(primaryButtonClass, "px-16 py-6 text-lg")}
                     >
                       СЛЕДВАЩА СТЪПКА
                     </Button>
@@ -784,12 +791,12 @@ export default function FinancialPlanner() {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -20 }}
-                className="grid lg:grid-cols-4 gap-8 items-start"
+                className="grid lg:grid-cols-4 gap-8 items-center h-full"
               >
                 <div className="lg:col-span-1">
-                  <p className={cn("text-sm tracking-widest mb-4", accentColor)}>СТЪПКА 2</p>
-                  <h1 className="text-3xl md:text-4xl font-bold mb-4">Начин на осигуряване</h1>
-                  <p className={cn("text-base mb-6", mutedTextClasses)}>
+                  <p className={cn("text-base tracking-widest mb-4", accentColor)}>СТЪПКА 2</p>
+                  <h1 className="text-4xl md:text-5xl font-bold mb-4">Начин на осигуряване</h1>
+                  <p className={cn("text-lg mb-6", mutedTextClasses)}>
                     {familyType === 'family' 
                       ? 'Изберете начина на осигуряване за клиента и партньора.'
                       : 'Изберете вашия начин на осигуряване.'
@@ -797,7 +804,7 @@ export default function FinancialPlanner() {
                   </p>
                 </div>
 
-                <div className={cn("lg:col-span-3 rounded-3xl border p-6 min-h-[450px]", cardClasses)}>
+                <div className={cn("lg:col-span-3 rounded-3xl border p-8 min-h-[500px] flex flex-col", cardClasses)}>
                   {/* Inline Step Tracker */}
                   <div className="mb-6 pb-4 border-b border-slate-100">
                     <div className="flex justify-between items-start">
@@ -815,27 +822,27 @@ export default function FinancialPlanner() {
                     </div>
                   </div>
                   
-                  <div className="flex items-center justify-between mb-4">
-                    <p className={cn("text-sm tracking-widest", mutedTextClasses)}>СТЪПКА 2</p>
+                  <div className="flex items-center justify-between mb-6">
+                    <p className={cn("text-base tracking-widest", mutedTextClasses)}>СТЪПКА 2</p>
                     <button onClick={restart} className="p-2 rounded-full text-slate-400 hover:text-blue-500 hover:bg-slate-100 transition-colors">
-                      <RotateCcw className="w-4 h-4" />
+                      <RotateCcw className="w-5 h-5" />
                     </button>
                   </div>
                   
-                  <h2 className="text-2xl font-bold mb-6">Начин на осигуряване</h2>
+                  <h2 className="text-3xl font-bold mb-8">Начин на осигуряване</h2>
 
                   {/* Insurance type selection */}
-                  <div className={cn("space-y-6", familyType === 'family' && "grid grid-cols-2 gap-6 space-y-0")}>
+                  <div className={cn("space-y-8 flex-1", familyType === 'family' && "grid grid-cols-2 gap-8 space-y-0")}>
                     {/* Client Insurance */}
                     <div>
                       {familyType === 'family' && (
-                        <p className={cn("text-sm font-medium mb-3", mutedTextClasses)}>КЛИЕНТ</p>
+                        <p className={cn("text-base font-medium mb-4", mutedTextClasses)}>КЛИЕНТ</p>
                       )}
-                      <div className="grid grid-cols-2 gap-3">
+                      <div className="grid grid-cols-2 gap-4">
                         <button
                           onClick={() => setClientInsuranceType('employee')}
                           className={cn(
-                            "p-4 rounded-2xl border-2 text-left transition-all duration-300 group",
+                            "p-6 rounded-2xl border-2 text-left transition-all duration-300 group",
                             clientInsuranceType === 'employee'
                               ? "border-blue-500 bg-blue-600 text-white"
                               : isDarkMode 
@@ -843,8 +850,8 @@ export default function FinancialPlanner() {
                                 : "border-slate-200 hover:border-blue-500 hover:bg-blue-600 hover:text-white"
                           )}
                         >
-                          <h3 className={cn("font-semibold mb-1 text-sm", clientInsuranceType !== 'employee' && "group-hover:text-white")}>Служител</h3>
-                          <p className={cn("text-xs", clientInsuranceType === 'employee' ? "text-blue-100" : mutedTextClasses, clientInsuranceType !== 'employee' && "group-hover:text-blue-100")}>
+                          <h3 className={cn("font-semibold mb-2 text-lg", clientInsuranceType !== 'employee' && "group-hover:text-white")}>Служител</h3>
+                          <p className={cn("text-sm", clientInsuranceType === 'employee' ? "text-blue-100" : mutedTextClasses, clientInsuranceType !== 'employee' && "group-hover:text-blue-100")}>
                             Осигуряването съответства на доходите
                           </p>
                         </button>
@@ -852,7 +859,7 @@ export default function FinancialPlanner() {
                         <button
                           onClick={() => setClientInsuranceType('entrepreneur')}
                           className={cn(
-                            "p-4 rounded-2xl border-2 text-left transition-all duration-300 group",
+                            "p-6 rounded-2xl border-2 text-left transition-all duration-300 group",
                             clientInsuranceType === 'entrepreneur'
                               ? "border-blue-500 bg-blue-600 text-white"
                               : isDarkMode 
@@ -860,8 +867,8 @@ export default function FinancialPlanner() {
                                 : "border-slate-200 hover:border-blue-500 hover:bg-blue-600 hover:text-white"
                           )}
                         >
-                          <h3 className={cn("font-semibold mb-1 text-sm", clientInsuranceType !== 'entrepreneur' && "group-hover:text-white")}>Предприемач</h3>
-                          <p className={cn("text-xs", clientInsuranceType === 'entrepreneur' ? "text-blue-100" : mutedTextClasses, clientInsuranceType !== 'entrepreneur' && "group-hover:text-blue-100")}>
+                          <h3 className={cn("font-semibold mb-2 text-lg", clientInsuranceType !== 'entrepreneur' && "group-hover:text-white")}>Предприемач</h3>
+                          <p className={cn("text-sm", clientInsuranceType === 'entrepreneur' ? "text-blue-100" : mutedTextClasses, clientInsuranceType !== 'entrepreneur' && "group-hover:text-blue-100")}>
                             Осигуряването е по-ниско от доходите
                           </p>
                         </button>
@@ -871,12 +878,12 @@ export default function FinancialPlanner() {
                     {/* Partner Insurance (only for family) */}
                     {familyType === 'family' && (
                       <div>
-                        <p className={cn("text-sm font-medium mb-3", mutedTextClasses)}>ПАРТНЬОР</p>
-                        <div className="grid grid-cols-2 gap-3">
+                        <p className={cn("text-base font-medium mb-4", mutedTextClasses)}>ПАРТНЬОР</p>
+                        <div className="grid grid-cols-2 gap-4">
                           <button
                             onClick={() => setPartnerInsuranceType('employee')}
                             className={cn(
-                              "p-4 rounded-2xl border-2 text-left transition-all duration-300 group",
+                              "p-6 rounded-2xl border-2 text-left transition-all duration-300 group",
                               partnerInsuranceType === 'employee'
                                 ? "border-blue-500 bg-blue-600 text-white"
                                 : isDarkMode 
@@ -884,8 +891,8 @@ export default function FinancialPlanner() {
                                   : "border-slate-200 hover:border-blue-500 hover:bg-blue-600 hover:text-white"
                             )}
                           >
-                            <h3 className={cn("font-semibold mb-1 text-sm", partnerInsuranceType !== 'employee' && "group-hover:text-white")}>Служител</h3>
-                            <p className={cn("text-xs", partnerInsuranceType === 'employee' ? "text-blue-100" : mutedTextClasses, partnerInsuranceType !== 'employee' && "group-hover:text-blue-100")}>
+                            <h3 className={cn("font-semibold mb-2 text-lg", partnerInsuranceType !== 'employee' && "group-hover:text-white")}>Служител</h3>
+                            <p className={cn("text-sm", partnerInsuranceType === 'employee' ? "text-blue-100" : mutedTextClasses, partnerInsuranceType !== 'employee' && "group-hover:text-blue-100")}>
                               Осигуряването съответства на доходите
                             </p>
                           </button>
@@ -893,7 +900,7 @@ export default function FinancialPlanner() {
                           <button
                             onClick={() => setPartnerInsuranceType('entrepreneur')}
                             className={cn(
-                              "p-4 rounded-2xl border-2 text-left transition-all duration-300 group",
+                              "p-6 rounded-2xl border-2 text-left transition-all duration-300 group",
                               partnerInsuranceType === 'entrepreneur'
                                 ? "border-blue-500 bg-blue-600 text-white"
                                 : isDarkMode 
@@ -901,8 +908,8 @@ export default function FinancialPlanner() {
                                   : "border-slate-200 hover:border-blue-500 hover:bg-blue-600 hover:text-white"
                             )}
                           >
-                            <h3 className={cn("font-semibold mb-1 text-sm", partnerInsuranceType !== 'entrepreneur' && "group-hover:text-white")}>Предприемач</h3>
-                            <p className={cn("text-xs", partnerInsuranceType === 'entrepreneur' ? "text-blue-100" : mutedTextClasses, partnerInsuranceType !== 'entrepreneur' && "group-hover:text-blue-100")}>
+                            <h3 className={cn("font-semibold mb-2 text-lg", partnerInsuranceType !== 'entrepreneur' && "group-hover:text-white")}>Предприемач</h3>
+                            <p className={cn("text-sm", partnerInsuranceType === 'entrepreneur' ? "text-blue-100" : mutedTextClasses, partnerInsuranceType !== 'entrepreneur' && "group-hover:text-blue-100")}>
                               Осигуряването е по-ниско от доходите
                             </p>
                           </button>
@@ -911,11 +918,11 @@ export default function FinancialPlanner() {
                     )}
                   </div>
 
-                  <div className="flex justify-center mt-6">
+                  <div className="flex justify-center mt-8">
                     <Button 
                       onClick={goNext}
                       disabled={!clientInsuranceType || (familyType === 'family' && !partnerInsuranceType)}
-                      className={cn(primaryButtonClass, "px-12")}
+                      className={cn(primaryButtonClass, "px-16 py-6 text-lg")}
                     >
                       СЛЕДВАЩА СТЪПКА
                     </Button>
@@ -931,12 +938,12 @@ export default function FinancialPlanner() {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -20 }}
-                className="grid lg:grid-cols-4 gap-8 items-start"
+                className="grid lg:grid-cols-4 gap-8 items-center h-full"
               >
                 <div className="lg:col-span-1">
-                  <p className={cn("text-sm tracking-widest mb-4", accentColor)}>СТЪПКА 3</p>
-                  <h1 className="text-3xl md:text-4xl font-bold mb-4">Възраст</h1>
-                  <p className={cn("text-base mb-6", mutedTextClasses)}>
+                  <p className={cn("text-base tracking-widest mb-4", accentColor)}>СТЪПКА 3</p>
+                  <h1 className="text-4xl md:text-5xl font-bold mb-4">Възраст</h1>
+                  <p className={cn("text-lg mb-6", mutedTextClasses)}>
                     {familyType === 'family' 
                       ? 'Въведете възрастта на клиента и партньора.'
                       : 'Въведете вашата възраст.'
@@ -944,7 +951,7 @@ export default function FinancialPlanner() {
                   </p>
                 </div>
 
-                <div className={cn("lg:col-span-3 rounded-3xl border p-6 min-h-[450px]", cardClasses)}>
+                <div className={cn("lg:col-span-3 rounded-3xl border p-8 min-h-[500px] flex flex-col", cardClasses)}>
                   {/* Inline Step Tracker */}
                   <div className="mb-6 pb-4 border-b border-slate-100">
                     <div className="flex justify-between items-start">
@@ -962,23 +969,23 @@ export default function FinancialPlanner() {
                     </div>
                   </div>
                   
-                  <div className="flex items-center justify-between mb-4">
-                    <p className={cn("text-sm tracking-widest", mutedTextClasses)}>СТЪПКА 3</p>
+                  <div className="flex items-center justify-between mb-6">
+                    <p className={cn("text-base tracking-widest", mutedTextClasses)}>СТЪПКА 3</p>
                     <button onClick={restart} className="p-2 rounded-full text-slate-400 hover:text-blue-500 hover:bg-slate-100 transition-colors">
-                      <RotateCcw className="w-4 h-4" />
+                      <RotateCcw className="w-5 h-5" />
                     </button>
                   </div>
                   
-                  <h2 className="text-2xl font-bold mb-6">Възраст</h2>
+                  <h2 className="text-3xl font-bold mb-8">Възраст</h2>
 
                   {/* Age inputs side by side */}
-                  <div className={cn("grid gap-6 mb-6", familyType === 'family' ? "grid-cols-2" : "grid-cols-1")}>
+                  <div className={cn("grid gap-8 mb-8 flex-1", familyType === 'family' ? "grid-cols-2" : "grid-cols-1")}>
                     {/* Client Age */}
-                    <div>
-                      <p className={cn("text-sm font-medium mb-3", mutedTextClasses)}>
+                    <div className="flex flex-col justify-center">
+                      <p className={cn("text-base font-medium mb-4", mutedTextClasses)}>
                         {familyType === 'family' ? 'КЛИЕНТ' : 'ВАШАТА ВЪЗРАСТ'}
                       </p>
-                      <div className="text-center mb-3">
+                      <div className="text-center mb-4">
                         <input
                           type="text"
                           inputMode="numeric"
@@ -998,9 +1005,9 @@ export default function FinancialPlanner() {
                             if (clientAge === '' || clientAge < 18) setClientAge(18);
                             else if (clientAge > 70) setClientAge(70);
                           }}
-                          className={cn("text-4xl font-bold text-blue-500 bg-transparent border-none text-center w-20 outline-none focus:ring-2 focus:ring-blue-500 rounded")}
+                          className={cn("text-5xl font-bold text-blue-500 bg-transparent border-none text-center w-24 outline-none focus:ring-2 focus:ring-blue-500 rounded")}
                         />
-                        <span className={cn("text-lg ml-2", mutedTextClasses)}>години</span>
+                        <span className={cn("text-xl ml-2", mutedTextClasses)}>години</span>
                       </div>
                       <Slider
                         value={[typeof clientAge === 'number' ? clientAge : 35]}
@@ -1010,7 +1017,7 @@ export default function FinancialPlanner() {
                         step={1}
                         className="mb-2"
                       />
-                      <div className={cn("flex justify-between text-xs", mutedTextClasses)}>
+                      <div className={cn("flex justify-between text-sm", mutedTextClasses)}>
                         <span>18</span>
                         <span>70</span>
                       </div>
@@ -1018,9 +1025,9 @@ export default function FinancialPlanner() {
 
                     {/* Partner Age (only for family) */}
                     {familyType === 'family' && (
-                      <div>
-                        <p className={cn("text-sm font-medium mb-3", mutedTextClasses)}>ПАРТНЬОР</p>
-                        <div className="text-center mb-3">
+                      <div className="flex flex-col justify-center">
+                        <p className={cn("text-base font-medium mb-4", mutedTextClasses)}>ПАРТНЬОР</p>
+                        <div className="text-center mb-4">
                           <input
                             type="text"
                             inputMode="numeric"
@@ -1040,9 +1047,9 @@ export default function FinancialPlanner() {
                               if (partnerAge === '' || partnerAge < 18) setPartnerAge(18);
                               else if (partnerAge > 70) setPartnerAge(70);
                             }}
-                            className={cn("text-4xl font-bold text-blue-500 bg-transparent border-none text-center w-20 outline-none focus:ring-2 focus:ring-blue-500 rounded")}
+                            className={cn("text-5xl font-bold text-blue-500 bg-transparent border-none text-center w-24 outline-none focus:ring-2 focus:ring-blue-500 rounded")}
                           />
-                          <span className={cn("text-lg ml-2", mutedTextClasses)}>години</span>
+                          <span className={cn("text-xl ml-2", mutedTextClasses)}>години</span>
                         </div>
                         <Slider
                           value={[typeof partnerAge === 'number' ? partnerAge : 35]}
@@ -1052,7 +1059,7 @@ export default function FinancialPlanner() {
                           step={1}
                           className="mb-2"
                         />
-                        <div className={cn("flex justify-between text-xs", mutedTextClasses)}>
+                        <div className={cn("flex justify-between text-sm", mutedTextClasses)}>
                           <span>18</span>
                           <span>70</span>
                         </div>
@@ -1061,7 +1068,7 @@ export default function FinancialPlanner() {
                   </div>
 
                   <div className="flex justify-center">
-                    <Button onClick={goNext} className={cn(primaryButtonClass, "px-12")}>
+                    <Button onClick={goNext} className={cn(primaryButtonClass, "px-16 py-6 text-lg")}>
                       СЛЕДВАЩА СТЪПКА
                     </Button>
                   </div>
@@ -1077,12 +1084,12 @@ export default function FinancialPlanner() {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -20 }}
-                className="grid lg:grid-cols-4 gap-8 items-start"
+                className="grid lg:grid-cols-4 gap-8 items-center h-full"
               >
                 <div className="lg:col-span-1">
-                  <p className={cn("text-sm tracking-widest mb-4", accentColor)}>СТЪПКА 4</p>
-                  <h1 className="text-3xl md:text-4xl font-bold mb-4">Месечен доход</h1>
-                  <p className={cn("text-base mb-6", mutedTextClasses)}>
+                  <p className={cn("text-base tracking-widest mb-4", accentColor)}>СТЪПКА 4</p>
+                  <h1 className="text-4xl md:text-5xl font-bold mb-4">Месечен доход</h1>
+                  <p className={cn("text-lg mb-6", mutedTextClasses)}>
                     {familyType === 'family' 
                       ? 'Въведете месечния доход на клиента и партньора.'
                       : 'Въведете вашия месечен доход.'
@@ -1090,7 +1097,7 @@ export default function FinancialPlanner() {
                   </p>
                 </div>
 
-                <div className={cn("lg:col-span-3 rounded-3xl border p-6 min-h-[450px]", cardClasses)}>
+                <div className={cn("lg:col-span-3 rounded-3xl border p-8 min-h-[500px] flex flex-col", cardClasses)}>
                   {/* Inline Step Tracker */}
                   <div className="mb-6 pb-4 border-b border-slate-100">
                     <div className="flex justify-between items-start">
@@ -1108,23 +1115,23 @@ export default function FinancialPlanner() {
                     </div>
                   </div>
                   
-                  <div className="flex items-center justify-between mb-4">
-                    <p className={cn("text-sm tracking-widest", mutedTextClasses)}>СТЪПКА 4</p>
+                  <div className="flex items-center justify-between mb-6">
+                    <p className={cn("text-base tracking-widest", mutedTextClasses)}>СТЪПКА 4</p>
                     <button onClick={restart} className="p-2 rounded-full text-slate-400 hover:text-blue-500 hover:bg-slate-100 transition-colors">
-                      <RotateCcw className="w-4 h-4" />
+                      <RotateCcw className="w-5 h-5" />
                     </button>
                   </div>
                   
-                  <h2 className="text-2xl font-bold mb-6">Месечен доход</h2>
+                  <h2 className="text-3xl font-bold mb-8">Месечен доход</h2>
 
                   {/* Income inputs side by side */}
-                  <div className={cn("grid gap-6 mb-4", familyType === 'family' ? "grid-cols-2" : "grid-cols-1")}>
+                  <div className={cn("grid gap-8 mb-6 flex-1", familyType === 'family' ? "grid-cols-2" : "grid-cols-1")}>
                     {/* Client Income */}
-                    <div>
-                      <p className={cn("text-sm font-medium mb-3", mutedTextClasses)}>
+                    <div className="flex flex-col justify-center">
+                      <p className={cn("text-base font-medium mb-4", mutedTextClasses)}>
                         {familyType === 'family' ? 'КЛИЕНТ' : 'ВАШИЯТ ДОХОД'}
                       </p>
-                      <div className="text-center mb-3">
+                      <div className="text-center mb-4">
                         <input
                           type="text"
                           inputMode="numeric"
@@ -1144,9 +1151,9 @@ export default function FinancialPlanner() {
                             if (monthlyIncome === '' || monthlyIncome < 400) setMonthlyIncome(400);
                             else if (monthlyIncome > 15000) setMonthlyIncome(15000);
                           }}
-                          className={cn("text-3xl font-bold text-blue-500 bg-transparent border-none text-center w-32 outline-none focus:ring-2 focus:ring-blue-500 rounded")}
+                          className={cn("text-4xl font-bold text-blue-500 bg-transparent border-none text-center w-36 outline-none focus:ring-2 focus:ring-blue-500 rounded")}
                         />
-                        <span className={cn("text-lg ml-2", mutedTextClasses)}>€</span>
+                        <span className={cn("text-xl ml-2", mutedTextClasses)}>€</span>
                       </div>
                       <Slider
                         value={[typeof monthlyIncome === 'number' ? monthlyIncome : 1000]}
@@ -1156,7 +1163,7 @@ export default function FinancialPlanner() {
                         step={100}
                         className="mb-2"
                       />
-                      <div className={cn("flex justify-between text-xs", mutedTextClasses)}>
+                      <div className={cn("flex justify-between text-sm", mutedTextClasses)}>
                         <span>400 €</span>
                         <span>15 000 €</span>
                       </div>
@@ -1164,9 +1171,9 @@ export default function FinancialPlanner() {
 
                     {/* Partner Income (only for family) */}
                     {familyType === 'family' && (
-                      <div>
-                        <p className={cn("text-sm font-medium mb-3", mutedTextClasses)}>ПАРТНЬОР</p>
-                        <div className="text-center mb-3">
+                      <div className="flex flex-col justify-center">
+                        <p className={cn("text-base font-medium mb-4", mutedTextClasses)}>ПАРТНЬОР</p>
+                        <div className="text-center mb-4">
                           <input
                             type="text"
                             inputMode="numeric"
@@ -1186,44 +1193,12 @@ export default function FinancialPlanner() {
                               if (partnerIncome === '' || partnerIncome < 400) setPartnerIncome(400);
                               else if (partnerIncome > 15000) setPartnerIncome(15000);
                             }}
-                            className={cn("text-3xl font-bold text-blue-500 bg-transparent border-none text-center w-32 outline-none focus:ring-2 focus:ring-blue-500 rounded")}
+                            className={cn("text-4xl font-bold text-blue-500 bg-transparent border-none text-center w-36 outline-none focus:ring-2 focus:ring-blue-500 rounded")}
                           />
-                          <span className={cn("text-lg ml-2", mutedTextClasses)}>€</span>
+                          <span className={cn("text-xl ml-2", mutedTextClasses)}>€</span>
                         </div>
                         <Slider
-                          value={[typeof partnerIncome === 'number' ? partnerIncome : 1000]}
-                          onValueChange={(v) => setPartnerIncome(v[0])}
-                          min={400}
-                          max={15000}
-                          step={100}
-                          className="mb-2"
-                        />
-                        <div className={cn("flex justify-between text-xs", mutedTextClasses)}>
-                          <span>400 €</span>
-                          <span>15 000 €</span>
-                        </div>
-                      </div>
-                    )}
-                  </div>
-
-                  {/* Total (for family) */}
-                  {familyType === 'family' && (
-                    <div className={cn("p-3 rounded-xl mb-4", isDarkMode ? "bg-slate-800" : "bg-slate-100")}>
-                      <div className="flex justify-between items-center">
-                        <span className={mutedTextClasses}>Общо месечен доход:</span>
-                        <span className="text-xl font-bold text-blue-500">{formatNumber((typeof monthlyIncome === 'number' ? monthlyIncome : 0) + (typeof partnerIncome === 'number' ? partnerIncome : 0))} €</span>
-                      </div>
-                    </div>
-                  )}
-
-                  <div className="flex justify-center">
-                    <Button onClick={goNext} className={cn(primaryButtonClass, "px-12")}>
-                      СЛЕДВАЩА СТЪПКА
-                    </Button>
-                  </div>
-                </div>
-              </motion.div>
-            )}
+                          value={[typeof
 
             {/* Step 5: Priorities (multi-select with icons) */}
             {currentStep === 5 && (

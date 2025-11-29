@@ -4,10 +4,10 @@ import { Shield, Award, Building2, CheckCircle2, BadgeCheck } from 'lucide-react
 
 const logos = [
   { name: 'КФН лиценз', icon: Shield },
-  { name: 'ISO сертификат', icon: Award },
+  { name: 'Администратор на лични данни', icon: Award },
   { name: 'CFP сертифициран', icon: BadgeCheck },
   { name: 'Доверен партньор', icon: CheckCircle2 },
-  { name: 'Фидуциарен стандарт', icon: Building2 },
+  { name: 'Независимо финансово консултиране', icon: Building2 },
 ];
 
 export default function TrustLogos() {

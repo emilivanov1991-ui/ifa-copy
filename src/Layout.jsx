@@ -21,9 +21,15 @@ const navLinks = [
   { name: 'Контакти', page: 'Contact' },
 ];
 
+// Pages that have dark hero sections (header should be transparent with white text initially)
+const DARK_HERO_PAGES = ['Home', 'FinancialPlanner'];
+
 export default function Layout({ children, currentPageName }) {
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  
+  // Check if page has dark hero
+  const hasDarkHero = DARK_HERO_PAGES.includes(currentPageName);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -41,25 +47,27 @@ export default function Layout({ children, currentPageName }) {
         className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
           isScrolled 
             ? 'bg-white/95 backdrop-blur-md shadow-lg shadow-slate-200/50 py-3' 
-            : 'bg-transparent py-5'
+            : hasDarkHero 
+              ? 'bg-transparent py-5' 
+              : 'bg-white/95 backdrop-blur-md shadow-lg shadow-slate-200/50 py-3'
         }`}
       >
         <div className="max-w-7xl mx-auto px-6 flex items-center justify-between">
           {/* Logo */}
           <Link to={createPageUrl('Home')} className="flex items-center gap-3">
             <div className={`w-10 h-10 rounded-xl flex items-center justify-center transition-colors duration-300 ${
-              isScrolled ? 'bg-blue-600' : 'bg-white/20 backdrop-blur-sm'
+              isScrolled || !hasDarkHero ? 'bg-blue-600' : 'bg-white/20 backdrop-blur-sm'
             }`}>
-              <TrendingUp className={`h-5 w-5 ${isScrolled ? 'text-white' : 'text-white'}`} />
+              <TrendingUp className="h-5 w-5 text-white" />
             </div>
             <div>
               <span className={`font-semibold text-lg tracking-tight transition-colors duration-300 ${
-                isScrolled ? 'text-slate-900' : 'text-white'
+                isScrolled || !hasDarkHero ? 'text-slate-900' : 'text-white'
               }`}>
                 APEX
               </span>
               <span className={`hidden sm:inline ml-1 font-light transition-colors duration-300 ${
-                isScrolled ? 'text-slate-600' : 'text-blue-100'
+                isScrolled || !hasDarkHero ? 'text-slate-600' : 'text-blue-100'
               }`}>
                 Financial
               </span>
@@ -73,7 +81,7 @@ export default function Layout({ children, currentPageName }) {
                 key={link.name}
                 to={createPageUrl(link.page)}
                 className={`text-sm font-medium transition-colors duration-300 hover:text-blue-500 ${
-                  isScrolled ? 'text-slate-600' : 'text-white/80 hover:text-white'
+                  isScrolled || !hasDarkHero ? 'text-slate-600' : 'text-white/80 hover:text-white'
                 } ${currentPageName === link.page ? 'text-blue-500' : ''}`}
               >
                 {link.name}
@@ -83,7 +91,7 @@ export default function Layout({ children, currentPageName }) {
               <DropdownMenuTrigger asChild>
                 <Button 
                   className={`rounded-full px-6 transition-all duration-300 ${
-                    isScrolled 
+                    isScrolled || !hasDarkHero
                       ? 'bg-blue-600 hover:bg-blue-700 text-white' 
                       : 'bg-white/20 hover:bg-white/30 text-white backdrop-blur-sm border border-white/30'
                   }`}
@@ -125,9 +133,9 @@ export default function Layout({ children, currentPageName }) {
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
           >
             {mobileMenuOpen ? (
-              <X className={`h-6 w-6 ${isScrolled ? 'text-slate-900' : 'text-white'}`} />
+              <X className={`h-6 w-6 ${isScrolled || !hasDarkHero ? 'text-slate-900' : 'text-white'}`} />
             ) : (
-              <Menu className={`h-6 w-6 ${isScrolled ? 'text-slate-900' : 'text-white'}`} />
+              <Menu className={`h-6 w-6 ${isScrolled || !hasDarkHero ? 'text-slate-900' : 'text-white'}`} />
             )}
           </button>
         </div>

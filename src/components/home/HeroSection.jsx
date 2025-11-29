@@ -70,7 +70,7 @@ export default function HeroSection() {
           <Button 
             variant="outline" 
             size="lg"
-            className="border-white/30 text-white hover:bg-white/10 px-8 py-6 text-lg rounded-full transition-all duration-300"
+            className="border-white/50 text-white bg-white/10 hover:bg-white/20 px-8 py-6 text-lg rounded-full transition-all duration-300 backdrop-blur-sm"
             onClick={scrollToServices}
           >
             Научете повече

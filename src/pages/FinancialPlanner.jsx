@@ -1036,11 +1036,6 @@ export default function FinancialPlanner() {
                     )}
                   </div>
 
-                  <div className="flex justify-center">
-                    <Button onClick={goNext} className={cn(primaryButtonClass, "px-12")}>
-                      СЛЕДВАЩА СТЪПКА
-                    </Button>
-                  </div>
                 </div>
               </motion.div>
             )}

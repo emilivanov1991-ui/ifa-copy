@@ -1540,7 +1540,7 @@ export default function FinancialPlanner() {
                 className="w-full px-4"
               >
                 {/* Inline Step Tracker */}
-                <div className={cn("rounded-2xl border p-4 mb-6", cardClasses)}>
+                <div className={cn("rounded-2xl border p-4 mb-4", cardClasses)}>
                   <div className="flex justify-between items-start">
                     {VISUAL_STEPS.map((step, index) => {
                       const isActive = currentStep >= (index + 1);
@@ -1556,10 +1556,36 @@ export default function FinancialPlanner() {
                   </div>
                 </div>
 
-                <h2 className="text-3xl font-bold mb-6 text-center">Вашият оптимален финансов план</h2>
+                <div className="text-center mb-4">
+                  <h2 className="text-3xl font-bold mb-2">Вашият оптимален финансов план</h2>
+                  <p className={cn("text-sm max-w-2xl mx-auto", mutedTextClasses)}>
+                    Разпределете 50% от дохода си между четири ключови области. Плъзгачите автоматично балансират останалите категории.
+                  </p>
+                </div>
+
+                {/* Allocation Summary Bar */}
+                <div className={cn("rounded-xl border p-3 mb-4 flex items-center justify-between", cardClasses)}>
+                  <div className="flex items-center gap-2">
+                    <Target className="w-5 h-5 text-blue-500" />
+                    <span className={cn("text-sm font-medium", mutedTextClasses)}>Общо разпределение:</span>
+                  </div>
+                  <div className="flex items-center gap-4">
+                    <div className="flex items-center gap-1">
+                      <div className="w-3 h-3 rounded-full bg-blue-500"></div>
+                      <span className="text-sm font-semibold">{allocations.security + allocations.pension + allocations.housing + allocations.cash}%</span>
+                      <span className={cn("text-sm", mutedTextClasses)}>/ 50%</span>
+                    </div>
+                    <div className="w-32 h-2 bg-slate-200 rounded-full overflow-hidden">
+                      <div 
+                        className="h-full bg-blue-500 rounded-full transition-all duration-300"
+                        style={{ width: `${((allocations.security + allocations.pension + allocations.housing + allocations.cash) / 50) * 100}%` }}
+                      />
+                    </div>
+                  </div>
+                </div>
 
                 {/* Goals Grid - 4 columns like the image */}
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
                   {/* Security */}
                   <motion.div 
                     className={cn("rounded-2xl border p-4 text-center relative transition-all duration-300 group hover:border-blue-500 hover:bg-blue-600", cardClasses)}

@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from "@/components/ui/button";
@@ -1037,14 +1036,16 @@ export default function FinancialPlanner() {
                     )}
                   </div>
 
-                  <Button onClick={goNext} className={cn(primaryButtonClass, "w-full")}>
+                  <div className="flex justify-center">
+                    <Button onClick={goNext} className={cn(primaryButtonClass, "px-12")}>
                       СЛЕДВАЩА СТЪПКА
                     </Button>
                   </div>
-                  </motion.div>
-                  )}
+                </div>
+              </motion.div>
+            )}
 
-                  {/* Step 4: Monthly Income */}
+            {/* Step 4: Monthly Income */}
             {currentStep === 4 && (
               <motion.div
                 key="step-4"

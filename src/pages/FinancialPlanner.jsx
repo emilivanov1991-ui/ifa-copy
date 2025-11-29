@@ -1239,61 +1239,61 @@ export default function FinancialPlanner() {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -20 }}
-                className="grid lg:grid-cols-4 gap-8 items-center h-full"
+                className="grid lg:grid-cols-4 gap-4 items-stretch h-[calc(100vh-48px)]"
               >
-                <div className="lg:col-span-1">
-                  <p className={cn("text-base tracking-widest mb-4", accentColor)}>СТЪПКА 5</p>
-                  <h1 className="text-4xl md:text-5xl font-bold mb-4">Приоритети</h1>
-                  <p className={cn("text-lg mb-6", mutedTextClasses)}>
+                <div className="lg:col-span-1 flex flex-col justify-center">
+                  <p className={cn("text-sm tracking-widest mb-2", accentColor)}>СТЪПКА 5</p>
+                  <h1 className="text-3xl md:text-4xl font-bold mb-2">Приоритети</h1>
+                  <p className={cn("text-base", mutedTextClasses)}>
                     Изберете една или повече посоки, които резонират с Вашите мечти и финансови цели.
                   </p>
                 </div>
 
-                <div className={cn("lg:col-span-3 rounded-3xl border p-8 min-h-[500px] flex flex-col", cardClasses)}>
+                <div className={cn("lg:col-span-3 rounded-3xl border p-4 flex flex-col", cardClasses)}>
                   {/* Inline Step Tracker */}
-                  <div className="mb-6 pb-4 border-b border-slate-100">
+                  <div className="mb-2 pb-2 border-b border-slate-100">
                     <div className="flex justify-between items-start">
                       {VISUAL_STEPS.map((step, index) => {
                         const isActive = currentStep >= (index + 1);
                         const isCurrent = index === 4;
                         return (
                           <div key={step.id} className={cn("flex flex-col items-center text-center flex-1 transition-all duration-300", isActive ? "opacity-100" : "opacity-40")}>
-                            <div className={cn("w-full h-1 mb-2 rounded-full transition-all duration-300", isCurrent ? "bg-blue-500" : isActive ? "bg-blue-500" : isDarkMode ? "bg-slate-700" : "bg-slate-200")} />
-                            <span className={cn("text-[9px] font-semibold tracking-wider leading-tight uppercase", isCurrent ? "text-slate-900" : "text-slate-400")}>{step.label}</span>
-                            <span className={cn("text-[9px] font-semibold tracking-wider leading-tight uppercase", isCurrent ? "text-slate-900" : "text-slate-400")}>{step.subLabel}</span>
+                            <div className={cn("w-full h-1 mb-1 rounded-full transition-all duration-300", isCurrent ? "bg-blue-500" : isActive ? "bg-blue-500" : isDarkMode ? "bg-slate-700" : "bg-slate-200")} />
+                            <span className={cn("text-[8px] font-semibold tracking-wider leading-tight uppercase", isCurrent ? "text-slate-900" : "text-slate-400")}>{step.label}</span>
+                            <span className={cn("text-[8px] font-semibold tracking-wider leading-tight uppercase", isCurrent ? "text-slate-900" : "text-slate-400")}>{step.subLabel}</span>
                           </div>
                         );
                       })}
                     </div>
                   </div>
                   
-                  <div className="flex items-center justify-between mb-6">
-                    <p className={cn("text-base tracking-widest", mutedTextClasses)}>СТЪПКА 5</p>
-                    <button onClick={restart} className="p-2 rounded-full text-slate-400 hover:text-blue-500 hover:bg-slate-100 transition-colors">
-                      <RotateCcw className="w-5 h-5" />
+                  <div className="flex items-center justify-between mb-2">
+                    <p className={cn("text-sm tracking-widest", mutedTextClasses)}>СТЪПКА 5</p>
+                    <button onClick={restart} className="p-1 rounded-full text-slate-400 hover:text-blue-500 hover:bg-slate-100 transition-colors">
+                      <RotateCcw className="w-4 h-4" />
                     </button>
                   </div>
                   
-                  <h2 className="text-3xl font-bold mb-3">Вашите финансови приоритети</h2>
-                  <p className={cn("text-base mb-8", mutedTextClasses)}>
-                    Изберете всички области, които са важни за Вас. Можете да изберете повече от една.
+                  <h2 className="text-xl font-bold mb-1">Вашите финансови приоритети</h2>
+                  <p className={cn("text-sm mb-2", mutedTextClasses)}>
+                    Изберете всички области, които са важни за Вас.
                   </p>
 
                   {/* Priority Grid - 4 columns, 2 rows */}
-                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6 flex-1">
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-2 mb-2 flex-1">
                     {/* Row 1 */}
                     <button
                       onClick={() => togglePriority('stability')}
                       className={cn(
-                        "p-6 rounded-2xl border-2 transition-all duration-300 flex flex-col items-center justify-center h-full group",
+                        "p-3 rounded-xl border-2 transition-all duration-300 flex flex-col items-center justify-center h-full group",
                         selectedPriorities.includes('stability')
                           ? "border-blue-500 bg-blue-600 text-white"
                           : isDarkMode ? "border-slate-700 hover:border-blue-500 hover:bg-blue-600" : "border-slate-200 hover:border-blue-500 hover:bg-blue-600"
                       )}
                     >
-                      <Shield className={cn("w-10 h-10 mb-3", selectedPriorities.includes('stability') ? "text-white" : "text-blue-500 group-hover:text-white")} />
-                      <h3 className={cn("font-semibold text-base mb-2 text-center", !selectedPriorities.includes('stability') && "group-hover:text-white")}>Финансова сигурност</h3>
-                      <p className={cn("text-sm text-center", selectedPriorities.includes('stability') ? "text-blue-100" : mutedTextClasses, !selectedPriorities.includes('stability') && "group-hover:text-blue-100")}>
+                      <Shield className={cn("w-8 h-8 mb-1", selectedPriorities.includes('stability') ? "text-white" : "text-blue-500 group-hover:text-white")} />
+                      <h3 className={cn("font-semibold text-sm text-center", !selectedPriorities.includes('stability') && "group-hover:text-white")}>Финансова сигурност</h3>
+                      <p className={cn("text-xs text-center", selectedPriorities.includes('stability') ? "text-blue-100" : mutedTextClasses, !selectedPriorities.includes('stability') && "group-hover:text-blue-100")}>
                         Резерв и защита
                       </p>
                     </button>
@@ -1301,15 +1301,15 @@ export default function FinancialPlanner() {
                     <button
                       onClick={() => togglePriority('investments')}
                       className={cn(
-                        "p-4 rounded-2xl border-2 transition-all duration-300 flex flex-col items-center h-full group",
+                        "p-3 rounded-xl border-2 transition-all duration-300 flex flex-col items-center justify-center h-full group",
                         selectedPriorities.includes('investments')
                           ? "border-blue-500 bg-blue-600 text-white"
                           : isDarkMode ? "border-slate-700 hover:border-blue-500 hover:bg-blue-600" : "border-slate-200 hover:border-blue-500 hover:bg-blue-600"
                       )}
                     >
-                      <TrendingUp className={cn("w-10 h-10 mb-3", selectedPriorities.includes('investments') ? "text-white" : "text-emerald-500 group-hover:text-white")} />
-                      <h3 className={cn("font-semibold text-base mb-2 text-center", !selectedPriorities.includes('investments') && "group-hover:text-white")}>Инвестиции</h3>
-                      <p className={cn("text-sm text-center", selectedPriorities.includes('investments') ? "text-blue-100" : mutedTextClasses, !selectedPriorities.includes('investments') && "group-hover:text-blue-100")}>
+                      <TrendingUp className={cn("w-8 h-8 mb-1", selectedPriorities.includes('investments') ? "text-white" : "text-emerald-500 group-hover:text-white")} />
+                      <h3 className={cn("font-semibold text-sm text-center", !selectedPriorities.includes('investments') && "group-hover:text-white")}>Инвестиции</h3>
+                      <p className={cn("text-xs text-center", selectedPriorities.includes('investments') ? "text-blue-100" : mutedTextClasses, !selectedPriorities.includes('investments') && "group-hover:text-blue-100")}>
                         Растеж на капитала
                       </p>
                     </button>
@@ -1317,15 +1317,15 @@ export default function FinancialPlanner() {
                     <button
                       onClick={() => togglePriority('pension')}
                       className={cn(
-                        "p-4 rounded-2xl border-2 transition-all duration-300 flex flex-col items-center h-full group",
+                        "p-3 rounded-xl border-2 transition-all duration-300 flex flex-col items-center justify-center h-full group",
                         selectedPriorities.includes('pension')
                           ? "border-blue-500 bg-blue-600 text-white"
                           : isDarkMode ? "border-slate-700 hover:border-blue-500 hover:bg-blue-600" : "border-slate-200 hover:border-blue-500 hover:bg-blue-600"
                       )}
                     >
-                      <PiggyBank className={cn("w-10 h-10 mb-3", selectedPriorities.includes('pension') ? "text-white" : "text-amber-500 group-hover:text-white")} />
-                      <h3 className={cn("font-semibold text-base mb-2 text-center", !selectedPriorities.includes('pension') && "group-hover:text-white")}>Пенсия</h3>
-                      <p className={cn("text-sm text-center", selectedPriorities.includes('pension') ? "text-blue-100" : mutedTextClasses, !selectedPriorities.includes('pension') && "group-hover:text-blue-100")}>
+                      <PiggyBank className={cn("w-8 h-8 mb-1", selectedPriorities.includes('pension') ? "text-white" : "text-amber-500 group-hover:text-white")} />
+                      <h3 className={cn("font-semibold text-sm text-center", !selectedPriorities.includes('pension') && "group-hover:text-white")}>Пенсия</h3>
+                      <p className={cn("text-xs text-center", selectedPriorities.includes('pension') ? "text-blue-100" : mutedTextClasses, !selectedPriorities.includes('pension') && "group-hover:text-blue-100")}>
                         Спокойна старост
                       </p>
                     </button>
@@ -1333,15 +1333,15 @@ export default function FinancialPlanner() {
                     <button
                       onClick={() => togglePriority('housing')}
                       className={cn(
-                        "p-4 rounded-2xl border-2 transition-all duration-300 flex flex-col items-center h-full group",
+                        "p-3 rounded-xl border-2 transition-all duration-300 flex flex-col items-center justify-center h-full group",
                         selectedPriorities.includes('housing')
                           ? "border-blue-500 bg-blue-600 text-white"
                           : isDarkMode ? "border-slate-700 hover:border-blue-500 hover:bg-blue-600" : "border-slate-200 hover:border-blue-500 hover:bg-blue-600"
                       )}
                     >
-                      <Home className={cn("w-10 h-10 mb-3", selectedPriorities.includes('housing') ? "text-white" : "text-violet-500 group-hover:text-white")} />
-                      <h3 className={cn("font-semibold text-base mb-2 text-center", !selectedPriorities.includes('housing') && "group-hover:text-white")}>Ново жилище</h3>
-                      <p className={cn("text-sm text-center", selectedPriorities.includes('housing') ? "text-blue-100" : mutedTextClasses, !selectedPriorities.includes('housing') && "group-hover:text-blue-100")}>
+                      <Home className={cn("w-8 h-8 mb-1", selectedPriorities.includes('housing') ? "text-white" : "text-violet-500 group-hover:text-white")} />
+                      <h3 className={cn("font-semibold text-sm text-center", !selectedPriorities.includes('housing') && "group-hover:text-white")}>Ново жилище</h3>
+                      <p className={cn("text-xs text-center", selectedPriorities.includes('housing') ? "text-blue-100" : mutedTextClasses, !selectedPriorities.includes('housing') && "group-hover:text-blue-100")}>
                         Собствен дом
                       </p>
                     </button>
@@ -1350,15 +1350,15 @@ export default function FinancialPlanner() {
                     <button
                       onClick={() => togglePriority('children')}
                       className={cn(
-                        "p-4 rounded-2xl border-2 transition-all duration-300 flex flex-col items-center h-full group",
+                        "p-3 rounded-xl border-2 transition-all duration-300 flex flex-col items-center justify-center h-full group",
                         selectedPriorities.includes('children')
                           ? "border-blue-500 bg-blue-600 text-white"
                           : isDarkMode ? "border-slate-700 hover:border-blue-500 hover:bg-blue-600" : "border-slate-200 hover:border-blue-500 hover:bg-blue-600"
                       )}
                     >
-                      <Baby className={cn("w-10 h-10 mb-3", selectedPriorities.includes('children') ? "text-white" : "text-pink-500 group-hover:text-white")} />
-                      <h3 className={cn("font-semibold text-base mb-2 text-center", !selectedPriorities.includes('children') && "group-hover:text-white")}>Бъдеще на децата</h3>
-                      <p className={cn("text-sm text-center", selectedPriorities.includes('children') ? "text-blue-100" : mutedTextClasses, !selectedPriorities.includes('children') && "group-hover:text-blue-100")}>
+                      <Baby className={cn("w-8 h-8 mb-1", selectedPriorities.includes('children') ? "text-white" : "text-pink-500 group-hover:text-white")} />
+                      <h3 className={cn("font-semibold text-sm text-center", !selectedPriorities.includes('children') && "group-hover:text-white")}>Бъдеще на децата</h3>
+                      <p className={cn("text-xs text-center", selectedPriorities.includes('children') ? "text-blue-100" : mutedTextClasses, !selectedPriorities.includes('children') && "group-hover:text-blue-100")}>
                         Образование и старт
                       </p>
                     </button>
@@ -1366,15 +1366,15 @@ export default function FinancialPlanner() {
                     <button
                       onClick={() => togglePriority('travel')}
                       className={cn(
-                        "p-4 rounded-2xl border-2 transition-all duration-300 flex flex-col items-center h-full group",
+                        "p-3 rounded-xl border-2 transition-all duration-300 flex flex-col items-center justify-center h-full group",
                         selectedPriorities.includes('travel')
                           ? "border-blue-500 bg-blue-600 text-white"
                           : isDarkMode ? "border-slate-700 hover:border-blue-500 hover:bg-blue-600" : "border-slate-200 hover:border-blue-500 hover:bg-blue-600"
                       )}
                     >
-                      <Plane className={cn("w-10 h-10 mb-3", selectedPriorities.includes('travel') ? "text-white" : "text-cyan-500 group-hover:text-white")} />
-                      <h3 className={cn("font-semibold text-base mb-2 text-center", !selectedPriorities.includes('travel') && "group-hover:text-white")}>Пътувания</h3>
-                      <p className={cn("text-sm text-center", selectedPriorities.includes('travel') ? "text-blue-100" : mutedTextClasses, !selectedPriorities.includes('travel') && "group-hover:text-blue-100")}>
+                      <Plane className={cn("w-8 h-8 mb-1", selectedPriorities.includes('travel') ? "text-white" : "text-cyan-500 group-hover:text-white")} />
+                      <h3 className={cn("font-semibold text-sm text-center", !selectedPriorities.includes('travel') && "group-hover:text-white")}>Пътувания</h3>
+                      <p className={cn("text-xs text-center", selectedPriorities.includes('travel') ? "text-blue-100" : mutedTextClasses, !selectedPriorities.includes('travel') && "group-hover:text-blue-100")}>
                         Преживявания
                       </p>
                     </button>
@@ -1382,15 +1382,15 @@ export default function FinancialPlanner() {
                     <button
                       onClick={() => togglePriority('health')}
                       className={cn(
-                        "p-4 rounded-2xl border-2 transition-all duration-300 flex flex-col items-center h-full group",
+                        "p-3 rounded-xl border-2 transition-all duration-300 flex flex-col items-center justify-center h-full group",
                         selectedPriorities.includes('health')
                           ? "border-blue-500 bg-blue-600 text-white"
                           : isDarkMode ? "border-slate-700 hover:border-blue-500 hover:bg-blue-600" : "border-slate-200 hover:border-blue-500 hover:bg-blue-600"
                       )}
                     >
-                      <Heart className={cn("w-10 h-10 mb-3", selectedPriorities.includes('health') ? "text-white" : "text-red-500 group-hover:text-white")} />
-                      <h3 className={cn("font-semibold text-base mb-2 text-center", !selectedPriorities.includes('health') && "group-hover:text-white")}>Здраве</h3>
-                      <p className={cn("text-sm text-center", selectedPriorities.includes('health') ? "text-blue-100" : mutedTextClasses, !selectedPriorities.includes('health') && "group-hover:text-blue-100")}>
+                      <Heart className={cn("w-8 h-8 mb-1", selectedPriorities.includes('health') ? "text-white" : "text-red-500 group-hover:text-white")} />
+                      <h3 className={cn("font-semibold text-sm text-center", !selectedPriorities.includes('health') && "group-hover:text-white")}>Здраве</h3>
+                      <p className={cn("text-xs text-center", selectedPriorities.includes('health') ? "text-blue-100" : mutedTextClasses, !selectedPriorities.includes('health') && "group-hover:text-blue-100")}>
                         Застраховки и грижа
                       </p>
                     </button>
@@ -1398,24 +1398,24 @@ export default function FinancialPlanner() {
                     <button
                       onClick={() => togglePriority('business')}
                       className={cn(
-                        "p-4 rounded-2xl border-2 transition-all duration-300 flex flex-col items-center h-full group",
+                        "p-3 rounded-xl border-2 transition-all duration-300 flex flex-col items-center justify-center h-full group",
                         selectedPriorities.includes('business')
                           ? "border-blue-500 bg-blue-600 text-white"
                           : isDarkMode ? "border-slate-700 hover:border-blue-500 hover:bg-blue-600" : "border-slate-200 hover:border-blue-500 hover:bg-blue-600"
                       )}
                     >
-                      <Briefcase className={cn("w-10 h-10 mb-3", selectedPriorities.includes('business') ? "text-white" : "text-orange-500 group-hover:text-white")} />
-                      <h3 className={cn("font-semibold text-base mb-2 text-center", !selectedPriorities.includes('business') && "group-hover:text-white")}>Бизнес</h3>
-                      <p className={cn("text-sm text-center", selectedPriorities.includes('business') ? "text-blue-100" : mutedTextClasses, !selectedPriorities.includes('business') && "group-hover:text-blue-100")}>
+                      <Briefcase className={cn("w-8 h-8 mb-1", selectedPriorities.includes('business') ? "text-white" : "text-orange-500 group-hover:text-white")} />
+                      <h3 className={cn("font-semibold text-sm text-center", !selectedPriorities.includes('business') && "group-hover:text-white")}>Бизнес</h3>
+                      <p className={cn("text-xs text-center", selectedPriorities.includes('business') ? "text-blue-100" : mutedTextClasses, !selectedPriorities.includes('business') && "group-hover:text-blue-100")}>
                         Собствен бизнес
                       </p>
                     </button>
                   </div>
 
                   {selectedPriorities.length > 0 && (
-                    <div className={cn("p-4 rounded-xl mb-6 flex items-center gap-3", isDarkMode ? "bg-slate-800" : "bg-blue-50")}>
-                      <CheckCircle2 className="w-6 h-6 text-blue-500" />
-                      <p className={cn("text-base", accentColor)}>
+                    <div className={cn("p-2 rounded-lg mb-2 flex items-center gap-2", isDarkMode ? "bg-slate-800" : "bg-blue-50")}>
+                      <CheckCircle2 className="w-4 h-4 text-blue-500" />
+                      <p className={cn("text-sm", accentColor)}>
                         Избрани: {selectedPriorities.length} {selectedPriorities.length === 1 ? 'приоритет' : 'приоритета'}
                       </p>
                     </div>
@@ -1425,7 +1425,7 @@ export default function FinancialPlanner() {
                     <Button 
                       onClick={goNext}
                       disabled={selectedPriorities.length === 0}
-                      className={cn(primaryButtonClass, "px-16 py-6 text-lg")}
+                      className={cn(primaryButtonClass, "px-12 py-4")}
                     >
                       СЛЕДВАЩА СТЪПКА
                     </Button>
@@ -1544,31 +1544,31 @@ export default function FinancialPlanner() {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -20 }}
-                className="w-full px-4"
+                className="w-full px-4 h-[calc(100vh-48px)] flex flex-col"
               >
                 {/* Inline Step Tracker */}
-                <div className={cn("rounded-2xl border p-4 mb-4", cardClasses)}>
+                <div className={cn("rounded-xl border p-2 mb-2", cardClasses)}>
                   <div className="flex justify-between items-start">
                     {VISUAL_STEPS.map((step, index) => {
                       const isActive = currentStep >= (index + 1);
                       const isCurrent = index === 5;
                       return (
                         <div key={step.id} className={cn("flex flex-col items-center text-center flex-1 transition-all duration-300", isActive ? "opacity-100" : "opacity-40")}>
-                          <div className={cn("w-full h-1 mb-2 rounded-full transition-all duration-300", isCurrent ? "bg-blue-500" : isActive ? "bg-blue-500" : isDarkMode ? "bg-slate-700" : "bg-slate-200")} />
-                          <span className={cn("text-[9px] font-semibold tracking-wider leading-tight uppercase", isCurrent ? "text-slate-900" : "text-slate-400")}>{step.label}</span>
-                          <span className={cn("text-[9px] font-semibold tracking-wider leading-tight uppercase", isCurrent ? "text-slate-900" : "text-slate-400")}>{step.subLabel}</span>
+                          <div className={cn("w-full h-1 mb-1 rounded-full transition-all duration-300", isCurrent ? "bg-blue-500" : isActive ? "bg-blue-500" : isDarkMode ? "bg-slate-700" : "bg-slate-200")} />
+                          <span className={cn("text-[8px] font-semibold tracking-wider leading-tight uppercase", isCurrent ? "text-slate-900" : "text-slate-400")}>{step.label}</span>
+                          <span className={cn("text-[8px] font-semibold tracking-wider leading-tight uppercase", isCurrent ? "text-slate-900" : "text-slate-400")}>{step.subLabel}</span>
                         </div>
                       );
                     })}
                   </div>
                 </div>
 
-                <div className="text-center mb-3">
-                  <h2 className="text-3xl md:text-4xl font-bold mb-2">Вашият оптимален финансов план</h2>
+                <div className="text-center mb-2">
+                  <h2 className="text-2xl md:text-3xl font-bold">Вашият оптимален финансов план</h2>
                 </div>
 
                 {/* Goals Grid - 4 columns like the image */}
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-2 mb-2 flex-1">
                   {/* Security */}
                   <motion.div 
                     className={cn("rounded-2xl border p-4 text-center relative transition-all duration-300 group hover:border-blue-500 hover:bg-blue-600", cardClasses)}
@@ -1821,44 +1821,44 @@ export default function FinancialPlanner() {
                 </div>
 
                 {/* Detailed Info Section */}
-                <div className={cn("rounded-2xl border p-4 mb-3", cardClasses)}>
-                  <div className="grid md:grid-cols-4 gap-4 text-sm">
-                    <div className="flex items-start gap-2">
-                      <Info className="w-4 h-4 text-blue-500 mt-0.5 flex-shrink-0" />
+                <div className={cn("rounded-xl border p-2 mb-2", cardClasses)}>
+                  <div className="grid md:grid-cols-4 gap-2 text-xs">
+                    <div className="flex items-start gap-1">
+                      <Info className="w-3 h-3 text-blue-500 mt-0.5 flex-shrink-0" />
                       <div>
-                        <p className="font-medium mb-1">Финансова сигурност</p>
-                        <p className={mutedTextClasses}>Резерв от {Math.round((allocations.security / 10) * 6)} месеца доходи за непредвидени ситуации.</p>
+                        <p className="font-medium">Финансова сигурност</p>
+                        <p className={mutedTextClasses}>Резерв от {Math.round((allocations.security / 10) * 6)} месеца доходи.</p>
                       </div>
                     </div>
-                    <div className="flex items-start gap-2">
-                      <Info className="w-4 h-4 text-blue-500 mt-0.5 flex-shrink-0" />
+                    <div className="flex items-start gap-1">
+                      <Info className="w-3 h-3 text-blue-500 mt-0.5 flex-shrink-0" />
                       <div>
-                        <p className="font-medium mb-1">Пенсия</p>
-                        <p className={mutedTextClasses}>Държавна пенсия + лични инвестиции при прогнозна 8% годишна доходност.</p>
+                        <p className="font-medium">Пенсия</p>
+                        <p className={mutedTextClasses}>Държавна пенсия + лични инвестиции при 8% доходност.</p>
                       </div>
                     </div>
-                    <div className="flex items-start gap-2">
-                      <Info className="w-4 h-4 text-blue-500 mt-0.5 flex-shrink-0" />
+                    <div className="flex items-start gap-1">
+                      <Info className="w-3 h-3 text-blue-500 mt-0.5 flex-shrink-0" />
                       <div>
-                        <p className="font-medium mb-1">Жилище</p>
-                        <p className={mutedTextClasses}>Ипотечен кредит {calculateGoals.loanTerm} години при 3% лихва, 85% финансиране.</p>
+                        <p className="font-medium">Жилище</p>
+                        <p className={mutedTextClasses}>Ипотечен кредит {calculateGoals.loanTerm}г. при 3% лихва.</p>
                       </div>
                     </div>
-                    <div className="flex items-start gap-2">
-                      <Info className="w-4 h-4 text-blue-500 mt-0.5 flex-shrink-0" />
+                    <div className="flex items-start gap-1">
+                      <Info className="w-3 h-3 text-blue-500 mt-0.5 flex-shrink-0" />
                       <div>
-                        <p className="font-medium mb-1">Други цели</p>
-                        <p className={mutedTextClasses}>Сума за важните неща в живота. Автомобил, образование за Вашите деца и др.</p>
+                        <p className="font-medium">Други цели</p>
+                        <p className={mutedTextClasses}>Автомобил, образование за децата и др.</p>
                       </div>
                     </div>
                   </div>
                 </div>
 
                 {/* Total Wealth - Bottom Center */}
-                <div className={cn("rounded-2xl border p-5 text-center max-w-lg mx-auto mb-3 relative group transition-all duration-300 hover:border-blue-500 hover:bg-blue-600", cardClasses)}>
-                  <p className={cn("text-xs tracking-widest mb-2 group-hover:text-blue-100", mutedTextClasses)}>ОБЩО ИМУЩЕСТВО</p>
+                <div className={cn("rounded-xl border p-3 text-center max-w-md mx-auto mb-2 relative group transition-all duration-300 hover:border-blue-500 hover:bg-blue-600", cardClasses)}>
+                  <p className={cn("text-[10px] tracking-widest mb-1 group-hover:text-blue-100", mutedTextClasses)}>ОБЩО ИМУЩЕСТВО</p>
                   <motion.p 
-                    className="text-4xl md:text-5xl font-bold group-hover:text-white"
+                    className="text-3xl md:text-4xl font-bold group-hover:text-white"
                     key={calculateGoals.totalWealth}
                     initial={{ scale: 1.05 }}
                     animate={{ scale: 1 }}
@@ -1887,75 +1887,70 @@ export default function FinancialPlanner() {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -20 }}
-                className="w-full px-4"
+                className="w-full px-4 h-[calc(100vh-48px)] flex flex-col"
               >
-                <div className={cn("rounded-3xl border p-6 md:p-8", cardClasses)}>
+                <div className={cn("rounded-2xl border p-4 flex-1 flex flex-col", cardClasses)}>
                   {/* Inline Step Tracker */}
-                  <div className="mb-6 pb-4 border-b border-slate-100">
+                  <div className="mb-2 pb-2 border-b border-slate-100">
                     <div className="flex justify-between items-start">
                       {VISUAL_STEPS.map((step, index) => {
                         const isActive = currentStep >= (index + 1);
                         const isCurrent = index === 6;
                         return (
                           <div key={step.id} className={cn("flex flex-col items-center text-center flex-1 transition-all duration-300", isActive ? "opacity-100" : "opacity-40")}>
-                            <div className={cn("w-full h-1 mb-2 rounded-full transition-all duration-300", isCurrent ? "bg-blue-500" : isActive ? "bg-blue-500" : isDarkMode ? "bg-slate-700" : "bg-slate-200")} />
-                            <span className={cn("text-[9px] font-semibold tracking-wider leading-tight uppercase", isCurrent ? "text-slate-900" : "text-slate-400")}>{step.label}</span>
-                            <span className={cn("text-[9px] font-semibold tracking-wider leading-tight uppercase", isCurrent ? "text-slate-900" : "text-slate-400")}>{step.subLabel}</span>
+                            <div className={cn("w-full h-1 mb-1 rounded-full transition-all duration-300", isCurrent ? "bg-blue-500" : isActive ? "bg-blue-500" : isDarkMode ? "bg-slate-700" : "bg-slate-200")} />
+                            <span className={cn("text-[8px] font-semibold tracking-wider leading-tight uppercase", isCurrent ? "text-slate-900" : "text-slate-400")}>{step.label}</span>
+                            <span className={cn("text-[8px] font-semibold tracking-wider leading-tight uppercase", isCurrent ? "text-slate-900" : "text-slate-400")}>{step.subLabel}</span>
                           </div>
                         );
                       })}
                     </div>
                   </div>
 
-                  <h2 className="text-3xl font-bold mb-4">Система на работа</h2>
-                  <p className={cn("text-sm mb-6 max-w-2xl", mutedTextClasses)}>
-                    Нашият структуриран подход гарантира, че всяка стъпка от финансовото планиране 
-                    е ясна, прозрачна и насочена към постигане на Вашите цели.
+                  <h2 className="text-2xl font-bold mb-2">Система на работа</h2>
+                  <p className={cn("text-sm mb-3", mutedTextClasses)}>
+                    Нашият структуриран подход гарантира ясно и прозрачно финансово планиране.
                   </p>
 
-                  <div className="grid md:grid-cols-2 gap-4 mb-6">
-                    <div className={cn("rounded-2xl border p-5 transition-all duration-300 group hover:border-blue-500 hover:bg-blue-600", isDarkMode ? "border-slate-800" : "border-slate-200")}>
-                      <p className={cn("text-xs tracking-widest mb-2 group-hover:text-blue-100", mutedTextClasses)}>ФАЗА 1</p>
-                      <h3 className="text-lg font-semibold mb-1 group-hover:text-white">Анализ</h3>
-                      <p className="text-blue-400 text-sm mb-2 group-hover:text-blue-200">Нужди, цели, желания</p>
-                      <p className={cn("text-sm group-hover:text-blue-100", mutedTextClasses)}>
-                        Анализираме целите на клиента, за да намерим най-подходящите 
-                        финансови решения за неговия живот.
+                  <div className="grid md:grid-cols-2 gap-3 flex-1">
+                    <div className={cn("rounded-xl border p-4 transition-all duration-300 group hover:border-blue-500 hover:bg-blue-600 flex flex-col justify-center", isDarkMode ? "border-slate-800" : "border-slate-200")}>
+                      <p className={cn("text-[10px] tracking-widest mb-1 group-hover:text-blue-100", mutedTextClasses)}>ФАЗА 1</p>
+                      <h3 className="text-base font-semibold group-hover:text-white">Анализ</h3>
+                      <p className="text-blue-400 text-sm group-hover:text-blue-200">Нужди, цели, желания</p>
+                      <p className={cn("text-xs group-hover:text-blue-100", mutedTextClasses)}>
+                        Анализираме целите на клиента за най-подходящите финансови решения.
                       </p>
                     </div>
 
-                    <div className={cn("rounded-2xl border p-5 transition-all duration-300 group hover:border-blue-500 hover:bg-blue-600", isDarkMode ? "border-slate-800" : "border-slate-200")}>
-                      <p className={cn("text-xs tracking-widest mb-2 group-hover:text-blue-100", mutedTextClasses)}>ФАЗА 2</p>
-                      <h3 className="text-lg font-semibold mb-1 group-hover:text-white">Оптимизация</h3>
-                      <p className="text-blue-400 text-sm mb-2 group-hover:text-blue-200">Подготовка на финансовия план</p>
-                      <p className={cn("text-sm group-hover:text-blue-100", mutedTextClasses)}>
-                        Разглеждаме вече съществуващи финансови продукти и решения 
-                        с цел оптимизация и спестяване на излишни разходи.
+                    <div className={cn("rounded-xl border p-4 transition-all duration-300 group hover:border-blue-500 hover:bg-blue-600 flex flex-col justify-center", isDarkMode ? "border-slate-800" : "border-slate-200")}>
+                      <p className={cn("text-[10px] tracking-widest mb-1 group-hover:text-blue-100", mutedTextClasses)}>ФАЗА 2</p>
+                      <h3 className="text-base font-semibold group-hover:text-white">Оптимизация</h3>
+                      <p className="text-blue-400 text-sm group-hover:text-blue-200">Подготовка на финансовия план</p>
+                      <p className={cn("text-xs group-hover:text-blue-100", mutedTextClasses)}>
+                        Разглеждаме съществуващи продукти за оптимизация и спестяване.
                       </p>
                     </div>
 
-                    <div className={cn("rounded-2xl border p-5 transition-all duration-300 group hover:border-blue-500 hover:bg-blue-600", isDarkMode ? "border-slate-800" : "border-slate-200")}>
-                      <p className={cn("text-xs tracking-widest mb-2 group-hover:text-blue-100", mutedTextClasses)}>ФАЗА 3</p>
-                      <h3 className="text-lg font-semibold mb-1 group-hover:text-white">Представяне</h3>
-                      <p className="text-blue-400 text-sm mb-2 group-hover:text-blue-200">Финансовият план и реализацията</p>
-                      <p className={cn("text-sm group-hover:text-blue-100", mutedTextClasses)}>
-                        Представяме финансовия план и привеждаме в действие 
-                        предложените финансови решения.
+                    <div className={cn("rounded-xl border p-4 transition-all duration-300 group hover:border-blue-500 hover:bg-blue-600 flex flex-col justify-center", isDarkMode ? "border-slate-800" : "border-slate-200")}>
+                      <p className={cn("text-[10px] tracking-widest mb-1 group-hover:text-blue-100", mutedTextClasses)}>ФАЗА 3</p>
+                      <h3 className="text-base font-semibold group-hover:text-white">Представяне</h3>
+                      <p className="text-blue-400 text-sm group-hover:text-blue-200">Финансовият план и реализацията</p>
+                      <p className={cn("text-xs group-hover:text-blue-100", mutedTextClasses)}>
+                        Представяме плана и привеждаме в действие решенията.
                       </p>
                     </div>
 
-                    <div className={cn("rounded-2xl border p-5 transition-all duration-300 group hover:border-blue-500 hover:bg-blue-600", isDarkMode ? "border-slate-800" : "border-slate-200")}>
-                      <p className={cn("text-xs tracking-widest mb-2 group-hover:text-blue-100", mutedTextClasses)}>ФАЗА 4</p>
-                      <h3 className="text-lg font-semibold mb-1 group-hover:text-white">Дългосрочно обслужване</h3>
-                      <p className="text-blue-400 text-sm mb-2 group-hover:text-blue-200">Дългосрочно и редовно</p>
-                      <p className={cn("text-sm group-hover:text-blue-100", mutedTextClasses)}>
-                        Осигуряваме постоянна подкрепа чрез редовни срещи, 
-                        актуализации на плана и навременни корекции при нужда.
+                    <div className={cn("rounded-xl border p-4 transition-all duration-300 group hover:border-blue-500 hover:bg-blue-600 flex flex-col justify-center", isDarkMode ? "border-slate-800" : "border-slate-200")}>
+                      <p className={cn("text-[10px] tracking-widest mb-1 group-hover:text-blue-100", mutedTextClasses)}>ФАЗА 4</p>
+                      <h3 className="text-base font-semibold group-hover:text-white">Дългосрочно обслужване</h3>
+                      <p className="text-blue-400 text-sm group-hover:text-blue-200">Дългосрочно и редовно</p>
+                      <p className={cn("text-xs group-hover:text-blue-100", mutedTextClasses)}>
+                        Постоянна подкрепа с редовни срещи и актуализации.
                       </p>
                     </div>
                   </div>
 
-                  <div className="flex justify-center">
+                  <div className="flex justify-center mt-3">
                     <Button 
                       onClick={goNext}
                       className={cn(primaryButtonClass, "px-12")}
@@ -2085,116 +2080,10 @@ export default function FinancialPlanner() {
                     <div className="w-20 h-20 mx-auto mb-4 rounded-full bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center">
                       <CheckCircle2 className="w-10 h-10 text-white" />
                     </div>
-                    <h2 className="text-3xl font-bold mb-4">Готови сте!</h2>
-                    <p className={cn("text-base max-w-lg mx-auto", mutedTextClasses)}>
-                      Вече знаете какъв е вашият финансов потенциал. Нека преминем към детайлния анализ!
+                    <h2 className="text-3xl font-bold mb-4">Поздравления!</h2>
+                    <p className={cn("text-lg max-w-2xl mx-auto", mutedTextClasses)}>
+                      Вие успешно завършихте Financial Planner. Следващата стъпка е да попълните детайлния финансов анализ, за да създадем Вашия персонализиран финансов план.
                     </p>
-                  </div>
-
-                  {/* Summary Cards */}
-                  <div className="grid md:grid-cols-2 gap-4 mb-6">
-                    {/* Personal Info Summary */}
-                    <div className={cn("rounded-2xl border p-5", cardClasses)}>
-                      <div className="flex items-center gap-2 mb-4">
-                        <Users className="w-5 h-5 text-blue-500" />
-                        <h3 className="font-semibold">Лична информация</h3>
-                      </div>
-                      <div className="space-y-2 text-sm">
-                        <div className="flex justify-between">
-                          <span className={mutedTextClasses}>Тип планиране:</span>
-                          <span className="font-medium">{familyType === 'family' ? 'Семейство' : 'Индивидуално'}</span>
-                        </div>
-                        <div className="flex justify-between">
-                          <span className={mutedTextClasses}>Възраст:</span>
-                          <span className="font-medium">
-                            {familyType === 'family' 
-                              ? `${clientAgeNum} / ${partnerAgeNum} години` 
-                              : `${clientAgeNum} години`
-                            }
-                          </span>
-                        </div>
-                        <div className="flex justify-between">
-                          <span className={mutedTextClasses}>Години до пенсия:</span>
-                          <span className="font-medium">{Math.round(yearsToRetirement)} години</span>
-                        </div>
-                        <div className="flex justify-between">
-                          <span className={mutedTextClasses}>Месечен доход:</span>
-                          <span className="font-medium text-blue-500">{formatNumber(totalIncome)} €</span>
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Financial Goals Summary */}
-                    <div className={cn("rounded-2xl border p-5", cardClasses)}>
-                      <div className="flex items-center gap-2 mb-4">
-                        <Target className="w-5 h-5 text-blue-500" />
-                        <h3 className="font-semibold">Финансови цели</h3>
-                      </div>
-                      <div className="space-y-2 text-sm">
-                        <div className="flex justify-between">
-                          <span className={mutedTextClasses}>Резерв ({allocations.security}%):</span>
-                          <span className="font-medium">{formatNumber(calculateGoals.security)} €</span>
-                        </div>
-                        <div className="flex justify-between">
-                          <span className={mutedTextClasses}>Пенсия ({allocations.pension}%):</span>
-                          <span className="font-medium">{formatNumber(calculateGoals.pension)} €/мес</span>
-                        </div>
-                        <div className="flex justify-between">
-                          <span className={mutedTextClasses}>Жилище ({allocations.housing}%):</span>
-                          <span className="font-medium">{formatNumber(calculateGoals.housing)} €</span>
-                        </div>
-                        <div className="flex justify-between">
-                          <span className={mutedTextClasses}>Други цели ({allocations.cash}%):</span>
-                          <span className="font-medium">{formatNumber(calculateGoals.cash)} €</span>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Total Wealth Card */}
-                  <div className={cn("rounded-2xl border p-6 mb-6 text-center bg-gradient-to-br from-blue-50 to-indigo-50", isDarkMode ? "border-slate-700 bg-slate-800" : "border-blue-200")}>
-                    <p className={cn("text-sm tracking-widest mb-2", mutedTextClasses)}>ОБЩО ИМУЩЕСТВО ПРИ ПЕНСИОНИРАНЕ</p>
-                    <p className="text-4xl md:text-5xl font-bold text-blue-600 mb-2">{formatNumber(calculateGoals.totalWealth)} €</p>
-                    <p className={cn("text-sm", mutedTextClasses)}>
-                      При спестяване на {allocations.security + allocations.pension + allocations.housing + allocations.cash}% от месечния доход
-                    </p>
-                  </div>
-
-                  {/* Next Steps */}
-                  <div className={cn("rounded-2xl border p-5 mb-6", cardClasses)}>
-                    <div className="flex items-center gap-2 mb-4">
-                      <Calendar className="w-5 h-5 text-blue-500" />
-                      <h3 className="font-semibold">Следващи стъпки</h3>
-                    </div>
-                    <div className="grid md:grid-cols-3 gap-4">
-                      <div className="flex items-start gap-3">
-                        <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center flex-shrink-0">
-                          <span className="text-blue-600 font-semibold text-sm">1</span>
-                        </div>
-                        <div>
-                          <p className="font-medium text-sm">Детайлен анализ</p>
-                          <p className={cn("text-xs", mutedTextClasses)}>Попълнете пълния финансов анализ за персонализиран план.</p>
-                        </div>
-                      </div>
-                      <div className="flex items-start gap-3">
-                        <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center flex-shrink-0">
-                          <span className="text-blue-600 font-semibold text-sm">2</span>
-                        </div>
-                        <div>
-                          <p className="font-medium text-sm">Среща с консултант</p>
-                          <p className={cn("text-xs", mutedTextClasses)}>Обсъдете резултатите с наш финансов експерт.</p>
-                        </div>
-                      </div>
-                      <div className="flex items-start gap-3">
-                        <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center flex-shrink-0">
-                          <span className="text-blue-600 font-semibold text-sm">3</span>
-                        </div>
-                        <div>
-                          <p className="font-medium text-sm">Реализация</p>
-                          <p className={cn("text-xs", mutedTextClasses)}>Стартирайте изпълнението на вашия финансов план.</p>
-                        </div>
-                      </div>
-                    </div>
                   </div>
 
                   {/* Action Buttons */}

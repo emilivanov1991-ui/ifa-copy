@@ -1636,7 +1636,14 @@ export default function FinancialPlanner() {
                     
                     {/* Housing Icon based on value */}
                     <div className="flex justify-center mb-2">
-                      {calculateGoals.housing >= 100000 ? (
+                      {allocations.housing === 0 ? (
+                        <div className="relative">
+                          <Home className={cn("w-12 h-12 md:w-14 md:h-14 text-red-400 group-hover:text-red-200")} />
+                          <div className="absolute inset-0 flex items-center justify-center">
+                            <div className="w-16 h-0.5 bg-red-400 group-hover:bg-red-200 rotate-45 transform origin-center"></div>
+                          </div>
+                        </div>
+                      ) : calculateGoals.housing >= 100000 ? (
                         <Home className={cn("w-12 h-12 md:w-14 md:h-14 text-emerald-500 group-hover:text-emerald-200")} />
                       ) : (
                         <HomeIcon className={cn("w-12 h-12 md:w-14 md:h-14 text-slate-400 group-hover:text-slate-200")} />

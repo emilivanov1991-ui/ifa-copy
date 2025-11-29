@@ -401,9 +401,9 @@ export default function FinancialPlanner() {
     setClientInsuranceType(null);
     setPartnerInsuranceType(null);
     setClientAge(35);
-    setPartnerAge(33);
-    setMonthlyIncome(5000);
-    setPartnerIncome(3000);
+    setPartnerAge(35);
+    setMonthlyIncome(1000);
+    setPartnerIncome(1000);
     setSelectedPriorities([]);
     setAllocations({
       security: 10,

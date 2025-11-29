@@ -1207,17 +1207,17 @@ export default function FinancialPlanner() {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -20 }}
-                className="grid lg:grid-cols-4 gap-8 items-start"
+                className="grid lg:grid-cols-4 gap-8 items-center h-full"
               >
                 <div className="lg:col-span-1">
-                  <p className={cn("text-sm tracking-widest mb-4", accentColor)}>СТЪПКА 5</p>
-                  <h1 className="text-3xl md:text-4xl font-bold mb-4">Приоритети</h1>
-                  <p className={cn("text-base mb-6", mutedTextClasses)}>
+                  <p className={cn("text-base tracking-widest mb-4", accentColor)}>СТЪПКА 5</p>
+                  <h1 className="text-4xl md:text-5xl font-bold mb-4">Приоритети</h1>
+                  <p className={cn("text-lg mb-6", mutedTextClasses)}>
                     Изберете една или повече посоки, които резонират с Вашите мечти и финансови цели.
                   </p>
                 </div>
 
-                <div className={cn("lg:col-span-3 rounded-3xl border p-6 min-h-[450px]", cardClasses)}>
+                <div className={cn("lg:col-span-3 rounded-3xl border p-8 min-h-[500px] flex flex-col", cardClasses)}>
                   {/* Inline Step Tracker */}
                   <div className="mb-6 pb-4 border-b border-slate-100">
                     <div className="flex justify-between items-start">
@@ -1235,20 +1235,20 @@ export default function FinancialPlanner() {
                     </div>
                   </div>
                   
-                  <div className="flex items-center justify-between mb-4">
-                    <p className={cn("text-sm tracking-widest", mutedTextClasses)}>СТЪПКА 5</p>
+                  <div className="flex items-center justify-between mb-6">
+                    <p className={cn("text-base tracking-widest", mutedTextClasses)}>СТЪПКА 5</p>
                     <button onClick={restart} className="p-2 rounded-full text-slate-400 hover:text-blue-500 hover:bg-slate-100 transition-colors">
-                      <RotateCcw className="w-4 h-4" />
+                      <RotateCcw className="w-5 h-5" />
                     </button>
                   </div>
                   
-                  <h2 className="text-2xl font-bold mb-2">Вашите финансови приоритети</h2>
-                  <p className={cn("text-sm mb-4", mutedTextClasses)}>
+                  <h2 className="text-3xl font-bold mb-3">Вашите финансови приоритети</h2>
+                  <p className={cn("text-base mb-8", mutedTextClasses)}>
                     Изберете всички области, които са важни за Вас. Можете да изберете повече от една.
                   </p>
 
                   {/* Priority Grid - 4 columns, 2 rows */}
-                  <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-4">
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6 flex-1">
                     {/* Row 1 */}
                     <button
                       onClick={() => togglePriority('stability')}
@@ -1259,9 +1259,9 @@ export default function FinancialPlanner() {
                           : isDarkMode ? "border-slate-700 hover:border-blue-500 hover:bg-blue-600" : "border-slate-200 hover:border-blue-500 hover:bg-blue-600"
                       )}
                     >
-                      <Shield className={cn("w-8 h-8 mb-2", selectedPriorities.includes('stability') ? "text-white" : "text-blue-500 group-hover:text-white")} />
-                      <h3 className={cn("font-semibold text-sm mb-1 text-center", !selectedPriorities.includes('stability') && "group-hover:text-white")}>Финансова сигурност</h3>
-                      <p className={cn("text-xs text-center", selectedPriorities.includes('stability') ? "text-blue-100" : mutedTextClasses, !selectedPriorities.includes('stability') && "group-hover:text-blue-100")}>
+                      <Shield className={cn("w-10 h-10 mb-3", selectedPriorities.includes('stability') ? "text-white" : "text-blue-500 group-hover:text-white")} />
+                      <h3 className={cn("font-semibold text-base mb-2 text-center", !selectedPriorities.includes('stability') && "group-hover:text-white")}>Финансова сигурност</h3>
+                      <p className={cn("text-sm text-center", selectedPriorities.includes('stability') ? "text-blue-100" : mutedTextClasses, !selectedPriorities.includes('stability') && "group-hover:text-blue-100")}>
                         Резерв и защита
                       </p>
                     </button>
@@ -1275,9 +1275,9 @@ export default function FinancialPlanner() {
                           : isDarkMode ? "border-slate-700 hover:border-blue-500 hover:bg-blue-600" : "border-slate-200 hover:border-blue-500 hover:bg-blue-600"
                       )}
                     >
-                      <TrendingUp className={cn("w-8 h-8 mb-2", selectedPriorities.includes('investments') ? "text-white" : "text-emerald-500 group-hover:text-white")} />
-                      <h3 className={cn("font-semibold text-sm mb-1 text-center", !selectedPriorities.includes('investments') && "group-hover:text-white")}>Инвестиции</h3>
-                      <p className={cn("text-xs text-center", selectedPriorities.includes('investments') ? "text-blue-100" : mutedTextClasses, !selectedPriorities.includes('investments') && "group-hover:text-blue-100")}>
+                      <TrendingUp className={cn("w-10 h-10 mb-3", selectedPriorities.includes('investments') ? "text-white" : "text-emerald-500 group-hover:text-white")} />
+                      <h3 className={cn("font-semibold text-base mb-2 text-center", !selectedPriorities.includes('investments') && "group-hover:text-white")}>Инвестиции</h3>
+                      <p className={cn("text-sm text-center", selectedPriorities.includes('investments') ? "text-blue-100" : mutedTextClasses, !selectedPriorities.includes('investments') && "group-hover:text-blue-100")}>
                         Растеж на капитала
                       </p>
                     </button>
@@ -1291,9 +1291,9 @@ export default function FinancialPlanner() {
                           : isDarkMode ? "border-slate-700 hover:border-blue-500 hover:bg-blue-600" : "border-slate-200 hover:border-blue-500 hover:bg-blue-600"
                       )}
                     >
-                      <PiggyBank className={cn("w-8 h-8 mb-2", selectedPriorities.includes('pension') ? "text-white" : "text-amber-500 group-hover:text-white")} />
-                      <h3 className={cn("font-semibold text-sm mb-1 text-center", !selectedPriorities.includes('pension') && "group-hover:text-white")}>Пенсия</h3>
-                      <p className={cn("text-xs text-center", selectedPriorities.includes('pension') ? "text-blue-100" : mutedTextClasses, !selectedPriorities.includes('pension') && "group-hover:text-blue-100")}>
+                      <PiggyBank className={cn("w-10 h-10 mb-3", selectedPriorities.includes('pension') ? "text-white" : "text-amber-500 group-hover:text-white")} />
+                      <h3 className={cn("font-semibold text-base mb-2 text-center", !selectedPriorities.includes('pension') && "group-hover:text-white")}>Пенсия</h3>
+                      <p className={cn("text-sm text-center", selectedPriorities.includes('pension') ? "text-blue-100" : mutedTextClasses, !selectedPriorities.includes('pension') && "group-hover:text-blue-100")}>
                         Спокойна старост
                       </p>
                     </button>
@@ -1307,9 +1307,9 @@ export default function FinancialPlanner() {
                           : isDarkMode ? "border-slate-700 hover:border-blue-500 hover:bg-blue-600" : "border-slate-200 hover:border-blue-500 hover:bg-blue-600"
                       )}
                     >
-                      <Home className={cn("w-8 h-8 mb-2", selectedPriorities.includes('housing') ? "text-white" : "text-violet-500 group-hover:text-white")} />
-                      <h3 className={cn("font-semibold text-sm mb-1 text-center", !selectedPriorities.includes('housing') && "group-hover:text-white")}>Ново жилище</h3>
-                      <p className={cn("text-xs text-center", selectedPriorities.includes('housing') ? "text-blue-100" : mutedTextClasses, !selectedPriorities.includes('housing') && "group-hover:text-blue-100")}>
+                      <Home className={cn("w-10 h-10 mb-3", selectedPriorities.includes('housing') ? "text-white" : "text-violet-500 group-hover:text-white")} />
+                      <h3 className={cn("font-semibold text-base mb-2 text-center", !selectedPriorities.includes('housing') && "group-hover:text-white")}>Ново жилище</h3>
+                      <p className={cn("text-sm text-center", selectedPriorities.includes('housing') ? "text-blue-100" : mutedTextClasses, !selectedPriorities.includes('housing') && "group-hover:text-blue-100")}>
                         Собствен дом
                       </p>
                     </button>
@@ -1324,9 +1324,9 @@ export default function FinancialPlanner() {
                           : isDarkMode ? "border-slate-700 hover:border-blue-500 hover:bg-blue-600" : "border-slate-200 hover:border-blue-500 hover:bg-blue-600"
                       )}
                     >
-                      <Baby className={cn("w-8 h-8 mb-2", selectedPriorities.includes('children') ? "text-white" : "text-pink-500 group-hover:text-white")} />
-                      <h3 className={cn("font-semibold text-sm mb-1 text-center", !selectedPriorities.includes('children') && "group-hover:text-white")}>Бъдеще на децата</h3>
-                      <p className={cn("text-xs text-center", selectedPriorities.includes('children') ? "text-blue-100" : mutedTextClasses, !selectedPriorities.includes('children') && "group-hover:text-blue-100")}>
+                      <Baby className={cn("w-10 h-10 mb-3", selectedPriorities.includes('children') ? "text-white" : "text-pink-500 group-hover:text-white")} />
+                      <h3 className={cn("font-semibold text-base mb-2 text-center", !selectedPriorities.includes('children') && "group-hover:text-white")}>Бъдеще на децата</h3>
+                      <p className={cn("text-sm text-center", selectedPriorities.includes('children') ? "text-blue-100" : mutedTextClasses, !selectedPriorities.includes('children') && "group-hover:text-blue-100")}>
                         Образование и старт
                       </p>
                     </button>
@@ -1340,9 +1340,9 @@ export default function FinancialPlanner() {
                           : isDarkMode ? "border-slate-700 hover:border-blue-500 hover:bg-blue-600" : "border-slate-200 hover:border-blue-500 hover:bg-blue-600"
                       )}
                     >
-                      <Plane className={cn("w-8 h-8 mb-2", selectedPriorities.includes('travel') ? "text-white" : "text-cyan-500 group-hover:text-white")} />
-                      <h3 className={cn("font-semibold text-sm mb-1 text-center", !selectedPriorities.includes('travel') && "group-hover:text-white")}>Пътувания</h3>
-                      <p className={cn("text-xs text-center", selectedPriorities.includes('travel') ? "text-blue-100" : mutedTextClasses, !selectedPriorities.includes('travel') && "group-hover:text-blue-100")}>
+                      <Plane className={cn("w-10 h-10 mb-3", selectedPriorities.includes('travel') ? "text-white" : "text-cyan-500 group-hover:text-white")} />
+                      <h3 className={cn("font-semibold text-base mb-2 text-center", !selectedPriorities.includes('travel') && "group-hover:text-white")}>Пътувания</h3>
+                      <p className={cn("text-sm text-center", selectedPriorities.includes('travel') ? "text-blue-100" : mutedTextClasses, !selectedPriorities.includes('travel') && "group-hover:text-blue-100")}>
                         Преживявания
                       </p>
                     </button>
@@ -1356,9 +1356,9 @@ export default function FinancialPlanner() {
                           : isDarkMode ? "border-slate-700 hover:border-blue-500 hover:bg-blue-600" : "border-slate-200 hover:border-blue-500 hover:bg-blue-600"
                       )}
                     >
-                      <Heart className={cn("w-8 h-8 mb-2", selectedPriorities.includes('health') ? "text-white" : "text-red-500 group-hover:text-white")} />
-                      <h3 className={cn("font-semibold text-sm mb-1 text-center", !selectedPriorities.includes('health') && "group-hover:text-white")}>Здраве</h3>
-                      <p className={cn("text-xs text-center", selectedPriorities.includes('health') ? "text-blue-100" : mutedTextClasses, !selectedPriorities.includes('health') && "group-hover:text-blue-100")}>
+                      <Heart className={cn("w-10 h-10 mb-3", selectedPriorities.includes('health') ? "text-white" : "text-red-500 group-hover:text-white")} />
+                      <h3 className={cn("font-semibold text-base mb-2 text-center", !selectedPriorities.includes('health') && "group-hover:text-white")}>Здраве</h3>
+                      <p className={cn("text-sm text-center", selectedPriorities.includes('health') ? "text-blue-100" : mutedTextClasses, !selectedPriorities.includes('health') && "group-hover:text-blue-100")}>
                         Застраховки и грижа
                       </p>
                     </button>
@@ -1372,18 +1372,18 @@ export default function FinancialPlanner() {
                           : isDarkMode ? "border-slate-700 hover:border-blue-500 hover:bg-blue-600" : "border-slate-200 hover:border-blue-500 hover:bg-blue-600"
                       )}
                     >
-                      <Briefcase className={cn("w-8 h-8 mb-2", selectedPriorities.includes('business') ? "text-white" : "text-orange-500 group-hover:text-white")} />
-                      <h3 className={cn("font-semibold text-sm mb-1 text-center", !selectedPriorities.includes('business') && "group-hover:text-white")}>Бизнес</h3>
-                      <p className={cn("text-xs text-center", selectedPriorities.includes('business') ? "text-blue-100" : mutedTextClasses, !selectedPriorities.includes('business') && "group-hover:text-blue-100")}>
+                      <Briefcase className={cn("w-10 h-10 mb-3", selectedPriorities.includes('business') ? "text-white" : "text-orange-500 group-hover:text-white")} />
+                      <h3 className={cn("font-semibold text-base mb-2 text-center", !selectedPriorities.includes('business') && "group-hover:text-white")}>Бизнес</h3>
+                      <p className={cn("text-sm text-center", selectedPriorities.includes('business') ? "text-blue-100" : mutedTextClasses, !selectedPriorities.includes('business') && "group-hover:text-blue-100")}>
                         Собствен бизнес
                       </p>
                     </button>
                   </div>
 
                   {selectedPriorities.length > 0 && (
-                    <div className={cn("p-3 rounded-xl mb-4 flex items-center gap-2", isDarkMode ? "bg-slate-800" : "bg-blue-50")}>
-                      <CheckCircle2 className="w-5 h-5 text-blue-500" />
-                      <p className={cn("text-sm", accentColor)}>
+                    <div className={cn("p-4 rounded-xl mb-6 flex items-center gap-3", isDarkMode ? "bg-slate-800" : "bg-blue-50")}>
+                      <CheckCircle2 className="w-6 h-6 text-blue-500" />
+                      <p className={cn("text-base", accentColor)}>
                         Избрани: {selectedPriorities.length} {selectedPriorities.length === 1 ? 'приоритет' : 'приоритета'}
                       </p>
                     </div>
@@ -1393,7 +1393,7 @@ export default function FinancialPlanner() {
                     <Button 
                       onClick={goNext}
                       disabled={selectedPriorities.length === 0}
-                      className={cn(primaryButtonClass, "px-12")}
+                      className={cn(primaryButtonClass, "px-16 py-6 text-lg")}
                     >
                       СЛЕДВАЩА СТЪПКА
                     </Button>

@@ -128,6 +128,13 @@ const ToggleWithLabel = ({ checked, onChange, defaultYes = false }) => {
 export default function PersonalDataStep({ data, onChange, showErrors }) {
   const isFieldInvalid = (value) => showErrors && (value === undefined || value === '' || value === null);
   const [showDisclaimer, setShowDisclaimer] = useState(true);
+  const [emailTouched, setEmailTouched] = useState({ client: false, partner: false });
+  
+  // Email validation - only show error after field loses focus and has content
+  const isEmailInvalid = (email, touched) => {
+    if (!email || !touched) return false;
+    return !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+  };
 
   useEffect(() => {
     if (data.client_is_employed === undefined) onChange('client_is_employed', true);
@@ -253,10 +260,10 @@ export default function PersonalDataStep({ data, onChange, showErrors }) {
               onChange('client_phone', value);
             }} className={`rounded-lg ${isFieldInvalid(data.client_phone) ? 'border-red-500 bg-red-50' : ''}`} required />
           </div>
-          <div className="space-y-2" data-invalid={isFieldInvalid(data.client_email) || (data.client_email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.client_email)) ? 'true' : undefined}>
+          <div className="space-y-2" data-invalid={isFieldInvalid(data.client_email) || isEmailInvalid(data.client_email, emailTouched.client) ? 'true' : undefined}>
             <Label>Email <span className="text-red-500">*</span></Label>
-            <Input type="email" placeholder="email@example.com" value={data.client_email || ''} onChange={(e) => onChange('client_email', e.target.value)} className={`rounded-lg ${isFieldInvalid(data.client_email) || (data.client_email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.client_email)) ? 'border-red-500 bg-red-50' : ''}`} required />
-            {data.client_email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.client_email) && (
+            <Input type="email" placeholder="email@example.com" value={data.client_email || ''} onChange={(e) => onChange('client_email', e.target.value)} onBlur={() => setEmailTouched(prev => ({ ...prev, client: true }))} className={`rounded-lg ${isFieldInvalid(data.client_email) || isEmailInvalid(data.client_email, emailTouched.client) ? 'border-red-500 bg-red-50' : ''}`} required />
+            {isEmailInvalid(data.client_email, emailTouched.client) && (
               <p className="text-red-500 text-xs">Невалиден формат на email</p>
             )}
           </div>
@@ -456,10 +463,10 @@ export default function PersonalDataStep({ data, onChange, showErrors }) {
                   onChange('partner_phone', value);
                 }} className={`rounded-lg ${isFieldInvalid(data.partner_phone) ? 'border-red-500 bg-red-50' : ''}`} required />
               </div>
-              <div className="space-y-2" data-invalid={isFieldInvalid(data.partner_email) || (data.partner_email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.partner_email)) ? "true" : undefined}>
+              <div className="space-y-2" data-invalid={isFieldInvalid(data.partner_email) || isEmailInvalid(data.partner_email, emailTouched.partner) ? "true" : undefined}>
                 <Label>Email <span className="text-red-500">*</span></Label>
-                <Input type="email" placeholder="email@example.com" value={data.partner_email || ''} onChange={(e) => onChange('partner_email', e.target.value)} className={`rounded-lg ${isFieldInvalid(data.partner_email) || (data.partner_email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.partner_email)) ? 'border-red-500 bg-red-50' : ''}`} required />
-                {data.partner_email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.partner_email) && (
+                <Input type="email" placeholder="email@example.com" value={data.partner_email || ''} onChange={(e) => onChange('partner_email', e.target.value)} onBlur={() => setEmailTouched(prev => ({ ...prev, partner: true }))} className={`rounded-lg ${isFieldInvalid(data.partner_email) || isEmailInvalid(data.partner_email, emailTouched.partner) ? 'border-red-500 bg-red-50' : ''}`} required />
+                {isEmailInvalid(data.partner_email, emailTouched.partner) && (
                   <p className="text-red-500 text-xs">Невалиден формат на email</p>
                 )}
               </div>

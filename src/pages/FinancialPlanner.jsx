@@ -130,9 +130,9 @@ export default function FinancialPlanner() {
   const [partnerInsuranceType, setPartnerInsuranceType] = useState(null); // 'employee' | 'entrepreneur'
   const [clientAge, setClientAge] = useState(35);
   const [partnerAge, setPartnerAge] = useState(35);
-  const [monthlyIncome, setMonthlyIncome] = useState(5000);
+  const [monthlyIncome, setMonthlyIncome] = useState(1000); // EUR
   const [selectedPriorities, setSelectedPriorities] = useState([]); // multi-select
-  const [partnerIncome, setPartnerIncome] = useState(5000);
+  const [partnerIncome, setPartnerIncome] = useState(1000); // EUR
   
   // Percentage allocations (default: 10% reserve, 5% pension, 30% housing, 5% other = 50% total)
   const [allocations, setAllocations] = useState({

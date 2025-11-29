@@ -64,8 +64,12 @@ const calculateLoanAmount = (monthlyPayment, annualRate, years) => {
   return monthlyPayment * ((1 - Math.pow(1 + monthlyRate, -months)) / monthlyRate);
 };
 
+const BGN_TO_EUR = 1.95583;
+
+const toEuro = (bgnValue) => Math.round(bgnValue / BGN_TO_EUR / 10) * 10;
+
 const calculateStatePension = (clientIncome, partnerIncome, clientIsEntrepreneur, partnerIsEntrepreneur, isFamily) => {
-  // 60% of income, min 630 per person, max 3400 per person
+  // 60% of income, min 630 per person, max 3400 per person (in BGN)
   // Entrepreneurs always get minimum pension (630)
   const minPension = 630;
   const maxPension = 3400;
@@ -88,7 +92,8 @@ const calculateStatePension = (clientIncome, partnerIncome, clientIsEntrepreneur
     }
   }
   
-  return Math.round((clientPension + partnerPension) / 10) * 10;
+  // Convert to EUR and round to 10
+  return toEuro(clientPension + partnerPension);
 };
 
 export default function FinancialPlanner() {
@@ -152,7 +157,7 @@ export default function FinancialPlanner() {
   const yearsToRetirement = Math.max(0, 65 - avgAge);
   const numPeople = familyType === 'family' ? 2 : 1;
 
-  // Calculate financial values based on allocations
+  // Calculate financial values based on allocations (all in EUR)
   const calculateGoals = useMemo(() => {
     const securityPercent = allocations.security;
     const pensionPercent = allocations.pension;
@@ -164,14 +169,15 @@ export default function FinancialPlanner() {
     // At 50% allocation -> 30 months of income (5x)
     // At 0% allocation -> 0
     const reserveMonths = (securityPercent / 10) * 6;
-    const securityValue = Math.round(totalIncome * reserveMonths / 100) * 100;
+    const securityValueBGN = totalIncome * reserveMonths;
+    const securityValue = toEuro(securityValueBGN);
 
     // 2. Pension calculation
     // pensionPercent% of income invested monthly at 8% until retirement
     // Then moved to 3% fund and withdrawn over 20 years
     const monthlyPensionInvestment = totalIncome * (pensionPercent / 100);
     const pensionFundAtRetirement = calculateFutureValue(monthlyPensionInvestment, 0.08, yearsToRetirement);
-    const monthlyPensionFromFund = calculateAnnuityPayment(pensionFundAtRetirement, 0.03, 20);
+    const monthlyPensionFromFundBGN = calculateAnnuityPayment(pensionFundAtRetirement, 0.03, 20);
     const statePension = calculateStatePension(
       familyType === 'family' ? monthlyIncome : totalIncome,
       partnerIncome,
@@ -179,7 +185,8 @@ export default function FinancialPlanner() {
       partnerInsuranceType === 'entrepreneur',
       familyType === 'family'
     );
-    const totalMonthlyPension = Math.round((monthlyPensionFromFund + statePension) / 10) * 10;
+    // statePension is already in EUR, monthlyPensionFromFund needs conversion
+    const totalMonthlyPension = toEuro(monthlyPensionFromFundBGN) + statePension;
 
     // 3. Housing calculation
     // housingPercent% of income goes to mortgage payment
@@ -188,20 +195,23 @@ export default function FinancialPlanner() {
     const monthlyMortgagePayment = totalIncome * (housingPercent / 100);
     const loanAmount = calculateLoanAmount(monthlyMortgagePayment, 0.03, maxLoanTerm);
     // Loan is 85% of property value, so property = loan / 0.85 = loan * 1.176
-    const housingValue = Math.round(loanAmount * 1.176 / 100) * 100;
+    const housingValueBGN = loanAmount * 1.176;
+    const housingValue = toEuro(housingValueBGN);
 
     // 4. Other goals calculation
     // cashPercent% of income invested monthly at 5% until retirement
     const monthlyOtherInvestment = totalIncome * (cashPercent / 100);
-    const otherGoalsValue = Math.round(calculateFutureValue(monthlyOtherInvestment, 0.05, yearsToRetirement) / 100) * 100;
+    const otherGoalsValueBGN = calculateFutureValue(monthlyOtherInvestment, 0.05, yearsToRetirement);
+    const otherGoalsValue = toEuro(otherGoalsValueBGN);
 
-    // Total wealth = Reserve + Pension Fund at retirement + Housing Value + Other Goals
-    const totalWealth = securityValue + Math.round(pensionFundAtRetirement / 100) * 100 + housingValue + otherGoalsValue;
+    // Total wealth = Reserve + Pension Fund at retirement + Housing Value + Other Goals (all in EUR)
+    const pensionFundEUR = toEuro(pensionFundAtRetirement);
+    const totalWealth = securityValue + pensionFundEUR + housingValue + otherGoalsValue;
 
     return {
       security: securityValue,
-      pension: totalMonthlyPension, // This shows monthly pension income
-      pensionFund: Math.round(pensionFundAtRetirement / 100) * 100, // For total wealth calculation
+      pension: totalMonthlyPension, // This shows monthly pension income in EUR
+      pensionFund: pensionFundEUR, // For total wealth calculation
       housing: housingValue,
       cash: otherGoalsValue,
       totalWealth: totalWealth,
@@ -661,9 +671,9 @@ export default function FinancialPlanner() {
             </div>
 
             {/* Right side - card (75%) */}
-            <div className={cn("lg:col-span-3 rounded-3xl border p-6", cardClasses)}>
-                  {/* Inline Step Tracker */}
-                  <div className="mb-6 pb-4 border-b border-slate-100">
+            <div className={cn("lg:col-span-3 rounded-3xl border p-6 min-h-[450px]", cardClasses)}>
+              {/* Inline Step Tracker */}
+              <div className="mb-6 pb-4 border-b border-slate-100">
                     <div className="flex justify-between items-start">
                       {VISUAL_STEPS.map((step, index) => {
                         const isActive = currentStep >= (index + 1);
@@ -750,13 +760,15 @@ export default function FinancialPlanner() {
                     </button>
                   </div>
 
-                  <Button 
+                  <div className="flex justify-center">
+                    <Button 
                       onClick={goNext}
                       disabled={!familyType}
-                      className={cn(primaryButtonClass, "w-full")}
+                      className={cn(primaryButtonClass, "px-12")}
                     >
                       СЛЕДВАЩА СТЪПКА
                     </Button>
+                  </div>
                   </div>
                   </motion.div>
                   )}
@@ -781,7 +793,7 @@ export default function FinancialPlanner() {
                   </p>
                 </div>
 
-                <div className={cn("lg:col-span-3 rounded-3xl border p-6", cardClasses)}>
+                <div className={cn("lg:col-span-3 rounded-3xl border p-6 min-h-[450px]", cardClasses)}>
                   {/* Inline Step Tracker */}
                   <div className="mb-6 pb-4 border-b border-slate-100">
                     <div className="flex justify-between items-start">
@@ -895,13 +907,15 @@ export default function FinancialPlanner() {
                     )}
                   </div>
 
-                  <Button 
-                    onClick={goNext}
-                    disabled={!clientInsuranceType || (familyType === 'family' && !partnerInsuranceType)}
-                    className={cn(primaryButtonClass, "w-full mt-6")}
-                  >
-                    СЛЕДВАЩА СТЪПКА
-                  </Button>
+                  <div className="flex justify-center mt-6">
+                    <Button 
+                      onClick={goNext}
+                      disabled={!clientInsuranceType || (familyType === 'family' && !partnerInsuranceType)}
+                      className={cn(primaryButtonClass, "px-12")}
+                    >
+                      СЛЕДВАЩА СТЪПКА
+                    </Button>
+                  </div>
                 </div>
               </motion.div>
             )}
@@ -926,7 +940,7 @@ export default function FinancialPlanner() {
                   </p>
                 </div>
 
-                <div className={cn("lg:col-span-3 rounded-3xl border p-6", cardClasses)}>
+                <div className={cn("lg:col-span-3 rounded-3xl border p-6 min-h-[450px]", cardClasses)}>
                   {/* Inline Step Tracker */}
                   <div className="mb-6 pb-4 border-b border-slate-100">
                     <div className="flex justify-between items-start">
@@ -961,7 +975,17 @@ export default function FinancialPlanner() {
                         {familyType === 'family' ? 'КЛИЕНТ' : 'ВАШАТА ВЪЗРАСТ'}
                       </p>
                       <div className="text-center mb-3">
-                        <span className="text-4xl font-bold text-blue-500">{clientAge}</span>
+                        <input
+                          type="number"
+                          min={18}
+                          max={70}
+                          value={clientAge}
+                          onChange={(e) => {
+                            const val = Math.min(70, Math.max(18, parseInt(e.target.value) || 18));
+                            setClientAge(val);
+                          }}
+                          className={cn("text-4xl font-bold text-blue-500 bg-transparent border-none text-center w-20 outline-none focus:ring-2 focus:ring-blue-500 rounded")}
+                        />
                         <span className={cn("text-lg ml-2", mutedTextClasses)}>години</span>
                       </div>
                       <Slider
@@ -983,7 +1007,17 @@ export default function FinancialPlanner() {
                       <div>
                         <p className={cn("text-sm font-medium mb-3", mutedTextClasses)}>ПАРТНЬОР</p>
                         <div className="text-center mb-3">
-                          <span className="text-4xl font-bold text-blue-500">{partnerAge}</span>
+                          <input
+                            type="number"
+                            min={18}
+                            max={70}
+                            value={partnerAge}
+                            onChange={(e) => {
+                              const val = Math.min(70, Math.max(18, parseInt(e.target.value) || 18));
+                              setPartnerAge(val);
+                            }}
+                            className={cn("text-4xl font-bold text-blue-500 bg-transparent border-none text-center w-20 outline-none focus:ring-2 focus:ring-blue-500 rounded")}
+                          />
                           <span className={cn("text-lg ml-2", mutedTextClasses)}>години</span>
                         </div>
                         <Slider
@@ -1029,7 +1063,7 @@ export default function FinancialPlanner() {
                   </p>
                 </div>
 
-                <div className={cn("lg:col-span-3 rounded-3xl border p-6", cardClasses)}>
+                <div className={cn("lg:col-span-3 rounded-3xl border p-6 min-h-[450px]", cardClasses)}>
                   {/* Inline Step Tracker */}
                   <div className="mb-6 pb-4 border-b border-slate-100">
                     <div className="flex justify-between items-start">
@@ -1064,20 +1098,31 @@ export default function FinancialPlanner() {
                         {familyType === 'family' ? 'КЛИЕНТ' : 'ВАШИЯТ ДОХОД'}
                       </p>
                       <div className="text-center mb-3">
-                        <span className="text-3xl font-bold text-blue-500">{formatNumber(monthlyIncome)}</span>
+                        <input
+                          type="number"
+                          min={1000}
+                          max={20000}
+                          step={100}
+                          value={monthlyIncome}
+                          onChange={(e) => {
+                            const val = Math.min(20000, Math.max(1000, parseInt(e.target.value) || 1000));
+                            setMonthlyIncome(val);
+                          }}
+                          className={cn("text-3xl font-bold text-blue-500 bg-transparent border-none text-center w-32 outline-none focus:ring-2 focus:ring-blue-500 rounded")}
+                        />
                         <span className={cn("text-lg ml-2", mutedTextClasses)}>лв.</span>
                       </div>
                       <Slider
                         value={[monthlyIncome]}
                         onValueChange={(v) => setMonthlyIncome(v[0])}
                         min={1000}
-                        max={30000}
+                        max={20000}
                         step={100}
                         className="mb-2"
                       />
                       <div className={cn("flex justify-between text-xs", mutedTextClasses)}>
                         <span>1 000 лв.</span>
-                        <span>30 000 лв.</span>
+                        <span>20 000 лв.</span>
                       </div>
                     </div>
 
@@ -1086,20 +1131,31 @@ export default function FinancialPlanner() {
                       <div>
                         <p className={cn("text-sm font-medium mb-3", mutedTextClasses)}>ПАРТНЬОР</p>
                         <div className="text-center mb-3">
-                          <span className="text-3xl font-bold text-blue-500">{formatNumber(partnerIncome)}</span>
+                          <input
+                            type="number"
+                            min={1000}
+                            max={20000}
+                            step={100}
+                            value={partnerIncome}
+                            onChange={(e) => {
+                              const val = Math.min(20000, Math.max(1000, parseInt(e.target.value) || 1000));
+                              setPartnerIncome(val);
+                            }}
+                            className={cn("text-3xl font-bold text-blue-500 bg-transparent border-none text-center w-32 outline-none focus:ring-2 focus:ring-blue-500 rounded")}
+                          />
                           <span className={cn("text-lg ml-2", mutedTextClasses)}>лв.</span>
                         </div>
                         <Slider
                           value={[partnerIncome]}
                           onValueChange={(v) => setPartnerIncome(v[0])}
                           min={1000}
-                          max={30000}
+                          max={20000}
                           step={100}
                           className="mb-2"
                         />
                         <div className={cn("flex justify-between text-xs", mutedTextClasses)}>
                           <span>1 000 лв.</span>
-                          <span>30 000 лв.</span>
+                          <span>20 000 лв.</span>
                         </div>
                       </div>
                     )}
@@ -1139,7 +1195,7 @@ export default function FinancialPlanner() {
                   </p>
                 </div>
 
-                <div className={cn("lg:col-span-3 rounded-3xl border p-6", cardClasses)}>
+                <div className={cn("lg:col-span-3 rounded-3xl border p-6 min-h-[450px]", cardClasses)}>
                   {/* Inline Step Tracker */}
                   <div className="mb-6 pb-4 border-b border-slate-100">
                     <div className="flex justify-between items-start">
@@ -1237,13 +1293,15 @@ export default function FinancialPlanner() {
                     </p>
                   )}
 
-                  <Button 
+                  <div className="flex justify-center">
+                    <Button 
                       onClick={goNext}
                       disabled={selectedPriorities.length === 0}
-                      className={cn(primaryButtonClass, "w-full")}
+                      className={cn(primaryButtonClass, "px-12")}
                     >
                       СЛЕДВАЩА СТЪПКА
                     </Button>
+                  </div>
                   </div>
                   </motion.div>
                   )}
@@ -1427,7 +1485,7 @@ export default function FinancialPlanner() {
                       animate={{ scale: 1 }}
                       transition={{ duration: 0.2 }}
                     >
-                      {formatNumber(calculateGoals.security)}
+                      {formatNumber(calculateGoals.security)} €
                     </motion.p>
                     <p className={cn("text-xs mb-3 group-hover:text-blue-200", accentColor)}>{allocations.security}%</p>
                     <Slider
@@ -1487,7 +1545,7 @@ export default function FinancialPlanner() {
                       animate={{ scale: 1 }}
                       transition={{ duration: 0.2 }}
                     >
-                      {formatNumber(calculateGoals.pension)}
+                      {formatNumber(calculateGoals.pension)} €
                     </motion.p>
                     <p className={cn("text-xs mb-3 group-hover:text-blue-200", accentColor)}>{allocations.pension}%</p>
                     <Slider
@@ -1498,7 +1556,7 @@ export default function FinancialPlanner() {
                       step={1}
                       className="mb-2"
                     />
-                    <p className={cn("text-[10px] mt-1 group-hover:text-blue-100", mutedTextClasses)}>лв./месец при пенсия</p>
+                    <p className={cn("text-[10px] mt-1 group-hover:text-blue-100", mutedTextClasses)}>€/месец при пенсия</p>
                   </motion.div>
 
                   {/* Housing */}
@@ -1545,7 +1603,7 @@ export default function FinancialPlanner() {
                       animate={{ scale: 1 }}
                       transition={{ duration: 0.2 }}
                     >
-                      {formatNumber(calculateGoals.housing)}
+                      {formatNumber(calculateGoals.housing)} €
                     </motion.p>
                     <p className={cn("text-xs mb-3 group-hover:text-blue-200", accentColor)}>{allocations.housing}%</p>
                     <Slider
@@ -1599,7 +1657,7 @@ export default function FinancialPlanner() {
                       ) : allocations.cash <= 2 ? (
                         <Car className={cn("w-12 h-12 md:w-14 md:h-14 text-blue-500 group-hover:text-blue-200")} />
                       ) : (
-                        <Wallet className={cn("w-12 h-12 md:w-14 md:h-14 text-violet-500 group-hover:text-violet-200")} />
+                        <GraduationCap className={cn("w-12 h-12 md:w-14 md:h-14 text-violet-500 group-hover:text-violet-200")} />
                       )}
                     </div>
                     
@@ -1610,7 +1668,7 @@ export default function FinancialPlanner() {
                       animate={{ scale: 1 }}
                       transition={{ duration: 0.2 }}
                     >
-                      {formatNumber(calculateGoals.cash)}
+                      {formatNumber(calculateGoals.cash)} €
                     </motion.p>
                     <p className={cn("text-xs mb-3 group-hover:text-blue-200", accentColor)}>{allocations.cash}%</p>
                     <Slider
@@ -1635,7 +1693,7 @@ export default function FinancialPlanner() {
                     animate={{ scale: 1 }}
                     transition={{ duration: 0.2 }}
                   >
-                    {formatNumber(calculateGoals.totalWealth)} BGN
+                    {formatNumber(calculateGoals.totalWealth)} EUR
                   </motion.p>
                 </div>
 
@@ -1854,7 +1912,7 @@ export default function FinancialPlanner() {
                   </div>
 
                   <h2 className="text-3xl font-bold mb-4">Готови сте!</h2>
-                  <p className={cn("text-lg mb-8", mutedTextClasses)}>
+                  <p className={cn("text-sm mb-6 max-w-2xl mx-auto", mutedTextClasses)}>
                     Вече знаете какъв е вашият финансов потенциал. Нека преминем към детайлния анализ!
                   </p>
 

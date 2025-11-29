@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { 
@@ -10,6 +10,7 @@ import {
 } from "@/components/ui/select";
 import { ListOrdered, TrendingUp } from 'lucide-react';
 import FinancialHealthCard from './FinancialHealthCard';
+import BulgarianDateInput from '@/components/ui/BulgarianDateInput';
 
 const allPriorities = [
   { key: 'priority_income_protection', label: 'Подсигуряване на доходите' },
@@ -22,6 +23,45 @@ const allPriorities = [
 ];
 
 export default function PrioritiesStep({ data, onChange, showErrors }) {
+  // Calculate monthly balance from FinancialFlowStep data
+  const monthlyBalance = useMemo(() => {
+    const includePartner = data.include_partner || false;
+    
+    const clientAnnualBonusMonthly = Math.round((data.client_annual_bonus || 0) / 12);
+    const partnerAnnualBonusMonthly = Math.round((data.partner_annual_bonus || 0) / 12);
+    
+    const totalClientIncome = (data.client_net_income || 0) + (data.client_other_monthly_income || 0) + clientAnnualBonusMonthly;
+    const totalPartnerIncome = includePartner ? ((data.partner_net_income || 0) + (data.partner_other_monthly_income || 0) + partnerAnnualBonusMonthly) : 0;
+    const totalMonthlyIncome = totalClientIncome + totalPartnerIncome;
+    
+    const totalHousingExpenses = (data.expense_rent || 0) + (data.expense_utilities || 0) + 
+      (data.expense_phone || 0) + (data.expense_internet || 0) + (data.expense_tv || 0) + (data.expense_other_housing || 0);
+    
+    const totalCarExpenses = (data.expense_fuel || 0) + (data.expense_car_maintenance || 0) + (data.expense_car_other || 0);
+    
+    const totalVariableExpenses = (data.expense_food || 0) + (data.expense_clothing || 0) + (data.expense_culture || 0) +
+      (data.expense_travel || 0) + (data.expense_children || 0) + (data.expense_cigarettes || 0) +
+      (data.expense_pets || 0) + (data.expense_vacation || 0) + (data.expense_business || 0) + (data.expense_other || 0) +
+      (data.expense_education || 0) + (data.expense_health || 0) + (data.expense_cosmetics || 0) +
+      (data.expense_hobbies || 0) + (data.expense_electronics || 0) + (data.expense_taxes || 0);
+
+    const totalExpenses = totalHousingExpenses + totalCarExpenses + totalVariableExpenses;
+    
+    const totalLiabilitiesMonthly = (data.liability_mortgage_monthly || 0) + (data.liability_consumer_loans_monthly || 0) +
+      (data.liability_credit_cards_monthly || 0) + (data.liability_leasing_monthly || 0) + (data.liability_overdraft_monthly || 0);
+
+    const totalInsurance = (data.insurance_life || 0) + (data.insurance_property || 0) +
+      (data.insurance_movable || 0) + (data.insurance_civil || 0) + (data.insurance_casco || 0) + (data.insurance_other || 0);
+    
+    return totalMonthlyIncome - totalExpenses - totalInsurance - totalLiabilitiesMonthly;
+  }, [data]);
+
+  // Get minimum date (tomorrow)
+  const getMinDate = () => {
+    const tomorrow = new Date();
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    return tomorrow.toISOString().split('T')[0];
+  };
   // Filter priorities based on conditions
   const getActivePriorities = () => {
     return allPriorities.filter(p => {
@@ -145,7 +185,7 @@ export default function PrioritiesStep({ data, onChange, showErrors }) {
         <div className="space-y-4">
           <div className="space-y-2" data-invalid={showErrors && (data.monthly_priority_allocation === undefined || data.monthly_priority_allocation === '') ? "true" : undefined}>
             <Label>
-              Каква част от <span className="font-semibold text-blue-600">{(data.monthly_balance || 0).toLocaleString()} €</span> (месечен баланс от "Финансов поток"), която Ви остава на месечна база бихте заделили за осигуряване на Вашите приоритети? <span className="text-red-500">*</span>
+              Каква част от <span className="font-semibold text-blue-600">{monthlyBalance.toLocaleString()} €</span> (месечен баланс от "Финансов поток"), която Ви остава на месечна база бихте заделили за осигуряване на Вашите приоритети? <span className="text-red-500">*</span>
             </Label>
             <Input
               type="number"
@@ -171,13 +211,34 @@ export default function PrioritiesStep({ data, onChange, showErrors }) {
           <Label>
             Кога би било удобно да се срещнем за презентация на Вашия финансов план? <span className="text-red-500">*</span>
           </Label>
-          <Input
-            type="datetime-local"
-            value={data.next_meeting_datetime || ''}
-            onChange={(e) => onChange('next_meeting_datetime', e.target.value)}
-            className={`rounded-lg max-w-xs ${showErrors && !data.next_meeting_datetime ? 'border-red-500 bg-red-50' : ''}`}
-            required
-          />
+          <div className="flex gap-2 max-w-md">
+            <BulgarianDateInput
+              value={data.next_meeting_date || ''}
+              onChange={(value) => {
+                onChange('next_meeting_date', value);
+                if (value && data.next_meeting_time) {
+                  onChange('next_meeting_datetime', `${value}T${data.next_meeting_time}`);
+                }
+              }}
+              minDate={getMinDate()}
+              className={`rounded-lg flex-1 ${showErrors && !data.next_meeting_datetime ? 'border-red-500 bg-red-50' : ''}`}
+              placeholder="дд.мм.гггг"
+            />
+            <Input
+              type="time"
+              value={data.next_meeting_time || ''}
+              onChange={(e) => {
+                onChange('next_meeting_time', e.target.value);
+                if (data.next_meeting_date && e.target.value) {
+                  onChange('next_meeting_datetime', `${data.next_meeting_date}T${e.target.value}`);
+                }
+              }}
+              className={`rounded-lg w-32 ${showErrors && !data.next_meeting_datetime ? 'border-red-500 bg-red-50' : ''}`}
+            />
+          </div>
+          {data.next_meeting_date && new Date(data.next_meeting_date) <= new Date() && (
+            <p className="text-red-500 text-xs">Моля, изберете бъдеща дата</p>
+          )}
         </div>
       </div>
     </div>

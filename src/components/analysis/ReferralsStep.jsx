@@ -171,13 +171,13 @@ export default function ReferralsStep({ data, onChange, onComplete, existingName
       <Dialog open={showLowReferralsWarning} onOpenChange={setShowLowReferralsWarning}>
         <DialogContent className="max-w-lg">
           <DialogHeader>
-            <DialogTitle className="text-amber-600">Недостатъчен брой препоръки</DialogTitle>
+            <DialogTitle className="text-red-600">Недостатъчен брой препоръки</DialogTitle>
           </DialogHeader>
-          <div className="py-4">
+          <div className="py-4 bg-red-50 -mx-6 px-6 -mb-6 pb-6 rounded-b-lg">
             <p className="text-slate-700 mb-6">
               Работата на консултантите се оценява в частност от броя препоръки, които получават на анализ. 
               Ниското ниво препоръки ще доведе до лоша оценка на консултанта в системата ни. 
-              Бихте ли могли да допълните останалите <span className="font-bold text-amber-600">{remainingCount}</span> имена?
+              Бихте ли могли да допълните останалите <span className="font-bold text-red-600">{remainingCount}</span> имена?
             </p>
             <div className="flex justify-end gap-3">
               <Button 

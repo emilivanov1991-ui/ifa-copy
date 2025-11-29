@@ -248,11 +248,17 @@ export default function PersonalDataStep({ data, onChange, showErrors }) {
 
           <div className="space-y-2" data-invalid={isFieldInvalid(data.client_phone) ? 'true' : undefined}>
             <Label>Телефонен номер <span className="text-red-500">*</span></Label>
-            <Input placeholder="+359 888 000 000" value={data.client_phone || ''} onChange={(e) => onChange('client_phone', e.target.value)} className={`rounded-lg ${isFieldInvalid(data.client_phone) ? 'border-red-500 bg-red-50' : ''}`} required />
+            <Input placeholder="+359 888 000 000" value={data.client_phone || ''} onChange={(e) => {
+              const value = e.target.value.replace(/[^0-9+\s]/g, '');
+              onChange('client_phone', value);
+            }} className={`rounded-lg ${isFieldInvalid(data.client_phone) ? 'border-red-500 bg-red-50' : ''}`} required />
           </div>
-          <div className="space-y-2" data-invalid={isFieldInvalid(data.client_email) ? 'true' : undefined}>
+          <div className="space-y-2" data-invalid={isFieldInvalid(data.client_email) || (data.client_email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.client_email)) ? 'true' : undefined}>
             <Label>Email <span className="text-red-500">*</span></Label>
-            <Input type="email" placeholder="email@example.com" value={data.client_email || ''} onChange={(e) => onChange('client_email', e.target.value)} className={`rounded-lg ${isFieldInvalid(data.client_email) ? 'border-red-500 bg-red-50' : ''}`} required />
+            <Input type="email" placeholder="email@example.com" value={data.client_email || ''} onChange={(e) => onChange('client_email', e.target.value)} className={`rounded-lg ${isFieldInvalid(data.client_email) || (data.client_email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.client_email)) ? 'border-red-500 bg-red-50' : ''}`} required />
+            {data.client_email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.client_email) && (
+              <p className="text-red-500 text-xs">Невалиден формат на email</p>
+            )}
           </div>
           <div className="space-y-2" data-invalid={isFieldInvalid(data.client_marital_status) ? 'true' : undefined}>
             <Label>Семейно положение <span className="text-red-500">*</span></Label>
@@ -445,11 +451,17 @@ export default function PersonalDataStep({ data, onChange, showErrors }) {
 
               <div className="space-y-2" data-invalid={isFieldInvalid(data.partner_phone) ? "true" : undefined}>
                 <Label>Телефонен номер <span className="text-red-500">*</span></Label>
-                <Input placeholder="+359 888 000 000" value={data.partner_phone || ''} onChange={(e) => onChange('partner_phone', e.target.value)} className={`rounded-lg ${isFieldInvalid(data.partner_phone) ? 'border-red-500 bg-red-50' : ''}`} required />
+                <Input placeholder="+359 888 000 000" value={data.partner_phone || ''} onChange={(e) => {
+                  const value = e.target.value.replace(/[^0-9+\s]/g, '');
+                  onChange('partner_phone', value);
+                }} className={`rounded-lg ${isFieldInvalid(data.partner_phone) ? 'border-red-500 bg-red-50' : ''}`} required />
               </div>
-              <div className="space-y-2" data-invalid={isFieldInvalid(data.partner_email) ? "true" : undefined}>
+              <div className="space-y-2" data-invalid={isFieldInvalid(data.partner_email) || (data.partner_email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.partner_email)) ? "true" : undefined}>
                 <Label>Email <span className="text-red-500">*</span></Label>
-                <Input type="email" placeholder="email@example.com" value={data.partner_email || ''} onChange={(e) => onChange('partner_email', e.target.value)} className={`rounded-lg ${isFieldInvalid(data.partner_email) ? 'border-red-500 bg-red-50' : ''}`} required />
+                <Input type="email" placeholder="email@example.com" value={data.partner_email || ''} onChange={(e) => onChange('partner_email', e.target.value)} className={`rounded-lg ${isFieldInvalid(data.partner_email) || (data.partner_email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.partner_email)) ? 'border-red-500 bg-red-50' : ''}`} required />
+                {data.partner_email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.partner_email) && (
+                  <p className="text-red-500 text-xs">Невалиден формат на email</p>
+                )}
               </div>
               <div className="space-y-2" data-invalid={isFieldInvalid(data.partner_marital_status) ? "true" : undefined}>
                 <Label>Семейно положение <span className="text-red-500">*</span></Label>

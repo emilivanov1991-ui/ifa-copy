@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -41,6 +41,26 @@ export default function ReserveStep({ data, onChange, showErrors }) {
   const isFieldInvalid = (value) => showErrors && (value === undefined || value === '' || value === null);
   // Get total monthly income from input
   const totalMonthlyIncome = data.total_monthly_income || 0;
+  
+  // Delayed reserve message state
+  const [showReserveMessage, setShowReserveMessage] = useState(false);
+  const reserveTimerRef = useRef(null);
+  
+  useEffect(() => {
+    // When desired_reserve_amount changes, start a 1 second delay
+    if (data.desired_reserve_amount !== undefined && data.desired_reserve_amount !== '') {
+      if (reserveTimerRef.current) clearTimeout(reserveTimerRef.current);
+      setShowReserveMessage(false);
+      reserveTimerRef.current = setTimeout(() => {
+        setShowReserveMessage(true);
+      }, 1000);
+    } else {
+      setShowReserveMessage(false);
+    }
+    return () => {
+      if (reserveTimerRef.current) clearTimeout(reserveTimerRef.current);
+    };
+  }, [data.desired_reserve_amount]);
 
   // Calculate monthly expenses (income - savings)
   const monthlySavings = data.monthly_savings_amount || 0;
@@ -561,7 +581,7 @@ export default function ReserveStep({ data, onChange, showErrors }) {
                   </span>
                 </div>
 
-                {totalLiquid > recommendedReserve && (
+                {showReserveMessage && totalLiquid > recommendedReserve && (
                   <div className="p-4 bg-red-50 border border-red-200 rounded-lg">
                     <p className="text-red-700">
                       Спестяванията ви надвишават препоръчителния резерв и губите средно <span className="font-bold">{Math.round((totalLiquid - recommendedReserve) * 0.05).toLocaleString('bg-BG')} €</span> годишно от инфлация. Ще ви помогнем да реализирате доходност на тези средства!
@@ -569,7 +589,7 @@ export default function ReserveStep({ data, onChange, showErrors }) {
                   </div>
                 )}
 
-                {totalLiquid < recommendedReserve && totalLiquid > 0 && (
+                {showReserveMessage && totalLiquid < recommendedReserve && totalLiquid >= 0 && (
                   <div className="p-4 bg-red-50 border border-red-200 rounded-lg">
                     <p className="text-red-700">
                       Спестяванията ви са по-малко от препоръчителния резерв с <span className="font-bold">{(recommendedReserve - totalLiquid).toLocaleString('bg-BG')} €</span>. Ще ви помогнем да достигнете до него чрез правилно финансово планиране!

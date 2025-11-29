@@ -324,8 +324,8 @@ export default function ChildrenGoalsStep({ data, onChange, showErrors }) {
           </div>
 
           {/* Current savings for children goals */}
-          <div className="grid grid-cols-2 gap-4 items-end pt-4">
-            <Label className="font-medium">Колко спестявания имате заделени за горните цели?</Label>
+          <div className="grid grid-cols-2 gap-4 items-end pt-4" data-invalid={!data.skip_children_section && isInvalid(data.children_current_savings) ? "true" : undefined}>
+            <Label className="font-medium">Колко спестявания имате заделени за горните цели? <span className="text-red-500">*</span></Label>
             <div className="space-y-1">
               <Label className="text-xs text-slate-500 text-center block">Сума (€)</Label>
               <Input
@@ -334,13 +334,14 @@ export default function ChildrenGoalsStep({ data, onChange, showErrors }) {
                 placeholder="0"
                 value={data.children_current_savings ?? ''}
                 onChange={(e) => onChange('children_current_savings', e.target.value === '' ? '' : parseInt(e.target.value))}
-                className="rounded-lg text-center"
+                className={`rounded-lg text-center ${!data.skip_children_section && isInvalid(data.children_current_savings) ? 'border-red-500 bg-red-50' : ''}`}
+                required
               />
             </div>
           </div>
 
           {/* Investment calculation message */}
-          {currentSavings > 0 && missingAmount > 0 && averageChildAge > 0 && (
+          {(currentSavings >= 0 && data.children_current_savings !== undefined && data.children_current_savings !== '') && missingAmount > 0 && averageChildAge > 0 && (
             <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg mt-4">
               <p className="text-blue-800">
                 За осигуряване на подобни суми са ви необходими инвестиции в размер на около <span className="font-bold">{monthlyInvestment.toLocaleString()} €</span> месечно. Във финансовия план ще откриете по-подробни предложения и проекции.

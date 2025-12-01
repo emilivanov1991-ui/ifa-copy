@@ -1,120 +1,495 @@
 import {
-  CONSTANTS,
-  DEFAULT_PRODUCT_RATES,
+  EUR_BGN_RATE,
+  DAYS_PER_YEAR,
+  TERM_LIFE_RATES,
+  EDUCATION_PLAN_COEFFICIENTS,
+  UL_FEES,
+  STRATEGY_RETURNS,
+  PENSION_PLAN_RATES,
+  CRITICAL_ILLNESS_RATES,
+  HEALTH_INSURANCE_RATES,
+  MODEL_COEFFICIENTS,
+  bgnToEur,
+  eurToBgn,
   calculateAge,
   calculateYearsToRetirement,
   calculateYearsToEducation,
   vlookup,
+  getTermLifeRate,
   calculateFutureValue,
   calculateMonthlyPayment,
-  calculateTermLifePremium
+  calculateLaborCapital,
+  calculateProtectionNeed,
+  calculateReserveNeed,
+  calculatePensionGap,
+  calculateTermLifePremium,
+  calculateULInvestment,
+  calculateTaxBenefit
 } from './FinancialPlanConstants';
 
-// Главен калкулатор за финансов план
+// ============================================================
+// ГЛАВЕН КАЛКУЛАТОР ЗА ФИНАНСОВ ПЛАН
+// Имплементира логиката от Excel файла
+// ============================================================
+
 export const calculateFinancialPlan = (analysisData) => {
   const today = new Date();
-  const validUntil = new Date(today.getTime() + CONSTANTS.PLAN_VALIDITY_DAYS * 24 * 60 * 60 * 1000);
+  const validUntil = new Date(today.getTime() + 30 * 24 * 60 * 60 * 1000);
   
-  // 1. Изчисляване на възрасти
+  // ============================================================
+  // 1. ЛИЧНИ ДАННИ И ВЪЗРАСТИ (Блок 1-2 от Excel)
+  // ============================================================
+  
   const partner1Age = calculateAge(analysisData.client_birthdate);
   const partner2Age = analysisData.include_partner ? calculateAge(analysisData.partner_birthdate) : 0;
   
-  // 2. Години до пенсия
+  const partner1Gender = analysisData.client_gender || 'male';
+  const partner2Gender = analysisData.partner_gender || 'female';
+  
+  const partner1IsSmoker = analysisData.client_is_smoker || false;
+  const partner2IsSmoker = analysisData.partner_is_smoker || false;
+  
+  // Пенсионна възраст
   const retirementAgeP1 = analysisData.client_retirement_age || 
-    (analysisData.client_gender === 'male' ? CONSTANTS.DEFAULT_RETIREMENT_AGE_MALE : CONSTANTS.DEFAULT_RETIREMENT_AGE_FEMALE);
+    (partner1Gender === 'male' ? 65 : 63);
   const retirementAgeP2 = analysisData.partner_retirement_age ||
-    (analysisData.partner_gender === 'male' ? CONSTANTS.DEFAULT_RETIREMENT_AGE_MALE : CONSTANTS.DEFAULT_RETIREMENT_AGE_FEMALE);
+    (partner2Gender === 'male' ? 65 : 63);
   
   const yearsToRetirementP1 = calculateYearsToRetirement(partner1Age, retirementAgeP1);
-  const yearsToRetirementP2 = analysisData.include_partner ? calculateYearsToRetirement(partner2Age, retirementAgeP2) : 0;
+  const yearsToRetirementP2 = analysisData.include_partner ? 
+    calculateYearsToRetirement(partner2Age, retirementAgeP2) : 0;
   
-  // 3. Изчисляване на доходи и разходи
-  const totalMonthlyIncome = calculateTotalMonthlyIncome(analysisData);
-  const totalMonthlyExpenses = calculateTotalMonthlyExpenses(analysisData);
-  const availableForInvestment = totalMonthlyIncome - totalMonthlyExpenses;
+  // Деца
+  const childrenData = [];
+  const childrenCount = analysisData.children_count || 0;
   
-  // 4. Изчисляване на нужди
-  const protectionNeedP1 = calculateProtectionNeed(analysisData, 'partner1');
-  const protectionNeedP2 = analysisData.include_partner ? calculateProtectionNeed(analysisData, 'partner2') : 0;
-  const reserveNeed = calculateReserveNeed(analysisData);
-  const pensionGapP1 = calculatePensionGap(analysisData, 'partner1');
-  const pensionGapP2 = analysisData.include_partner ? calculatePensionGap(analysisData, 'partner2') : 0;
+  for (let i = 1; i <= childrenCount && i <= 10; i++) {
+    const birthDate = analysisData[`child_${i}_birthdate`];
+    if (birthDate) {
+      const childAge = calculateAge(birthDate);
+      const yearsToEducation = calculateYearsToEducation(birthDate, 18);
+      childrenData.push({
+        index: i,
+        name: analysisData[`child_${i}_name`] || `Дете ${i}`,
+        birthDate,
+        age: childAge,
+        yearsToEducation
+      });
+    }
+  }
   
-  // Образователни нужди за деца
-  const educationNeeds = calculateEducationNeeds(analysisData);
+  // ============================================================
+  // 2. ДОХОДИ, РАЗХОДИ, ИМУЩЕСТВО (Блок 3 от Excel)
+  // ============================================================
   
-  // 5. Генериране на продуктови предложения
-  const products = generateProductRecommendations(analysisData, {
-    protectionNeedP1,
-    protectionNeedP2,
-    reserveNeed,
-    pensionGapP1,
-    pensionGapP2,
-    educationNeeds,
-    availableForInvestment,
-    yearsToRetirementP1,
-    yearsToRetirementP2
+  // Месечни доходи в лева
+  const monthlyIncomeP1_BGN = (analysisData.client_net_income || 0);
+  const monthlyIncomeP2_BGN = analysisData.include_partner ? (analysisData.partner_net_income || 0) : 0;
+  const otherMonthlyIncome_BGN = (analysisData.client_other_monthly_income || 0) + 
+    (analysisData.partner_other_monthly_income || 0);
+  
+  // Годишни доходи
+  const annualBonusP1 = (analysisData.client_13th_salary || 0) + (analysisData.client_other_annual_income || 0);
+  const annualBonusP2 = (analysisData.partner_13th_salary || 0) + (analysisData.partner_other_annual_income || 0);
+  
+  const totalMonthlyIncome_BGN = monthlyIncomeP1_BGN + monthlyIncomeP2_BGN + otherMonthlyIncome_BGN + 
+    (annualBonusP1 + annualBonusP2) / 12;
+  
+  // Конвертиране в EUR
+  const totalMonthlyIncome_EUR = bgnToEur(totalMonthlyIncome_BGN);
+  const monthlyIncomeP1_EUR = bgnToEur(monthlyIncomeP1_BGN);
+  const monthlyIncomeP2_EUR = bgnToEur(monthlyIncomeP2_BGN);
+  
+  // Месечни разходи
+  const monthlyExpenses_BGN = calculateTotalMonthlyExpenses(analysisData);
+  const monthlyExpenses_EUR = bgnToEur(monthlyExpenses_BGN);
+  
+  // Свободни средства
+  const availableForInvestment_BGN = totalMonthlyIncome_BGN - monthlyExpenses_BGN;
+  const availableForInvestment_EUR = bgnToEur(availableForInvestment_BGN);
+  
+  // Имущество
+  const totalAssets_BGN = (analysisData.property_apartment_value || 0) +
+    (analysisData.property_house_value || 0) +
+    (analysisData.property_car_value || 0) +
+    (analysisData.property_other_value || 0) +
+    (analysisData.client_checking_account || 0) +
+    (analysisData.client_savings_book || 0) +
+    (analysisData.client_term_deposit || 0) +
+    (analysisData.client_mutual_funds || 0) +
+    (analysisData.client_savings_account || 0) +
+    (analysisData.client_cash || 0);
+  
+  // Задължения
+  const totalLiabilities_BGN = ((analysisData.liability_mortgage || 0) +
+    (analysisData.liability_consumer_loans || 0) +
+    (analysisData.liability_credit_cards || 0) +
+    (analysisData.liability_leasing || 0) +
+    (analysisData.liability_overdraft || 0)) * 12 * 5; // Предполагаем 5 години остатък
+  
+  const netWorth_BGN = totalAssets_BGN - totalLiabilities_BGN;
+  
+  // ============================================================
+  // 3. ТРУДОВ КАПИТАЛ (Labor Capital)
+  // ============================================================
+  
+  const laborCapitalP1 = calculateLaborCapital(
+    monthlyIncomeP1_EUR, 
+    yearsToRetirementP1, 
+    MODEL_COEFFICIENTS.INCOME_GROWTH_RATE
+  );
+  
+  const laborCapitalP2 = analysisData.include_partner ? 
+    calculateLaborCapital(monthlyIncomeP2_EUR, yearsToRetirementP2, MODEL_COEFFICIENTS.INCOME_GROWTH_RATE) : 0;
+  
+  // ============================================================
+  // 4. НУЖДИ ОТ ЗАЩИТА (Protection Needs)
+  // ============================================================
+  
+  const protectionNeedP1_EUR = calculateProtectionNeed(
+    monthlyIncomeP1_EUR,
+    monthlyExpenses_EUR / 2, // Половината разходи са на партньор 1
+    bgnToEur(totalLiabilities_BGN / 5), // Годишни задължения
+    yearsToRetirementP1
+  );
+  
+  const protectionNeedP2_EUR = analysisData.include_partner ? 
+    calculateProtectionNeed(
+      monthlyIncomeP2_EUR,
+      monthlyExpenses_EUR / 2,
+      bgnToEur(totalLiabilities_BGN / 5),
+      yearsToRetirementP2
+    ) : 0;
+  
+  // ============================================================
+  // 5. НУЖДА ОТ РЕЗЕРВ (Reserve Need)
+  // ============================================================
+  
+  const desiredReserveMonths = analysisData.desired_reserve_months || 6;
+  const reserveNeed_EUR = calculateReserveNeed(monthlyExpenses_EUR, desiredReserveMonths);
+  
+  // Текущ резерв
+  const currentReserve_EUR = bgnToEur(
+    (analysisData.client_checking_account || 0) +
+    (analysisData.client_savings_account || 0) +
+    (analysisData.client_cash || 0)
+  );
+  
+  const reserveGap_EUR = Math.max(0, reserveNeed_EUR - currentReserve_EUR);
+  
+  // ============================================================
+  // 6. ПЕНСИОНЕН ДЕФИЦИТ (Pension Gap)
+  // ============================================================
+  
+  const desiredPensionP1_EUR = bgnToEur(analysisData.client_desired_pension || monthlyIncomeP1_BGN * 0.7);
+  const expectedStatePensionP1_EUR = bgnToEur(analysisData.client_expected_state_pension || monthlyIncomeP1_BGN * 0.35);
+  
+  const pensionGapP1_EUR = calculatePensionGap(desiredPensionP1_EUR, expectedStatePensionP1_EUR, 20);
+  
+  const desiredPensionP2_EUR = analysisData.include_partner ? 
+    bgnToEur(analysisData.partner_desired_pension || monthlyIncomeP2_BGN * 0.7) : 0;
+  const expectedStatePensionP2_EUR = analysisData.include_partner ?
+    bgnToEur(analysisData.partner_expected_state_pension || monthlyIncomeP2_BGN * 0.35) : 0;
+  
+  const pensionGapP2_EUR = analysisData.include_partner ?
+    calculatePensionGap(desiredPensionP2_EUR, expectedStatePensionP2_EUR, 20) : 0;
+  
+  // ============================================================
+  // 7. ОБРАЗОВАТЕЛНИ НУЖДИ ЗА ДЕЦА
+  // ============================================================
+  
+  const educationNeeds = {};
+  const educationCostPerChild_EUR = bgnToEur(analysisData.children_education_costs || 20000);
+  
+  childrenData.forEach(child => {
+    const coefficient = vlookup(Math.round(child.yearsToEducation), EDUCATION_PLAN_COEFFICIENTS) || 0.7;
+    educationNeeds[`child${child.index}`] = {
+      yearsToEducation: child.yearsToEducation,
+      coefficient,
+      totalNeed: educationCostPerChild_EUR * coefficient
+    };
   });
   
-  // 6. Сумиране на резултати
-  const totalMonthlyPremium = products
-    .filter(p => p.is_active)
+  // ============================================================
+  // 8. ГЕНЕРИРАНЕ НА ПРОДУКТОВИ ПРЕДЛОЖЕНИЯ
+  // ============================================================
+  
+  const products = [];
+  const priorities = getPriorities(analysisData);
+  
+  // --- TK1: Срочна застраховка за партньор 1 ---
+  if (priorities.includes('income_protection') && protectionNeedP1_EUR > 0) {
+    const termYears = Math.min(Math.round(yearsToRetirementP1), 30);
+    const premium = calculateTermLifePremium(
+      protectionNeedP1_EUR,
+      partner1Age,
+      termYears,
+      partner1Gender,
+      partner1IsSmoker
+    );
+    
+    products.push({
+      product_type: 'term_life',
+      product_code: 'TK1',
+      provider: 'MetLife',
+      beneficiary: 'partner1',
+      beneficiary_name: `${analysisData.client_first_name} ${analysisData.client_last_name}`,
+      strategy: null,
+      term_years: termYears,
+      monthly_premium: Math.round(premium.monthly * 100) / 100,
+      annual_premium: Math.round(premium.annual * 100) / 100,
+      total_premium: Math.round(premium.total * 100) / 100,
+      coverage_amount: Math.round(protectionNeedP1_EUR),
+      expected_value: null,
+      rate_per_1000: premium.rate,
+      is_active: true
+    });
+  }
+  
+  // --- TK2: Срочна застраховка за партньор 2 ---
+  if (analysisData.include_partner && priorities.includes('income_protection') && protectionNeedP2_EUR > 0) {
+    const termYears = Math.min(Math.round(yearsToRetirementP2), 30);
+    const premium = calculateTermLifePremium(
+      protectionNeedP2_EUR,
+      partner2Age,
+      termYears,
+      partner2Gender,
+      partner2IsSmoker
+    );
+    
+    products.push({
+      product_type: 'term_life',
+      product_code: 'TK2',
+      provider: 'MetLife',
+      beneficiary: 'partner2',
+      beneficiary_name: `${analysisData.partner_first_name} ${analysisData.partner_last_name}`,
+      strategy: null,
+      term_years: termYears,
+      monthly_premium: Math.round(premium.monthly * 100) / 100,
+      annual_premium: Math.round(premium.annual * 100) / 100,
+      total_premium: Math.round(premium.total * 100) / 100,
+      coverage_amount: Math.round(protectionNeedP2_EUR),
+      expected_value: null,
+      rate_per_1000: premium.rate,
+      is_active: true
+    });
+  }
+  
+  // --- UL: Инвестиции за резерв и пенсия ---
+  if (priorities.includes('reserve') || priorities.includes('pension')) {
+    const strategy = analysisData.risk_profile || 'balanced';
+    const termYears = Math.min(Math.round(yearsToRetirementP1), 35);
+    
+    // Изчисляваме месечна вноска базирана на свободните средства
+    const maxMonthlyPremium = availableForInvestment_EUR * 0.5; // 50% от свободните
+    const monthlyPremium = Math.max(30, Math.min(maxMonthlyPremium, 500)); // Между 30 и 500 EUR
+    
+    const ulCalc = calculateULInvestment(monthlyPremium, termYears, strategy, 0);
+    
+    products.push({
+      product_type: 'ul_investment',
+      product_code: 'UL1',
+      provider: 'MetLife',
+      beneficiary: 'partner1',
+      beneficiary_name: `${analysisData.client_first_name} ${analysisData.client_last_name}`,
+      strategy: strategy,
+      term_years: termYears,
+      monthly_premium: Math.round(monthlyPremium * 100) / 100,
+      annual_premium: Math.round(monthlyPremium * 12 * 100) / 100,
+      total_premium: Math.round(ulCalc.totalInvested * 100) / 100,
+      coverage_amount: null,
+      expected_value: ulCalc.expectedValue,
+      return_percent: Math.round(ulCalc.returnPercent * 10) / 10,
+      is_active: true
+    });
+  }
+  
+  // --- PI: Инвестиция с Partners ---
+  if (priorities.includes('pension') && pensionGapP1_EUR > 10000) {
+    const strategy = analysisData.risk_profile || 'balanced';
+    const termYears = Math.round(yearsToRetirementP1);
+    const monthlyPremium = calculateMonthlyPayment(
+      pensionGapP1_EUR * 0.5, // 50% от дефицита
+      termYears,
+      STRATEGY_RETURNS[strategy]
+    );
+    
+    const piCalc = calculateULInvestment(Math.max(50, monthlyPremium), termYears, strategy, 0);
+    
+    products.push({
+      product_type: 'pension_plan',
+      product_code: 'PI1',
+      provider: 'Partners Investments',
+      beneficiary: 'partner1',
+      beneficiary_name: `${analysisData.client_first_name} ${analysisData.client_last_name}`,
+      strategy: strategy,
+      term_years: termYears,
+      monthly_premium: Math.round(Math.max(50, monthlyPremium) * 100) / 100,
+      annual_premium: Math.round(Math.max(50, monthlyPremium) * 12 * 100) / 100,
+      total_premium: Math.round(piCalc.totalInvested * 100) / 100,
+      coverage_amount: null,
+      expected_value: piCalc.expectedValue,
+      return_percent: Math.round(piCalc.returnPercent * 10) / 10,
+      is_active: true
+    });
+  }
+  
+  // --- Образователни планове за деца ---
+  if (priorities.includes('children')) {
+    childrenData.forEach(child => {
+      const eduNeed = educationNeeds[`child${child.index}`];
+      if (eduNeed && eduNeed.totalNeed > 0 && child.yearsToEducation > 2) {
+        const monthlyPremium = calculateMonthlyPayment(
+          eduNeed.totalNeed,
+          child.yearsToEducation,
+          STRATEGY_RETURNS.balanced
+        );
+        
+        const eduCalc = calculateULInvestment(Math.max(25, monthlyPremium), child.yearsToEducation, 'balanced', 0);
+        
+        products.push({
+          product_type: 'education_plan',
+          product_code: `EDU${child.index}`,
+          provider: 'MetLife UL',
+          beneficiary: `child${child.index}`,
+          beneficiary_name: child.name,
+          strategy: 'balanced',
+          term_years: Math.round(child.yearsToEducation),
+          monthly_premium: Math.round(Math.max(25, monthlyPremium) * 100) / 100,
+          annual_premium: Math.round(Math.max(25, monthlyPremium) * 12 * 100) / 100,
+          total_premium: Math.round(eduCalc.totalInvested * 100) / 100,
+          coverage_amount: null,
+          expected_value: eduCalc.expectedValue,
+          return_percent: Math.round(eduCalc.returnPercent * 10) / 10,
+          is_active: true
+        });
+      }
+    });
+  }
+  
+  // --- MLC: Здравна застраховка ---
+  if (analysisData.interest_in_better_savings || priorities.includes('income_protection')) {
+    const ageKey = Math.floor(partner1Age / 5) * 5;
+    const healthRate = vlookup(ageKey, HEALTH_INSURANCE_RATES.uniqa_premium) || 30;
+    
+    products.push({
+      product_type: 'health_insurance',
+      product_code: 'MLC1',
+      provider: 'UNIQA',
+      beneficiary: 'partner1',
+      beneficiary_name: `${analysisData.client_first_name} ${analysisData.client_last_name}`,
+      strategy: null,
+      term_years: 1,
+      monthly_premium: healthRate,
+      annual_premium: healthRate * 12,
+      total_premium: healthRate * 12,
+      coverage_amount: 2240000, // EUR годишен лимит
+      expected_value: null,
+      is_active: true
+    });
+  }
+  
+  // ============================================================
+  // 9. СУМИРАНЕ НА РЕЗУЛТАТИ
+  // ============================================================
+  
+  const activeProducts = products.filter(p => p.is_active);
+  
+  const totalMonthlyPremium = activeProducts.reduce((sum, p) => sum + (p.monthly_premium || 0), 0);
+  const totalAnnualPremium = activeProducts.reduce((sum, p) => sum + (p.annual_premium || 0), 0);
+  const totalCoverage = activeProducts.filter(p => p.coverage_amount).reduce((sum, p) => sum + p.coverage_amount, 0);
+  const totalExpectedValue = activeProducts.filter(p => p.expected_value).reduce((sum, p) => sum + p.expected_value, 0);
+  
+  // Фиксирани vs Променливи вноски
+  const fixedPremium = activeProducts
+    .filter(p => ['term_life', 'health_insurance', 'critical_illness'].includes(p.product_type))
     .reduce((sum, p) => sum + (p.monthly_premium || 0), 0);
   
-  const totalCoverage = products
-    .filter(p => p.is_active && p.coverage_amount)
-    .reduce((sum, p) => sum + p.coverage_amount, 0);
+  const variablePremium = totalMonthlyPremium - fixedPremium;
   
-  const totalExpectedValue = products
-    .filter(p => p.is_active && p.expected_value)
-    .reduce((sum, p) => sum + p.expected_value, 0);
+  // Данъчно облекчение
+  const pensionPremiums = activeProducts
+    .filter(p => p.product_type === 'pension_plan')
+    .reduce((sum, p) => sum + (p.annual_premium || 0), 0);
+  
+  const taxBenefit = calculateTaxBenefit(
+    eurToBgn(pensionPremiums),
+    totalMonthlyIncome_BGN * 12
+  );
+  
+  // ============================================================
+  // 10. ВРЪЩАНЕ НА РЕЗУЛТАТ
+  // ============================================================
   
   return {
+    // Метаданни
     valid_until: validUntil.toISOString().split('T')[0],
+    currency: 'EUR',
+    exchange_rate: EUR_BGN_RATE,
+    
+    // Лични данни
     partner1_age: Math.floor(partner1Age),
     partner2_age: Math.floor(partner2Age),
+    partner1_gender: partner1Gender,
+    partner2_gender: partner2Gender,
     years_to_retirement_p1: Math.floor(yearsToRetirementP1),
     years_to_retirement_p2: Math.floor(yearsToRetirementP2),
-    total_monthly_income: totalMonthlyIncome,
-    total_monthly_expenses: totalMonthlyExpenses,
-    available_for_investment: availableForInvestment,
-    protection_need_p1: protectionNeedP1,
-    protection_need_p2: protectionNeedP2,
-    reserve_need: reserveNeed,
-    pension_gap_p1: pensionGapP1,
-    pension_gap_p2: pensionGapP2,
-    education_need_child1: educationNeeds.child1 || 0,
-    education_need_child2: educationNeeds.child2 || 0,
-    education_need_child3: educationNeeds.child3 || 0,
+    children_count: childrenCount,
+    
+    // Финансово състояние
+    total_monthly_income: Math.round(totalMonthlyIncome_EUR),
+    total_monthly_income_bgn: Math.round(totalMonthlyIncome_BGN),
+    total_monthly_expenses: Math.round(monthlyExpenses_EUR),
+    total_monthly_expenses_bgn: Math.round(monthlyExpenses_BGN),
+    available_for_investment: Math.round(availableForInvestment_EUR),
+    available_for_investment_bgn: Math.round(availableForInvestment_BGN),
+    
+    // Имущество
+    total_assets_bgn: Math.round(totalAssets_BGN),
+    total_liabilities_bgn: Math.round(totalLiabilities_BGN),
+    net_worth_bgn: Math.round(netWorth_BGN),
+    
+    // Трудов капитал
+    labor_capital_p1: Math.round(laborCapitalP1),
+    labor_capital_p2: Math.round(laborCapitalP2),
+    
+    // Нужди
+    protection_need_p1: Math.round(protectionNeedP1_EUR),
+    protection_need_p2: Math.round(protectionNeedP2_EUR),
+    reserve_need: Math.round(reserveNeed_EUR),
+    reserve_gap: Math.round(reserveGap_EUR),
+    pension_gap_p1: Math.round(pensionGapP1_EUR),
+    pension_gap_p2: Math.round(pensionGapP2_EUR),
+    
+    // Образователни нужди
+    education_need_child1: Math.round(educationNeeds.child1?.totalNeed || 0),
+    education_need_child2: Math.round(educationNeeds.child2?.totalNeed || 0),
+    education_need_child3: Math.round(educationNeeds.child3?.totalNeed || 0),
+    
+    // Продукти
     products,
-    total_monthly_premium: totalMonthlyPremium,
-    total_coverage: totalCoverage,
-    total_expected_value: totalExpectedValue
+    
+    // Обобщения
+    total_monthly_premium: Math.round(totalMonthlyPremium * 100) / 100,
+    total_annual_premium: Math.round(totalAnnualPremium * 100) / 100,
+    fixed_monthly_premium: Math.round(fixedPremium * 100) / 100,
+    variable_monthly_premium: Math.round(variablePremium * 100) / 100,
+    total_coverage: Math.round(totalCoverage),
+    total_expected_value: Math.round(totalExpectedValue),
+    
+    // Данъчно облекчение
+    tax_benefit_annual_bgn: Math.round(taxBenefit.taxSaved),
+    tax_benefit_total_bgn: Math.round(taxBenefit.taxSaved * yearsToRetirementP1)
   };
 };
 
-// Изчисляване на общ месечен доход
-const calculateTotalMonthlyIncome = (data) => {
-  let total = 0;
-  
-  // Партньор 1
-  total += data.client_net_income || 0;
-  total += data.client_other_monthly_income || 0;
-  total += (data.client_13th_salary || 0) / 12;
-  total += (data.client_other_annual_income || 0) / 12;
-  
-  // Партньор 2
-  if (data.include_partner) {
-    total += data.partner_net_income || 0;
-    total += data.partner_other_monthly_income || 0;
-    total += (data.partner_13th_salary || 0) / 12;
-    total += (data.partner_other_annual_income || 0) / 12;
-  }
-  
-  return total;
-};
+// ============================================================
+// ПОМОЩНИ ФУНКЦИИ
+// ============================================================
 
-// Изчисляване на общи месечни разходи
+/**
+ * Изчислява общи месечни разходи
+ */
 const calculateTotalMonthlyExpenses = (data) => {
   let total = 0;
   
@@ -161,232 +536,13 @@ const calculateTotalMonthlyExpenses = (data) => {
   return total;
 };
 
-// Изчисляване на нужда от защита (при загуба на доход)
-const calculateProtectionNeed = (data, partner) => {
-  const isP1 = partner === 'partner1';
-  
-  // Месечен доход на партньора
-  const monthlyIncome = isP1 ? 
-    (data.client_net_income || 0) : 
-    (data.partner_net_income || 0);
-  
-  // Нужда = месечен доход * брой месеци * коефициент 1.96
-  const baseNeed = monthlyIncome * CONSTANTS.PROTECTION_MONTHS_MULTIPLIER;
-  
-  // Добавяме задължения (кредити)
-  const liabilities = (data.liability_mortgage || 0) * 12 * 10 + // предполагаем 10 години остатък
-    (data.liability_consumer_loans || 0) * 12 * 3;
-  
-  return (baseNeed + liabilities) * CONSTANTS.CAPITAL_MULTIPLIER;
-};
-
-// Изчисляване на нужда от резерв
-const calculateReserveNeed = (data) => {
-  const monthlyExpenses = calculateTotalMonthlyExpenses(data);
-  const desiredMonths = data.desired_reserve_months || 6;
-  
-  return monthlyExpenses * desiredMonths * CONSTANTS.CAPITAL_MULTIPLIER;
-};
-
-// Изчисляване на пенсионен дефицит
-const calculatePensionGap = (data, partner) => {
-  const isP1 = partner === 'partner1';
-  
-  const currentIncome = isP1 ? (data.client_net_income || 0) : (data.partner_net_income || 0);
-  const desiredPension = isP1 ? (data.client_desired_pension || currentIncome * 0.7) : (data.partner_desired_pension || currentIncome * 0.7);
-  const expectedStatePension = isP1 ? 
-    (data.client_expected_state_pension || currentIncome * CONSTANTS.STATE_PENSION_REPLACEMENT_RATE) :
-    (data.partner_expected_state_pension || currentIncome * CONSTANTS.STATE_PENSION_REPLACEMENT_RATE);
-  
-  const monthlyGap = Math.max(0, desiredPension - expectedStatePension);
-  
-  // Пенсионен дефицит = месечен дефицит * 12 месеца * очаквани години пенсия (20)
-  return monthlyGap * 12 * 20 * CONSTANTS.CAPITAL_MULTIPLIER;
-};
-
-// Изчисляване на образователни нужди
-const calculateEducationNeeds = (data) => {
-  const needs = {};
-  const childrenCount = data.children_count || 0;
-  
-  const childBirthDates = [
-    data.child_1_birthdate,
-    data.child_2_birthdate,
-    data.child_3_birthdate
-  ];
-  
-  const educationCosts = [
-    data.children_education_costs || 20000,
-    data.children_education_costs || 20000,
-    data.children_education_costs || 20000
-  ];
-  
-  for (let i = 0; i < Math.min(childrenCount, 3); i++) {
-    if (childBirthDates[i]) {
-      const yearsToEducation = calculateYearsToEducation(childBirthDates[i]);
-      const coefficient = vlookup(yearsToEducation, DEFAULT_PRODUCT_RATES.education_plan.coefficients);
-      
-      needs[`child${i + 1}`] = educationCosts[i] * coefficient * CONSTANTS.CAPITAL_MULTIPLIER;
-    }
-  }
-  
-  return needs;
-};
-
-// Генериране на продуктови препоръки
-const generateProductRecommendations = (data, needs) => {
-  const products = [];
-  const priorities = getPriorities(data);
-  
-  // 1. Защита на доходите - срочна застраховка живот
-  if (priorities.includes('income_protection') && needs.protectionNeedP1 > 0) {
-    const termYears = Math.min(needs.yearsToRetirementP1, 30);
-    const premium = calculateTermLifePremium(
-      needs.protectionNeedP1,
-      calculateAge(data.client_birthdate),
-      termYears,
-      data.client_is_smoker,
-      data.client_gender
-    );
-    
-    products.push({
-      product_type: 'term_life',
-      provider: 'MetLife',
-      beneficiary: 'partner1',
-      strategy: null,
-      term_years: termYears,
-      monthly_premium: Math.round(premium.monthly * 100) / 100,
-      total_premium: Math.round(premium.total * 100) / 100,
-      coverage_amount: Math.round(needs.protectionNeedP1),
-      expected_value: null,
-      is_active: true
-    });
-  }
-  
-  // 2. Партньор 2 - защита
-  if (data.include_partner && priorities.includes('income_protection') && needs.protectionNeedP2 > 0) {
-    const termYears = Math.min(needs.yearsToRetirementP2, 30);
-    const premium = calculateTermLifePremium(
-      needs.protectionNeedP2,
-      calculateAge(data.partner_birthdate),
-      termYears,
-      data.partner_is_smoker,
-      data.partner_gender
-    );
-    
-    products.push({
-      product_type: 'term_life',
-      provider: 'MetLife',
-      beneficiary: 'partner2',
-      strategy: null,
-      term_years: termYears,
-      monthly_premium: Math.round(premium.monthly * 100) / 100,
-      total_premium: Math.round(premium.total * 100) / 100,
-      coverage_amount: Math.round(needs.protectionNeedP2),
-      expected_value: null,
-      is_active: true
-    });
-  }
-  
-  // 3. Резерв - UL инвестиция за резерв
-  if (priorities.includes('reserve') && needs.reserveNeed > 0) {
-    const termYears = 5;
-    const strategy = data.risk_profile || 'balanced';
-    const expectedReturn = CONSTANTS.STRATEGY_RETURNS[strategy];
-    const monthlyPayment = calculateMonthlyPayment(needs.reserveNeed, termYears, expectedReturn);
-    const expectedValue = calculateFutureValue(monthlyPayment, termYears, expectedReturn);
-    
-    products.push({
-      product_type: 'ul_investment',
-      provider: 'MetLife',
-      beneficiary: 'family',
-      strategy: strategy,
-      term_years: termYears,
-      monthly_premium: Math.round(Math.max(monthlyPayment, DEFAULT_PRODUCT_RATES.ul_investment.min_monthly) * 100) / 100,
-      total_premium: Math.round(monthlyPayment * 12 * termYears * 100) / 100,
-      coverage_amount: null,
-      expected_value: Math.round(expectedValue * 100) / 100,
-      is_active: true
-    });
-  }
-  
-  // 4. Пенсионни планове
-  if (priorities.includes('pension') && needs.pensionGapP1 > 0) {
-    const termYears = needs.yearsToRetirementP1;
-    const strategy = data.risk_profile || 'balanced';
-    const expectedReturn = CONSTANTS.STRATEGY_RETURNS[strategy];
-    const monthlyPayment = calculateMonthlyPayment(needs.pensionGapP1, termYears, expectedReturn);
-    const expectedValue = calculateFutureValue(monthlyPayment, termYears, expectedReturn);
-    
-    products.push({
-      product_type: 'pension_plan',
-      provider: 'Partners Investments',
-      beneficiary: 'partner1',
-      strategy: strategy,
-      term_years: Math.round(termYears),
-      monthly_premium: Math.round(Math.max(monthlyPayment, DEFAULT_PRODUCT_RATES.pension_plan.min_monthly) * 100) / 100,
-      total_premium: Math.round(monthlyPayment * 12 * termYears * 100) / 100,
-      coverage_amount: null,
-      expected_value: Math.round(expectedValue * 100) / 100,
-      is_active: true
-    });
-  }
-  
-  // 5. Образователни планове за деца
-  const childrenCount = data.children_count || 0;
-  if (priorities.includes('children') && childrenCount > 0) {
-    for (let i = 1; i <= Math.min(childrenCount, 3); i++) {
-      const educationNeed = needs.educationNeeds[`child${i}`];
-      if (educationNeed > 0) {
-        const childBirthDate = data[`child_${i}_birthdate`];
-        const yearsToEducation = calculateYearsToEducation(childBirthDate);
-        const strategy = 'balanced';
-        const expectedReturn = CONSTANTS.STRATEGY_RETURNS[strategy];
-        const monthlyPayment = calculateMonthlyPayment(educationNeed, yearsToEducation, expectedReturn);
-        const expectedValue = calculateFutureValue(monthlyPayment, yearsToEducation, expectedReturn);
-        
-        products.push({
-          product_type: 'education_plan',
-          provider: 'MetLife UL',
-          beneficiary: `child${i}`,
-          strategy: strategy,
-          term_years: Math.round(yearsToEducation),
-          monthly_premium: Math.round(Math.max(monthlyPayment, DEFAULT_PRODUCT_RATES.education_plan.min_monthly) * 100) / 100,
-          total_premium: Math.round(monthlyPayment * 12 * yearsToEducation * 100) / 100,
-          coverage_amount: null,
-          expected_value: Math.round(expectedValue * 100) / 100,
-          is_active: true
-        });
-      }
-    }
-  }
-  
-  // 6. Здравна застраховка MLC
-  if (data.interest_in_better_savings) {
-    const age = calculateAge(data.client_birthdate);
-    const rate = vlookup(Math.floor(age), DEFAULT_PRODUCT_RATES.mlc_health.rates);
-    
-    products.push({
-      product_type: 'mlc_health',
-      provider: 'MetLife',
-      beneficiary: 'partner1',
-      strategy: null,
-      term_years: 10,
-      monthly_premium: rate,
-      total_premium: rate * 12 * 10,
-      coverage_amount: 50000,
-      expected_value: null,
-      is_active: true
-    });
-  }
-  
-  return products;
-};
-
-// Извличане на приоритети от анализа
+/**
+ * Извлича приоритети от анализа
+ */
 const getPriorities = (data) => {
   const priorities = [];
   
+  // По флагове от анализа
   if (data.include_income_protection_in_plan || data.priority_income_protection > 0) {
     priorities.push('income_protection');
   }

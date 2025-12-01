@@ -262,7 +262,8 @@ export const UL_FEES = {
   exit_fee_year_6_plus: 0.0
 };
 
-// MetLife Unit Linked - детайлни такси от Sheet7
+// MetLife Unit Linked - детайлни такси от Sheet7/8/9
+// Прилага се за: Клиент (Sheet7), Партньор (Sheet8), Дете1/2/3 (Sheet9)
 export const METLIFE_UL_FEES = {
   policy_fee_annual: 15,          // €15/година Policy Fee
   fixed_fee_monthly: 0,           // €0/месец Fixed Fee

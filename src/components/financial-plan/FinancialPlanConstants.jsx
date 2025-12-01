@@ -462,6 +462,133 @@ export const PARTNERS_INVESTMENTS_SINGLE_MIN = {
   strategies: ['Conservative', 'Balanced', 'Dynamic', 'Real Estate']
 };
 
+// Partners Investments - Очаквана доходност по стратегия
+export const PARTNERS_INVESTMENTS_RETURNS = {
+  regular: {
+    real_estate: 0.0451,    // 4.51%
+    conservative: 0.0349,   // 3.49%
+    balanced: 0.0631,       // 6.31%
+    dynamic: 0.0823         // 8.23%
+  },
+  single: {
+    real_estate: 0.0451,    // 4.51%
+    conservative: 0.0338,   // 3.38%
+    balanced: 0.0622,       // 6.22%
+    dynamic: 0.0934         // 9.34%
+  }
+};
+
+// Partners Investments - Такси за РЕГУЛЯРНИ инвестиции по целева сума
+// Структура: стратегия -> { праг: такса% }
+export const PARTNERS_INVESTMENTS_REGULAR_FEES = {
+  real_estate: {
+    1800: 0.028,    // 2.8% за 1800-19999
+    20000: 0.024,   // 2.4% за 20000-29999
+    30000: 0.02,    // 2.0% за 30000-49999
+    50000: 0.016    // 1.6% за 50000+
+  },
+  conservative: {
+    1800: 0.02,     // 2.0% за 1800-19999
+    20000: 0.018,   // 1.8% за 20000-29999
+    30000: 0.016,   // 1.6% за 30000-49999
+    50000: 0.014    // 1.4% за 50000+
+  },
+  balanced: {
+    1800: 0.028,    // 2.8% за 1800-19999
+    20000: 0.024,   // 2.4% за 20000-29999
+    30000: 0.02,    // 2.0% за 30000-49999
+    50000: 0.016    // 1.6% за 50000+
+  },
+  dynamic: {
+    1800: 0.035,    // 3.5% за 1800-19999
+    20000: 0.03,    // 3.0% за 20000-29999
+    30000: 0.025,   // 2.5% за 30000-49999
+    50000: 0.02     // 2.0% за 50000+
+  }
+};
+
+// Partners Investments - Такси за ЕДНОКРАТНИ инвестиции по сума
+export const PARTNERS_INVESTMENTS_SINGLE_FEES = {
+  real_estate: {
+    5000: 0.024,      // 2.4% за 5000-49999
+    50000: 0.016,     // 1.6% за 50000-199999
+    200000: 0.016,    // 1.6% за 200000-499999
+    500000: 0.016,    // 1.6% за 500000-999999
+    1000000: 0.016    // 1.6% за 1000000+
+  },
+  conservative: {
+    5000: 0.015,      // 1.5% за 5000-49999
+    50000: 0.015,     // 1.5% за 50000-199999
+    200000: 0.01,     // 1.0% за 200000-499999
+    500000: 0.01,     // 1.0% за 500000-999999
+    1000000: 0.005    // 0.5% за 1000000+
+  },
+  balanced: {
+    5000: 0.025,      // 2.5% за 5000-49999
+    50000: 0.02,      // 2.0% за 50000-199999
+    200000: 0.015,    // 1.5% за 200000-499999
+    500000: 0.01,     // 1.0% за 500000-999999
+    1000000: 0.005    // 0.5% за 1000000+
+  },
+  dynamic: {
+    5000: 0.03,       // 3.0% за 5000-49999
+    50000: 0.02,      // 2.0% за 50000-199999
+    200000: 0.015,    // 1.5% за 200000-499999
+    500000: 0.01,     // 1.0% за 500000-999999
+    1000000: 0.005    // 0.5% за 1000000+
+  }
+};
+
+// Помощна функция за изчисляване на такса за Partners Investments
+export const getPartnersInvestmentFee = (strategy, amount, isRegular = true) => {
+  const feeTable = isRegular 
+    ? PARTNERS_INVESTMENTS_REGULAR_FEES[strategy.toLowerCase()] 
+    : PARTNERS_INVESTMENTS_SINGLE_FEES[strategy.toLowerCase()];
+  
+  if (!feeTable) return 0;
+  
+  const thresholds = Object.keys(feeTable).map(Number).sort((a, b) => b - a);
+  for (const threshold of thresholds) {
+    if (amount >= threshold) {
+      return feeTable[threshold];
+    }
+  }
+  return 0;
+};
+
+// Помощна функция за изчисляване на очаквана стойност Partners Investments
+export const calculatePartnersInvestmentValue = (strategy, amount, years, isRegular = true) => {
+  const returns = isRegular 
+    ? PARTNERS_INVESTMENTS_RETURNS.regular[strategy.toLowerCase()]
+    : PARTNERS_INVESTMENTS_RETURNS.single[strategy.toLowerCase()];
+  
+  const fee = getPartnersInvestmentFee(strategy, amount, isRegular);
+  const netReturn = returns - fee;
+  
+  if (isRegular) {
+    // За регулярни - месечни вноски
+    const monthlyAmount = amount;
+    const monthlyRate = netReturn / 12;
+    const months = years * 12;
+    const fv = monthlyAmount * ((Math.pow(1 + monthlyRate, months) - 1) / monthlyRate) * (1 + monthlyRate);
+    return {
+      expected: Math.round(fv),
+      optimistic: Math.round(fv * 1.2),
+      pessimistic: Math.round(fv * 0.8),
+      totalInvested: monthlyAmount * months
+    };
+  } else {
+    // За еднократни
+    const fv = amount * Math.pow(1 + netReturn, years);
+    return {
+      expected: Math.round(fv),
+      optimistic: Math.round(fv * 1.2),
+      pessimistic: Math.round(fv * 0.8),
+      totalInvested: amount
+    };
+  }
+};
+
 // ============================================================
 // ФИНАНСОВ ПЛАН - СПИСЪК НА ПРОДУКТИТЕ И ПРИОРИТЕТИ
 // ============================================================

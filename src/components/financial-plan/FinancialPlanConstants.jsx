@@ -378,23 +378,34 @@ export const calculateTermLifePremium = (coverageAmount, age, termYears, gender,
 };
 
 /**
- * Изчислява UL инвестиция с такси
+ * Изчислява UL инвестиция с такси (според Excel формули)
  */
 export const calculateULInvestment = (monthlyPremium, years, strategy, oneTimeDeposit = 0) => {
   const annualReturn = STRATEGY_RETURNS[strategy] || STRATEGY_RETURNS.balanced;
   const entryFee = UL_FEES.entry_fee_percent / 100;
   const managementFee = UL_FEES.management_fee_percent / 100;
   
-  // Нетна вноска след входна такса
+  // Нетна вноска след входна такса (3%)
   const netMonthly = monthlyPremium * (1 - entryFee);
   const netOneTime = oneTimeDeposit * (1 - entryFee);
   
-  // Ефективна годишна доходност след такса за управление
+  // Ефективна годишна доходност след такса за управление (1.5%)
   const effectiveReturn = annualReturn - managementFee;
+  const monthlyRate = effectiveReturn / 12;
   
-  // Изчисляваме бъдеща стойност
-  const fvMonthly = calculateFutureValue(netMonthly, years, effectiveReturn);
-  const fvOneTime = netOneTime * Math.pow(1 + effectiveReturn, years);
+  // FV формула от Excel: -FV(rate, nper, pmt, pv, 0)
+  const months = years * 12;
+  let fvMonthly = 0;
+  
+  if (monthlyRate === 0) {
+    fvMonthly = netMonthly * months;
+  } else {
+    // Excel FV формула за редовни вноски
+    fvMonthly = netMonthly * ((Math.pow(1 + monthlyRate, months) - 1) / monthlyRate) * (1 + monthlyRate);
+  }
+  
+  // Еднократен депозит
+  const fvOneTime = netOneTime * Math.pow(1 + monthlyRate, months);
   
   const totalInvested = (monthlyPremium * 12 * years) + oneTimeDeposit;
   const expectedValue = fvMonthly + fvOneTime;
@@ -404,8 +415,9 @@ export const calculateULInvestment = (monthlyPremium, years, strategy, oneTimeDe
     totalInvested,
     expectedValue: Math.round(expectedValue),
     totalReturn: Math.round(totalReturn),
-    returnPercent: ((expectedValue / totalInvested) - 1) * 100,
-    effectiveReturn: effectiveReturn * 100
+    returnPercent: totalInvested > 0 ? ((expectedValue / totalInvested) - 1) * 100 : 0,
+    effectiveReturn: effectiveReturn * 100,
+    monthlyRate: monthlyRate * 100
   };
 };
 

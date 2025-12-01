@@ -218,10 +218,16 @@ export const calculateFinancialPlan = (analysisData) => {
   const priorities = getPriorities(analysisData);
   
   // --- TK1: Срочна застраховка за партньор 1 ---
+  // Formula: Coverage = VLOOKUP(years_to_retirement, Partner1_Table, col19) * 1.96 * coef
   if (priorities.includes('income_protection') && protectionNeedP1_EUR > 0) {
     const termYears = Math.min(Math.round(yearsToRetirementP1), 30);
+    
+    // Реална защита според формулите от Excel
+    const baseProtection = monthlyIncomeP1_EUR * MODEL_COEFFICIENTS.PROTECTION_MONTHS;
+    const coverageNeeded = Math.ceil(baseProtection / 100) * 100; // Закръгляне нагоре до 100
+    
     const premium = calculateTermLifePremium(
-      protectionNeedP1_EUR,
+      coverageNeeded,
       partner1Age,
       termYears,
       partner1Gender,
@@ -239,7 +245,7 @@ export const calculateFinancialPlan = (analysisData) => {
       monthly_premium: Math.round(premium.monthly * 100) / 100,
       annual_premium: Math.round(premium.annual * 100) / 100,
       total_premium: Math.round(premium.total * 100) / 100,
-      coverage_amount: Math.round(protectionNeedP1_EUR),
+      coverage_amount: Math.round(coverageNeeded),
       expected_value: null,
       rate_per_1000: premium.rate,
       is_active: true
@@ -249,8 +255,12 @@ export const calculateFinancialPlan = (analysisData) => {
   // --- TK2: Срочна застраховка за партньор 2 ---
   if (analysisData.include_partner && priorities.includes('income_protection') && protectionNeedP2_EUR > 0) {
     const termYears = Math.min(Math.round(yearsToRetirementP2), 30);
+    
+    const baseProtection = monthlyIncomeP2_EUR * MODEL_COEFFICIENTS.PROTECTION_MONTHS;
+    const coverageNeeded = Math.ceil(baseProtection / 100) * 100;
+    
     const premium = calculateTermLifePremium(
-      protectionNeedP2_EUR,
+      coverageNeeded,
       partner2Age,
       termYears,
       partner2Gender,
@@ -268,21 +278,26 @@ export const calculateFinancialPlan = (analysisData) => {
       monthly_premium: Math.round(premium.monthly * 100) / 100,
       annual_premium: Math.round(premium.annual * 100) / 100,
       total_premium: Math.round(premium.total * 100) / 100,
-      coverage_amount: Math.round(protectionNeedP2_EUR),
+      coverage_amount: Math.round(coverageNeeded),
       expected_value: null,
       rate_per_1000: premium.rate,
       is_active: true
     });
   }
   
-  // --- UL: Инвестиции за резерв и пенсия ---
-  if (priorities.includes('reserve') || priorities.includes('pension')) {
+  // --- UL1: Инвестиция + Защита за партньор 1 ---
+  // Formula: R27 = (UL_Парт1.C10 + 15) * коеф
+  // Formula: coverage = (monthlyIncome * 18) / 1.96 + 10000
+  if (priorities.includes('reserve') || priorities.includes('pension') || priorities.includes('income_protection')) {
     const strategy = analysisData.risk_profile || 'balanced';
     const termYears = Math.min(Math.round(yearsToRetirementP1), 35);
     
-    // Изчисляваме месечна вноска базирана на свободните средства
-    const maxMonthlyPremium = availableForInvestment_EUR * 0.5; // 50% от свободните
-    const monthlyPremium = Math.max(30, Math.min(maxMonthlyPremium, 500)); // Между 30 и 500 EUR
+    // Покритие според формулата от Excel
+    const ulCoverage = Math.ceil(((monthlyIncomeP1_BGN * 18) / EUR_BGN_RATE + 10000) / 100) * 100;
+    
+    // Месечна вноска - базирана на комбинация от защита и инвестиция
+    const baseMonthlyPremium = Math.max(50, availableForInvestment_EUR * 0.3);
+    const monthlyPremium = Math.min(baseMonthlyPremium, 500);
     
     const ulCalc = calculateULInvestment(monthlyPremium, termYears, strategy, 0);
     
@@ -297,24 +312,57 @@ export const calculateFinancialPlan = (analysisData) => {
       monthly_premium: Math.round(monthlyPremium * 100) / 100,
       annual_premium: Math.round(monthlyPremium * 12 * 100) / 100,
       total_premium: Math.round(ulCalc.totalInvested * 100) / 100,
-      coverage_amount: null,
+      coverage_amount: Math.round(ulCoverage),
       expected_value: ulCalc.expectedValue,
       return_percent: Math.round(ulCalc.returnPercent * 10) / 10,
       is_active: true
     });
   }
   
-  // --- PI: Инвестиция с Partners ---
-  if (priorities.includes('pension') && pensionGapP1_EUR > 10000) {
+  // --- UL2: Инвестиция + Защита за партньор 2 ---
+  if (analysisData.include_partner && (priorities.includes('reserve') || priorities.includes('pension'))) {
     const strategy = analysisData.risk_profile || 'balanced';
-    const termYears = Math.round(yearsToRetirementP1);
-    const monthlyPremium = calculateMonthlyPayment(
-      pensionGapP1_EUR * 0.5, // 50% от дефицита
-      termYears,
-      STRATEGY_RETURNS[strategy]
-    );
+    const termYears = Math.min(Math.round(yearsToRetirementP2), 35);
     
-    const piCalc = calculateULInvestment(Math.max(50, monthlyPremium), termYears, strategy, 0);
+    const ulCoverage = Math.ceil(((monthlyIncomeP2_BGN * 18) / EUR_BGN_RATE + 10000) / 100) * 100;
+    const baseMonthlyPremium = Math.max(30, availableForInvestment_EUR * 0.2);
+    const monthlyPremium = Math.min(baseMonthlyPremium, 300);
+    
+    const ulCalc = calculateULInvestment(monthlyPremium, termYears, strategy, 0);
+    
+    products.push({
+      product_type: 'ul_investment',
+      product_code: 'UL2',
+      provider: 'MetLife',
+      beneficiary: 'partner2',
+      beneficiary_name: `${analysisData.partner_first_name} ${analysisData.partner_last_name}`,
+      strategy: strategy,
+      term_years: termYears,
+      monthly_premium: Math.round(monthlyPremium * 100) / 100,
+      annual_premium: Math.round(monthlyPremium * 12 * 100) / 100,
+      total_premium: Math.round(ulCalc.totalInvested * 100) / 100,
+      coverage_amount: Math.round(ulCoverage),
+      expected_value: ulCalc.expectedValue,
+      return_percent: Math.round(ulCalc.returnPercent * 10) / 10,
+      is_active: true
+    });
+  }
+  
+  // --- PI1: Partners Investments за партньор 1 ---
+  // Формула: AB43 = AA43 * 1.96 * CZ4
+  // Формула: AE43 = (Z43 * 12 * AA43) + ((AC43 - AA43) * CZ13) * CZ4
+  if (priorities.includes('pension') || priorities.includes('reserve')) {
+    const strategy = analysisData.risk_profile || 'balanced';
+    const termYears = Math.min(Math.round(yearsToRetirementP1), 40);
+    
+    // Определяме месечна вноска
+    const suggestedMonthly = availableForInvestment_EUR * 0.3;
+    const monthlyPremium = Math.max(50, Math.min(suggestedMonthly, 400));
+    
+    // Еднократна вноска (ако има)
+    const oneTimeDeposit = Math.min(bgnToEur(analysisData.one_time_investment || 0), 5000);
+    
+    const piCalc = calculateULInvestment(monthlyPremium, termYears, strategy, oneTimeDeposit);
     
     products.push({
       product_type: 'pension_plan',
@@ -324,57 +372,148 @@ export const calculateFinancialPlan = (analysisData) => {
       beneficiary_name: `${analysisData.client_first_name} ${analysisData.client_last_name}`,
       strategy: strategy,
       term_years: termYears,
-      monthly_premium: Math.round(Math.max(50, monthlyPremium) * 100) / 100,
-      annual_premium: Math.round(Math.max(50, monthlyPremium) * 12 * 100) / 100,
+      monthly_premium: Math.round(monthlyPremium * 100) / 100,
+      annual_premium: Math.round(monthlyPremium * 12 * 100) / 100,
+      total_premium: Math.round(piCalc.totalInvested * 100) / 100,
+      coverage_amount: null,
+      expected_value: piCalc.expectedValue,
+      one_time_deposit: Math.round(oneTimeDeposit),
+      return_percent: Math.round(piCalc.returnPercent * 10) / 10,
+      is_active: termYears <= 30 // Активен само ако срокът е до 30 г
+    });
+  }
+  
+  // --- PI2: Partners Investments за партньор 2 ---
+  if (analysisData.include_partner && priorities.includes('pension')) {
+    const strategy = analysisData.risk_profile || 'balanced';
+    const termYears = Math.min(Math.round(yearsToRetirementP2), 40);
+    
+    const suggestedMonthly = availableForInvestment_EUR * 0.2;
+    const monthlyPremium = Math.max(50, Math.min(suggestedMonthly, 300));
+    
+    const piCalc = calculateULInvestment(monthlyPremium, termYears, strategy, 0);
+    
+    products.push({
+      product_type: 'pension_plan',
+      product_code: 'PI2',
+      provider: 'Partners Investments',
+      beneficiary: 'partner2',
+      beneficiary_name: `${analysisData.partner_first_name} ${analysisData.partner_last_name}`,
+      strategy: strategy,
+      term_years: termYears,
+      monthly_premium: Math.round(monthlyPremium * 100) / 100,
+      annual_premium: Math.round(monthlyPremium * 12 * 100) / 100,
       total_premium: Math.round(piCalc.totalInvested * 100) / 100,
       coverage_amount: null,
       expected_value: piCalc.expectedValue,
       return_percent: Math.round(piCalc.returnPercent * 10) / 10,
-      is_active: true
+      is_active: termYears <= 30
     });
   }
   
-  // --- Образователни планове за деца ---
+  // --- Образователни планове за деца (UL Education) ---
+  // Formula: M41 = VLOOKUP(N41, Дете1_стр2, col19) * 1.96 * EB16 * EE16
+  // Formula: L41 = R29 * N41 * 1.96 * EB16
   if (priorities.includes('children')) {
     childrenData.forEach(child => {
       const eduNeed = educationNeeds[`child${child.index}`];
-      if (eduNeed && eduNeed.totalNeed > 0 && child.yearsToEducation > 2) {
-        const monthlyPremium = calculateMonthlyPayment(
-          eduNeed.totalNeed,
-          child.yearsToEducation,
-          STRATEGY_RETURNS.balanced
-        );
+      if (eduNeed && child.yearsToEducation > 2 && child.yearsToEducation <= 18) {
+        // VLOOKUP от коефициентната таблица
+        const coefficient = vlookup(Math.round(child.yearsToEducation), EDUCATION_PLAN_COEFFICIENTS, false) || 0.7;
         
-        const eduCalc = calculateULInvestment(Math.max(25, monthlyPremium), child.yearsToEducation, 'balanced', 0);
+        // Месечна вноска според формулата
+        const basePremium = educationCostPerChild_EUR * coefficient / (child.yearsToEducation * 12);
+        const monthlyPremium = Math.max(25, basePremium);
+        
+        const eduCalc = calculateULInvestment(monthlyPremium, child.yearsToEducation, 'balanced', 0);
+        
+        // Целева сума
+        const targetAmount = eduCalc.expectedValue;
         
         products.push({
           product_type: 'education_plan',
           product_code: `EDU${child.index}`,
-          provider: 'MetLife UL',
+          provider: 'MetLife',
           beneficiary: `child${child.index}`,
           beneficiary_name: child.name,
           strategy: 'balanced',
           term_years: Math.round(child.yearsToEducation),
-          monthly_premium: Math.round(Math.max(25, monthlyPremium) * 100) / 100,
-          annual_premium: Math.round(Math.max(25, monthlyPremium) * 12 * 100) / 100,
+          monthly_premium: Math.round(monthlyPremium * 100) / 100,
+          annual_premium: Math.round(monthlyPremium * 12 * 100) / 100,
           total_premium: Math.round(eduCalc.totalInvested * 100) / 100,
           coverage_amount: null,
-          expected_value: eduCalc.expectedValue,
+          expected_value: Math.round(targetAmount),
           return_percent: Math.round(eduCalc.returnPercent * 10) / 10,
+          coefficient: coefficient,
           is_active: true
         });
       }
     });
   }
   
-  // --- MLC: Здравна застраховка ---
+  // --- MLC1: Критични заболявания за партньор 1 ---
+  // Formula: Y29 = MLC1.E17 * EE23
+  if (priorities.includes('income_protection')) {
+    const ageKey = Math.floor(partner1Age / 5) * 5;
+    const mlcMonthly = vlookup(ageKey, {
+      25: 24, 30: 24, 35: 26, 40: 30, 45: 38, 50: 50, 55: 68, 60: 95
+    }) || 30;
+    
+    const coverageAmount = Math.round(protectionNeedP1_EUR * 0.5); // 50% от нуждата
+    
+    products.push({
+      product_type: 'critical_illness',
+      product_code: 'MLC1',
+      provider: 'UNIQA',
+      beneficiary: 'partner1',
+      beneficiary_name: `${analysisData.client_first_name} ${analysisData.client_last_name}`,
+      strategy: null,
+      term_years: 1,
+      monthly_premium: mlcMonthly,
+      annual_premium: mlcMonthly * 12,
+      total_premium: mlcMonthly * 12,
+      coverage_amount: coverageAmount,
+      expected_value: null,
+      coverages: ['32 критични заболявания', 'Второ медицинско мнение', 'Телемедицина'],
+      is_active: true
+    });
+  }
+  
+  // --- MLC2: Критични заболявания за партньор 2 ---
+  if (analysisData.include_partner && priorities.includes('income_protection')) {
+    const ageKey = Math.floor(partner2Age / 5) * 5;
+    const mlcMonthly = vlookup(ageKey, {
+      25: 24, 30: 24, 35: 26, 40: 30, 45: 38, 50: 50, 55: 68, 60: 95
+    }) || 30;
+    
+    const coverageAmount = Math.round(protectionNeedP2_EUR * 0.5);
+    
+    products.push({
+      product_type: 'critical_illness',
+      product_code: 'MLC2',
+      provider: 'UNIQA',
+      beneficiary: 'partner2',
+      beneficiary_name: `${analysisData.partner_first_name} ${analysisData.partner_last_name}`,
+      strategy: null,
+      term_years: 1,
+      monthly_premium: mlcMonthly,
+      annual_premium: mlcMonthly * 12,
+      total_premium: mlcMonthly * 12,
+      coverage_amount: coverageAmount,
+      expected_value: null,
+      coverages: ['32 критични заболявания', 'Второ медицинско мнение', 'Телемедицина'],
+      is_active: true
+    });
+  }
+  
+  // --- UNIQA Здраве и Ценност (Международна здравна) ---
   if (analysisData.interest_in_better_savings || priorities.includes('income_protection')) {
     const ageKey = Math.floor(partner1Age / 5) * 5;
-    const healthRate = vlookup(ageKey, HEALTH_INSURANCE_RATES.uniqa_premium) || 30;
+    const healthRate = vlookup(ageKey, HEALTH_INSURANCE_RATES.uniqa_premium) || 35;
     
     products.push({
       product_type: 'health_insurance',
-      product_code: 'MLC1',
+      product_code: 'HEALTH1',
       provider: 'UNIQA',
       beneficiary: 'partner1',
       beneficiary_name: `${analysisData.client_first_name} ${analysisData.client_last_name}`,
@@ -384,6 +523,29 @@ export const calculateFinancialPlan = (analysisData) => {
       annual_premium: healthRate * 12,
       total_premium: healthRate * 12,
       coverage_amount: 2240000, // EUR годишен лимит
+      expected_value: null,
+      coverages: ['Европейско покритие', 'Болнично лечение', 'Амбулаторно лечение', 'Телемедицина'],
+      is_active: true
+    });
+  }
+  
+  // --- UNIQA Здраве и Ценност за партньор 2 ---
+  if (analysisData.include_partner && analysisData.interest_in_better_savings) {
+    const ageKey = Math.floor(partner2Age / 5) * 5;
+    const healthRate = vlookup(ageKey, HEALTH_INSURANCE_RATES.uniqa_premium) || 35;
+    
+    products.push({
+      product_type: 'health_insurance',
+      product_code: 'HEALTH2',
+      provider: 'UNIQA',
+      beneficiary: 'partner2',
+      beneficiary_name: `${analysisData.partner_first_name} ${analysisData.partner_last_name}`,
+      strategy: null,
+      term_years: 1,
+      monthly_premium: healthRate,
+      annual_premium: healthRate * 12,
+      total_premium: healthRate * 12,
+      coverage_amount: 2240000,
       expected_value: null,
       is_active: true
     });
@@ -408,14 +570,24 @@ export const calculateFinancialPlan = (analysisData) => {
   const variablePremium = totalMonthlyPremium - fixedPremium;
   
   // Данъчно облекчение
+  // Formula: Данъчна облага = 10% от вноската до max 2400 лв/год
   const pensionPremiums = activeProducts
-    .filter(p => p.product_type === 'pension_plan')
+    .filter(p => p.product_type === 'pension_plan' || p.product_code?.startsWith('UL'))
     .reduce((sum, p) => sum + (p.annual_premium || 0), 0);
   
   const taxBenefit = calculateTaxBenefit(
     eurToBgn(pensionPremiums),
     totalMonthlyIncome_BGN * 12
   );
+  
+  // Изчисляване на врeменна алокация (краткосрочни, средносрочни, дългосрочни)
+  const shortTermProducts = activeProducts.filter(p => p.term_years <= 5);
+  const mediumTermProducts = activeProducts.filter(p => p.term_years > 5 && p.term_years <= 15);
+  const longTermProducts = activeProducts.filter(p => p.term_years > 15);
+  
+  const shortTermPremium = shortTermProducts.reduce((s, p) => s + (p.monthly_premium || 0), 0);
+  const mediumTermPremium = mediumTermProducts.reduce((s, p) => s + (p.monthly_premium || 0), 0);
+  const longTermPremium = longTermProducts.reduce((s, p) => s + (p.monthly_premium || 0), 0);
   
   // ============================================================
   // 10. ВРЪЩАНЕ НА РЕЗУЛТАТ
@@ -479,7 +651,15 @@ export const calculateFinancialPlan = (analysisData) => {
     
     // Данъчно облекчение
     tax_benefit_annual_bgn: Math.round(taxBenefit.taxSaved),
-    tax_benefit_total_bgn: Math.round(taxBenefit.taxSaved * yearsToRetirementP1)
+    tax_benefit_total_bgn: Math.round(taxBenefit.taxSaved * yearsToRetirementP1),
+    
+    // Временна алокация
+    short_term_premium: Math.round(shortTermPremium * 100) / 100,
+    medium_term_premium: Math.round(mediumTermPremium * 100) / 100,
+    long_term_premium: Math.round(longTermPremium * 100) / 100,
+    short_term_percent: totalMonthlyPremium > 0 ? Math.round((shortTermPremium / totalMonthlyPremium) * 100) : 0,
+    medium_term_percent: totalMonthlyPremium > 0 ? Math.round((mediumTermPremium / totalMonthlyPremium) * 100) : 0,
+    long_term_percent: totalMonthlyPremium > 0 ? Math.round((longTermPremium / totalMonthlyPremium) * 100) : 0
   };
 };
 

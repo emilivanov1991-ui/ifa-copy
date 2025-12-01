@@ -32,10 +32,17 @@ export const PROVIDER_LOGOS = {
   'Булстрад': 'https://www.bulstrad.bg/images/bulstrad-logo.png',
   
   // Пенсионни фондове
+  'ОББ': 'https://www.ubb.bg/images/ubb-logo.png',
   'ОББ Пенсионно': 'https://www.ubb.bg/images/ubb-logo.png',
-  'ДСК-Родина': 'https://www.dskrodina.bg/images/logo.png',
-  'Съгласие': 'https://www.saglasie.bg/images/logo.png',
+  'Пенсионноосигурителен институт': 'https://www.poi.bg/images/logo.png',
+  'ЦКБ Сила': 'https://www.ckbsila.bg/images/logo.png',
   'Доверие': 'https://www.doverie.bg/images/logo.png',
+  'Съгласие': 'https://www.saglasie.bg/images/logo.png',
+  'ДСК-Родина': 'https://www.dskrodina.bg/images/logo.png',
+  'Бъдеще': 'https://www.badeshte.bg/images/logo.png',
+  'Топлина': 'https://www.toplina.bg/images/logo.png',
+  'ДаллБогг': 'https://www.dallbogg.bg/images/logo.png',
+  'DallBogg': 'https://www.dallbogg.bg/images/logo.png',
   
   // Инвестиционни компании
   'Partners Investments': 'https://www.partners.bg/images/logo.png',
@@ -46,7 +53,7 @@ export const PROVIDER_LOGOS = {
 export const PROVIDERS_BY_CATEGORY = {
   international: ['MetLife', 'Allianz', 'UNIQA', 'Generali', 'GRAWE'],
   bulgarian_insurance: ['ДЗИ', 'Армеец', 'Булинс', 'ЛЕВ ИНС', 'ЕВРОИНС', 'Булстрад', 'БАЕЗ'],
-  pension_funds: ['ОББ Пенсионно', 'ДСК-Родина', 'Съгласие', 'Доверие', 'Алианц'],
+  pension_funds: ['ОББ', 'Пенсионноосигурителен институт', 'ЦКБ Сила', 'Доверие', 'Съгласие', 'ДСК-Родина', 'Алианц', 'Бъдеще', 'Топлина', 'ДаллБогг'],
   investments: ['Partners Investments', 'Partners Group']
 };
 

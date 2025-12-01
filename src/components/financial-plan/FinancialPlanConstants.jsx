@@ -290,15 +290,42 @@ export const PENSION_PLAN_RATES = {
 
 // ============================================================
 // ТАРИФНИ ТАБЛИЦИ - CRITICAL ILLNESS (MLC)
+// UNIQA СЕЛЕКТ - Лечение на критични заболявания
 // ============================================================
 
+// План "Европа" - Застрахователни премии в EUR
+// Структура: { възрастова_група: { месечна, тримесечна, шестмесечна, годишна } }
+export const UNIQA_SELECT_EUROPA_RATES = {
+  '0-17':  { monthly: 6.6096, quarterly: 19.4412, semiannual: 38.5152, annual: 75.5208 },
+  '18-30': { monthly: 12.7908, quarterly: 37.6482, semiannual: 74.562, annual: 145.1864 },
+  '31-40': { monthly: 13.9842, quarterly: 41.1498, semiannual: 81.4776, annual: 159.7728 },
+  '41-45': { monthly: 16.8096, quarterly: 49.4598, semiannual: 97.9608, annual: 192.0864 },
+  '46-50': { monthly: 20.2044, quarterly: 60.0984, semiannual: 119.0288, annual: 233.376 },
+  '51-55': { monthly: 25.2042, quarterly: 74.1642, semiannual: 146.88, annual: 288.0072 },
+  '56-60': { monthly: 31.11, quarterly: 91.5552, semiannual: 181.3356, annual: 355.572 },
+  '61-65': { monthly: 38.148, quarterly: 112.2714, semiannual: 222.3468, annual: 435.8928 }
+};
+
+// План "Свят" - Застрахователни премии в EUR  
+// ВСИЧКИ СУМИ СА С ВКЛЮЧЕН 2% ДАНЪК, СУМАТА Е ФИНАЛНА
+export const UNIQA_SELECT_WORLD_RATES = {
+  '0-17':  { monthly: 13.2192, quarterly: 38.8926, semiannual: 77.0406, annual: 151.0416 },
+  '18-30': { monthly: 25.5816, quarterly: 75.2862, semiannual: 149.1138, annual: 292.3728 },
+  '31-40': { monthly: 27.9582, quarterly: 82.2884, semiannual: 162.9552, annual: 319.5456 },
+  '46-50': { monthly: 40.8408, quarterly: 120.1866, semiannual: 238.0476, annual: 466.752 },
+  '51-55': { monthly: 50.8982, quarterly: 148.3584, semiannual: 293.76, annual: 576.0144 },
+  '56-60': { monthly: 62.7096, quarterly: 184.5312, semiannual: 362.6712, annual: 711.144 },
+  '61-65': { monthly: 76.296, quarterly: 224.5326, semiannual: 444.6804, annual: 871.7856 }
+};
+
+// Legacy compatibility
 export const CRITICAL_ILLNESS_RATES = {
-  // Тарифа на 1000 EUR покритие по възраст
+  // Тарифа на 1000 EUR покритие по възраст (стара структура)
   male: {
-    25: 1.20, 30: 1.50, 35: 2.00, 40: 2.80, 45: 4.00, 50: 5.80, 55: 8.50, 60: 12.50
+    17: 6.61, 25: 12.79, 30: 12.79, 35: 13.98, 40: 13.98, 45: 16.81, 50: 20.20, 55: 25.20, 60: 31.11, 65: 38.15
   },
   female: {
-    25: 1.00, 30: 1.25, 35: 1.65, 40: 2.30, 45: 3.30, 50: 4.80, 55: 7.00, 60: 10.30
+    17: 6.61, 25: 12.79, 30: 12.79, 35: 13.98, 40: 13.98, 45: 16.81, 50: 20.20, 55: 25.20, 60: 31.11, 65: 38.15
   }
 };
 

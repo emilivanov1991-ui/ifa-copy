@@ -496,6 +496,184 @@ export const GENERALI_HEALTH_LINE_RATES = {
   }
 };
 
+// ============================================================
+// UNIQA ДОБРОВОЛНО ЗДРАВНО ОСИГУРЯВАНЕ
+// Всички суми са с включен 2% данък, финални
+// ============================================================
+
+// Здравен пакет "Извънболнично (амбулаторно) лечение"
+export const UNIQA_HEALTH_OUTPATIENT_RATES = {
+  // Индивидуални и семейни застраховки по възрастови групи
+  individual: {
+    '0-17':   { standard: { annual: 57.12, semiannual: 31.11, quarterly: 16.88 }, comfort: { annual: 72.42, semiannual: 39.44, quarterly: 21.40 }, premium: { annual: 170.54, semiannual: 92.89, quarterly: 50.39 }},
+    '18-30':  { standard: { annual: 80.58, semiannual: 43.89, quarterly: 23.81 }, comfort: { annual: 102.00, semiannual: 55.56, quarterly: 30.14 }, premium: { annual: 240.21, semiannual: 130.84, quarterly: 70.97 }},
+    '31-40':  { standard: { annual: 105.06, semiannual: 57.22, quarterly: 31.04 }, comfort: { annual: 133.11, semiannual: 72.50, quarterly: 39.33 }, premium: { annual: 313.45, semiannual: 170.74, quarterly: 92.62 }},
+    '41-50':  { standard: { annual: 129.13, semiannual: 70.33, quarterly: 38.15 }, comfort: { annual: 163.60, semiannual: 89.11, quarterly: 48.34 }, premium: { annual: 385.25, semiannual: 209.85, quarterly: 113.84 }},
+    '51-60':  { standard: { annual: 191.25, semiannual: 104.17, quarterly: 56.51 }, comfort: { annual: 242.28, semiannual: 131.97, quarterly: 71.59 }, premium: { annual: 570.56, semiannual: 310.77, quarterly: 168.57 }},
+    '61-70':  { standard: { annual: 268.26, semiannual: 146.12, quarterly: 79.26 }, comfort: { annual: 339.91, semiannual: 185.14, quarterly: 100.44 }, premium: { annual: 800.49, semiannual: 436.04, quarterly: 236.55 }}
+  },
+  // Групови застраховки
+  group: {
+    '0-17':   { standard: 45.70, comfort: 57.94, premium: 136.43 },
+    '18-30':  { standard: 64.46, comfort: 81.60, premium: 192.17 },
+    '31-40':  { standard: 84.05, comfort: 106.49, premium: 250.76 },
+    '41-50':  { standard: 103.30, comfort: 130.88, premium: 308.20 },
+    '51-60':  { standard: 153.00, comfort: 193.82, premium: 456.45 },
+    '61-70':  { standard: 214.61, comfort: 271.93, premium: 640.39 }
+  }
+};
+
+// Здравен пакет "Болнично лечение"
+export const UNIQA_HEALTH_HOSPITAL_RATES = {
+  individual: {
+    '0-17':   { standard: { annual: 53.00, semiannual: 28.87, quarterly: 15.66 }, comfort: { annual: 77.97, semiannual: 42.47, quarterly: 23.04 }, premium: { annual: 91.22, semiannual: 49.69, quarterly: 26.96 }},
+    '18-30':  { standard: { annual: 74.76, semiannual: 40.72, quarterly: 22.09 }, comfort: { annual: 109.96, semiannual: 59.90, quarterly: 32.49 }, premium: { annual: 128.65, semiannual: 70.08, quarterly: 38.01 }},
+    '31-40':  { standard: { annual: 88.26, semiannual: 48.07, quarterly: 26.08 }, comfort: { annual: 129.81, semiannual: 70.72, quarterly: 38.36 }, premium: { annual: 151.87, semiannual: 82.73, quarterly: 44.88 }},
+    '41-50':  { standard: { annual: 123.73, semiannual: 67.40, quarterly: 36.56 }, comfort: { annual: 182.02, semiannual: 99.15, quarterly: 53.79 }, premium: { annual: 212.96, semiannual: 116.00, quarterly: 62.93 }},
+    '51-60':  { standard: { annual: 225.16, semiannual: 122.65, quarterly: 66.54 }, comfort: { annual: 331.24, semiannual: 180.40, quarterly: 97.86 }, premium: { annual: 387.54, semiannual: 211.08, quarterly: 114.51 }},
+    '61-70':  { standard: { annual: 345.51, semiannual: 188.19, quarterly: 102.09 }, comfort: { annual: 508.26, semiannual: 276.89, quarterly: 150.19 }, premium: { annual: 594.61, semiannual: 323.94, quarterly: 175.71 }}
+  },
+  group: {
+    '0-17':   { standard: 42.40, comfort: 62.38, premium: 72.98 },
+    '18-30':  { standard: 59.81, comfort: 87.97, premium: 102.92 },
+    '31-40':  { standard: 70.61, comfort: 103.85, premium: 121.50 },
+    '41-50':  { standard: 98.98, comfort: 145.62, premium: 170.37 },
+    '51-60':  { standard: 180.13, comfort: 265.00, premium: 310.03 },
+    '61-70':  { standard: 276.41, comfort: 406.61, premium: 475.69 }
+  }
+};
+
+// Здравен пакет "Дентално лечение"
+export const UNIQA_HEALTH_DENTAL_RATES = {
+  individual: {
+    '0-17':   { standard: { annual: 22.24, semiannual: 12.12, quarterly: 6.57 }, comfort: { annual: 96.16, semiannual: 52.38, quarterly: 28.41 }, premium: { annual: 130.56, semiannual: 71.13, quarterly: 38.58 }},
+    '18-30':  { standard: { annual: 75.28, semiannual: 41.01, quarterly: 22.25 }, comfort: { annual: 110.72, semiannual: 60.31, quarterly: 32.71 }, premium: { annual: 150.34, semiannual: 81.90, quarterly: 44.43 }},
+    '31-40':  { standard: { annual: 83.33, semiannual: 45.39, quarterly: 24.62 }, comfort: { annual: 122.55, semiannual: 66.76, quarterly: 36.22 }, premium: { annual: 166.40, semiannual: 90.65, quarterly: 49.16 }},
+    '41-50':  { standard: { annual: 99.14, semiannual: 54.01, quarterly: 29.30 }, comfort: { annual: 145.80, semiannual: 79.42, quarterly: 43.09 }, premium: { annual: 198.00, semiannual: 107.86, quarterly: 58.51 }},
+    '51-60':  { standard: { annual: 127.30, semiannual: 69.34, quarterly: 37.62 }, comfort: { annual: 187.20, semiannual: 101.97, quarterly: 55.31 }, premium: { annual: 254.20, semiannual: 138.47, quarterly: 75.11 }},
+    '61-70':  { standard: { annual: 146.88, semiannual: 80.01, quarterly: 43.40 }, comfort: { annual: 216.00, semiannual: 117.66, quarterly: 63.83 }, premium: { annual: 293.28, semiannual: 159.76, quarterly: 86.67 }}
+  },
+  group: {
+    '0-17':   { standard: 17.79, comfort: 76.93, premium: 104.45 },
+    '18-30':  { standard: 60.22, comfort: 88.58, premium: 120.27 },
+    '31-40':  { standard: 66.66, comfort: 98.04, premium: 133.12 },
+    '41-50':  { standard: 79.31, comfort: 116.64, premium: 158.40 },
+    '51-60':  { standard: 101.84, comfort: 149.76, premium: 203.36 },
+    '61-70':  { standard: 117.50, comfort: 172.80, premium: 234.62 }
+  }
+};
+
+// Здравен пакет "Медицински средства"
+export const UNIQA_HEALTH_MEDICAL_SUPPLIES_RATES = {
+  individual: {
+    '0-17':   { standard: { annual: 56.30, semiannual: 30.67, quarterly: 16.64 }, comfort: { annual: 73.85, semiannual: 40.22, quarterly: 21.82 }, premium: { annual: 113.46, semiannual: 61.80, quarterly: 33.53 }},
+    '18-30':  { standard: { annual: 27.44, semiannual: 14.95, quarterly: 8.11 }, comfort: { annual: 36.00, semiannual: 19.61, quarterly: 10.64 }, premium: { annual: 55.33, semiannual: 30.14, quarterly: 16.35 }},
+    '31-40':  { standard: { annual: 50.18, semiannual: 27.33, quarterly: 14.83 }, comfort: { annual: 65.82, semiannual: 35.85, quarterly: 19.45 }, premium: { annual: 101.18, semiannual: 55.11, quarterly: 29.90 }},
+    '41-50':  { standard: { annual: 72.93, semiannual: 39.72, quarterly: 21.55 }, comfort: { annual: 95.66, semiannual: 52.10, quarterly: 28.26 }, premium: { annual: 147.02, semiannual: 80.09, quarterly: 43.44 }},
+    '51-60':  { standard: { annual: 123.32, semiannual: 67.17, quarterly: 36.44 }, comfort: { annual: 161.77, semiannual: 88.12, quarterly: 47.80 }, premium: { annual: 248.68, semiannual: 135.45, quarterly: 73.48 }},
+    '61-70':  { standard: { annual: 168.71, semiannual: 91.90, quarterly: 49.85 }, comfort: { annual: 221.27, semiannual: 120.52, quarterly: 65.38 }, premium: { annual: 340.14, semiannual: 185.26, quarterly: 100.50 }}
+  }
+};
+
+// Здравен пакет "Услуги свързани с битови и други допълнителни условия"
+export const UNIQA_HEALTH_AMENITIES_RATES = {
+  individual: {
+    '0-17':   { annual: 11.06, semiannual: 6.02, quarterly: 3.27 },
+    '18-30':  { annual: 7.80, semiannual: 4.25, quarterly: 2.31 },
+    '31-40':  { annual: 12.08, semiannual: 6.58, quarterly: 3.57 },
+    '41-50':  { annual: 16.99, semiannual: 9.26, quarterly: 5.02 },
+    '51-60':  { annual: 27.10, semiannual: 14.76, quarterly: 8.01 },
+    '61-70':  { annual: 39.27, semiannual: 21.39, quarterly: 11.60 }
+  }
+};
+
+// Здравен пакет "Профилактика"
+export const UNIQA_HEALTH_PREVENTION_RATES = {
+  individual: {
+    '0-17':   { standard: { annual: 18.77, semiannual: 10.22, quarterly: 5.55 }, comfort: { annual: 26.01, semiannual: 14.17, quarterly: 7.69 }},
+    '18-70':  { standard: { annual: 18.77, semiannual: 10.22, quarterly: 5.55 }, comfort: { annual: 26.01, semiannual: 14.17, quarterly: 7.69 }}
+  },
+  group: { standard: 15.02, comfort: 20.81 }
+};
+
+// Здравен пакет "Дневни пари за болничен престой"
+export const UNIQA_HEALTH_DAILY_BENEFIT_RATES = {
+  // Обезщетение 30 EUR/ден при болничен престой
+  eur30: {
+    '0-17':   { annual: 17.85, semiannual: 9.72, quarterly: 5.27 },
+    '18-30':  { annual: 19.99, semiannual: 10.89, quarterly: 5.91 },
+    '31-40':  { annual: 21.19, semiannual: 11.54, quarterly: 6.26 },
+    '41-50':  { annual: 22.93, semiannual: 12.49, quarterly: 6.78 },
+    '51-60':  { annual: 30.04, semiannual: 16.36, quarterly: 8.88 },
+    '61-70':  { annual: 44.46, semiannual: 24.22, quarterly: 13.14 }
+  }
+};
+
+// Здравен пакет "Обезщетение за операции"
+export const UNIQA_HEALTH_SURGERY_BENEFIT_RATES = {
+  // Лимит 1000 EUR
+  eur1000: { annual: 3.47 },
+  // Лимит 1500 EUR
+  eur1500: { annual: 7.65 }
+};
+
+// Здравен пакет "Второ медицинско мнение"
+export const UNIQA_HEALTH_SECOND_OPINION_RATES = {
+  individual: { annual: 7.80 },
+  group: { annual: 7.14 }
+};
+
+// Здравен пакет "Здравни услуги оказвани на бременни"
+export const UNIQA_HEALTH_PREGNANCY_RATES = {
+  // Секция "Проследяване на нормална бременност"
+  monitoring: {
+    '18-30': { annual: 120.36, semiannual: 65.56, quarterly: 35.57 },
+    '31-40': { annual: 133.26, semiannual: 72.59, quarterly: 39.38 },
+    '41-50': { annual: 158.51, semiannual: 86.35, quarterly: 46.84 }
+  },
+  // Секция "Раждане"
+  birth: {
+    '18-30': { annual: 143.82, semiannual: 78.33, quarterly: 42.49 },
+    '31-40': { annual: 159.22, semiannual: 86.73, quarterly: 47.05 },
+    '41-50': { annual: 189.45, semiannual: 103.20, quarterly: 55.98 }
+  }
+};
+
+// Правила за завишения и отстъпки
+export const UNIQA_HEALTH_RULES = {
+  // Завишения
+  surcharges: {
+    children_individual: 0.30,        // +30% за деца до 17г. с индивидуален договор
+    private_hospital: 0.50,           // +50% за частно здравно - болнично лечение
+    private_amenities: 0.50,          // +50% за частно здравно - битови условия
+    private_birth: 0.50,              // +50% за частно здравно - раждане
+    private_outpatient: 0.25,         // +25% за частно здравно - извънболнично
+    private_pregnancy_monitoring: 0.25, // +25% за частно здравно - проследяване бременност
+    private_medical_supplies: 0.25,   // +25% за частно здравно - медицински средства
+    private_dental: 0.15,             // +15% за частно здравно - дентално
+    high_risk: 1.00                   // до +100% за лица с повишен риск
+  },
+  // Отстъпки за брой пакети
+  package_discounts: {
+    3: 0.03,  // -3% при 3 пакета
+    4: 0.05,  // -5% при 4 пакета
+    5: 0.08   // -8% при 5+ пакета
+  },
+  // Отстъпки за групови застраховки
+  group_discounts: {
+    20: 0.05,   // до -5% при 20-50 лица
+    50: 0.10,   // до -10% при 50-100 лица
+    100: 0.15,  // до -15% при 100-200 лица
+    200: null   // запитване до Техническа дирекция
+  },
+  // Отстъпки при подновяване (ако ползван лимит < 50% от премия)
+  renewal_discounts: {
+    1: 0.05,  // до -5% след 1-ва година
+    2: 0.08,  // до -8% след 2-ра година
+    3: 0.12   // до -12% след 3-та+ година
+  }
+};
+
 // Legacy compatibility - стари тарифи по възраст
 export const HEALTH_INSURANCE_RATES = {
   // UNIQA Здраве и Ценност - месечна премия по възраст

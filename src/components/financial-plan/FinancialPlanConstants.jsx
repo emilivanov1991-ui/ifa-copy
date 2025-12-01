@@ -262,6 +262,14 @@ export const UL_FEES = {
   exit_fee_year_6_plus: 0.0
 };
 
+// MetLife Unit Linked - детайлни такси от Sheet7
+export const METLIFE_UL_FEES = {
+  policy_fee_annual: 15,          // €15/година Policy Fee
+  fixed_fee_monthly: 0,           // €0/месец Fixed Fee
+  variable_fee_percent: 1.75,     // 1.75% * Account Value
+  ph_irr: 0.0574890383883506      // ~5.75% вътрешна норма на възвръщаемост
+};
+
 // Очаквана доходност по стратегии (годишна)
 export const STRATEGY_RETURNS = {
   conservative: 0.03,   // 3%

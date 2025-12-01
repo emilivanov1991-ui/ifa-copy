@@ -4,9 +4,10 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Loader2, Printer, Download, ChevronLeft, ChevronRight, Save, CheckCircle } from 'lucide-react';
+import { Loader2, Printer, Download, ChevronLeft, ChevronRight, Save, CheckCircle, Sparkles } from 'lucide-react';
 import { calculateFinancialPlan } from './FinancialPlanCalculator';
 import FinancialPlanPDF, { CoverPage, FinancialPlanMainPage, IncomeProtectionPage, PortfolioStructurePage } from './FinancialPlanPDF';
+import AIProductRecommender from './AIProductRecommender';
 
 export default function FinancialPlanView({ analysisId, onPlanSaved }) {
   const [currentPage, setCurrentPage] = useState(0);
@@ -74,6 +75,8 @@ export default function FinancialPlanView({ analysisId, onPlanSaved }) {
     }
   };
 
+  const [activeTab, setActiveTab] = useState('plan');
+
   const pages = [
     { name: 'Заглавна страница', component: CoverPage },
     { name: 'Финансов план', component: FinancialPlanMainPage },
@@ -94,6 +97,27 @@ export default function FinancialPlanView({ analysisId, onPlanSaved }) {
 
   return (
     <div className="space-y-4">
+      {/* Main Tabs */}
+      <Tabs value={activeTab} onValueChange={setActiveTab}>
+        <TabsList className="grid w-full grid-cols-2">
+          <TabsTrigger value="plan" className="flex items-center gap-2">
+            <Download className="w-4 h-4" />
+            Финансов план
+          </TabsTrigger>
+          <TabsTrigger value="offers" className="flex items-center gap-2">
+            <Sparkles className="w-4 h-4" />
+            AI Продуктови оферти
+          </TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="offers" className="mt-4">
+          <AIProductRecommender 
+            analysisId={analysisId} 
+            plan={generatedPlan}
+          />
+        </TabsContent>
+
+        <TabsContent value="plan" className="mt-4 space-y-4">
       {/* Toolbar */}
       <div className="flex items-center justify-between bg-white p-4 rounded-lg shadow-sm border">
         <div className="flex items-center gap-2">
@@ -186,6 +210,8 @@ export default function FinancialPlanView({ analysisId, onPlanSaved }) {
           }
         }
       `}</style>
+        </TabsContent>
+      </Tabs>
     </div>
   );
 }

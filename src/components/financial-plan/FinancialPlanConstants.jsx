@@ -465,13 +465,45 @@ export const getBestCriticalIllnessRate = (age, preferProvider = null) => {
 // ТАРИФНИ ТАБЛИЦИ - HEALTH INSURANCE
 // ============================================================
 
+// GENERALI HEALTH LINE - Доброволно здравно осигуряване
+// Премии в BGN с включен 2% данък
+export const GENERALI_HEALTH_LINE_RATES = {
+  // За здравноосигурени лица (с НЗОК)
+  insured: {
+    basic: {
+      annual: 459.00,       // Еднократно
+      semiannual: 252.45,   // На 2 вноски
+      quarterly: 126.23     // На 4 вноски
+    },
+    plus: {
+      annual: 571.20,
+      semiannual: 314.16,
+      quarterly: 157.08
+    }
+  },
+  // За лица без здравна осигуровка (без НЗОК)
+  uninsured: {
+    basic: {
+      annual: 596.70,
+      semiannual: 327.93,
+      quarterly: 163.97
+    },
+    plus: {
+      annual: 828.24,
+      semiannual: 455.43,
+      quarterly: 227.72
+    }
+  }
+};
+
+// Legacy compatibility - стари тарифи по възраст
 export const HEALTH_INSURANCE_RATES = {
   // UNIQA Здраве и Ценност - месечна премия по възраст
   uniqa_premium: {
     0: 35, 5: 32, 10: 30, 15: 28, 20: 26, 25: 28, 30: 32, 
     35: 38, 40: 48, 45: 62, 50: 82, 55: 110, 60: 150, 65: 200
   },
-  // Generali Health Line
+  // Generali Health Line (monthly approximation)
   generali_basic: {
     0: 25, 10: 22, 20: 20, 30: 24, 40: 35, 50: 55, 60: 90
   },

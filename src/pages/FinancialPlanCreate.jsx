@@ -8,7 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { Loader2, Search, FileText, User, Calendar, ArrowRight, CheckCircle } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { createPageUrl } from '../utils';
-import FinancialPlanGenerator from '../components/financial-plan/FinancialPlanGenerator';
+import FinancialPlanView from '../components/financial-plan/FinancialPlanView';
 
 export default function FinancialPlanCreate() {
   const [selectedAnalysisId, setSelectedAnalysisId] = useState(null);
@@ -93,9 +93,9 @@ export default function FinancialPlanCreate() {
             >
               ← Назад към списъка
             </Button>
-            <FinancialPlanGenerator 
+            <FinancialPlanView 
               analysisId={selectedAnalysisId}
-              onPlanGenerated={handlePlanGenerated}
+              onPlanSaved={handlePlanGenerated}
             />
           </div>
         ) : (

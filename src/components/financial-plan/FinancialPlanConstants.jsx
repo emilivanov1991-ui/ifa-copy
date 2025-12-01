@@ -862,64 +862,61 @@ export const calculateMetLifeCarePremium = (age, plan, coverages = {}) => {
 // Тарифи за индивидуална злополука - критични за Term Life
 // ============================================================
 
-// Рискови класове - тарифи на 1000 EUR покритие
+// Рискови класове - тарифи на 1000 EUR покритие (освен Hospital Cash - per 1 day)
 export const METLIFE_PA_RISK_CLASSES = {
   1: {
     name: 'I рисков клас',
-    accidentalDeath: 1.5,      // Смърт от злополука
-    ptd: 1.5,                   // Пълна трайна неработоспособност (Permanent Total Disability)
-    ppd: 1.2,                   // Частична трайна неработоспособност (Permanent Partial Disability)
-    medical: 3.5,               // Медицински разходи
-    funeral: 16                 // Погребални разходи
+    accidentalDeath: 1.5,       // 1. ACCIDENTAL DEATH Rate per 1000
+    pi: 1.5,                    // PI (=PTD+PPD) Rate per 1000
+    hospitalCash: 1.2,          // 5a. HOSPITAL CASH Rate per 1 day
+    surgical: 3.5,              // 6a. SURGICAL Rate per 100
+    fracturesAndBurns: 16       // 7a. FRACTURES AND BURNS Rate per 1000
   },
   2: {
     name: 'II рисков клас',
     accidentalDeath: 2.5,
-    ptd: 2.5,
-    ppd: 1.5,
-    medical: 4.0,
-    funeral: 20
+    pi: 2.5,
+    hospitalCash: 1.5,
+    surgical: 4.0,
+    fracturesAndBurns: 20
   },
   3: {
     name: 'III рисков клас',
     accidentalDeath: 4.0,
-    ptd: 4.0,
-    ppd: 1.8,
-    medical: 5.0,
-    funeral: 27
+    pi: 4.0,
+    hospitalCash: 1.8,
+    surgical: 5.0,
+    fracturesAndBurns: 27
   }
 };
 
-// Премийни класове - коефициенти за калкулация
-export const METLIFE_PA_PREMIUM_CLASSES = {
-  1: { name: 'I рисков клас', value1: 0.043799, value2: 0.12514, value3: 0.35 },
-  2: { name: 'II рисков клас', value1: 0.0525, value2: 0.15, value3: 0.35 },
-  3: { name: 'III рисков клас', value1: 0.07, value2: 0.20, value3: 0.35 }
+// Daily Cash Benefit тарифи по възраст
+export const METLIFE_PA_DAILY_CASH_RATES = {
+  '18-40': { dailyCashRate: 5.2, surgicalBenefitRate: 7 },
+  '41-50': { dailyCashRate: 5.8, surgicalBenefitRate: 14.5 },
+  '51-60': { dailyCashRate: 7.2, surgicalBenefitRate: 21.5 },
+  '61-65': { dailyCashRate: 7.2, surgicalBenefitRate: 21.5, commonRateProposed: 4.25, surgicalCommonRate: 8.52 }
 };
 
-// CPA (Critical Period Addition) - добавка по възраст
-// Използва се за изчисляване на допълнителна премия
-export const METLIFE_PA_CPA_RATES = {
-  18: 0.04, 19: 0.04, 20: 0.04, 21: 0.04, 22: 0.04, 23: 0.04, 24: 0.04, 25: 0.04,
-  26: 0.04, 27: 0.04, 28: 0.04, 29: 0.04, 30: 0.04,
-  31: 0.08, 32: 0.08, 33: 0.08, 34: 0.08, 35: 0.08,
-  36: 0.08, 37: 0.08, 38: 0.08, 39: 0.08, 40: 0.08,
-  41: 0.08, 42: 0.08, 43: 0.08, 44: 0.08, 45: 0.08,
-  46: 0.19, 47: 0.19, 48: 0.19, 49: 0.19, 50: 0.19,
-  51: 0.19, 52: 0.19, 53: 0.19, 54: 0.19, 55: 0.19,
-  56: 0.19, 57: 0.19, 58: 0.19, 59: 0.19
+// Помощна функция за Daily Cash Rate по възраст
+export const getDailyCashRateByAge = (age) => {
+  if (age <= 40) return METLIFE_PA_DAILY_CASH_RATES['18-40'];
+  if (age <= 50) return METLIFE_PA_DAILY_CASH_RATES['41-50'];
+  if (age <= 60) return METLIFE_PA_DAILY_CASH_RATES['51-60'];
+  return METLIFE_PA_DAILY_CASH_RATES['61-65'];
 };
 
-// Тарифи по възраст и срок (5 и 10 години) - rate per 1000 EUR
-export const METLIFE_PA_AGE_TERM_RATES = {
-  18: { yr5: 1.40, yr10: 1.85 },
-  19: { yr5: 1.40, yr10: 1.85 },
-  20: { yr5: 1.40, yr10: 1.85 },
-  21: { yr5: 1.40, yr10: 1.85 },
-  22: { yr5: 1.40, yr10: 1.85 },
-  23: { yr5: 1.40, yr10: 1.85 },
-  24: { yr5: 1.40, yr10: 1.85 },
-  25: { yr5: 1.40, yr10: 1.85 },
+// Critical Illness covering 32 diseases - тарифи по възрастова група и срок
+// Rate per 1000 EUR покритие
+export const METLIFE_PA_CRITICAL_ILLNESS_32_RATES = {
+  18: { yr5: 1.4, yr10: 1.85 },
+  19: { yr5: 1.4, yr10: 1.85 },
+  20: { yr5: 1.4, yr10: 1.85 },
+  21: { yr5: 1.4, yr10: 1.85 },
+  22: { yr5: 1.4, yr10: 1.85 },
+  23: { yr5: 1.4, yr10: 1.85 },
+  24: { yr5: 1.4, yr10: 1.85 },
+  25: { yr5: 1.4, yr10: 1.85 },
   26: { yr5: 2.35, yr10: 3.19 },
   27: { yr5: 2.35, yr10: 3.19 },
   28: { yr5: 2.35, yr10: 3.19 },
@@ -935,11 +932,11 @@ export const METLIFE_PA_AGE_TERM_RATES = {
   38: { yr5: 7.24, yr10: 9.57 },
   39: { yr5: 7.24, yr10: 9.57 },
   40: { yr5: 7.24, yr10: 9.57 },
-  41: { yr5: 12.31, yr10: 16.00 },
-  42: { yr5: 12.31, yr10: 16.00 },
-  43: { yr5: 12.31, yr10: 16.00 },
-  44: { yr5: 12.31, yr10: 16.00 },
-  45: { yr5: 12.31, yr10: 16.00 },
+  41: { yr5: 12.31, yr10: 16 },
+  42: { yr5: 12.31, yr10: 16 },
+  43: { yr5: 12.31, yr10: 16 },
+  44: { yr5: 12.31, yr10: 16 },
+  45: { yr5: 12.31, yr10: 16 },
   46: { yr5: 20.45, yr10: 25.47 },
   47: { yr5: 20.45, yr10: 25.47 },
   48: { yr5: 20.45, yr10: 25.47 },
@@ -950,39 +947,99 @@ export const METLIFE_PA_AGE_TERM_RATES = {
   53: { yr5: 31.79, yr10: 38.07 },
   54: { yr5: 31.79, yr10: 38.07 },
   55: { yr5: 31.79, yr10: 38.07 },
-  56: { yr5: 46.34, yr10: null },  // 10-годишен срок не е наличен над 55г
+  56: { yr5: 46.34, yr10: null },
   57: { yr5: 46.34, yr10: null },
   58: { yr5: 46.34, yr10: null },
   59: { yr5: 46.34, yr10: null },
   60: { yr5: 46.34, yr10: null }
 };
 
+// Child Coverages - детски покрития
+export const METLIFE_PA_CHILD_COVERAGES = {
+  permanentInvalidityAccident: { per: 1000, rate: 1.5 },
+  hospitalizationAccidentSickness: { per: 1, rate: 4.25 },  // daily benefit
+  hospitalizationAccidentOnly: { per: 1, rate: 1.2 },       // daily benefit
+  surgicalAccidentSickness: { per: 100, rate: 8.32 },
+  surgicalAccidentOnly: { per: 100, rate: 3.5 },
+  brokenBonesAndBurns: { per: 1000, rate: 33 }
+};
+
+// Откaз от премия - коефициенти по рисков клас
+export const METLIFE_PA_PREMIUM_WAIVER = {
+  1: { name: 'I рисков клас', coefficient: 0.043799, formula: '=B48/D48', factor: 0.35 },
+  2: { name: 'II рисков клас', coefficient: 0.0525, formula: '=B49/D49', factor: 0.35 },
+  3: { name: 'III рисков клас', coefficient: 0.07, formula: '=B50/D50', factor: 0.35 }
+};
+
+// CPA (Critical Period Addition) - добавка по възраст
+export const METLIFE_PA_CPA_RATES = {
+  18: 0.04, 19: 0.04, 20: 0.04, 21: 0.04, 22: 0.04, 23: 0.04, 24: 0.04, 25: 0.04,
+  26: 0.04, 27: 0.04, 28: 0.04, 29: 0.04, 30: 0.04,
+  31: 0.08, 32: 0.08, 33: 0.08, 34: 0.08, 35: 0.08,
+  36: 0.08, 37: 0.08, 38: 0.08, 39: 0.08, 40: 0.08,
+  41: 0.08, 42: 0.08, 43: 0.08, 44: 0.08, 45: 0.08,
+  46: 0.19, 47: 0.19, 48: 0.19, 49: 0.19, 50: 0.19,
+  51: 0.19, 52: 0.19, 53: 0.19, 54: 0.19, 55: 0.19,
+  56: 0.19, 57: 0.19, 58: 0.19, 59: 0.19
+};
+
+// Сигурност+ коефициенти по възраст (от колона R на 4-тия скрийншот)
+// Формула: Коефициент за изчисляване на очаквана стойност
+export const METLIFE_PA_SECURITY_PLUS_COEFFICIENTS = {
+  18: 225.73363431512, 19: 218.87883074358, 20: 212.31422505308, 21: 206.18556703131,
+  22: 200.40086940331, 23: 194.95252915858, 24: 188.67924528302, 25: 182.81535644910,
+  26: 177.30446546194, 27: 173.23287671233, 28: 165.83747927032, 29: 160.25641025641,
+  30: 154.79876100700, 31: 149.46043165468, 32: 143.88489208633, 33: 138.50445513246,
+  34: 133.33333333333, 35: 128.04097311139, 36: 122.85012285012, 37: 117.50881316098,
+  38: 107.52688172043, 39: 102.66884045171, 40: 101.94192440845, 41: 97.34392640851,
+  42: 88.96709715302, 43: 84.74572737156, 44: 76.86390508707, 45: 73.20644112863,
+  46: 66.35700066357, 47: 63.01482594684, 48: 60.08541113531, 49: 56.35000066357,
+  50: 53.01482594684, 51: 49.32051282051, 52: 48.53213178131, 53: 44.20054200542,
+  54: 42.00542005420, 55: 40.08068170553, 56: 38.51737369943, 57: 37.14353006943,
+  58: 36.07508670520, 59: 36.53635367193, 60: 35.36807050836, 61: 36.07508673054,
+  62: 34.94600078316, 63: 33.26670973836, 64: 31.17200682543
+};
+
 // Помощна функция за изчисляване на MetLife PA премия
-export const calculateMetLifePAPremium = (age, coverageAmount, termYears, riskClass = 1) => {
-  const ageRates = METLIFE_PA_AGE_TERM_RATES[age] || METLIFE_PA_AGE_TERM_RATES[60];
+export const calculateMetLifePAPremium = (age, coverageAmount, termYears, riskClass = 1, options = {}) => {
+  const ciRates = METLIFE_PA_CRITICAL_ILLNESS_32_RATES[age] || METLIFE_PA_CRITICAL_ILLNESS_32_RATES[60];
   const riskClassData = METLIFE_PA_RISK_CLASSES[riskClass] || METLIFE_PA_RISK_CLASSES[1];
   const cpaRate = METLIFE_PA_CPA_RATES[age] || METLIFE_PA_CPA_RATES[59];
+  const dailyCashData = getDailyCashRateByAge(age);
   
   // Избор на тарифа според срока
   let baseRate;
   if (termYears <= 5) {
-    baseRate = ageRates.yr5;
-  } else if (termYears <= 10 && ageRates.yr10) {
-    baseRate = ageRates.yr10;
+    baseRate = ciRates.yr5;
+  } else if (termYears <= 10 && ciRates.yr10) {
+    baseRate = ciRates.yr10;
   } else {
-    baseRate = ageRates.yr5; // Fallback за по-дълги срокове или липсващи данни
+    baseRate = ciRates.yr5;
   }
   
-  // Базова премия
-  const basePremium = (coverageAmount / 1000) * baseRate;
+  // Базова премия за Critical Illness
+  const ciPremium = (coverageAmount / 1000) * baseRate;
   
   // Добавка за рисков клас (смърт от злополука)
   const accidentalDeathPremium = (coverageAmount / 1000) * riskClassData.accidentalDeath;
   
-  // CPA добавка
-  const cpaPremium = coverageAmount * cpaRate;
+  // PI (PTD+PPD) премия
+  const piPremium = options.includePI ? (coverageAmount / 1000) * riskClassData.pi : 0;
   
-  const annualPremium = basePremium + accidentalDeathPremium;
+  // Hospital Cash премия
+  const hospitalCashPremium = options.hospitalCashDays ? 
+    options.hospitalCashDays * dailyCashData.dailyCashRate : 0;
+  
+  // Surgical премия
+  const surgicalPremium = options.surgicalAmount ? 
+    (options.surgicalAmount / 100) * dailyCashData.surgicalBenefitRate : 0;
+  
+  // Fractures and Burns премия
+  const fracturesPremium = options.fracturesAmount ? 
+    (options.fracturesAmount / 1000) * riskClassData.fracturesAndBurns : 0;
+  
+  const annualPremium = ciPremium + accidentalDeathPremium + piPremium + 
+                        hospitalCashPremium + surgicalPremium + fracturesPremium;
   
   return {
     annual: Math.round(annualPremium * 100) / 100,
@@ -991,9 +1048,12 @@ export const calculateMetLifePAPremium = (age, coverageAmount, termYears, riskCl
     riskClass: riskClassData.name,
     cpaRate,
     breakdown: {
-      base: Math.round(basePremium * 100) / 100,
+      criticalIllness: Math.round(ciPremium * 100) / 100,
       accidentalDeath: Math.round(accidentalDeathPremium * 100) / 100,
-      cpa: Math.round(cpaPremium * 100) / 100
+      pi: Math.round(piPremium * 100) / 100,
+      hospitalCash: Math.round(hospitalCashPremium * 100) / 100,
+      surgical: Math.round(surgicalPremium * 100) / 100,
+      fractures: Math.round(fracturesPremium * 100) / 100
     }
   };
 };

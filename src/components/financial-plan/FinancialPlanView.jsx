@@ -6,7 +6,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Loader2, Printer, Download, ChevronLeft, ChevronRight, Save, CheckCircle, Sparkles } from 'lucide-react';
 import { calculateFinancialPlan } from './FinancialPlanCalculator';
-import FinancialPlanPDF, { CoverPage, FinancialPlanMainPage, IncomeProtectionPage, PortfolioStructurePage } from './FinancialPlanPDF';
+import FinancialPlanPDF, { CoverPage, FinancialPlanMainPage, IncomeProtectionPage, PortfolioStructurePage, SummaryPage } from './FinancialPlanPDF';
 import AIProductRecommender from './AIProductRecommender';
 
 export default function FinancialPlanView({ analysisId, onPlanSaved }) {
@@ -82,6 +82,7 @@ export default function FinancialPlanView({ analysisId, onPlanSaved }) {
     { name: 'Финансов план', component: FinancialPlanMainPage },
     { name: 'Защита на дохода', component: IncomeProtectionPage },
     { name: 'Структура на портфейла', component: PortfolioStructurePage },
+    { name: 'Резюме', component: SummaryPage },
   ];
 
   if (loadingAnalysis || !generatedPlan) {

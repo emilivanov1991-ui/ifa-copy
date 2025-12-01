@@ -413,6 +413,139 @@ export function IncomeProtectionPage({ plan, analysis }) {
   );
 }
 
+// Summary Page - Резюме на финансовия план
+export function SummaryPage({ plan, analysis }) {
+  const totalMonthlyPremium = plan?.total_monthly_premium || 0;
+  const monthlyIncome = plan?.total_monthly_income || 0;
+  const redistributionPercent = monthlyIncome > 0 ? Math.round((totalMonthlyPremium / monthlyIncome) * 100) : 0;
+  
+  // Времева алокация
+  const shortTermPercent = plan?.short_term_percent || 0;
+  const mediumTermPercent = plan?.medium_term_percent || 0;
+  const longTermPercent = plan?.long_term_percent || 100;
+  
+  const shortTermAmount = plan?.short_term_premium || 0;
+  const mediumTermAmount = plan?.medium_term_premium || 0;
+  const longTermAmount = plan?.long_term_premium || totalMonthlyPremium;
+
+  // "Без финансов план" проблеми
+  const withoutPlanProblems = [
+    'Няма защита на дохода',
+    'Няма активи за бъдещето',
+    'Няма изградена стратегия',
+    'Няма подсигуряване при заболяване',
+    'Неоптимизиран ефект на спестяванията',
+    'Незащитени от инфлация средства',
+    'Няма изработена стратегия за пенсия',
+    'Няма изградена стратегия за децата'
+  ];
+
+  // "С финансов план" ползи
+  const withPlanBenefits = [
+    'Адекватна защита на дохода',
+    'Качествена защита при заболяване',
+    'Създаване на дългосрочни активи',
+    'Създаване на достойна пенсия',
+    'Подсигуряване на децата',
+    'Създаване на резерв',
+    'Създаване на инвестиции',
+    'Създаване на самочувствие'
+  ];
+
+  // Pie chart data
+  const pieData = [
+    { name: 'Дългосрочни', value: longTermPercent, amount: longTermAmount, color: '#991b1b' },
+    { name: 'Средносрочни', value: mediumTermPercent, amount: mediumTermAmount, color: '#dc2626' },
+    { name: 'Краткосрочни', value: shortTermPercent, amount: shortTermAmount, color: '#fca5a5' },
+  ].filter(d => d.value > 0);
+
+  return (
+    <div className="bg-white min-h-[1100px] p-8">
+      <h1 className="text-3xl font-bold text-blue-600 text-center mb-8">
+        РЕЗЮМЕ НА ВАШИЯ ФИНАНСОВ ПЛАН
+      </h1>
+
+      <div className="grid grid-cols-2 gap-12">
+        {/* Без финансов план */}
+        <div>
+          <h2 className="text-xl font-bold text-red-700 mb-4">БЕЗ ФИНАНСОВ ПЛАН</h2>
+          <div className="space-y-2">
+            {withoutPlanProblems.map((problem, i) => (
+              <div key={i} className="flex items-start gap-2">
+                <span className="text-red-600 font-bold">-</span>
+                <span className="text-slate-700">{problem}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* С финансов план */}
+        <div>
+          <h2 className="text-xl font-bold text-green-700 mb-4">С ФИНАНСОВ ПЛАН</h2>
+          
+          {/* Pie Chart - времева алокация */}
+          <div className="flex items-center gap-6 mb-6">
+            <div className="relative w-40 h-40">
+              <ResponsiveContainer width="100%" height="100%">
+                <PieChart>
+                  <Pie
+                    data={pieData}
+                    cx="50%"
+                    cy="50%"
+                    innerRadius={0}
+                    outerRadius={60}
+                    dataKey="value"
+                    labelLine={false}
+                  >
+                    {pieData.map((entry, index) => (
+                      <Cell key={`cell-${index}`} fill={entry.color} />
+                    ))}
+                  </Pie>
+                </PieChart>
+              </ResponsiveContainer>
+              {/* Center label */}
+              <div className="absolute inset-0 flex flex-col items-center justify-center">
+                <span className="text-lg font-bold text-slate-800">
+                  {totalMonthlyPremium.toLocaleString('bg-BG')} лв.
+                </span>
+                <span className="text-xs text-slate-500">100%</span>
+              </div>
+            </div>
+            
+            <div className="space-y-2 text-sm">
+              {pieData.map((item, i) => (
+                <div key={i} className="flex items-center gap-2">
+                  <div className="w-3 h-3 rounded" style={{ backgroundColor: item.color }}></div>
+                  <span className="text-slate-600">{item.name}</span>
+                  <span className="font-semibold">{item.amount.toLocaleString('bg-BG')} лв. ({item.value}%)</span>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Ползи */}
+          <div className="space-y-2">
+            {withPlanBenefits.map((benefit, i) => (
+              <div key={i} className="flex items-start gap-2">
+                <span className="text-green-600 font-bold">+</span>
+                <span className="text-slate-700">{benefit}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* Обобщение */}
+      <div className="mt-8 p-6 bg-blue-50 rounded-lg border border-blue-200">
+        <p className="text-lg text-blue-800">
+          Преразпределяме Вашите настоящи средства, така че <strong>{redistributionPercent}%</strong> от месечния Ви доход 
+          ({totalMonthlyPremium.toLocaleString('bg-BG')} лв.) работи за постигане на финансовите Ви цели.
+        </p>
+      </div>
+    </div>
+  );
+}
+
 // Portfolio Structure Page
 export function PortfolioStructurePage({ plan, analysis }) {
   const shortTermGoals = plan?.products?.filter(p => (p.term_years || 0) <= 5)
@@ -540,6 +673,8 @@ export default function FinancialPlanPDF({ plan, analysis, consultant }) {
       <IncomeProtectionPage plan={plan} analysis={analysis} />
       <div className="page-break"></div>
       <PortfolioStructurePage plan={plan} analysis={analysis} />
+      <div className="page-break"></div>
+      <SummaryPage plan={plan} analysis={analysis} />
       
       <style>{`
         @media print {

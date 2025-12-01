@@ -46,7 +46,32 @@ export const PROVIDER_LOGOS = {
   
   // Инвестиционни компании
   'Partners Investments': 'https://www.partners.bg/images/logo.png',
-  'Partners Group': 'https://www.partners.bg/images/logo.png'
+  'Partners Group': 'https://www.partners.bg/images/logo.png',
+  
+  // Банки
+  'Postbank': 'https://www.postbank.bg/images/logo.png',
+  'ЦКБ': 'https://www.ccbank.bg/images/logo.png',
+  'Централна Кооперативна Банка': 'https://www.ccbank.bg/images/logo.png',
+  'Fibank': 'https://www.fibank.bg/images/logo.png',
+  'Първа Инвестиционна Банка': 'https://www.fibank.bg/images/logo.png',
+  'UniCredit Bulbank': 'https://www.unicreditbulbank.bg/images/logo.png',
+  'Банка ДСК': 'https://www.dskbank.bg/images/logo.png',
+  'DSK Bank': 'https://www.dskbank.bg/images/logo.png',
+  'Texim Bank': 'https://www.teximbank.bg/images/logo.png',
+  'Токуда Банк': 'https://www.tokudabank.bg/images/logo.png',
+  'Tokuda Bank': 'https://www.tokudabank.bg/images/logo.png',
+  'Общинска Банка': 'https://www.municipalbank.bg/images/logo.png',
+  'TBI Bank': 'https://www.tbibank.bg/images/logo.png',
+  'ProCredit Bank': 'https://www.procreditbank.bg/images/logo.png',
+  'BNP Paribas': 'https://www.bnpparibas.bg/images/logo.png',
+  'iBank': 'https://www.ibank.bg/images/logo.png',
+  'Ziraat Bank': 'https://www.ziraatbank.bg/images/logo.png',
+  'D Bank': 'https://www.dbank.bg/images/logo.png',
+  'International Asset Bank': 'https://www.iabank.bg/images/logo.png',
+  'Bulgarian American Credit Bank': 'https://www.bacb.bg/images/logo.png',
+  'BACB': 'https://www.bacb.bg/images/logo.png',
+  'Citibank': 'https://www.citibank.bg/images/logo.png',
+  'Citi': 'https://www.citibank.bg/images/logo.png'
 };
 
 // Списък на всички доставчици по категория
@@ -54,7 +79,8 @@ export const PROVIDERS_BY_CATEGORY = {
   international: ['MetLife', 'Allianz', 'UNIQA', 'Generali', 'GRAWE'],
   bulgarian_insurance: ['ДЗИ', 'Армеец', 'Булинс', 'ЛЕВ ИНС', 'ЕВРОИНС', 'Булстрад', 'БАЕЗ'],
   pension_funds: ['ОББ', 'Пенсионноосигурителен институт', 'ЦКБ Сила', 'Доверие', 'Съгласие', 'ДСК-Родина', 'Алианц', 'Бъдеще', 'Топлина', 'ДаллБогг'],
-  investments: ['Partners Investments', 'Partners Group']
+  investments: ['Partners Investments', 'Partners Group'],
+  banks: ['Postbank', 'ОББ', 'ЦКБ', 'Fibank', 'UniCredit Bulbank', 'Банка ДСК', 'Texim Bank', 'Токуда Банк', 'Общинска Банка', 'TBI Bank', 'ProCredit Bank', 'BNP Paribas', 'iBank', 'Ziraat Bank', 'D Bank', 'International Asset Bank', 'BACB', 'Citibank']
 };
 
 // Конвертиране дни в години

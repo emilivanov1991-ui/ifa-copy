@@ -892,10 +892,10 @@ export const METLIFE_PA_RISK_CLASSES = {
 
 // Daily Cash Benefit тарифи по възраст
 export const METLIFE_PA_DAILY_CASH_RATES = {
-  '18-40': { dailyCashRate: 5.2, surgicalBenefitRate: 7 },
+  '18-40': { dailyCashRate: 3.2, surgicalBenefitRate: 7, commonRateProposed: 4.25, surgicalCommonRate: 8.32 },
   '41-50': { dailyCashRate: 5.8, surgicalBenefitRate: 14.5 },
   '51-60': { dailyCashRate: 7.2, surgicalBenefitRate: 21.5 },
-  '61-65': { dailyCashRate: 7.2, surgicalBenefitRate: 21.5, commonRateProposed: 4.25, surgicalCommonRate: 8.52 }
+  '61-65': { dailyCashRate: 7.2, surgicalBenefitRate: 21.5 }
 };
 
 // Помощна функция за Daily Cash Rate по възраст

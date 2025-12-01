@@ -5,6 +5,51 @@
 // Валутен курс EUR/BGN
 export const EUR_BGN_RATE = 1.96;
 
+// ============================================================
+// ЛОГОТА НА ЗАСТРАХОВАТЕЛИ И ФИНАНСОВИ ПАРТНЬОРИ
+// ============================================================
+
+export const PROVIDER_LOGOS = {
+  // Международни застрахователи
+  'MetLife': 'https://upload.wikimedia.org/wikipedia/commons/thumb/6/66/MetLife_logo.svg/200px-MetLife_logo.svg.png',
+  'Allianz': 'https://upload.wikimedia.org/wikipedia/commons/thumb/4/44/Allianz_logo.svg/200px-Allianz_logo.svg.png',
+  'UNIQA': 'https://upload.wikimedia.org/wikipedia/commons/thumb/5/5e/UNIQA_Insurance_Group_logo.svg/200px-UNIQA_Insurance_Group_logo.svg.png',
+  'Generali': 'https://upload.wikimedia.org/wikipedia/commons/thumb/9/9a/Generali_logo.svg/200px-Generali_logo.svg.png',
+  'GRAWE': 'https://upload.wikimedia.org/wikipedia/commons/thumb/a/a4/Grawe_logo.svg/200px-Grawe_logo.svg.png',
+  
+  // Български застрахователи
+  'ДЗИ': 'https://www.dzi.bg/images/dzi-logo.png',
+  'Армеец': 'https://www.armeec.bg/images/logo.png',
+  'Булинс': 'https://bulins.bg/wp-content/uploads/2020/07/bulins-logo.png',
+  'ЛЕВ ИНС': 'https://www.lev-ins.com/images/logo.png',
+  'Бул Инс': 'https://www.bulins.bg/images/logo.png',
+  'ЕВРОИНС': 'https://www.euroins.bg/images/euroins-logo.png',
+  'EUROINS': 'https://www.euroins.bg/images/euroins-logo.png',
+  'Застраховане': 'https://www.zastrahovane.bg/images/logo.png',
+  'Bulgaria Insurance': 'https://www.bulgariainsurance.bg/images/logo.png',
+  'Asset Insurance': 'https://www.assetinsurance.bg/images/logo.png',
+  'БАЕЗ': 'https://www.baez.bg/images/logo.png',
+  'Булстрад': 'https://www.bulstrad.bg/images/bulstrad-logo.png',
+  
+  // Пенсионни фондове
+  'ОББ Пенсионно': 'https://www.ubb.bg/images/ubb-logo.png',
+  'ДСК-Родина': 'https://www.dskrodina.bg/images/logo.png',
+  'Съгласие': 'https://www.saglasie.bg/images/logo.png',
+  'Доверие': 'https://www.doverie.bg/images/logo.png',
+  
+  // Инвестиционни компании
+  'Partners Investments': 'https://www.partners.bg/images/logo.png',
+  'Partners Group': 'https://www.partners.bg/images/logo.png'
+};
+
+// Списък на всички доставчици по категория
+export const PROVIDERS_BY_CATEGORY = {
+  international: ['MetLife', 'Allianz', 'UNIQA', 'Generali', 'GRAWE'],
+  bulgarian_insurance: ['ДЗИ', 'Армеец', 'Булинс', 'ЛЕВ ИНС', 'ЕВРОИНС', 'Булстрад', 'БАЕЗ'],
+  pension_funds: ['ОББ Пенсионно', 'ДСК-Родина', 'Съгласие', 'Доверие', 'Алианц'],
+  investments: ['Partners Investments', 'Partners Group']
+};
+
 // Конвертиране дни в години
 export const DAYS_PER_YEAR = 365.25;
 

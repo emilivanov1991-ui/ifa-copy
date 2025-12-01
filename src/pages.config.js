@@ -9,6 +9,7 @@ import ConsultantPortal from './pages/ConsultantPortal';
 import Calculators from './pages/Calculators';
 import FinancialPlanner from './pages/FinancialPlanner';
 import AuxiliaryTools from './pages/AuxiliaryTools';
+import FinancialPlanCreate from './pages/FinancialPlanCreate';
 import __Layout from './Layout.jsx';
 
 
@@ -24,6 +25,7 @@ export const PAGES = {
     "Calculators": Calculators,
     "FinancialPlanner": FinancialPlanner,
     "AuxiliaryTools": AuxiliaryTools,
+    "FinancialPlanCreate": FinancialPlanCreate,
 }
 
 export const pagesConfig = {

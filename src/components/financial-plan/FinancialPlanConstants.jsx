@@ -731,6 +731,133 @@ export const HEALTH_INSURANCE_RATES = {
 };
 
 // ============================================================
+// METLIFE CARE - Здравна застраховка с лимити по план
+// ============================================================
+
+// Лимити по планове (в EUR)
+export const METLIFE_CARE_PLAN_LIMITS = {
+  bronze: {
+    name: 'Бронзов',
+    hospital: 10000,
+    surgery: 10000,
+    gp: 10000,
+    diagnostics: 10000,
+    dental: 5000
+  },
+  silver: {
+    name: 'Сребърен',
+    hospital: 25000,
+    surgery: 25000,
+    gp: 25000,
+    diagnostics: 25000,
+    dental: 12500
+  },
+  gold: {
+    name: 'Златен',
+    hospital: 50000,
+    surgery: 50000,
+    gp: 50000,
+    diagnostics: 50000,
+    dental: 25000
+  },
+  platinum: {
+    name: 'Платинен',
+    hospital: 100000,
+    surgery: 100000,
+    gp: 100000,
+    diagnostics: 100000,
+    dental: 50000
+  }
+};
+
+// Тарифи по възраст за различни покрития (rate per 1000 EUR)
+export const METLIFE_CARE_AGE_RATES = {
+  18: { disability: 2.82, ci40: 4.43, cancer: 3.84, inSitu: 4.55 },
+  19: { disability: 2.94, ci40: 4.57, cancer: 3.97, inSitu: 4.61 },
+  20: { disability: 2.94, ci40: 4.71, cancer: 4.09, inSitu: 4.70 },
+  21: { disability: 3.06, ci40: 4.85, cancer: 4.21, inSitu: 4.77 },
+  22: { disability: 3.06, ci40: 4.99, cancer: 4.33, inSitu: 4.87 },
+  23: { disability: 3.18, ci40: 5.14, cancer: 4.46, inSitu: 4.98 },
+  24: { disability: 3.18, ci40: 5.30, cancer: 4.60, inSitu: 5.09 },
+  25: { disability: 3.30, ci40: 5.47, cancer: 4.74, inSitu: 5.21 },
+  26: { disability: 3.30, ci40: 5.64, cancer: 4.90, inSitu: 5.34 },
+  27: { disability: 3.43, ci40: 5.84, cancer: 5.06, inSitu: 5.47 },
+  28: { disability: 3.55, ci40: 6.03, cancer: 5.23, inSitu: 5.63 },
+  29: { disability: 3.67, ci40: 6.24, cancer: 5.40, inSitu: 5.79 },
+  30: { disability: 3.79, ci40: 6.46, cancer: 5.59, inSitu: 5.95 },
+  31: { disability: 3.92, ci40: 6.70, cancer: 5.79, inSitu: 6.12 },
+  32: { disability: 4.04, ci40: 6.95, cancer: 6.01, inSitu: 6.30 },
+  33: { disability: 4.16, ci40: 7.22, cancer: 6.24, inSitu: 6.50 },
+  34: { disability: 4.41, ci40: 7.50, cancer: 6.49, inSitu: 6.72 },
+  35: { disability: 4.53, ci40: 7.81, cancer: 6.74, inSitu: 6.95 },
+  36: { disability: 4.77, ci40: 8.14, cancer: 7.04, inSitu: 7.18 },
+  37: { disability: 5.02, ci40: 8.51, cancer: 7.34, inSitu: 7.45 },
+  38: { disability: 5.26, ci40: 8.89, cancer: 7.67, inSitu: 7.74 },
+  39: { disability: 5.51, ci40: 9.30, cancer: 8.03, inSitu: 8.04 },
+  40: { disability: 5.75, ci40: 9.74, cancer: 8.41, inSitu: 8.35 },
+  41: { disability: 6.00, ci40: 10.21, cancer: 8.81, inSitu: 8.65 },
+  42: { disability: 6.24, ci40: 10.71, cancer: 9.23, inSitu: 8.96 },
+  43: { disability: 6.61, ci40: 11.24, cancer: 9.68, inSitu: 9.25 },
+  44: { disability: 6.98, ci40: 11.80, cancer: 10.17, inSitu: 9.55 },
+  45: { disability: 7.34, ci40: 12.39, cancer: 10.67, inSitu: 9.87 },
+  46: { disability: 7.71, ci40: 13.01, cancer: 11.20, inSitu: 10.24 },
+  47: { disability: 8.20, ci40: 13.66, cancer: 11.76, inSitu: 10.66 },
+  48: { disability: 8.57, ci40: 14.35, cancer: 12.34, inSitu: 11.11 },
+  49: { disability: 9.18, ci40: 15.07, cancer: 12.96, inSitu: 11.60 },
+  50: { disability: 9.67, ci40: 15.85, cancer: 13.62, inSitu: 12.15 },
+  51: { disability: 10.28, ci40: 16.65, cancer: 14.31, inSitu: 12.78 },
+  52: { disability: 10.89, ci40: 17.52, cancer: 15.06, inSitu: 13.44 },
+  53: { disability: 11.51, ci40: 18.45, cancer: 15.85, inSitu: 14.15 },
+  54: { disability: 12.12, ci40: 19.50, cancer: 16.73, inSitu: 14.90 },
+  55: { disability: 12.85, ci40: 20.69, cancer: 17.74, inSitu: 15.84 },
+  56: { disability: 13.71, ci40: 21.59, cancer: 18.53, inSitu: 16.71 },
+  57: { disability: 14.57, ci40: 22.77, cancer: 19.54, inSitu: 17.80 },
+  58: { disability: 15.67, ci40: 24.05, cancer: 20.59, inSitu: 19.01 },
+  59: { disability: 16.65, ci40: 25.57, cancer: 21.89, inSitu: 20.51 },
+  60: { disability: 18.12, ci40: 27.37, cancer: 23.43, inSitu: 22.31 },
+  61: { disability: 18.60, ci40: 27.72, cancer: 23.72, inSitu: 22.90 },
+  62: { disability: 19.34, ci40: 28.09, cancer: 24.03, inSitu: 23.48 },
+  63: { disability: 20.20, ci40: 28.62, cancer: 24.53, inSitu: 24.21 },
+  64: { disability: 21.42, ci40: 30.06, cancer: 25.70, inSitu: 25.52 },
+  65: { disability: 23.75, ci40: 32.08, cancer: 27.42, inSitu: 27.53 }
+};
+
+// Рискови класове за смърт от злополука (rate per 1000 EUR)
+export const METLIFE_CARE_RISK_CLASSES = {
+  1: { name: 'I рисков клас', accidentalDeathRate: 1.5 },
+  2: { name: 'II рисков клас', accidentalDeathRate: 2.5 },
+  3: { name: 'III рисков клас', accidentalDeathRate: 4.0 }
+};
+
+// Помощна функция за изчисляване на MetLife Care премия
+export const calculateMetLifeCarePremium = (age, plan, coverages = {}) => {
+  const ageRates = METLIFE_CARE_AGE_RATES[age] || METLIFE_CARE_AGE_RATES[65];
+  const planLimits = METLIFE_CARE_PLAN_LIMITS[plan] || METLIFE_CARE_PLAN_LIMITS.silver;
+  
+  let annualPremium = 0;
+  
+  // Изчисляване на премия по избрани покрития
+  if (coverages.disability) {
+    annualPremium += (coverages.disabilityAmount || 10000) / 1000 * ageRates.disability;
+  }
+  if (coverages.ci40) {
+    annualPremium += (coverages.ci40Amount || 10000) / 1000 * ageRates.ci40;
+  }
+  if (coverages.cancer) {
+    annualPremium += (coverages.cancerAmount || 10000) / 1000 * ageRates.cancer;
+  }
+  if (coverages.inSitu) {
+    annualPremium += (coverages.inSituAmount || 10000) / 1000 * ageRates.inSitu;
+  }
+  
+  return {
+    annual: Math.round(annualPremium * 100) / 100,
+    monthly: Math.round(annualPremium / 12 * 100) / 100,
+    planLimits
+  };
+};
+
+// ============================================================
 // МОДЕЛ КОЕФИЦИЕНТИ (CZ4, CZ13 от Excel)
 // ============================================================
 

@@ -858,6 +858,147 @@ export const calculateMetLifeCarePremium = (age, plan, coverages = {}) => {
 };
 
 // ============================================================
+// METLIFE INDIVIDUAL PERSONAL ACCIDENT (PA) RATES
+// Тарифи за индивидуална злополука - критични за Term Life
+// ============================================================
+
+// Рискови класове - тарифи на 1000 EUR покритие
+export const METLIFE_PA_RISK_CLASSES = {
+  1: {
+    name: 'I рисков клас',
+    accidentalDeath: 1.5,      // Смърт от злополука
+    ptd: 1.5,                   // Пълна трайна неработоспособност (Permanent Total Disability)
+    ppd: 1.2,                   // Частична трайна неработоспособност (Permanent Partial Disability)
+    medical: 3.5,               // Медицински разходи
+    funeral: 16                 // Погребални разходи
+  },
+  2: {
+    name: 'II рисков клас',
+    accidentalDeath: 2.5,
+    ptd: 2.5,
+    ppd: 1.5,
+    medical: 4.0,
+    funeral: 20
+  },
+  3: {
+    name: 'III рисков клас',
+    accidentalDeath: 4.0,
+    ptd: 4.0,
+    ppd: 1.8,
+    medical: 5.0,
+    funeral: 27
+  }
+};
+
+// Премийни класове - коефициенти за калкулация
+export const METLIFE_PA_PREMIUM_CLASSES = {
+  1: { name: 'I рисков клас', value1: 0.043799, value2: 0.12514, value3: 0.35 },
+  2: { name: 'II рисков клас', value1: 0.0525, value2: 0.15, value3: 0.35 },
+  3: { name: 'III рисков клас', value1: 0.07, value2: 0.20, value3: 0.35 }
+};
+
+// CPA (Critical Period Addition) - добавка по възраст
+// Използва се за изчисляване на допълнителна премия
+export const METLIFE_PA_CPA_RATES = {
+  18: 0.04, 19: 0.04, 20: 0.04, 21: 0.04, 22: 0.04, 23: 0.04, 24: 0.04, 25: 0.04,
+  26: 0.04, 27: 0.04, 28: 0.04, 29: 0.04, 30: 0.04,
+  31: 0.08, 32: 0.08, 33: 0.08, 34: 0.08, 35: 0.08,
+  36: 0.08, 37: 0.08, 38: 0.08, 39: 0.08, 40: 0.08,
+  41: 0.08, 42: 0.08, 43: 0.08, 44: 0.08, 45: 0.08,
+  46: 0.19, 47: 0.19, 48: 0.19, 49: 0.19, 50: 0.19,
+  51: 0.19, 52: 0.19, 53: 0.19, 54: 0.19, 55: 0.19,
+  56: 0.19, 57: 0.19, 58: 0.19, 59: 0.19
+};
+
+// Тарифи по възраст и срок (5 и 10 години) - rate per 1000 EUR
+export const METLIFE_PA_AGE_TERM_RATES = {
+  18: { yr5: 1.40, yr10: 1.85 },
+  19: { yr5: 1.40, yr10: 1.85 },
+  20: { yr5: 1.40, yr10: 1.85 },
+  21: { yr5: 1.40, yr10: 1.85 },
+  22: { yr5: 1.40, yr10: 1.85 },
+  23: { yr5: 1.40, yr10: 1.85 },
+  24: { yr5: 1.40, yr10: 1.85 },
+  25: { yr5: 1.40, yr10: 1.85 },
+  26: { yr5: 2.35, yr10: 3.19 },
+  27: { yr5: 2.35, yr10: 3.19 },
+  28: { yr5: 2.35, yr10: 3.19 },
+  29: { yr5: 2.35, yr10: 3.19 },
+  30: { yr5: 2.35, yr10: 3.19 },
+  31: { yr5: 4.63, yr10: 6.23 },
+  32: { yr5: 4.63, yr10: 6.23 },
+  33: { yr5: 4.63, yr10: 6.23 },
+  34: { yr5: 4.63, yr10: 6.23 },
+  35: { yr5: 4.63, yr10: 6.23 },
+  36: { yr5: 7.24, yr10: 9.57 },
+  37: { yr5: 7.24, yr10: 9.57 },
+  38: { yr5: 7.24, yr10: 9.57 },
+  39: { yr5: 7.24, yr10: 9.57 },
+  40: { yr5: 7.24, yr10: 9.57 },
+  41: { yr5: 12.31, yr10: 16.00 },
+  42: { yr5: 12.31, yr10: 16.00 },
+  43: { yr5: 12.31, yr10: 16.00 },
+  44: { yr5: 12.31, yr10: 16.00 },
+  45: { yr5: 12.31, yr10: 16.00 },
+  46: { yr5: 20.45, yr10: 25.47 },
+  47: { yr5: 20.45, yr10: 25.47 },
+  48: { yr5: 20.45, yr10: 25.47 },
+  49: { yr5: 20.45, yr10: 25.47 },
+  50: { yr5: 20.45, yr10: 25.47 },
+  51: { yr5: 31.79, yr10: 38.07 },
+  52: { yr5: 31.79, yr10: 38.07 },
+  53: { yr5: 31.79, yr10: 38.07 },
+  54: { yr5: 31.79, yr10: 38.07 },
+  55: { yr5: 31.79, yr10: 38.07 },
+  56: { yr5: 46.34, yr10: null },  // 10-годишен срок не е наличен над 55г
+  57: { yr5: 46.34, yr10: null },
+  58: { yr5: 46.34, yr10: null },
+  59: { yr5: 46.34, yr10: null },
+  60: { yr5: 46.34, yr10: null }
+};
+
+// Помощна функция за изчисляване на MetLife PA премия
+export const calculateMetLifePAPremium = (age, coverageAmount, termYears, riskClass = 1) => {
+  const ageRates = METLIFE_PA_AGE_TERM_RATES[age] || METLIFE_PA_AGE_TERM_RATES[60];
+  const riskClassData = METLIFE_PA_RISK_CLASSES[riskClass] || METLIFE_PA_RISK_CLASSES[1];
+  const cpaRate = METLIFE_PA_CPA_RATES[age] || METLIFE_PA_CPA_RATES[59];
+  
+  // Избор на тарифа според срока
+  let baseRate;
+  if (termYears <= 5) {
+    baseRate = ageRates.yr5;
+  } else if (termYears <= 10 && ageRates.yr10) {
+    baseRate = ageRates.yr10;
+  } else {
+    baseRate = ageRates.yr5; // Fallback за по-дълги срокове или липсващи данни
+  }
+  
+  // Базова премия
+  const basePremium = (coverageAmount / 1000) * baseRate;
+  
+  // Добавка за рисков клас (смърт от злополука)
+  const accidentalDeathPremium = (coverageAmount / 1000) * riskClassData.accidentalDeath;
+  
+  // CPA добавка
+  const cpaPremium = coverageAmount * cpaRate;
+  
+  const annualPremium = basePremium + accidentalDeathPremium;
+  
+  return {
+    annual: Math.round(annualPremium * 100) / 100,
+    monthly: Math.round(annualPremium / 12 * 100) / 100,
+    baseRate,
+    riskClass: riskClassData.name,
+    cpaRate,
+    breakdown: {
+      base: Math.round(basePremium * 100) / 100,
+      accidentalDeath: Math.round(accidentalDeathPremium * 100) / 100,
+      cpa: Math.round(cpaPremium * 100) / 100
+    }
+  };
+};
+
+// ============================================================
 // МОДЕЛ КОЕФИЦИЕНТИ (CZ4, CZ13 от Excel)
 // ============================================================
 

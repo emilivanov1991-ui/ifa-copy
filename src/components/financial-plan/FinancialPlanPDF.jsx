@@ -1,12 +1,16 @@
 import React from 'react';
 import { PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, ResponsiveContainer, Tooltip } from 'recharts';
 
+// Primary blue color
+const PRIMARY_COLOR = '#2563eb';
+const PRIMARY_DARK = '#1d4ed8';
+
 // Cover Page Component
 export function CoverPage({ plan, analysis, consultant }) {
   return (
     <div className="bg-white min-h-[1100px] p-8 relative">
       {/* Header Image with Text */}
-      <div className="bg-gradient-to-br from-[#8B1538] to-[#6B1028] rounded-lg p-12 mb-8 relative overflow-hidden">
+      <div className="bg-gradient-to-br from-blue-600 to-blue-800 rounded-lg p-12 mb-8 relative overflow-hidden">
         <div className="absolute inset-0 opacity-20">
           <div className="text-white/30 text-2xl font-bold leading-relaxed">
             <div className="ml-4">PENSION</div>
@@ -37,11 +41,11 @@ export function CoverPage({ plan, analysis, consultant }) {
         {/* Consultant */}
         <div>
           <p className="text-slate-500 text-sm mb-1">Финансов консултант</p>
-          <p className="text-[#8B1538] font-semibold text-lg">{consultant?.name || 'Консултант'}</p>
+          <p className="text-blue-600 font-semibold text-lg">{consultant?.name || 'Консултант'}</p>
           <p className="text-slate-600 text-sm">Личен Финансов Консултант</p>
           <div className="mt-3">
             <p className="text-slate-500 text-sm">КОНТАКТ</p>
-            <p className="text-[#8B1538] text-sm">{consultant?.email || 'consultant@pgbg.bg'}</p>
+            <p className="text-blue-600 text-sm">{consultant?.email || 'consultant@company.bg'}</p>
             <p className="text-slate-600 text-sm">{consultant?.phone || ''}</p>
           </div>
         </div>
@@ -49,12 +53,12 @@ export function CoverPage({ plan, analysis, consultant }) {
         {/* Client */}
         <div>
           <p className="text-slate-500 text-sm mb-1">Клиент</p>
-          <p className="text-[#8B1538] font-semibold text-lg">
+          <p className="text-blue-600 font-semibold text-lg">
             {analysis?.client_first_name} {analysis?.client_last_name}
           </p>
           <div className="mt-3">
             <p className="text-slate-500 text-sm">КОНТАКТ</p>
-            <p className="text-[#8B1538] text-sm">{analysis?.client_email}</p>
+            <p className="text-blue-600 text-sm">{analysis?.client_email}</p>
             <p className="text-slate-600 text-sm">{analysis?.client_phone}</p>
           </div>
         </div>
@@ -66,26 +70,18 @@ export function CoverPage({ plan, analysis, consultant }) {
         <p className="text-slate-700">{plan?.valid_until}</p>
       </div>
 
-      {/* Manager & Company Info */}
+      {/* Manager Info */}
       <div className="grid grid-cols-2 gap-8">
         <div>
           <p className="text-slate-500 text-sm mb-1">Пряк мениджър</p>
-          <p className="text-[#8B1538] font-semibold">Емил Иванов</p>
-          <p className="text-[#8B1538] text-sm">emil.ivanov@pgbg.bg</p>
-          <p className="text-slate-600 text-sm">0883 390 070</p>
+          <p className="text-blue-600 font-semibold">{consultant?.manager || 'Мениджър'}</p>
+          <p className="text-blue-600 text-sm">{consultant?.managerEmail || ''}</p>
+          <p className="text-slate-600 text-sm">{consultant?.managerPhone || ''}</p>
         </div>
         <div className="text-right">
-          <p className="text-[#8B1538] text-sm">info@pgbg.bg</p>
-          <p className="text-slate-600 text-sm">+359 2 907 2190</p>
-          <p className="text-[#8B1538] text-sm">https://partnersgroup.bg/</p>
-        </div>
-      </div>
-
-      {/* Logo */}
-      <div className="absolute bottom-8 left-8">
-        <div className="text-3xl font-bold">
-          <span className="text-[#8B1538]">P</span>
-          <span className="text-slate-400">ARTNERS</span>
+          <p className="text-blue-600 text-sm">{consultant?.companyEmail || 'info@company.bg'}</p>
+          <p className="text-slate-600 text-sm">{consultant?.companyPhone || ''}</p>
+          <p className="text-blue-600 text-sm">{consultant?.companyWebsite || ''}</p>
         </div>
       </div>
     </div>
@@ -114,11 +110,12 @@ export function FinancialPlanMainPage({ plan, analysis }) {
                       (analysis?.liability_consumer_loans || 0);
 
   const priorities = [
-    { num: 1, text: 'Увеличаване на резервите' },
-    { num: 2, text: 'Достойна пенсия' },
-    { num: 3, text: 'Защита на дохода' },
-    { num: 4, text: 'Други цели' },
-    { num: 5, text: 'Ново жилище' },
+    { num: 1, text: 'Защита на дохода' },
+    { num: 2, text: 'Увеличаване на резервите' },
+    { num: 3, text: 'Ново жилище' },
+    { num: 4, text: 'Създаване на активи и Защита на дохода' },
+    { num: 5, text: 'Достойна пенсия' },
+    { num: 6, text: 'Защита на собствеността' },
   ];
 
   const advantages = [
@@ -133,12 +130,12 @@ export function FinancialPlanMainPage({ plan, analysis }) {
 
   return (
     <div className="bg-white min-h-[1100px] p-8">
-      <h1 className="text-3xl font-bold text-[#8B1538] mb-6">ФИНАНСОВ ПЛАН</h1>
+      <h1 className="text-3xl font-bold text-blue-600 mb-6">ФИНАНСОВ ПЛАН</h1>
 
       <div className="grid grid-cols-2 gap-8">
         {/* Left Column - Monthly Deposit */}
         <div>
-          <h2 className="text-[#8B1538] font-semibold mb-4">Месечен депозит</h2>
+          <h2 className="text-blue-600 font-semibold mb-4">Месечен депозит</h2>
           
           <div className="space-y-2 mb-6">
             <div className="flex justify-end">
@@ -147,22 +144,22 @@ export function FinancialPlanMainPage({ plan, analysis }) {
               </span>
             </div>
             <div className="flex justify-between text-sm">
-              <span className="text-[#8B1538]">Фиксиран</span>
+              <span className="text-blue-600">Фиксиран</span>
               <span className="font-semibold">{fixedMonthly.toLocaleString('bg-BG')} лв.</span>
             </div>
             <div className="flex justify-between text-sm">
-              <span className="text-[#8B1538]">Променлив</span>
+              <span className="text-blue-600">Променлив</span>
               <span className="font-semibold">{variableMonthly.toLocaleString('bg-BG')} лв.</span>
             </div>
           </div>
 
           <div className="space-y-3 text-sm">
             <div>
-              <span className="text-[#8B1538]">Защита на собствеността</span>
+              <span className="text-blue-600">Защита на собствеността</span>
               <div className="font-semibold">{propertyProtection.toLocaleString('bg-BG')} лв.</div>
             </div>
             <div>
-              <span className="text-[#8B1538]">Защита на дохода</span>
+              <span className="text-blue-600">Защита на дохода</span>
               <div className="font-semibold">{incomeProtection.toLocaleString('bg-BG')} лв.</div>
             </div>
             <div>
@@ -181,7 +178,7 @@ export function FinancialPlanMainPage({ plan, analysis }) {
 
           <div className="mt-6 pt-4 border-t space-y-2 text-sm">
             <div className="flex justify-between">
-              <span className="text-[#8B1538]">Имущество</span>
+              <span className="text-blue-600">Имущество</span>
               <span className="font-semibold">{netWorth.toLocaleString('bg-BG')} лв.</span>
             </div>
             <div className="flex justify-between">
@@ -204,12 +201,12 @@ export function FinancialPlanMainPage({ plan, analysis }) {
               <div className="flex-1 bg-slate-300 rounded-t" style={{ height: '40%' }}>
                 <div className="text-xs text-center pt-2 text-slate-600">Създаване на резерв</div>
                 <div className="text-xs text-center text-slate-500">{variableMonthly.toLocaleString('bg-BG')} лв.</div>
-                <div className="absolute top-1/2 left-1/4 bg-[#8B1538] text-white text-xs px-2 py-1 rounded">0%</div>
+                <div className="absolute top-1/2 left-1/4 bg-blue-600 text-white text-xs px-2 py-1 rounded">0%</div>
               </div>
-              <div className="flex-1 bg-[#8B1538] rounded-t" style={{ height: '80%' }}>
+              <div className="flex-1 bg-blue-600 rounded-t" style={{ height: '80%' }}>
                 <div className="text-xs text-center pt-2 text-white">Създаване на активи и Защита на дохода</div>
                 <div className="text-xs text-center text-white">{fixedMonthly.toLocaleString('bg-BG')} лв.</div>
-                <div className="absolute top-4 right-4 bg-white text-[#8B1538] text-xs px-2 py-1 rounded font-bold">7-9%</div>
+                <div className="absolute top-4 right-4 bg-white text-blue-600 text-xs px-2 py-1 rounded font-bold">7-9%</div>
               </div>
             </div>
             <div className="flex justify-between mt-2 text-xs text-slate-500">
@@ -224,28 +221,28 @@ export function FinancialPlanMainPage({ plan, analysis }) {
       {/* Advantages & Priorities */}
       <div className="grid grid-cols-2 gap-8 mt-8">
         <div>
-          <h3 className="text-[#8B1538] font-bold mb-3">ПРЕДИМСТВА</h3>
+          <h3 className="text-blue-600 font-bold mb-3">ПРЕДИМСТВА</h3>
           <div className="space-y-2 text-sm">
             {advantages.map((adv, i) => (
               <p key={i}>
-                <span className="text-[#8B1538] font-semibold">{adv.title}</span>
+                <span className="text-blue-600 font-semibold">{adv.title}</span>
                 <span className="text-slate-600"> - {adv.desc}</span>
               </p>
             ))}
             <p className="mt-4">
-              <span className="text-[#8B1538] font-semibold">Данъчно облекчение</span>
+              <span className="text-blue-600 font-semibold">Данъчно облекчение</span>
               <span className="text-slate-600"> - спестяване от данъци за целия период </span>
-              <span className="font-bold text-[#8B1538]">{taxBenefit.toLocaleString('bg-BG')} лв.</span>
+              <span className="font-bold text-blue-600">{taxBenefit.toLocaleString('bg-BG')} лв.</span>
             </p>
           </div>
         </div>
 
         <div>
-          <h3 className="text-[#8B1538] font-bold mb-3">ПРИОРИТЕТИ</h3>
+          <h3 className="text-blue-600 font-bold mb-3">ПРИОРИТЕТИ</h3>
           <div className="space-y-2">
             {priorities.map((p) => (
               <div key={p.num} className="flex items-center gap-3">
-                <span className="w-6 h-6 rounded bg-[#8B1538] text-white text-sm flex items-center justify-center font-bold">
+                <span className="w-6 h-6 rounded bg-blue-600 text-white text-sm flex items-center justify-center font-bold">
                   {p.num}
                 </span>
                 <span className="text-slate-700 text-sm">{p.text}</span>
@@ -285,26 +282,26 @@ export function IncomeProtectionPage({ plan, analysis }) {
   const variableMonthly = (plan?.total_monthly_premium || 0) - fixedMonthly;
 
   const pieData = [
-    { name: 'Фиксирани', value: fixedMonthly, color: '#8B1538' },
+    { name: 'Фиксирани', value: fixedMonthly, color: '#2563eb' },
     { name: 'Променливи', value: variableMonthly, color: '#CBD5E1' },
   ];
 
   return (
     <div className="bg-white min-h-[1100px] p-8">
-      <h1 className="text-3xl font-bold text-[#8B1538] mb-6">ФИНАНСОВ ПЛАН</h1>
+      <h1 className="text-3xl font-bold text-blue-600 mb-6">ФИНАНСОВ ПЛАН</h1>
 
       <div className="grid grid-cols-2 gap-8">
         {/* Left - Income Protection */}
         <div>
           <div className="flex items-baseline gap-4 mb-4">
             <h2 className="text-xl font-bold text-slate-800">Трудов капитал:</h2>
-            <span className="text-2xl font-bold text-[#8B1538]">
+            <span className="text-2xl font-bold text-blue-600">
               {laborCapital.toLocaleString('bg-BG', { maximumFractionDigits: 0 })} лв.
             </span>
           </div>
           <p className="text-xs text-slate-500 mb-4">При прогнозен ръст на възнагражденията от 3% годишно</p>
           
-          <h3 className="text-[#8B1538] font-bold mb-3">Защита на дохода</h3>
+          <h3 className="text-blue-600 font-bold mb-3">Защита на дохода</h3>
           
           <table className="w-full text-sm">
             <thead>
@@ -317,7 +314,7 @@ export function IncomeProtectionPage({ plan, analysis }) {
             <tbody>
               {protectionItems.map((item, i) => (
                 <tr key={i} className="border-b border-slate-100">
-                  <td className="py-2 text-[#8B1538]">{item.name}</td>
+                  <td className="py-2 text-blue-600">{item.name}</td>
                   <td className="py-2 text-right">{item.current.toLocaleString('bg-BG')} лв.</td>
                   <td className="py-2 text-right">
                     {item.hasCheck ? '☑' : `${item.recommended.toLocaleString('bg-BG')} лв.`}
@@ -330,7 +327,7 @@ export function IncomeProtectionPage({ plan, analysis }) {
 
         {/* Right - Fund Allocation */}
         <div>
-          <h2 className="text-xl font-bold text-[#8B1538] mb-4">РАЗПРЕДЕЛЕНИЕ НА СРЕДСТВАТА</h2>
+          <h2 className="text-xl font-bold text-blue-600 mb-4">РАЗПРЕДЕЛЕНИЕ НА СРЕДСТВАТА</h2>
           
           <table className="w-full text-sm">
             <thead>
@@ -344,7 +341,7 @@ export function IncomeProtectionPage({ plan, analysis }) {
             <tbody>
               {fundAllocations.map((item, i) => (
                 <tr key={i} className="border-b border-slate-100">
-                  <td className="py-2 text-[#8B1538] font-medium">{item.goal}</td>
+                  <td className="py-2 text-blue-600 font-medium">{item.goal}</td>
                   <td className="py-2 text-right">{item.deposit.toLocaleString('bg-BG')} лв.</td>
                   <td className="py-2 text-right">{item.value.toLocaleString('bg-BG')} лв.</td>
                   <td className="py-2 text-right">{item.years}</td>
@@ -357,7 +354,7 @@ export function IncomeProtectionPage({ plan, analysis }) {
 
       {/* Time Allocation Section */}
       <div className="mt-8">
-        <h3 className="text-[#8B1538] font-bold mb-4">Времева алокация на средствата</h3>
+        <h3 className="text-blue-600 font-bold mb-4">Времева алокация на средствата</h3>
         
         <div className="grid grid-cols-2 gap-8">
           {/* Pie Chart */}
@@ -384,7 +381,7 @@ export function IncomeProtectionPage({ plan, analysis }) {
             </div>
             <div className="space-y-2 text-sm">
               <div className="flex items-center gap-2">
-                <div className="w-3 h-3 bg-[#8B1538]"></div>
+                <div className="w-3 h-3 bg-blue-600"></div>
                 <span>Дългосрочни</span>
               </div>
               <div className="flex items-center gap-2">
@@ -406,7 +403,7 @@ export function IncomeProtectionPage({ plan, analysis }) {
                 <YAxis tick={{ fontSize: 10 }} />
                 <Tooltip formatter={(v) => `${v.toLocaleString('bg-BG')} лв.`} />
                 <Bar dataKey="deposit" stackId="a" fill="#CBD5E1" name="Депозит" />
-                <Bar dataKey="value" stackId="a" fill="#8B1538" name="Стойност" />
+                <Bar dataKey="value" stackId="a" fill="#2563eb" name="Стойност" />
               </BarChart>
             </ResponsiveContainer>
           </div>
@@ -426,19 +423,19 @@ export function PortfolioStructurePage({ plan, analysis }) {
 
   return (
     <div className="bg-white min-h-[1100px] p-8">
-      <h1 className="text-3xl font-bold text-[#8B1538] mb-2">ФИНАНСОВ ПЛАН</h1>
-      <h2 className="text-xl font-bold text-[#8B1538] mb-6">СТРУКТУРА НА ПОРТФЕЙЛА</h2>
+      <h1 className="text-3xl font-bold text-blue-600 mb-2">ФИНАНСОВ ПЛАН</h1>
+      <h2 className="text-xl font-bold text-blue-600 mb-6">СТРУКТУРА НА ПОРТФЕЙЛА</h2>
 
       {/* Flow Diagram */}
       <div className="relative">
         {/* Left Side - Current State */}
         <div className="grid grid-cols-3 gap-4">
           <div className="space-y-4">
-            <div className="bg-slate-100 p-3 rounded border-l-4 border-[#8B1538]">
+            <div className="bg-slate-100 p-3 rounded border-l-4 border-blue-600">
               <p className="text-xs text-slate-500">Резерв</p>
               <p className="font-bold text-slate-800">{reserve.toLocaleString('bg-BG')} лв.</p>
             </div>
-            <div className="bg-slate-100 p-3 rounded border-l-4 border-[#8B1538]">
+            <div className="bg-slate-100 p-3 rounded border-l-4 border-blue-600">
               <p className="text-xs text-slate-500">Други цели</p>
               <p className="font-bold text-slate-800">{otherGoals.toLocaleString('bg-BG')} лв.</p>
             </div>
@@ -451,7 +448,7 @@ export function PortfolioStructurePage({ plan, analysis }) {
                   <span className="text-xs text-slate-600">СЕГА</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <div className="w-6 h-3 bg-[#8B1538] rounded"></div>
+                  <div className="w-6 h-3 bg-blue-600 rounded"></div>
                   <span className="text-xs text-slate-600">БЪДЕЩ</span>
                 </div>
               </div>
@@ -460,7 +457,7 @@ export function PortfolioStructurePage({ plan, analysis }) {
 
           {/* Center - Monthly Flow */}
           <div className="flex flex-col items-center justify-center">
-            <div className="bg-[#8B1538] text-white p-4 rounded-lg text-center mb-4">
+            <div className="bg-blue-600 text-white p-4 rounded-lg text-center mb-4">
               <p className="text-xs opacity-80">месечно</p>
               <p className="text-2xl font-bold">{monthlyDeposit.toLocaleString('bg-BG')} лв.</p>
               <p className="text-xs opacity-80">Ежемесечно спестяване</p>
@@ -479,7 +476,7 @@ export function PortfolioStructurePage({ plan, analysis }) {
             {plan?.products?.slice(0, 3).map((product, i) => (
               <div key={i} className="bg-white border border-slate-200 rounded-lg p-3 shadow-sm">
                 <div className="flex items-center gap-2 mb-2">
-                  <div className="w-8 h-8 bg-[#8B1538] rounded flex items-center justify-center">
+                  <div className="w-8 h-8 bg-blue-600 rounded flex items-center justify-center">
                     <span className="text-white text-xs font-bold">
                       {product.product_type === 'pension_plan' ? 'П' : 
                        product.product_type === 'ul_investment' ? 'И' : 'З'}
@@ -487,7 +484,7 @@ export function PortfolioStructurePage({ plan, analysis }) {
                   </div>
                   <div>
                     <p className="text-xs text-slate-500">Годишно</p>
-                    <p className="text-xs font-semibold text-[#8B1538]">
+                    <p className="text-xs font-semibold text-blue-600">
                       {analysis?.client_first_name}
                     </p>
                   </div>
@@ -496,7 +493,7 @@ export function PortfolioStructurePage({ plan, analysis }) {
                   {product.product_type === 'pension_plan' ? 'Достойна пенсия и Подсигуряване на дохода' :
                    product.product_type === 'ul_investment' ? 'Инвестиции' : 'Защита'}
                 </p>
-                <p className="font-bold text-[#8B1538]">
+                <p className="font-bold text-blue-600">
                   {(product.monthly_premium || 0).toLocaleString('bg-BG')} лв. на месец
                 </p>
                 <p className="text-xs text-slate-500">

@@ -84,7 +84,7 @@ export default function FinancialPlanView({ analysisId, onPlanSaved }) {
   if (loadingAnalysis || !generatedPlan) {
     return (
       <div className="flex items-center justify-center p-12">
-        <Loader2 className="w-8 h-8 animate-spin text-[#8B1538]" />
+        <Loader2 className="w-8 h-8 animate-spin text-blue-600" />
         <span className="ml-3 text-slate-600">Генериране на финансов план...</span>
       </div>
     );
@@ -124,7 +124,7 @@ export default function FinancialPlanView({ analysisId, onPlanSaved }) {
             Принтирай
           </Button>
           <Button 
-            className="bg-[#8B1538] hover:bg-[#6B1028]" 
+            className="bg-blue-600 hover:bg-blue-700" 
             size="sm"
             onClick={handleSave}
             disabled={savePlanMutation.isPending}
@@ -149,7 +149,7 @@ export default function FinancialPlanView({ analysisId, onPlanSaved }) {
             onClick={() => setCurrentPage(idx)}
             className={`px-4 py-2 rounded-lg text-sm whitespace-nowrap transition-colors ${
               currentPage === idx
-                ? 'bg-[#8B1538] text-white'
+                ? 'bg-blue-600 text-white'
                 : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
             }`}
           >

@@ -351,6 +351,62 @@ export const DZI_BEST_DOCTORS_SENIOR_GROUP_RATES = {
   '65-85': { annual: 576.06, semiannual: 287.13, quarterly: 143.616, monthly: 47.94 }
 };
 
+// ============================================================
+// ДЗИ ЗАКРИЛА - Бюджетна застраховка (ако няма средства за MetLife)
+// Използва се САМО ако клиентът няма възможност за по-добра застраховка
+// ============================================================
+
+export const DZI_ZAKRILA_PLANS = {
+  silver: {
+    name: 'Silver',
+    monthly_premium: 10,
+    coverages: {
+      death_accident: 20000,           // Смърт вследствие на злополука
+      death_traffic: 30000,            // Смърт вследствие на ПТП
+      disability_50_accident: 20000,   // Инвалидност над 50% от злополука
+      disability_50_traffic: 30000,    // Инвалидност над 50% от ПТП
+      temporary_disability: 2000,      // Временна неработоспособност (% от)
+      fractures_burns: 8000,           // Счупени кости и изгаряния (% от)
+      surgery_organs: 1000,            // Суми за оперативно лечение (% от)
+      hospital_daily: 10               // Дневни пари за болничен престой
+    }
+  },
+  gold: {
+    name: 'Gold',
+    monthly_premium: 15,
+    coverages: {
+      death_accident: 30000,
+      death_traffic: 50000,
+      disability_50_accident: 30000,
+      disability_50_traffic: 50000,
+      temporary_disability: 5000,
+      fractures_burns: 10000,
+      surgery_organs: 3000,
+      hospital_daily: 30
+    }
+  },
+  platinum: {
+    name: 'Platinum',
+    monthly_premium: 30,
+    coverages: {
+      death_accident: 50000,
+      death_traffic: 75000,
+      disability_50_accident: 50000,
+      disability_50_traffic: 75000,
+      temporary_disability: 10000,
+      fractures_burns: 20000,
+      surgery_organs: 10000,
+      hospital_daily: 100
+    }
+  }
+};
+
+// Помощна функция - препоръчва ДЗИ Закрила само ако няма бюджет за MetLife
+export const shouldRecommendDziZakrila = (availableBudget) => {
+  // Ако месечният бюджет е под 30 EUR, препоръчваме ДЗИ Закрила
+  return availableBudget < 30;
+};
+
 // Legacy compatibility
 export const CRITICAL_ILLNESS_RATES = {
   // Тарифа на 1000 EUR покритие по възраст (стара структура)

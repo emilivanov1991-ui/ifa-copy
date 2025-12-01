@@ -676,6 +676,190 @@ export const RESERVE_RULES = {
 };
 
 // ============================================================
+// ПЕНСИОНЕН ПЛАНЕР - КАЛКУЛАТОР ЗА ТЕГЛЕНЕ НА СРЕДСТВА
+// Retirement Withdrawal Calculator
+// ============================================================
+
+export const RETIREMENT_WITHDRAWAL_PARAMS = {
+  default_retirement_age: 65,           // Пенсионна възраст по подразбиране
+  life_expectancy: 85,                  // Очаквана продължителност на живота
+  post_retirement_return: 0.04,         // 4% годишна доходност след пенсия
+  inflation_rate: 0.02,                 // 2% годишна инфлация
+  withdrawal_frequency: 'monthly',      // Честота на теглене: 'monthly' или 'annually'
+  payment_timing: 'end'                 // 'beginning' или 'end' на периода
+};
+
+/**
+ * Изчислява план за теглене на пенсионни средства
+ * @param {number} retirementSum - Натрупана сума при пенсиониране
+ * @param {number} retirementAge - Възраст при пенсиониране
+ * @param {number} currentAge - Текуща възраст
+ * @param {number} desiredPension - Желана месечна пенсия (в днешни стойности)
+ * @param {number} statePension - Очаквана държавна пенсия
+ * @param {object} options - Допълнителни опции
+ * @returns {object} План за теглене с график и статистики
+ */
+export const calculateRetirementWithdrawalPlan = (
+  retirementSum,
+  retirementAge,
+  currentAge,
+  desiredPension,
+  statePension = 0,
+  options = {}
+) => {
+  const {
+    lifeExpectancy = RETIREMENT_WITHDRAWAL_PARAMS.life_expectancy,
+    postRetirementReturn = RETIREMENT_WITHDRAWAL_PARAMS.post_retirement_return,
+    inflationRate = RETIREMENT_WITHDRAWAL_PARAMS.inflation_rate,
+    frequency = RETIREMENT_WITHDRAWAL_PARAMS.withdrawal_frequency,
+    paymentTiming = RETIREMENT_WITHDRAWAL_PARAMS.payment_timing
+  } = options;
+
+  const yearsToRetirement = retirementAge - currentAge;
+  const periodsPerYear = frequency === 'monthly' ? 12 : 1;
+  const totalPeriods = (lifeExpectancy - retirementAge) * periodsPerYear;
+  
+  // Лихва за период
+  const ratePerPeriod = Math.pow(1 + postRetirementReturn, 1 / periodsPerYear) - 1;
+  // Инфлация за период (за корекция на тегленията)
+  const inflationPerPeriod = Math.pow(1 + inflationRate, 1 / periodsPerYear) - 1;
+  
+  // Нужна пенсия (над държавната) с корекция за инфлация до пенсиониране
+  const neededPension = desiredPension - statePension;
+  const inflationAdjustedPension = neededPension * Math.pow(1 + inflationRate, yearsToRetirement);
+  const initialWithdrawal = frequency === 'monthly' ? inflationAdjustedPension : inflationAdjustedPension * 12;
+  
+  // Генериране на график за теглене
+  const schedule = [];
+  let balance = retirementSum;
+  let currentWithdrawal = initialWithdrawal;
+  let totalWithdrawn = 0;
+  let totalInterest = 0;
+  let periodNumber = 0;
+  
+  // Първо теглене (ако е в началото на периода)
+  if (paymentTiming === 'beginning') {
+    const withdrawal = Math.min(currentWithdrawal, balance);
+    balance -= withdrawal;
+    totalWithdrawn += withdrawal;
+    
+    schedule.push({
+      period: 0,
+      age: retirementAge,
+      interest: 0,
+      withdrawal: withdrawal,
+      netChange: -withdrawal,
+      balance: balance
+    });
+  }
+  
+  // Последващи периоди
+  while (balance > 0 && periodNumber < totalPeriods) {
+    periodNumber++;
+    const age = retirementAge + periodNumber / periodsPerYear;
+    
+    // Натрупана лихва
+    const interest = Math.round(balance * ratePerPeriod * 100) / 100;
+    totalInterest += interest;
+    
+    // Коригирано теглене за инфлация
+    if (periodNumber > 1) {
+      currentWithdrawal = currentWithdrawal * (1 + inflationPerPeriod);
+    }
+    
+    // Теглене (не повече от наличния баланс + лихва)
+    const maxWithdrawal = balance + interest;
+    const withdrawal = Math.min(Math.round(currentWithdrawal * 100) / 100, maxWithdrawal);
+    
+    const netChange = interest - withdrawal;
+    balance = Math.max(0, Math.round((balance + netChange) * 100) / 100);
+    totalWithdrawn += withdrawal;
+    
+    schedule.push({
+      period: periodNumber,
+      age: Math.round(age * 100) / 100,
+      interest: interest,
+      withdrawal: withdrawal,
+      netChange: netChange,
+      balance: balance
+    });
+    
+    if (balance <= 0) break;
+  }
+  
+  const lastEntry = schedule[schedule.length - 1];
+  
+  return {
+    // Входни данни
+    inputs: {
+      retirementSum,
+      retirementAge,
+      currentAge,
+      desiredPension,
+      statePension,
+      yearsToRetirement
+    },
+    // Резултати
+    results: {
+      totalPeriods: schedule.length,
+      ageAtDepletion: lastEntry?.age || retirementAge,
+      yearsOfWithdrawals: (lastEntry?.age || retirementAge) - retirementAge,
+      initialWithdrawal: Math.round(initialWithdrawal),
+      lastWithdrawal: Math.round(lastEntry?.withdrawal || 0),
+      totalWithdrawn: Math.round(totalWithdrawn),
+      totalInterest: Math.round(totalInterest),
+      fundsLastUntilAge: lastEntry?.age || retirementAge,
+      willFundsLast: (lastEntry?.age || retirementAge) >= lifeExpectancy
+    },
+    // График (първите 20 + последните 5 записа за визуализация)
+    schedule: schedule,
+    // Годишен преглед (агрегиран по години)
+    yearlySchedule: aggregateToYearly(schedule, retirementAge, periodsPerYear)
+  };
+};
+
+// Помощна функция за агрегиране на месечни данни в годишни
+const aggregateToYearly = (schedule, startAge, periodsPerYear) => {
+  if (periodsPerYear === 1) return schedule;
+  
+  const yearly = [];
+  let currentYear = Math.floor(startAge);
+  let yearData = { interest: 0, withdrawal: 0 };
+  
+  for (const entry of schedule) {
+    const entryYear = Math.floor(entry.age);
+    
+    if (entryYear > currentYear && yearData.withdrawal > 0) {
+      yearly.push({
+        year: currentYear,
+        age: currentYear,
+        interest: Math.round(yearData.interest),
+        withdrawal: Math.round(yearData.withdrawal),
+        balance: entry.balance
+      });
+      yearData = { interest: 0, withdrawal: 0 };
+      currentYear = entryYear;
+    }
+    
+    yearData.interest += entry.interest;
+    yearData.withdrawal += entry.withdrawal;
+  }
+  
+  // Последна година
+  if (yearData.withdrawal > 0 && schedule.length > 0) {
+    yearly.push({
+      year: currentYear,
+      age: currentYear,
+      interest: Math.round(yearData.interest),
+      withdrawal: Math.round(yearData.withdrawal),
+      balance: schedule[schedule.length - 1].balance
+    });
+  }
+  
+  return yearly;
+};
+
+// ============================================================
 // ТАРИФНИ ТАБЛИЦИ - PENSION PLAN
 // ============================================================
 

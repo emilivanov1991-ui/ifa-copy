@@ -48,6 +48,13 @@ export const PROVIDER_LOGOS = {
   'Partners Investments': 'https://www.partners.bg/images/logo.png',
   'Partners Group': 'https://www.partners.bg/images/logo.png',
   
+  // Инвестиционни мениджъри и ETF доставчици
+  'iShares': 'https://upload.wikimedia.org/wikipedia/commons/thumb/5/5a/IShares_logo.svg/200px-IShares_logo.svg.png',
+  'BlackRock': 'https://upload.wikimedia.org/wikipedia/commons/thumb/5/5a/IShares_logo.svg/200px-IShares_logo.svg.png',
+  'LYXOR': 'https://upload.wikimedia.org/wikipedia/commons/thumb/8/8a/Lyxor_logo.svg/200px-Lyxor_logo.svg.png',
+  'Amundi': 'https://upload.wikimedia.org/wikipedia/commons/thumb/9/94/Amundi_logo.svg/200px-Amundi_logo.svg.png',
+  'Best Doctors': 'https://upload.wikimedia.org/wikipedia/commons/thumb/5/5a/Best_Doctors_logo.svg/200px-Best_Doctors_logo.svg.png',
+  
   // Банки
   'Postbank': 'https://www.postbank.bg/images/logo.png',
   'ЦКБ': 'https://www.ccbank.bg/images/logo.png',

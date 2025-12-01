@@ -424,6 +424,131 @@ export const STRATEGY_RETURNS = {
 };
 
 // ============================================================
+// PARTNERS INVESTMENTS - МИНИМАЛНИ ИЗИСКВАНИЯ
+// ============================================================
+
+// Минимални изисквания за регулярни инвестиции
+export const PARTNERS_INVESTMENTS_REGULAR_MIN = {
+  real_estate: {
+    strategy: 'Real Estate',
+    min_period_years: 7,
+    min_monthly_eur: 30,
+    min_total_eur: 2520  // 7 години * 12 месеца * 30 EUR
+  },
+  conservative: {
+    strategy: 'Conservative',
+    min_period_years: 5,
+    min_monthly_eur: 30,
+    min_total_eur: 1800  // 5 години * 12 месеца * 30 EUR
+  },
+  balanced: {
+    strategy: 'Balanced',
+    min_period_years: 7,
+    min_monthly_eur: 30,
+    min_total_eur: 2520  // 7 години * 12 месеца * 30 EUR
+  },
+  dynamic: {
+    strategy: 'Dynamic',
+    min_period_years: 10,
+    min_monthly_eur: 30,
+    min_total_eur: 3600  // 10 години * 12 месеца * 30 EUR
+  },
+  max_period_years: 30  // Максимален срок на инвестиция
+};
+
+// Минимални изисквания за еднократни инвестиции
+export const PARTNERS_INVESTMENTS_SINGLE_MIN = {
+  min_amount_eur: 5000,  // Минимум 5000 EUR за еднократна инвестиция
+  strategies: ['Conservative', 'Balanced', 'Dynamic', 'Real Estate']
+};
+
+// ============================================================
+// ФИНАНСОВ ПЛАН - СПИСЪК НА ПРОДУКТИТЕ И ПРИОРИТЕТИ
+// ============================================================
+
+// Видове продукти в плана
+export const FINANCIAL_PLAN_PRODUCTS = {
+  // Застрахователни продукти
+  insurance: [
+    { id: 'term_life', name: 'METLIFE Срочен Живот', provider: 'MetLife', coverages: ['Смърт', 'Смърт от злополука', 'Тежки заболявания (40)', 'Трайна загуба на работоспособност', 'Фрактури и изгаряния'] },
+    { id: 'critical_illness', name: 'UNIQA Здраве и ценност Европа', provider: 'UNIQA', coverages: ['Лечение на критични заболявания'] },
+    { id: 'ul_telemedicine', name: 'METLIFE UL Телемедицина', provider: 'MetLife', coverages: ['Телемедицина'] },
+    { id: 'health_supplementary', name: 'Допълнително Здравно', provider: 'Various', coverages: ['Допълнително здравно осигуряване'] },
+    { id: 'ul_child_protection', name: 'METLIFE UL Детска защита', provider: 'MetLife', coverages: ['Споразумение за защита на детето'] },
+    { id: 'best_doctors', name: 'Best Doctors', provider: 'ДЗИ/MetLife', coverages: ['Критични заболявания'] },
+    { id: 'uniqa_health', name: 'Уника Здр. и ценност', provider: 'UNIQA', coverages: ['Здравни пакети'] },
+    { id: 'dzi_zakrila', name: 'ДЗИ Закрила', provider: 'ДЗИ', coverages: ['Злополука'] },
+    { id: 'dzi_dinamik', name: 'ДЗИ Динамик', provider: 'ДЗИ', coverages: ['Злополука'] },
+    { id: 'mountain_abroad', name: 'Планинска/За Чужбина', provider: 'UNIQA/ДЗИ/Generali', coverages: ['Пътуване'] }
+  ],
+  
+  // Инвестиционни продукти
+  investment: [
+    { id: 'ul_investment', name: 'Unit Linked Инвестиция', provider: 'MetLife', type: 'regular' },
+    { id: 'partners_regular', name: 'Partners Investments Регулярна', provider: 'Partners Investments', type: 'regular' },
+    { id: 'partners_single', name: 'Partners Investments Еднократна', provider: 'Partners Investments', type: 'single' }
+  ],
+  
+  // Пенсионни продукти
+  pension: [
+    { id: 'pillar_2', name: 'Универсален Пенсионен Фонд', provider: 'Various', type: 'mandatory' },
+    { id: 'pillar_3', name: 'Доброволно Пенсионно Осигуряване', provider: 'Various', type: 'voluntary' }
+  ],
+  
+  // Имуществени застраховки
+  property: [
+    { id: 'apartment', name: 'Застраховка Апартамент', provider: 'Various', type: 'property' },
+    { id: 'car_liability', name: 'ГО на автомобил', provider: 'Various', type: 'car' },
+    { id: 'car_kasko', name: 'КАСКО на автомобил', provider: 'Various', type: 'car' },
+    { id: 'home', name: 'Застраховка за дома', provider: 'Various', type: 'property' }
+  ]
+};
+
+// Приоритети в плана
+export const FINANCIAL_PLAN_PRIORITIES = {
+  1: { name: 'Защита на дохода', description: 'Осигуряване на доход при загуба на работоспособност или смърт' },
+  2: { name: 'Увеличаване на резервите', description: 'Изграждане на финансов резерв за извънредни ситуации' },
+  3: { name: 'Ново жилище', description: 'Финансиране на покупка или подобрение на жилище' },
+  4: { name: 'Достойна пенсия', description: 'Осигуряване на доходи след пенсиониране' },
+  5: { name: 'Подсигуряване на децата', description: 'Образование и старт в живота на децата' },
+  6: { name: 'Защита на собствеността', description: 'Застраховка на имущество и активи' }
+};
+
+// Препоръчителна периодичност на плащане по доставчик
+export const PAYMENT_FREQUENCY_RECOMMENDATIONS = {
+  'MetLife': 'annual',      // Годишно
+  'UNIQA': 'annual',
+  'ДЗИ': 'annual',
+  'Generali': 'annual',
+  'Partners Investments': 'monthly'  // Месечно за инвестиции
+};
+
+// Лихвени проценти за различни типове заеми (за оптимизация)
+export const LOAN_INTEREST_RATES = {
+  mortgage: 0.022,           // 2.2% ипотечен кредит
+  mortgage_refinance: 0.022, // 2.2% рефинансиране ипотечен
+  consumer: 0.044,           // 4.4% потребителски кредит
+  consumer_refinance: 0.044, // 4.4% рефинансиране потребителски
+  credit_card: 0.127,        // 12.7% кредитни карти
+  leasing: 0.054,            // 5.4% лизинг
+  overdraft: 0.074,          // 7.4% овърдрафт
+  installment: 0.162         // 16.2% продукти на изплащане
+};
+
+// Данъчно облекчение параметри
+export const TAX_RELIEF = {
+  rate: 0.10,  // 10% данъчна ставка за облекчение
+  max_percent_income: 0.10,  // Макс 10% от дохода
+  max_amount_bgn: 2400  // Макс 2400 лв годишно (вече записано в PENSION_PLAN_RATES)
+};
+
+// Правила за резерв
+export const RESERVE_RULES = {
+  recommended_months: 6,  // Препоръчителни 6 месеца разходи
+  calculation_formula: 'monthly_expenses * desired_months'
+};
+
+// ============================================================
 // ТАРИФНИ ТАБЛИЦИ - PENSION PLAN
 // ============================================================
 

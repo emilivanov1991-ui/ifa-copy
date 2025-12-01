@@ -271,6 +271,150 @@ export const METLIFE_UL_FEES = {
   ph_irr: 0.0574890383883506      // ~5.75% вътрешна норма на възвръщаемост
 };
 
+// ============================================================
+// METLIFE UL - CAL! TAB ДАННИ
+// Таблици със смъртност, surrender charges, premium bonuses
+// ============================================================
+
+// Mortality Tables - Bulgarian 2008-2010 (qx per 1000)
+// Структура: възраст -> { male: qx, female: qx }
+export const METLIFE_MORTALITY_TABLES = {
+  male_weight: 0.8,    // Тегло за мъже в смесена смъртност
+  female_weight: 0.2,  // Тегло за жени в смесена смъртност
+  qx: {
+    0: { male: 10.4667, female: 8.3265 },
+    1: { male: 0.8631, female: 0.8105 },
+    2: { male: 0.2755, female: 0.4431 },
+    3: { male: 0.4692, female: 0.2624 },
+    4: { male: 0.3255, female: 0.1807 },
+    5: { male: 0.4914, female: 0.1928 },
+    10: { male: 0.1934, female: 0.2031 },
+    15: { male: 0.4320, female: 0.2681 },
+    20: { male: 0.9754, female: 0.3689 },
+    25: { male: 1.1798, female: 0.4777 },
+    30: { male: 1.2442, female: 0.6015 },
+    35: { male: 1.8178, female: 0.8255 },
+    40: { male: 3.1639, female: 1.2941 },
+    45: { male: 5.4322, female: 2.4594 },
+    50: { male: 9.2432, female: 3.4757 },
+    55: { male: 13.7477, female: 5.8224 },
+    60: { male: 21.6724, female: 7.7226 },
+    65: { male: 29.2752, female: 12.1736 }
+  }
+};
+
+// Surrender Charges по години (B3 секция от Cal!)
+export const METLIFE_UL_SURRENDER_CHARGES = {
+  regular_premium: {
+    1: 1.00,   // 100%
+    2: 1.00,
+    3: 0.60,
+    4: 0.50,
+    5: 0.40,
+    6: 0.30,
+    7: 0.20,
+    8: 0.10,
+    9: 0,
+    10: 0,
+    11: 0,
+    12: 0
+  },
+  single_premium: {
+    1: 0.05,   // 5%
+    2: 0.03,
+    3: 0.02,
+    4: 0,
+    5: 0,
+    6: 0,
+    7: 0,
+    8: 0,
+    9: 0,
+    10: 0,
+    11: 0,
+    12: 0
+  }
+};
+
+// Premium Bonus структура (B2 секция от Cal!)
+export const METLIFE_UL_PREMIUM_BONUS = {
+  regular_premium: [
+    { from: 0, to: 1200, bonus: 0 },
+    { from: 1200, to: 1800, bonus: 0.01 },
+    { from: 1800, to: 3000, bonus: 0.02 },
+    { from: 3000, to: 4200, bonus: 0.03 },
+    { from: 4200, to: Infinity, bonus: 0.04 }
+  ],
+  single_premium: [
+    { from: 0, to: 25000, bonus: 0 },
+    { from: 25000, to: 50000, bonus: 0.01 },
+    { from: 50000, to: 75000, bonus: 0.02 },
+    { from: 75000, to: 100000, bonus: 0.03 },
+    { from: 100000, to: Infinity, bonus: 0.04 }
+  ]
+};
+
+// AV % Charge based on premium level (B5 секция от Cal!)
+export const METLIFE_UL_AV_CHARGES = {
+  regular_premium: [
+    { from_monthly: 25, annual: 300, charge: 0.02 },
+    { from_monthly: 60, annual: 720, charge: 0.0175 },
+    { from_monthly: 80, annual: 960, charge: 0.015 },
+    { from_monthly: 100, annual: 1200, charge: 0.0125 },
+    { from_monthly: 125, annual: 1500, charge: 0.01 },
+    { from_monthly: 200, annual: 2400, charge: 0.0075 },
+    { from_monthly: 300, annual: 3600, charge: 0.005 },
+    { from_monthly: 400, annual: 4800, charge: 0.005 },
+    { from_monthly: 500, annual: 6000, charge: 0.005 }
+  ],
+  single_premium: [
+    { from: 5000, charge: 0.015 },
+    { from: 15000, charge: 0.0125 },
+    { from: 25000, charge: 0.01 },
+    { from: 50000, charge: 0.0075 },
+    { from: 100000, charge: 0.0075 }
+  ]
+};
+
+// Min Face Amount multiplier по възраст (B4 секция от Cal!)
+export const METLIFE_UL_FACE_AMOUNT_RULES = {
+  age_brackets: [
+    { from: 0, to: 17, min_multiplier: null, max_multiplier: null },
+    { from: 18, to: 25, min_multiplier: 10, max_multiplier: null },
+    { from: 26, to: 35, min_multiplier: 8, max_multiplier: null },
+    { from: 36, to: 45, min_multiplier: 6, max_multiplier: null },
+    { from: 46, to: 55, min_multiplier: 4, max_multiplier: null },
+    { from: 56, to: 65, min_multiplier: 2, max_multiplier: null }
+  ]
+};
+
+// Investible Premium коефициенти по години (B1 секция от Cal!)
+export const METLIFE_UL_INVESTIBLE_PREMIUM = {
+  regular_premium: {
+    year_1: 0.30,    // 100% - 70% = 30% investible
+    year_2: 0.60,    // 100% - 40% = 60% investible
+    year_3_plus: 1.00 // 100% investible
+  },
+  single_premium: {
+    all_years: 1.00   // 100% investible
+  }
+};
+
+// Fund Allocation стратегии (от Cal! горен десен ъгъл)
+export const METLIFE_UL_FUND_ALLOCATION = {
+  conservative: { globalBond: 0.60, globalStock: 0.30, emergingMarkets: 0.10, commodities: 0 },
+  balanced: { globalBond: 0.20, globalStock: 0.55, emergingMarkets: 0.25, commodities: 0 },
+  aggressive: { globalBond: 0.10, globalStock: 0.35, emergingMarkets: 0.55, commodities: 0 }
+};
+
+// Historical ETF returns (от Cal! долен ъгъл)
+export const METLIFE_UL_ETF_RETURNS = {
+  // Средни исторически доходности по фонд тип
+  globalBond: 0.0564,      // Citi G7 in Euro
+  globalStock: 0.0817,     // MSCI World NR Euro
+  emergingMarkets: 0.0477, // MSCI EM NR Euro (adjusted)
+  commodities: 0.0682      // Reuters/Jefferies in Euro
+};
+
 // Очаквана доходност по стратегии (годишна)
 export const STRATEGY_RETURNS = {
   conservative: 0.03,   // 3%

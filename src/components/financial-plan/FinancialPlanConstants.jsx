@@ -318,6 +318,39 @@ export const UNIQA_SELECT_WORLD_RATES = {
   '61-65': { monthly: 76.296, quarterly: 224.5326, semiannual: 444.6804, annual: 871.7856 }
 };
 
+// ============================================================
+// ДЗИ БЕСТ ДОКТОРС - Лечение на критични заболявания
+// Застрахователни премии в EUR (с включен 2% данък)
+// ============================================================
+
+// Премия за индивидуални и семейни застраховки (EUR)
+export const DZI_BEST_DOCTORS_INDIVIDUAL_RATES = {
+  '0-18':  { annual: 124.032, semiannual: 62.016, quarterly: 31.008, monthly: 10.404 },
+  '19-44': { annual: 251.124, semiannual: 125.562, quarterly: 62.832, monthly: 21.012 },
+  '45-49': { annual: 357.918, semiannual: 179.01, quarterly: 89.556, monthly: 29.886 },
+  '50-54': { annual: 411.672, semiannual: 205.836, quarterly: 102.918, monthly: 34.374 },
+  '55-64': { annual: 517.65, semiannual: 258.876, quarterly: 129.438, monthly: 43.146 }
+};
+
+// Премия за индивидуални (групови застраховки) (EUR)
+export const DZI_BEST_DOCTORS_GROUP_RATES = {
+  '0-18':  { annual: 114.138, semiannual: 57.12, quarterly: 28.56, monthly: 9.588 },
+  '19-44': { annual: 231.234, semiannual: 115.668, quarterly: 57.834, monthly: 19.326 },
+  '45-49': { annual: 329.562, semiannual: 164.832, quarterly: 82.416, monthly: 27.54 },
+  '50-54': { annual: 379.092, semiannual: 189.516, quarterly: 94.758, monthly: 31.62 },
+  '55-64': { annual: 485.826, semiannual: 238.374, quarterly: 119.238, monthly: 39.78 }
+};
+
+// Премия за индивидуални и семейни застраховки 65-85 (EUR)
+export const DZI_BEST_DOCTORS_SENIOR_INDIVIDUAL_RATES = {
+  '65-85': { annual: 674.78, semiannual: 311.016, quarterly: 155.958, monthly: 52.02 }
+};
+
+// Премия за групови застраховки 65-85 (EUR)
+export const DZI_BEST_DOCTORS_SENIOR_GROUP_RATES = {
+  '65-85': { annual: 576.06, semiannual: 287.13, quarterly: 143.616, monthly: 47.94 }
+};
+
 // Legacy compatibility
 export const CRITICAL_ILLNESS_RATES = {
   // Тарифа на 1000 EUR покритие по възраст (стара структура)
@@ -327,6 +360,49 @@ export const CRITICAL_ILLNESS_RATES = {
   female: {
     17: 6.61, 25: 12.79, 30: 12.79, 35: 13.98, 40: 13.98, 45: 16.81, 50: 20.20, 55: 25.20, 60: 31.11, 65: 38.15
   }
+};
+
+// Помощна функция за избор на по-изгодна оферта (UNIQA vs ДЗИ)
+// По подразбиране приоритизира UNIQA освен ако ДЗИ не е по-евтино
+export const getBestCriticalIllnessRate = (age, preferProvider = null) => {
+  // Определяме възрастова група за UNIQA
+  let uniqaGroup;
+  if (age <= 17) uniqaGroup = '0-17';
+  else if (age <= 30) uniqaGroup = '18-30';
+  else if (age <= 40) uniqaGroup = '31-40';
+  else if (age <= 45) uniqaGroup = '41-45';
+  else if (age <= 50) uniqaGroup = '46-50';
+  else if (age <= 55) uniqaGroup = '51-55';
+  else if (age <= 60) uniqaGroup = '56-60';
+  else uniqaGroup = '61-65';
+  
+  // Определяме възрастова група за ДЗИ
+  let dziGroup;
+  if (age <= 18) dziGroup = '0-18';
+  else if (age <= 44) dziGroup = '19-44';
+  else if (age <= 49) dziGroup = '45-49';
+  else if (age <= 54) dziGroup = '50-54';
+  else if (age <= 64) dziGroup = '55-64';
+  else dziGroup = '65-85';
+  
+  const uniqaRate = UNIQA_SELECT_EUROPA_RATES[uniqaGroup]?.monthly || 999;
+  const dziRate = age <= 64 
+    ? DZI_BEST_DOCTORS_INDIVIDUAL_RATES[dziGroup]?.monthly 
+    : DZI_BEST_DOCTORS_SENIOR_INDIVIDUAL_RATES[dziGroup]?.monthly || 999;
+  
+  // Ако има предпочитан доставчик
+  if (preferProvider === 'UNIQA') {
+    return { provider: 'UNIQA', rate: uniqaRate, plan: 'План Европа' };
+  }
+  if (preferProvider === 'DZI') {
+    return { provider: 'ДЗИ', rate: dziRate, plan: 'Бест Докторс' };
+  }
+  
+  // По подразбиране: UNIQA освен ако ДЗИ не е по-евтино
+  if (dziRate < uniqaRate) {
+    return { provider: 'ДЗИ', rate: dziRate, plan: 'Бест Докторс' };
+  }
+  return { provider: 'UNIQA', rate: uniqaRate, plan: 'План Европа' };
 };
 
 // ============================================================

@@ -140,6 +140,7 @@ export default function FinancialFlowStep({ data, onChange, showErrors }) {
     (data.expense_education || 0) + (data.expense_health || 0) + (data.expense_cosmetics || 0) +
     (data.expense_hobbies || 0) + (data.expense_electronics || 0) + (data.expense_taxes || 0);
 
+  const totalMonthlyInvestments = data.monthly_investments || 0;
   const totalExpenses = totalHousingExpenses + totalCarExpenses + totalVariableExpenses;
 
   const totalFinancialAssets = (data.asset_checking_account || 0) + (data.asset_long_term_savings || 0) +
@@ -343,6 +344,21 @@ export default function FinancialFlowStep({ data, onChange, showErrors }) {
         </div>
       </div>
 
+      {/* Monthly Investments */}
+      <div className="bg-slate-50 rounded-xl p-6">
+        <div className="flex items-center gap-2 mb-2">
+          <PiggyBank className="h-5 w-5 text-indigo-600" />
+          <h3 className="font-semibold text-slate-900">Месечни инвестиции (в €)</h3>
+        </div>
+        <p className="text-xs text-slate-500 mb-4">Средства, които ежемесечно биват насочвани към фондове, инвестиционни продукти, закупуване на акции от компании, злато, криптовалути и др.</p>
+        <div className="flex items-center justify-between gap-2" data-invalid={isFieldInvalid(data.monthly_investments) ? "true" : undefined}>
+          <Label className="text-sm">Месечна сума <span className="text-red-500">*</span></Label>
+          <Input type="number" min="0" value={data.monthly_investments ?? ''}
+            onChange={(e) => onChange('monthly_investments', e.target.value === '' ? '' : parseInt(e.target.value))} 
+            className={`rounded-lg w-28 ${isFieldInvalid(data.monthly_investments) ? 'border-red-500 bg-red-50' : ''}`} />
+        </div>
+      </div>
+
       {/* Assets */}
       <div className="bg-slate-50 rounded-xl p-6">
         <div className="flex items-center gap-2 mb-4">
@@ -537,6 +553,10 @@ export default function FinancialFlowStep({ data, onChange, showErrors }) {
               <span className="text-red-500">{totalExpenses.toLocaleString()} €</span>
             </div>
             <div className="flex justify-between">
+              <span className="text-slate-600">Месечни инвестиции:</span>
+              <span className="text-indigo-500">{totalMonthlyInvestments.toLocaleString()} €</span>
+            </div>
+            <div className="flex justify-between">
               <span className="text-slate-600">Разходи за заеми/кредити:</span>
               <span className="text-red-500">{totalLiabilitiesMonthly.toLocaleString()} €</span>
             </div>
@@ -546,7 +566,7 @@ export default function FinancialFlowStep({ data, onChange, showErrors }) {
             </div>
             <div className="flex justify-between">
               <span className="font-semibold">Общи разходи:</span>
-              <span className="font-semibold text-red-600">{(totalExpenses + totalLiabilitiesMonthly + totalInsurance).toLocaleString()} €</span>
+              <span className="font-semibold text-red-600">{(totalExpenses + totalMonthlyInvestments + totalLiabilitiesMonthly + totalInsurance).toLocaleString()} €</span>
             </div>
           </div>
           
@@ -580,11 +600,22 @@ export default function FinancialFlowStep({ data, onChange, showErrors }) {
             </span>
           </div>
         </div>
-        <div className="mt-4 pt-4 border-t border-blue-200 flex justify-between">
-          <span className="font-semibold">Месечен баланс:</span>
-          <span className={`font-bold text-lg ${(totalMonthlyIncome - totalExpenses - totalInsurance - totalLiabilitiesMonthly) >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-            {(totalMonthlyIncome - totalExpenses - totalInsurance - totalLiabilitiesMonthly).toLocaleString()} €
-          </span>
+        <div className="mt-4 pt-4 border-t border-blue-200 space-y-3">
+          <div className="flex justify-between">
+            <span className="font-semibold">Месечен баланс:</span>
+            <span className={`font-bold text-lg ${(totalMonthlyIncome - totalExpenses - totalMonthlyInvestments - totalInsurance - totalLiabilitiesMonthly) >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+              {(totalMonthlyIncome - totalExpenses - totalMonthlyInvestments - totalInsurance - totalLiabilitiesMonthly).toLocaleString()} €
+            </span>
+          </div>
+          <div>
+            <div className="flex justify-between">
+              <span className="font-semibold">Общо на финансов пазар:</span>
+              <span className="font-bold text-lg text-indigo-600">
+                {((totalMonthlyIncome - totalExpenses - totalMonthlyInvestments - totalInsurance - totalLiabilitiesMonthly) + totalLiabilitiesMonthly + totalInsurance + totalMonthlyInvestments).toLocaleString()} €
+              </span>
+            </div>
+            <p className="text-xs text-slate-500 mt-1">Спестявания и активни финансови продукти (Застраховки, инвестиции, кредити).</p>
+          </div>
         </div>
       </div>
     </div>

@@ -6,56 +6,67 @@ import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContai
 
 /**
  * Partners Investments - Инвестиционна оферта (PDF визуализация)
- * Базирана на Excel структура с проекция за развитие
+ * Поддържа както регуларни (месечни), така и еднократни инвестиции
  */
 export default function PartnersInvestmentsOfferPDF({ data, consultant }) {
   
   const projection = useMemo(() => {
     if (!data) return [];
 
-    const monthlyContribution = data.monthlyContribution || 0;
-    const annualContribution = monthlyContribution * 12;
-    const initialInvestment = data.initialInvestment || 0;
+    const isRegular = data.investmentType === 'regular'; // true за месечни, false за еднократни
+    const monthlyContribution = isRegular ? (data.monthlyContribution || 0) : 0;
+    const oneTimeInvestment = !isRegular ? (data.oneTimeInvestment || 0) : 0;
     const years = data.investmentHorizon || 30;
     const age = data.investorAge || 35;
-    const strategy = data.strategy || 'balanced';
 
-    // Доходности по сценарии (от ФИН. ПЛАН таб)
-    const returns = {
-      pessimistic: (data.pessimisticReturn || 0.03) / 12, // Песимистичен
-      realistic: (data.realisticReturn || 0.06) / 12,     // Реалистичен
-      optimistic: (data.optimisticReturn || 0.09) / 12    // Оптимистичен
-    };
+    // Доходности по сценарии
+    const pessimisticReturn = data.pessimisticReturn || 0.03; // 3%
+    const realisticReturn = data.realisticReturn || 0.06;     // 6%
+    const optimisticReturn = data.optimisticReturn || 0.09;   // 9%
 
     const yearlyProjection = [];
 
     for (let year = 1; year <= years; year++) {
       const currentAge = age + year;
-      const totalInvested = (annualContribution * year) + initialInvestment;
 
-      // Изчисляване на стойност по сценарии (компаундиране месечно)
-      const calculateValue = (monthlyReturn, yearNum) => {
-        let value = initialInvestment;
-        const months = yearNum * 12;
-        
-        for (let month = 1; month <= months; month++) {
-          value = value * (1 + monthlyReturn);
-          if (month % 12 === 0) { // Годишна вноска в края на годината
-            value += annualContribution;
+      // За регулярни инвестиции - натрупваме месечни вноски
+      if (isRegular) {
+        const annualContribution = monthlyContribution * 12;
+        const totalInvested = annualContribution * year;
+
+        // Изчисляване на FV с месечно компаундиране
+        const calculateFV = (monthlyRate, yearNum) => {
+          const months = yearNum * 12;
+          let value = 0;
+          
+          for (let month = 1; month <= months; month++) {
+            value = value * (1 + monthlyRate) + monthlyContribution;
           }
-        }
-        
-        return Math.round(value);
-      };
+          
+          return Math.round(value);
+        };
 
-      yearlyProjection.push({
-        year,
-        age: currentAge,
-        totalInvested,
-        pessimistic: calculateValue(returns.pessimistic, year),
-        realistic: calculateValue(returns.realistic, year),
-        optimistic: calculateValue(returns.optimistic, year)
-      });
+        yearlyProjection.push({
+          year,
+          age: currentAge,
+          totalInvested,
+          pessimistic: calculateFV(pessimisticReturn / 12, year),
+          realistic: calculateFV(realisticReturn / 12, year),
+          optimistic: calculateFV(optimisticReturn / 12, year)
+        });
+      } else {
+        // За еднократни инвестиции - просто компаундираме годишно
+        const totalInvested = oneTimeInvestment; // Еднократна сума не се променя
+
+        yearlyProjection.push({
+          year,
+          age: currentAge,
+          totalInvested,
+          pessimistic: Math.round(oneTimeInvestment * Math.pow(1 + pessimisticReturn, year)),
+          realistic: Math.round(oneTimeInvestment * Math.pow(1 + realisticReturn, year)),
+          optimistic: Math.round(oneTimeInvestment * Math.pow(1 + optimisticReturn, year))
+        });
+      }
     }
 
     return yearlyProjection;
@@ -72,6 +83,8 @@ export default function PartnersInvestmentsOfferPDF({ data, consultant }) {
   if (!data) {
     return <div className="p-8 text-center text-slate-500">Няма данни за оферта</div>;
   }
+
+  const isRegular = data.investmentType === 'regular';
 
   const strategyLabels = {
     'conservative': 'Консервативна',
@@ -135,22 +148,33 @@ export default function PartnersInvestmentsOfferPDF({ data, consultant }) {
           <div>
             <h3 className="font-semibold mb-3 text-slate-700">Основни характеристики</h3>
             <div className="space-y-2 text-sm">
-              <div className="flex justify-between">
-                <span>Месечна инвестиционна вноска</span>
-                <span className="font-semibold">{formatCurrency(data.monthlyContribution || 0)}</span>
-              </div>
-              <div className="flex justify-between">
-                <span>Годишна инвестиционна вноска</span>
-                <span className="font-semibold">{formatCurrency((data.monthlyContribution || 0) * 12)}</span>
-              </div>
-              <div className="flex justify-between">
-                <span>Инвестиционен хоризонт</span>
-                <span className="font-semibold">{data.investmentHorizon || 0} години</span>
-              </div>
-              <div className="flex justify-between">
-                <span>Целева сума</span>
-                <span className="font-semibold">{formatCurrency(data.targetValue || 0)}</span>
-              </div>
+              {isRegular ? (
+                <>
+                  <div className="flex justify-between">
+                    <span>Месечна инвестиционна вноска</span>
+                    <span className="font-semibold">{formatCurrency(data.monthlyContribution || 0)}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>Годишна инвестиционна вноска</span>
+                    <span className="font-semibold">{formatCurrency((data.monthlyContribution || 0) * 12)}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>Инвестиционен хоризонт</span>
+                    <span className="font-semibold">{data.investmentHorizon || 0} години</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>Целева сума</span>
+                    <span className="font-semibold">{formatCurrency(data.targetValue || 0)}</span>
+                  </div>
+                </>
+              ) : (
+                <>
+                  <div className="flex justify-between">
+                    <span>Еднократна инвестиция</span>
+                    <span className="font-semibold">{formatCurrency(data.oneTimeInvestment || 0)}</span>
+                  </div>
+                </>
+              )}
             </div>
           </div>
 
@@ -193,7 +217,7 @@ export default function PartnersInvestmentsOfferPDF({ data, consultant }) {
                 </tr>
               </thead>
               <tbody>
-                {projection.map((row, idx) => (
+                {projection.slice(0, 49).map((row, idx) => (
                   <tr key={idx} className={idx % 2 === 0 ? 'bg-white' : 'bg-slate-50'}>
                     <td className="border border-slate-200 px-2 py-1 text-center">{row.year}</td>
                     <td className="border border-slate-200 px-2 py-1 text-center">{row.age}</td>

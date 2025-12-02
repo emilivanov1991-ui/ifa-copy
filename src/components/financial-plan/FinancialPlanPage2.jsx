@@ -1,6 +1,14 @@
 import React, { useMemo } from 'react';
-import { PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, LabelList } from 'recharts';
-import { EUR_BGN_RATE } from './FinancialPlanConstants';
+import { PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LabelList } from 'recharts';
+import { 
+  EUR_BGN_RATE, 
+  generateMetLifeULProjection, 
+  calculatePartnersInvestmentValue, 
+  calculateFutureValue, 
+  calculateMonthlyPayment,
+  PARTNERS_INVESTMENTS_RETURNS,
+  getPartnersInvestmentFee
+} from './FinancialPlanConstants';
 import { Check } from 'lucide-react';
 
 /**
@@ -22,7 +30,6 @@ export default function FinancialPlanPage2({ analysis, plan, productOffers = [] 
     const avgYearsToRetirement = Math.round((clientYearsToRetirement + partnerYearsToRetirement) / 2);
 
     // === ТРУДОВ КАПИТАЛ ===
-    // Сбор от бъдещи доходи до пенсия с 3% годишен ръст
     const salaryGrowthRate = 0.03;
     const clientAnnualIncome = (analysis.client_net_income || 0) * 12;
     const partnerAnnualIncome = (analysis.partner_net_income || 0) * 12;
@@ -44,7 +51,6 @@ export default function FinancialPlanPage2({ analysis, plan, productOffers = [] 
     const totalLaborCapital = Math.round((clientLaborCapital + partnerLaborCapital) * EUR_BGN_RATE);
 
     // === ЗАЩИТА НА ДОХОДА - ПОКРИТИЯ ===
-    // Извличане от продуктови оферти или план
     const coverages = {
       death: { current: 0, client: 0, partner: 0 },
       accidentalDeath: { current: 0, client: 0, partner: 0 },
@@ -60,43 +66,54 @@ export default function FinancialPlanPage2({ analysis, plan, productOffers = [] 
     // Попълване от оферти
     productOffers.forEach(offer => {
       const coverageAmount = (offer.coverage_amount || 0) * EUR_BGN_RATE;
-      const isClient = offer.beneficiary === 'partner1';
-      const isPartner = offer.beneficiary === 'partner2';
-
+      const isClient = offer.beneficiary === 'partner1' || offer.beneficiary === 'family';
+      const isPartner = offer.beneficiary === 'partner2' || (offer.beneficiary === 'family' && analysis.include_partner);
+      
       if (offer.product_type === 'term_life' || offer.product_type === 'ul_investment') {
         if (isClient) {
           coverages.death.client += coverageAmount;
           coverages.accidentalDeath.client += coverageAmount;
         }
-        if (isPartner) {
+        if (isPartner && analysis.include_partner) {
           coverages.death.partner += coverageAmount;
           coverages.accidentalDeath.partner += coverageAmount;
         }
       }
 
-      // Допълнителни покрития от selected_coverages
       if (offer.selected_coverages) {
         offer.selected_coverages.forEach(cov => {
           const covAmount = (cov.coverage_amount || 0) * EUR_BGN_RATE;
-          if (cov.name?.includes('40') || cov.name?.includes('критични')) {
+          const covName = cov.name || '';
+          if (covName.includes('40') || covName.includes('критични')) {
             if (isClient) coverages.criticalIllness40.client += covAmount;
-            if (isPartner) coverages.criticalIllness40.partner += covAmount;
+            if (isPartner && analysis.include_partner) coverages.criticalIllness40.partner += covAmount;
+            if (offer.product_type === 'critical_illness') {
+              if (isClient) coverages.criticalIllnessTreatment.client += covAmount;
+              if (isPartner && analysis.include_partner) coverages.criticalIllnessTreatment.partner += covAmount;
+            }
           }
-          if (cov.name?.includes('нетрудоспособност') || cov.name?.includes('PTD')) {
+          if (covName.includes('нетрудоспособност') || covName.includes('PTD')) {
             if (isClient) coverages.permanentDisability.client += covAmount;
-            if (isPartner) coverages.permanentDisability.partner += covAmount;
+            if (isPartner && analysis.include_partner) coverages.permanentDisability.partner += covAmount;
           }
-          if (cov.name?.includes('фрактур')) {
+          if (covName.includes('фрактур')) {
             if (isClient) coverages.fractures.client += covAmount;
-            if (isPartner) coverages.fractures.partner += covAmount;
+            if (isPartner && analysis.include_partner) coverages.fractures.partner += covAmount;
           }
         });
       }
 
-      // Телемедицина, здравно, защита на детето
-      if (offer.product_type === 'health_insurance') {
+      if ((offer.product_type === 'ul_telemedicine' || offer.selected_coverages?.some(c => c.name?.includes('Телемедицина'))) && offer.monthly_premium > 0) {
+        if (isClient) coverages.telemedicine.client = true;
+        if (isPartner && analysis.include_partner) coverages.telemedicine.partner = true;
+      }
+      if (offer.product_type === 'health_insurance' && offer.monthly_premium > 0) {
         if (isClient) coverages.healthInsurance.client = true;
-        if (isPartner) coverages.healthInsurance.partner = true;
+        if (isPartner && analysis.include_partner) coverages.healthInsurance.partner = true;
+      }
+      if (offer.product_type === 'ul_child_protection' && offer.monthly_premium > 0) {
+        coverages.childProtection.client = true; 
+        if (analysis.include_partner) coverages.childProtection.partner = true;
       }
     });
 
@@ -132,88 +149,131 @@ export default function FinancialPlanPage2({ analysis, plan, productOffers = [] 
                          (analysis.expense_other || 0);
     const freeMonthly = monthlyBalance - totalExpenses;
     
-    // Еднократен резерв
     const oneTimeReserve = (analysis.asset_checking_account || 0) + (analysis.asset_short_term_savings || 0);
-
-    // Резерв: 3 години (желани месеци резерв * 12 + еднократен)
     const desiredMonths = analysis.desired_reserve_months || 6;
     const reserveTarget = freeMonthly * desiredMonths + oneTimeReserve * EUR_BGN_RATE;
     const reserveYears = 3;
 
-    // Други цели: 25% от резерва за 1 година
     const otherGoalsTarget = (analysis.other_goals_car || 0) + (analysis.other_goals_vacation || 0) + (analysis.other_goals_other || 0);
     const otherGoalsDeposit = otherGoalsTarget > 0 ? otherGoalsTarget * EUR_BGN_RATE : Math.round(reserveTarget * 0.25);
     const otherGoalsYears = 1;
 
-    // Самоучастие: от "Наличност в брой към момента на Закупуването" в Ново жилище
     const downPayment = (analysis.available_cash || 0) * EUR_BGN_RATE;
     const downPaymentYears = reserveYears;
 
-    // Инвестиции - 3 периода
-    const monthlyInvestment = (analysis.monthly_investments || 0) + (plan?.total_monthly_premium || 0);
-    const annualInvestment = monthlyInvestment * 12 * EUR_BGN_RATE;
-    
-    // Примерна доходност
-    const investmentReturn = 0.07; // 7% годишно
+    // === ИНВЕСТИЦИИ - извличане от оферти ===
+    let totalMonthlyFromUL = 0;
+    let totalMonthlyFromPartners = 0;
+    let totalOneTimeFromPartners = 0;
 
-    const calculateFV = (annual, years, rate) => {
-      if (rate === 0) return annual * years;
-      return annual * ((Math.pow(1 + rate, years) - 1) / rate) * (1 + rate);
+    // UL Investment offers (клиент и партньор)
+    const ulOffers = productOffers.filter(p => p.product_type === 'ul_investment');
+    ulOffers.forEach(offer => {
+      totalMonthlyFromUL += (offer.monthly_premium || 0);
+    });
+
+    // Partners Investments offers
+    const partnersRegularOffers = productOffers.filter(p => p.product_type === 'partners_regular');
+    partnersRegularOffers.forEach(offer => {
+      totalMonthlyFromPartners += (offer.monthly_premium || 0);
+    });
+
+    const partnersSingleOffers = productOffers.filter(p => p.product_type === 'partners_single');
+    partnersSingleOffers.forEach(offer => {
+      totalOneTimeFromPartners += (offer.initial_value || 0);
+    });
+
+    // Общо месечно + потребителски месечни инвестиции
+    const totalMonthlyInvestment = totalMonthlyFromUL + totalMonthlyFromPartners + (analysis.monthly_investments || 0);
+    const totalMonthlyInvestmentBGN = totalMonthlyInvestment * EUR_BGN_RATE;
+    const totalOneTimeInvestmentBGN = totalOneTimeFromPartners * EUR_BGN_RATE;
+
+    // Средна очаквана доходност (7% общо)
+    const generalInvestmentReturn = 0.07;
+
+    // Изчисляване на комбинирана FV (месечни вноски + еднократен капитал)
+    const calculateCombinedFV = (monthlyEUR, oneTimeEUR, years, annualReturn) => {
+      const monthlyBGN = monthlyEUR * EUR_BGN_RATE;
+      const oneTimeBGN = oneTimeEUR * EUR_BGN_RATE;
+      const fvRegular = calculateFutureValue(monthlyBGN, years, annualReturn);
+      const fvOneTime = oneTimeBGN * Math.pow(1 + annualReturn, years);
+      return fvRegular + fvOneTime;
     };
 
-    const investment10Years = {
-      deposit: Math.round(annualInvestment * 10),
-      value: Math.round(calculateFV(annualInvestment, 10, investmentReturn)),
+    const inv10Years = {
+      deposit: Math.round((totalMonthlyInvestmentBGN * 12 * 10) + totalOneTimeInvestmentBGN),
+      value: Math.round(calculateCombinedFV(totalMonthlyInvestment, totalOneTimeFromPartners, 10, generalInvestmentReturn)),
       years: 10
     };
 
-    const investment20Years = {
-      deposit: Math.round(annualInvestment * 20),
-      value: Math.round(calculateFV(annualInvestment, 20, investmentReturn)),
+    const inv20Years = {
+      deposit: Math.round((totalMonthlyInvestmentBGN * 12 * 20) + totalOneTimeInvestmentBGN),
+      value: Math.round(calculateCombinedFV(totalMonthlyInvestment, totalOneTimeFromPartners, 20, generalInvestmentReturn)),
       years: 20
     };
 
-    const investmentRetirement = {
-      deposit: Math.round(annualInvestment * avgYearsToRetirement),
-      value: Math.round(calculateFV(annualInvestment, avgYearsToRetirement, investmentReturn)),
+    const invRetirement = {
+      deposit: Math.round((totalMonthlyInvestmentBGN * 12 * avgYearsToRetirement) + totalOneTimeInvestmentBGN),
+      value: Math.round(calculateCombinedFV(totalMonthlyInvestment, totalOneTimeFromPartners, avgYearsToRetirement, generalInvestmentReturn)),
       years: avgYearsToRetirement
     };
 
-    // Образование на деца
+    // === ОБРАЗОВАНИЕ НА ДЕЦА ===
     const childrenCount = analysis.children_count || 0;
     const childEducationGoals = [];
 
     for (let i = 1; i <= Math.min(childrenCount, 3); i++) {
       const childBirthdate = analysis[`child_${i}_birthdate`];
       const childName = analysis[`child_${i}_name`] || `Дете ${i}`;
-      let childAge = 5;
-      
+      let childAge = 0;
       if (childBirthdate) {
-        const birthYear = new Date(childBirthdate).getFullYear();
-        childAge = new Date().getFullYear() - birthYear;
+        childAge = new Date().getFullYear() - new Date(childBirthdate).getFullYear();
       }
       
-      const yearsToEducation = Math.max(0, 20 - childAge);
-      const annualChildSavings = (analysis.children_education_costs || 10000) / (childrenCount || 1) * EUR_BGN_RATE / yearsToEducation;
+      const educationYearsTarget = 20;
+      const yearsToEducation = Math.max(1, educationYearsTarget - childAge);
       
+      let annualChildContributionEUR = 0;
+      let childExpectedValueBGN = 0;
+      
+      // Търсене на детска оферта (education_plan или ul_child_protection)
+      const childOffer = productOffers.find(
+        p => (p.product_type === 'education_plan' || p.product_type === 'ul_child_protection') && 
+             (p.beneficiary_name === childName || p.beneficiary === `child${i}`)
+      );
+
+      if (childOffer && childOffer.expected_value) {
+        annualChildContributionEUR = (childOffer.annual_premium || (childOffer.monthly_premium || 0) * 12);
+        childExpectedValueBGN = childOffer.expected_value * EUR_BGN_RATE;
+      } else {
+        // Fallback изчисление
+        const targetEducationCost = (analysis.children_education_costs || 10000) / (childrenCount || 1);
+        const monthlyNeeded = calculateMonthlyPayment(targetEducationCost, yearsToEducation, 0.06);
+        annualChildContributionEUR = monthlyNeeded * 12;
+        childExpectedValueBGN = calculateFutureValue(monthlyNeeded, yearsToEducation, 0.06) * EUR_BGN_RATE;
+      }
+
       childEducationGoals.push({
         name: childName,
-        deposit: Math.round(annualChildSavings * yearsToEducation),
-        value: Math.round(calculateFV(annualChildSavings, yearsToEducation, 0.06)),
+        deposit: Math.round(annualChildContributionEUR * yearsToEducation * EUR_BGN_RATE),
+        value: Math.round(childExpectedValueBGN),
         years: yearsToEducation
       });
     }
 
     // === PIE CHART ДАННИ ===
-    // Дългосрочни vs Краткосрочни от страница 1
-    const fixedAmount = (plan?.total_monthly_premium || 500) * EUR_BGN_RATE;
-    const variableAmount = freeMonthly * EUR_BGN_RATE - fixedAmount;
-    const shortTermAmount = 0; // Краткосрочни = 0 по подразбиране
+    const totalMonthlyPremiumsFromOffers = productOffers.reduce((sum, offer) => sum + (offer.monthly_premium || 0), 0);
+    const fixedAmountForPie = totalMonthlyPremiumsFromOffers * EUR_BGN_RATE;
+    const variableAmountForPie = (analysis.monthly_investments || 0) * EUR_BGN_RATE;
+
+    const longTermAmount = fixedAmountForPie + variableAmountForPie;
+    const mediumTermAmount = 0;
+    const shortTermAmount = 0;
 
     const pieData = [
-      { name: 'Дългосрочни', value: Math.round(fixedAmount), color: '#6b7280' },
-      { name: 'Средносрочни', value: Math.round(variableAmount), color: '#d97706' },
-      { name: 'Краткосрочни', value: shortTermAmount, color: '#dc2626' }
+      { name: 'Дългосрочни', value: Math.round(longTermAmount), color: '#6b7280' },
+      { name: 'Средносрочни', value: Math.round(mediumTermAmount), color: '#d97706' },
+      { name: 'Краткосрочни', value: Math.round(shortTermAmount), color: '#dc2626' }
     ];
 
     // === BAR CHART ДАННИ ===
@@ -238,25 +298,24 @@ export default function FinancialPlanPage2({ analysis, plan, productOffers = [] 
       },
       { 
         name: 'Инвестиции', 
-        deposit: investment10Years.deposit, 
-        value: investment10Years.value, 
-        years: investment10Years.years 
+        deposit: inv10Years.deposit, 
+        value: inv10Years.value, 
+        years: inv10Years.years 
       },
       { 
         name: 'Инвестиции', 
-        deposit: investment20Years.deposit, 
-        value: investment20Years.value, 
-        years: investment20Years.years 
+        deposit: inv20Years.deposit, 
+        value: inv20Years.value, 
+        years: inv20Years.years 
       },
       { 
         name: 'Инвестиции', 
-        deposit: investmentRetirement.deposit, 
-        value: investmentRetirement.value, 
-        years: investmentRetirement.years 
+        deposit: invRetirement.deposit, 
+        value: invRetirement.value, 
+        years: invRetirement.years 
       }
     ];
 
-    // Добавяне на образование за деца
     childEducationGoals.forEach(goal => {
       barData.push({
         name: `Образование на ${goal.name}`,
@@ -276,15 +335,15 @@ export default function FinancialPlanPage2({ analysis, plan, productOffers = [] 
         reserve: { deposit: Math.round(reserveTarget), value: Math.round(reserveTarget), years: reserveYears },
         otherGoals: { deposit: Math.round(otherGoalsDeposit), value: Math.round(otherGoalsDeposit), years: otherGoalsYears },
         downPayment: { deposit: Math.round(downPayment), value: Math.round(downPayment), years: downPaymentYears },
-        investment10: investment10Years,
-        investment20: investment20Years,
-        investmentRetirement: investmentRetirement,
+        investment10: inv10Years,
+        investment20: inv20Years,
+        investmentRetirement: invRetirement,
         childEducation: childEducationGoals
       },
       pieData,
       barData,
-      fixedAmount: Math.round(fixedAmount),
-      variableAmount: Math.round(variableAmount)
+      fixedAmount: Math.round(fixedAmountForPie),
+      variableAmount: Math.round(variableAmountForPie)
     };
   }, [analysis, plan, productOffers]);
 
@@ -307,8 +366,6 @@ export default function FinancialPlanPage2({ analysis, plan, productOffers = [] 
     { key: 'healthInsurance', label: 'Допълнително здравно осигуряване', isBoolean: true },
     { key: 'childProtection', label: 'Споразумение за защита на детето', isBoolean: true }
   ];
-
-  const COLORS = ['#6b7280', '#d97706', '#dc2626'];
 
   return (
     <div className="bg-white p-6 min-h-[900px] relative font-sans text-sm">

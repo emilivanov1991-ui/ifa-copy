@@ -134,7 +134,7 @@ export default function MetLifeChildULCalculator({ initialData = {}, onSave }) {
       } else if (formData.annualSavings <= 0) {
         breakdown.warnings.push('Задължително посочете размера на спестовната вноска');
       } else {
-        const coefficient = CHILD_PROTECTION_COEFFICIENTS[policyholderAge] || 0.044;
+        const coefficient = getChildProtectionCoefficient(policyholderAge) || 0.044;
         
         // Sum of coverage premiums + annual savings
         const coveragesPremiumSum = Object.values(breakdown.coverages).reduce((sum, c) => sum + c.premium, 0);

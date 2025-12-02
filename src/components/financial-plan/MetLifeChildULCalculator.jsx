@@ -6,21 +6,9 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Button } from "@/components/ui/button";
 import { AlertTriangle, Info, Baby } from 'lucide-react';
 import {
-  METLIFE_PA_RISK_CLASSES,
-  METLIFE_PA_CHILD_COVERAGES
+  METLIFE_PA_CHILD_COVERAGES,
+  getChildProtectionCoefficient
 } from './FinancialPlanConstants';
-
-// Child Protection Agreement coefficients by policyholder age (from Ind. PA Rates A55:B97)
-const CHILD_PROTECTION_COEFFICIENTS = {
-  18: 0.0438, 19: 0.0438, 20: 0.0438, 21: 0.0438, 22: 0.0438,
-  23: 0.0438, 24: 0.0438, 25: 0.0438, 26: 0.0438, 27: 0.0438,
-  28: 0.0438, 29: 0.0438, 30: 0.0438, 31: 0.044, 32: 0.044,
-  33: 0.044, 34: 0.044, 35: 0.044, 36: 0.045, 37: 0.045,
-  38: 0.045, 39: 0.045, 40: 0.045, 41: 0.048, 42: 0.048,
-  43: 0.048, 44: 0.048, 45: 0.048, 46: 0.052, 47: 0.052,
-  48: 0.052, 49: 0.052, 50: 0.052, 51: 0.058, 52: 0.058,
-  53: 0.058, 54: 0.058, 55: 0.058
-};
 
 export default function MetLifeChildULCalculator({ initialData = {}, onSave }) {
   const [formData, setFormData] = useState({

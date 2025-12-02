@@ -1757,14 +1757,33 @@ export const METLIFE_PA_CRITICAL_ILLNESS_32_RATES = {
   60: { yr5: 46.34, yr10: null }
 };
 
-// Child Coverages - детски покрития
+// Child Coverages - детски покрития (from Ind. PA Rates)
 export const METLIFE_PA_CHILD_COVERAGES = {
-  permanentInvalidityAccident: { per: 1000, rate: 1.5 },
-  hospitalizationAccidentSickness: { per: 1, rate: 4.25 },  // daily benefit
-  hospitalizationAccidentOnly: { per: 1, rate: 1.2 },       // daily benefit
-  surgicalAccidentSickness: { per: 100, rate: 8.32 },
-  surgicalAccidentOnly: { per: 100, rate: 3.5 },
-  brokenBonesAndBurns: { per: 1000, rate: 33 }
+  permanentInvalidityAccident: { per: 1000, rate: 1.5 },      // Permanent invalidity due to accident
+  hospitalizationAccidentSickness: { per: 1, rate: 4.25 },   // daily benefit - accident & sickness
+  hospitalizationAccidentOnly: { per: 1, rate: 1.2 },        // daily benefit - accident only
+  surgicalAccidentSickness: { per: 100, rate: 8.32 },        // Surgical treatment - accident & sickness
+  surgicalAccidentOnly: { per: 100, rate: 3.5 },             // Surgical treatment - accident only
+  brokenBonesAndBurns: { per: 1000, rate: 33 }               // Broken bones and burns
+};
+
+// Child Protection Agreement (Споразумение за защита на детето)
+// Coefficients by policyholder age (from Ind. PA Rates A55:B97)
+export const METLIFE_CHILD_PROTECTION_COEFFICIENTS = {
+  18: 0.0438, 19: 0.0438, 20: 0.0438, 21: 0.0438, 22: 0.0438,
+  23: 0.0438, 24: 0.0438, 25: 0.0438, 26: 0.0438, 27: 0.0438,
+  28: 0.0438, 29: 0.0438, 30: 0.0438, 31: 0.044, 32: 0.044,
+  33: 0.044, 34: 0.044, 35: 0.044, 36: 0.045, 37: 0.045,
+  38: 0.045, 39: 0.045, 40: 0.045, 41: 0.048, 42: 0.048,
+  43: 0.048, 44: 0.048, 45: 0.048, 46: 0.052, 47: 0.052,
+  48: 0.052, 49: 0.052, 50: 0.052, 51: 0.058, 52: 0.058,
+  53: 0.058, 54: 0.058, 55: 0.058
+};
+
+// Helper function to get child protection coefficient
+export const getChildProtectionCoefficient = (policyholderAge) => {
+  if (policyholderAge < 18 || policyholderAge > 55) return null;
+  return METLIFE_CHILD_PROTECTION_COEFFICIENTS[policyholderAge] || 0.044;
 };
 
 // Откaз от премия - коефициенти по рисков клас

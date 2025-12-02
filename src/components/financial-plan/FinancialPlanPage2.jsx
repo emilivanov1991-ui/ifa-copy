@@ -165,28 +165,43 @@ export default function FinancialPlanPage2({ analysis, plan, productOffers = [] 
     let totalMonthlyFromUL = 0;
     let totalMonthlyFromPartners = 0;
     let totalOneTimeFromPartners = 0;
+    let totalOneTimeFromUL = 0;
 
     // UL Investment offers (клиент и партньор)
     const ulOffers = productOffers.filter(p => p.product_type === 'ul_investment');
     ulOffers.forEach(offer => {
       totalMonthlyFromUL += (offer.monthly_premium || 0);
+      // Ако има еднократна вноска в UL
+      if (offer.one_time_deposit || offer.initial_value) {
+        totalOneTimeFromUL += (offer.one_time_deposit || offer.initial_value || 0);
+      }
     });
 
-    // Partners Investments offers
-    const partnersRegularOffers = productOffers.filter(p => p.product_type === 'partners_regular');
+    // Partners Investments offers - регулярни (месечни)
+    const partnersRegularOffers = productOffers.filter(p => 
+      p.product_type === 'partners_regular' || 
+      (p.product_type === 'partners_investments' && p.investment_type === 'regular')
+    );
     partnersRegularOffers.forEach(offer => {
-      totalMonthlyFromPartners += (offer.monthly_premium || 0);
+      totalMonthlyFromPartners += (offer.monthly_premium || offer.monthly_contribution || 0);
     });
 
-    const partnersSingleOffers = productOffers.filter(p => p.product_type === 'partners_single');
+    // Partners Investments offers - еднократни
+    const partnersSingleOffers = productOffers.filter(p => 
+      p.product_type === 'partners_single' || 
+      (p.product_type === 'partners_investments' && p.investment_type === 'single')
+    );
     partnersSingleOffers.forEach(offer => {
-      totalOneTimeFromPartners += (offer.initial_value || 0);
+      totalOneTimeFromPartners += (offer.one_time_investment || offer.initial_value || offer.coverage_amount || 0);
     });
 
     // Общо месечно + потребителски месечни инвестиции
     const totalMonthlyInvestment = totalMonthlyFromUL + totalMonthlyFromPartners + (analysis.monthly_investments || 0);
     const totalMonthlyInvestmentBGN = totalMonthlyInvestment * EUR_BGN_RATE;
-    const totalOneTimeInvestmentBGN = totalOneTimeFromPartners * EUR_BGN_RATE;
+    
+    // Общо еднократни инвестиции (Partners + UL)
+    const totalOneTimeInvestment = totalOneTimeFromPartners + totalOneTimeFromUL;
+    const totalOneTimeInvestmentBGN = totalOneTimeInvestment * EUR_BGN_RATE;
 
     // Средна очаквана доходност (7% общо)
     const generalInvestmentReturn = 0.07;
@@ -202,19 +217,19 @@ export default function FinancialPlanPage2({ analysis, plan, productOffers = [] 
 
     const inv10Years = {
       deposit: Math.round((totalMonthlyInvestmentBGN * 12 * 10) + totalOneTimeInvestmentBGN),
-      value: Math.round(calculateCombinedFV(totalMonthlyInvestment, totalOneTimeFromPartners, 10, generalInvestmentReturn)),
+      value: Math.round(calculateCombinedFV(totalMonthlyInvestment, totalOneTimeInvestment, 10, generalInvestmentReturn)),
       years: 10
     };
 
     const inv20Years = {
       deposit: Math.round((totalMonthlyInvestmentBGN * 12 * 20) + totalOneTimeInvestmentBGN),
-      value: Math.round(calculateCombinedFV(totalMonthlyInvestment, totalOneTimeFromPartners, 20, generalInvestmentReturn)),
+      value: Math.round(calculateCombinedFV(totalMonthlyInvestment, totalOneTimeInvestment, 20, generalInvestmentReturn)),
       years: 20
     };
 
     const invRetirement = {
       deposit: Math.round((totalMonthlyInvestmentBGN * 12 * avgYearsToRetirement) + totalOneTimeInvestmentBGN),
-      value: Math.round(calculateCombinedFV(totalMonthlyInvestment, totalOneTimeFromPartners, avgYearsToRetirement, generalInvestmentReturn)),
+      value: Math.round(calculateCombinedFV(totalMonthlyInvestment, totalOneTimeInvestment, avgYearsToRetirement, generalInvestmentReturn)),
       years: avgYearsToRetirement
     };
 

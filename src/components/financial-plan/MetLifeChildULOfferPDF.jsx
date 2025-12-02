@@ -1,8 +1,9 @@
 import React from 'react';
 import { Button } from "@/components/ui/button";
 import { Printer } from 'lucide-react';
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, Area, AreaChart } from 'recharts';
 
-export default function MetLifeChildULOfferPDF({ data, premiumBreakdown }) {
+export default function MetLifeChildULOfferPDF({ data, premiumBreakdown, projection = [] }) {
   const handlePrint = () => window.print();
 
   const formatCurrency = (value, decimals = 2) => {

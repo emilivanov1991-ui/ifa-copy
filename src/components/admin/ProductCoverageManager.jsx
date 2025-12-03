@@ -9,8 +9,28 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
 import { Switch } from "@/components/ui/switch";
-import { Plus, Pencil, Trash2, Search, Shield, CheckCircle2 } from 'lucide-react';
+import { Checkbox } from "@/components/ui/checkbox";
+import { Plus, Pencil, Trash2, Search, Shield, CheckCircle2, Download, ToggleLeft, ToggleRight } from 'lucide-react';
 import { toast } from 'sonner';
+
+const exportToCSV = (data, filename, columns) => {
+  const headers = columns.map(c => c.label).join(',');
+  const rows = data.map(item => 
+    columns.map(c => {
+      const val = c.accessor(item);
+      if (typeof val === 'string' && val.includes(',')) return `"${val}"`;
+      return val ?? '';
+    }).join(',')
+  );
+  const csv = [headers, ...rows].join('\n');
+  const blob = new Blob(['\ufeff' + csv], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = `${filename}_${new Date().toISOString().split('T')[0]}.csv`;
+  link.click();
+  URL.revokeObjectURL(url);
+};
 
 const COVERAGE_TYPES = [
   { value: 'death', label: 'Смърт' },
@@ -171,6 +191,7 @@ export default function ProductCoverageManager() {
   const [searchTerm, setSearchTerm] = useState('');
   const [filterProduct, setFilterProduct] = useState('all');
   const [filterType, setFilterType] = useState('all');
+  const [selectedIds, setSelectedIds] = useState([]);
 
   const { data: products = [] } = useQuery({
     queryKey: ['productCatalog'],
@@ -181,6 +202,62 @@ export default function ProductCoverageManager() {
     queryKey: ['productCoverages'],
     queryFn: () => base44.entities.ProductCoverage.list()
   });
+
+  const bulkDeleteMutation = useMutation({
+    mutationFn: async (ids) => {
+      await Promise.all(ids.map(id => base44.entities.ProductCoverage.delete(id)));
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['productCoverages'] });
+      setSelectedIds([]);
+      toast.success('Покритията са изтрити');
+    }
+  });
+
+  const bulkUpdateMutation = useMutation({
+    mutationFn: async ({ ids, data }) => {
+      await Promise.all(ids.map(id => base44.entities.ProductCoverage.update(id, data)));
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['productCoverages'] });
+      setSelectedIds([]);
+      toast.success('Покритията са обновени');
+    }
+  });
+
+  const getProductName = (productId) => {
+    const product = products.find(p => p.id === productId);
+    return product ? product.product_name : 'Неизвестен';
+  };
+
+  const exportCoverages = () => {
+    const columns = [
+      { label: 'Продукт', accessor: c => getProductName(c.catalog_product_id) },
+      { label: 'Име', accessor: c => c.coverage_name },
+      { label: 'Код', accessor: c => c.coverage_code },
+      { label: 'Тип', accessor: c => c.coverage_type },
+      { label: 'Включено', accessor: c => c.is_included ? 'Да' : 'Не' },
+      { label: 'Опционално', accessor: c => c.is_optional ? 'Да' : 'Не' },
+      { label: 'Мин. сума', accessor: c => c.min_amount },
+      { label: 'Макс. сума', accessor: c => c.max_amount },
+      { label: 'Тарифа/1000', accessor: c => c.rate_per_1000 },
+      { label: 'Активно', accessor: c => c.is_active ? 'Да' : 'Не' }
+    ];
+    exportToCSV(coverages, 'coverages', columns);
+    toast.success('Експортирано успешно');
+  };
+
+  const toggleSelect = (id) => {
+    setSelectedIds(prev => prev.includes(id) ? prev.filter(i => i !== id) : [...prev, id]);
+  };
+
+  const toggleSelectAll = () => {
+    if (selectedIds.length === filteredCoverages.length) {
+      setSelectedIds([]);
+    } else {
+      setSelectedIds(filteredCoverages.map(c => c.id));
+    }
+  };
 
   const createMutation = useMutation({
     mutationFn: (data) => base44.entities.ProductCoverage.create(data),
@@ -216,11 +293,6 @@ export default function ProductCoverageManager() {
     }
   };
 
-  const getProductName = (productId) => {
-    const product = products.find(p => p.id === productId);
-    return product ? `${product.product_name}` : 'Неизвестен';
-  };
-
   const filteredCoverages = coverages.filter(c => {
     const matchesSearch = c.coverage_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
                           c.coverage_code?.toLowerCase().includes(searchTerm.toLowerCase());
@@ -247,12 +319,36 @@ export default function ProductCoverageManager() {
   return (
     <div className="space-y-4">
       <div className="flex justify-between items-center">
-        <h2 className="text-lg font-semibold">Покрития</h2>
-        <Button onClick={() => { setSelectedCoverage(null); setIsDialogOpen(true); }} className="gap-2">
-          <Plus className="w-4 h-4" />
-          Ново Покритие
-        </Button>
+        <h2 className="text-lg font-semibold">Покрития ({coverages.length})</h2>
+        <div className="flex gap-2">
+          <Button variant="outline" onClick={exportCoverages} className="gap-2">
+            <Download className="w-4 h-4" />
+            Експорт
+          </Button>
+          <Button onClick={() => { setSelectedCoverage(null); setIsDialogOpen(true); }} className="gap-2">
+            <Plus className="w-4 h-4" />
+            Ново Покритие
+          </Button>
+        </div>
       </div>
+
+      {selectedIds.length > 0 && (
+        <div className="flex items-center gap-3 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+          <span className="text-sm font-medium text-blue-800">{selectedIds.length} избрани</span>
+          <div className="flex gap-2 ml-auto">
+            <Button variant="outline" size="sm" onClick={() => bulkUpdateMutation.mutate({ ids: selectedIds, data: { is_active: true } })} className="gap-1">
+              <ToggleRight className="w-4 h-4" />Активирай
+            </Button>
+            <Button variant="outline" size="sm" onClick={() => bulkUpdateMutation.mutate({ ids: selectedIds, data: { is_active: false } })} className="gap-1">
+              <ToggleLeft className="w-4 h-4" />Деактивирай
+            </Button>
+            <Button variant="outline" size="sm" onClick={() => { if(confirm('Изтрий избраните?')) bulkDeleteMutation.mutate(selectedIds); }} className="gap-1 text-red-600">
+              <Trash2 className="w-4 h-4" />Изтрий
+            </Button>
+            <Button variant="ghost" size="sm" onClick={() => setSelectedIds([])}>Отмени</Button>
+          </div>
+        </div>
+      )}
 
       <div className="flex gap-4">
         <div className="relative flex-1">
@@ -297,10 +393,15 @@ export default function ProductCoverageManager() {
         </div>
       ) : (
         <div className="space-y-2">
+          <div className="flex items-center gap-2 px-2">
+            <Checkbox checked={selectedIds.length === filteredCoverages.length && filteredCoverages.length > 0} onCheckedChange={toggleSelectAll} />
+            <span className="text-sm text-slate-500">Избери всички</span>
+          </div>
           {filteredCoverages.map(cov => (
-            <Card key={cov.id} className={`${!cov.is_active ? 'opacity-50' : ''}`}>
+            <Card key={cov.id} className={`${!cov.is_active ? 'opacity-50' : ''} ${selectedIds.includes(cov.id) ? 'ring-2 ring-blue-500' : ''}`}>
               <CardContent className="p-3">
-                <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <Checkbox checked={selectedIds.includes(cov.id)} onCheckedChange={() => toggleSelect(cov.id)} />
                   <div className="flex-1">
                     <div className="flex items-center gap-2 mb-1">
                       <span className="font-medium">{cov.coverage_name}</span>

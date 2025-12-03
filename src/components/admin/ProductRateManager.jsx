@@ -8,8 +8,28 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
 import { Switch } from "@/components/ui/switch";
-import { Plus, Pencil, Trash2, Search, Filter } from 'lucide-react';
+import { Checkbox } from "@/components/ui/checkbox";
+import { Plus, Pencil, Trash2, Search, Download, ToggleLeft, ToggleRight } from 'lucide-react';
 import { toast } from 'sonner';
+
+const exportToCSV = (data, filename, columns) => {
+  const headers = columns.map(c => c.label).join(',');
+  const rows = data.map(item => 
+    columns.map(c => {
+      const val = c.accessor(item);
+      if (typeof val === 'string' && val.includes(',')) return `"${val}"`;
+      return val ?? '';
+    }).join(',')
+  );
+  const csv = [headers, ...rows].join('\n');
+  const blob = new Blob(['\ufeff' + csv], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = `${filename}_${new Date().toISOString().split('T')[0]}.csv`;
+  link.click();
+  URL.revokeObjectURL(url);
+};
 
 const RATE_TYPES = [
   { value: 'age_based', label: 'По възраст' },
@@ -189,6 +209,7 @@ export default function ProductRateManager() {
   const [searchTerm, setSearchTerm] = useState('');
   const [filterProduct, setFilterProduct] = useState('all');
   const [filterType, setFilterType] = useState('all');
+  const [selectedIds, setSelectedIds] = useState([]);
 
   const { data: products = [] } = useQuery({
     queryKey: ['productCatalog'],
@@ -199,6 +220,63 @@ export default function ProductRateManager() {
     queryKey: ['productRates'],
     queryFn: () => base44.entities.ProductRate.list()
   });
+
+  const bulkDeleteMutation = useMutation({
+    mutationFn: async (ids) => {
+      await Promise.all(ids.map(id => base44.entities.ProductRate.delete(id)));
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['productRates'] });
+      setSelectedIds([]);
+      toast.success('Тарифите са изтрити');
+    }
+  });
+
+  const bulkUpdateMutation = useMutation({
+    mutationFn: async ({ ids, data }) => {
+      await Promise.all(ids.map(id => base44.entities.ProductRate.update(id, data)));
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['productRates'] });
+      setSelectedIds([]);
+      toast.success('Тарифите са обновени');
+    }
+  });
+
+  const getProductName = (productId) => {
+    const product = products.find(p => p.id === productId);
+    return product ? `${product.product_name} (${product.provider})` : 'Неизвестен';
+  };
+
+  const exportRates = () => {
+    const columns = [
+      { label: 'Продукт', accessor: r => getProductName(r.catalog_product_id) },
+      { label: 'Тип', accessor: r => r.rate_type },
+      { label: 'Възраст от', accessor: r => r.age_from },
+      { label: 'Възраст до', accessor: r => r.age_to },
+      { label: 'Срок', accessor: r => r.term_years },
+      { label: 'Пол', accessor: r => r.gender },
+      { label: 'Пушач', accessor: r => r.is_smoker ? 'Да' : 'Не' },
+      { label: 'Рисков клас', accessor: r => r.risk_class },
+      { label: 'Тарифа/1000', accessor: r => r.rate_per_1000 },
+      { label: 'Фиксирана', accessor: r => r.flat_rate },
+      { label: 'Активна', accessor: r => r.is_active ? 'Да' : 'Не' }
+    ];
+    exportToCSV(rates, 'rates', columns);
+    toast.success('Експортирано успешно');
+  };
+
+  const toggleSelect = (id) => {
+    setSelectedIds(prev => prev.includes(id) ? prev.filter(i => i !== id) : [...prev, id]);
+  };
+
+  const toggleSelectAll = () => {
+    if (selectedIds.length === filteredRates.length) {
+      setSelectedIds([]);
+    } else {
+      setSelectedIds(filteredRates.map(r => r.id));
+    }
+  };
 
   const createMutation = useMutation({
     mutationFn: (data) => base44.entities.ProductRate.create(data),
@@ -234,11 +312,6 @@ export default function ProductRateManager() {
     }
   };
 
-  const getProductName = (productId) => {
-    const product = products.find(p => p.id === productId);
-    return product ? `${product.product_name} (${product.provider})` : 'Неизвестен';
-  };
-
   const filteredRates = rates.filter(r => {
     const product = products.find(p => p.id === r.catalog_product_id);
     const matchesSearch = product?.product_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -251,12 +324,36 @@ export default function ProductRateManager() {
   return (
     <div className="space-y-4">
       <div className="flex justify-between items-center">
-        <h2 className="text-lg font-semibold">Тарифни Таблици</h2>
-        <Button onClick={() => { setSelectedRate(null); setIsDialogOpen(true); }} className="gap-2">
-          <Plus className="w-4 h-4" />
-          Нова Тарифа
-        </Button>
+        <h2 className="text-lg font-semibold">Тарифни Таблици ({rates.length})</h2>
+        <div className="flex gap-2">
+          <Button variant="outline" onClick={exportRates} className="gap-2">
+            <Download className="w-4 h-4" />
+            Експорт
+          </Button>
+          <Button onClick={() => { setSelectedRate(null); setIsDialogOpen(true); }} className="gap-2">
+            <Plus className="w-4 h-4" />
+            Нова Тарифа
+          </Button>
+        </div>
       </div>
+
+      {selectedIds.length > 0 && (
+        <div className="flex items-center gap-3 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+          <span className="text-sm font-medium text-blue-800">{selectedIds.length} избрани</span>
+          <div className="flex gap-2 ml-auto">
+            <Button variant="outline" size="sm" onClick={() => bulkUpdateMutation.mutate({ ids: selectedIds, data: { is_active: true } })} className="gap-1">
+              <ToggleRight className="w-4 h-4" />Активирай
+            </Button>
+            <Button variant="outline" size="sm" onClick={() => bulkUpdateMutation.mutate({ ids: selectedIds, data: { is_active: false } })} className="gap-1">
+              <ToggleLeft className="w-4 h-4" />Деактивирай
+            </Button>
+            <Button variant="outline" size="sm" onClick={() => { if(confirm('Изтрий избраните?')) bulkDeleteMutation.mutate(selectedIds); }} className="gap-1 text-red-600">
+              <Trash2 className="w-4 h-4" />Изтрий
+            </Button>
+            <Button variant="ghost" size="sm" onClick={() => setSelectedIds([])}>Отмени</Button>
+          </div>
+        </div>
+      )}
 
       <div className="flex gap-4">
         <div className="relative flex-1">
@@ -298,10 +395,15 @@ export default function ProductRateManager() {
         <div className="text-center py-8 text-slate-400">Няма намерени тарифи</div>
       ) : (
         <div className="space-y-2">
+          <div className="flex items-center gap-2 px-2">
+            <Checkbox checked={selectedIds.length === filteredRates.length && filteredRates.length > 0} onCheckedChange={toggleSelectAll} />
+            <span className="text-sm text-slate-500">Избери всички</span>
+          </div>
           {filteredRates.map(rate => (
-            <Card key={rate.id} className={`${!rate.is_active ? 'opacity-50' : ''}`}>
+            <Card key={rate.id} className={`${!rate.is_active ? 'opacity-50' : ''} ${selectedIds.includes(rate.id) ? 'ring-2 ring-blue-500' : ''}`}>
               <CardContent className="p-3">
-                <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <Checkbox checked={selectedIds.includes(rate.id)} onCheckedChange={() => toggleSelect(rate.id)} />
                   <div className="flex-1">
                     <div className="flex items-center gap-2 mb-1">
                       <span className="font-medium text-sm">{getProductName(rate.catalog_product_id)}</span>

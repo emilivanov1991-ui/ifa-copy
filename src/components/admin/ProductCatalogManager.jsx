@@ -12,6 +12,8 @@ import { Badge } from "@/components/ui/badge";
 import { Switch } from "@/components/ui/switch";
 import { Plus, Pencil, Trash2, Package, DollarSign, Shield, Search, Copy } from 'lucide-react';
 import { toast } from 'sonner';
+import ProductRateManager from './ProductRateManager';
+import ProductCoverageManager from './ProductCoverageManager';
 
 const PRODUCT_TYPES = [
   { value: 'term_life', label: 'Срочна Застраховка Живот' },
@@ -436,51 +438,11 @@ export default function ProductCatalogManager() {
         </TabsContent>
 
         <TabsContent value="rates" className="mt-4">
-          <Card>
-            <CardHeader>
-              <CardTitle>Тарифни Таблици</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-slate-500 mb-4">Управление на тарифи по възраст, срок и рисков клас за всеки продукт.</p>
-              {rates.length === 0 ? (
-                <p className="text-center py-4 text-slate-400">Няма добавени тарифи</p>
-              ) : (
-                <div className="space-y-2">
-                  {rates.slice(0, 10).map(rate => (
-                    <div key={rate.id} className="flex justify-between items-center p-2 bg-slate-50 rounded">
-                      <span className="text-sm">{rate.rate_type} - Възраст {rate.age_from}-{rate.age_to}</span>
-                      <span className="font-medium">{rate.rate_per_1000 || rate.flat_rate} {rate.rate_per_1000 ? '/1000' : ''}</span>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </CardContent>
-          </Card>
+          <ProductRateManager />
         </TabsContent>
 
         <TabsContent value="coverages" className="mt-4">
-          <Card>
-            <CardHeader>
-              <CardTitle>Покрития</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-slate-500 mb-4">Опционални и включени покрития за всеки продукт.</p>
-              {coverages.length === 0 ? (
-                <p className="text-center py-4 text-slate-400">Няма добавени покрития</p>
-              ) : (
-                <div className="space-y-2">
-                  {coverages.slice(0, 10).map(cov => (
-                    <div key={cov.id} className="flex justify-between items-center p-2 bg-slate-50 rounded">
-                      <span className="text-sm">{cov.coverage_name}</span>
-                      <Badge variant={cov.is_included ? 'default' : 'outline'}>
-                        {cov.is_included ? 'Включено' : 'Опционално'}
-                      </Badge>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </CardContent>
-          </Card>
+          <ProductCoverageManager />
         </TabsContent>
       </Tabs>
     </div>

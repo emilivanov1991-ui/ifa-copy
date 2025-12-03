@@ -15,6 +15,7 @@ import {
 import { toast } from 'sonner';
 import { format } from 'date-fns';
 import { bg } from 'date-fns/locale';
+import { generateApplicationPDF } from '../applications/ApplicationPDFGenerator';
 
 const STATUS_CONFIG = {
   draft: { label: 'Чернова', color: 'bg-slate-100 text-slate-800', icon: FileText },
@@ -106,16 +107,22 @@ export default function ApplicationManager({ analysisId, clientId }) {
   // Generate PDF application
   const generatePDF = async (app) => {
     toast.info('Генериране на PDF...');
-    // TODO: Implement PDF generation with pre-filled data
-    // This will be implemented when you provide the application templates
-    
-    updateAppMutation.mutate({
-      id: app.id,
-      data: {
-        status: 'pending_signature',
-        application_pdf_url: 'generated_url_placeholder'
-      }
-    });
+    try {
+      const pdfUrl = await generateApplicationPDF(app, analysis);
+      
+      updateAppMutation.mutate({
+        id: app.id,
+        data: {
+          status: 'pending_signature',
+          application_pdf_url: pdfUrl
+        }
+      });
+      
+      toast.success('PDF заявлението е генерирано успешно');
+    } catch (error) {
+      console.error('PDF generation error:', error);
+      toast.error('Грешка при генериране на PDF');
+    }
   };
 
   // Send reminder
@@ -324,8 +331,10 @@ export default function ApplicationManager({ analysisId, clientId }) {
                         </Button>
                       )}
                       {app.application_pdf_url && (
-                        <Button variant="ghost" size="icon">
-                          <Download className="w-4 h-4" />
+                        <Button variant="ghost" size="icon" asChild>
+                          <a href={app.application_pdf_url} target="_blank" rel="noopener noreferrer">
+                            <Download className="w-4 h-4" />
+                          </a>
                         </Button>
                       )}
                       <Button variant="ghost" size="icon">

@@ -10,10 +10,32 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { Switch } from "@/components/ui/switch";
-import { Plus, Pencil, Trash2, Package, DollarSign, Shield, Search, Copy } from 'lucide-react';
+import { Checkbox } from "@/components/ui/checkbox";
+import { Plus, Pencil, Trash2, Package, DollarSign, Shield, Search, Copy, Download, ToggleLeft, ToggleRight, CheckSquare } from 'lucide-react';
 import { toast } from 'sonner';
 import ProductRateManager from './ProductRateManager';
 import ProductCoverageManager from './ProductCoverageManager';
+
+// Export to CSV utility
+const exportToCSV = (data, filename, columns) => {
+  const headers = columns.map(c => c.label).join(',');
+  const rows = data.map(item => 
+    columns.map(c => {
+      const val = c.accessor(item);
+      if (typeof val === 'string' && val.includes(',')) return `"${val}"`;
+      if (Array.isArray(val)) return `"${val.join('; ')}"`;
+      return val ?? '';
+    }).join(',')
+  );
+  const csv = [headers, ...rows].join('\n');
+  const blob = new Blob(['\ufeff' + csv], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = `${filename}_${new Date().toISOString().split('T')[0]}.csv`;
+  link.click();
+  URL.revokeObjectURL(url);
+};
 
 const PRODUCT_TYPES = [
   { value: 'term_life', label: 'Срочна Застраховка Живот' },
@@ -232,6 +254,7 @@ export default function ProductCatalogManager() {
   const [searchTerm, setSearchTerm] = useState('');
   const [filterType, setFilterType] = useState('all');
   const [activeTab, setActiveTab] = useState('products');
+  const [selectedIds, setSelectedIds] = useState([]);
 
   const { data: products = [], isLoading } = useQuery({
     queryKey: ['productCatalog'],
@@ -247,6 +270,15 @@ export default function ProductCatalogManager() {
     queryKey: ['productCoverages'],
     queryFn: () => base44.entities.ProductCoverage.list()
   });
+
+  // Metrics
+  const metrics = {
+    totalProducts: products.length,
+    activeProducts: products.filter(p => p.is_active).length,
+    totalRates: rates.length,
+    totalCoverages: coverages.length,
+    providers: [...new Set(products.map(p => p.provider))].length
+  };
 
   const createMutation = useMutation({
     mutationFn: (data) => base44.entities.ProductCatalog.create(data),
@@ -273,6 +305,61 @@ export default function ProductCatalogManager() {
       toast.success('Продуктът е изтрит');
     }
   });
+
+  // Bulk actions
+  const bulkUpdateMutation = useMutation({
+    mutationFn: async ({ ids, data }) => {
+      await Promise.all(ids.map(id => base44.entities.ProductCatalog.update(id, data)));
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['productCatalog'] });
+      setSelectedIds([]);
+      toast.success('Продуктите са обновени');
+    }
+  });
+
+  const bulkDeleteMutation = useMutation({
+    mutationFn: async (ids) => {
+      await Promise.all(ids.map(id => base44.entities.ProductCatalog.delete(id)));
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['productCatalog'] });
+      setSelectedIds([]);
+      toast.success('Продуктите са изтрити');
+    }
+  });
+
+  const toggleSelectAll = () => {
+    if (selectedIds.length === filteredProducts.length) {
+      setSelectedIds([]);
+    } else {
+      setSelectedIds(filteredProducts.map(p => p.id));
+    }
+  };
+
+  const toggleSelect = (id) => {
+    setSelectedIds(prev => 
+      prev.includes(id) ? prev.filter(i => i !== id) : [...prev, id]
+    );
+  };
+
+  const exportProducts = () => {
+    const columns = [
+      { label: 'Име', accessor: p => p.product_name },
+      { label: 'Доставчик', accessor: p => p.provider },
+      { label: 'Тип', accessor: p => p.product_type },
+      { label: 'Категория', accessor: p => p.category },
+      { label: 'Мин. възраст', accessor: p => p.min_age },
+      { label: 'Макс. възраст', accessor: p => p.max_age },
+      { label: 'Мин. премия', accessor: p => p.min_monthly_premium },
+      { label: 'Валута', accessor: p => p.currency },
+      { label: 'Продаваемост', accessor: p => p.sellability_score },
+      { label: 'Активен', accessor: p => p.is_active ? 'Да' : 'Не' },
+      { label: 'Характеристики', accessor: p => p.features }
+    ];
+    exportToCSV(products, 'products', columns);
+    toast.success('Експортирано успешно');
+  };
 
   const handleSave = (data) => {
     if (selectedProduct?.id) {
@@ -314,29 +401,104 @@ export default function ProductCatalogManager() {
 
   return (
     <div className="p-6">
+      {/* Metrics Dashboard */}
+      <div className="grid grid-cols-5 gap-4 mb-6">
+        <Card>
+          <CardContent className="p-4">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-lg bg-blue-100 flex items-center justify-center">
+                <Package className="w-5 h-5 text-blue-600" />
+              </div>
+              <div>
+                <p className="text-2xl font-bold">{metrics.totalProducts}</p>
+                <p className="text-xs text-slate-500">Общо продукти</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent className="p-4">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-lg bg-green-100 flex items-center justify-center">
+                <ToggleRight className="w-5 h-5 text-green-600" />
+              </div>
+              <div>
+                <p className="text-2xl font-bold">{metrics.activeProducts}</p>
+                <p className="text-xs text-slate-500">Активни</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent className="p-4">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-lg bg-amber-100 flex items-center justify-center">
+                <DollarSign className="w-5 h-5 text-amber-600" />
+              </div>
+              <div>
+                <p className="text-2xl font-bold">{metrics.totalRates}</p>
+                <p className="text-xs text-slate-500">Тарифи</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent className="p-4">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-lg bg-purple-100 flex items-center justify-center">
+                <Shield className="w-5 h-5 text-purple-600" />
+              </div>
+              <div>
+                <p className="text-2xl font-bold">{metrics.totalCoverages}</p>
+                <p className="text-xs text-slate-500">Покрития</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent className="p-4">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-lg bg-slate-100 flex items-center justify-center">
+                <Package className="w-5 h-5 text-slate-600" />
+              </div>
+              <div>
+                <p className="text-2xl font-bold">{metrics.providers}</p>
+                <p className="text-xs text-slate-500">Доставчици</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
       <div className="flex justify-between items-center mb-6">
         <div>
           <h1 className="text-2xl font-bold text-slate-900">Продуктов Каталог</h1>
           <p className="text-slate-500">Управление на финансови продукти, тарифи и покрития</p>
         </div>
-        <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-          <DialogTrigger asChild>
-            <Button onClick={() => setSelectedProduct(null)} className="gap-2">
-              <Plus className="w-4 h-4" />
-              Нов Продукт
-            </Button>
-          </DialogTrigger>
-          <DialogContent className="max-w-3xl">
-            <DialogHeader>
-              <DialogTitle>{selectedProduct?.id ? 'Редактиране на продукт' : 'Нов продукт'}</DialogTitle>
-            </DialogHeader>
-            <ProductForm 
-              product={selectedProduct} 
-              onSave={handleSave} 
-              onCancel={() => setIsDialogOpen(false)} 
-            />
-          </DialogContent>
-        </Dialog>
+        <div className="flex gap-2">
+          <Button variant="outline" onClick={exportProducts} className="gap-2">
+            <Download className="w-4 h-4" />
+            Експорт
+          </Button>
+          <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+            <DialogTrigger asChild>
+              <Button onClick={() => setSelectedProduct(null)} className="gap-2">
+                <Plus className="w-4 h-4" />
+                Нов Продукт
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="max-w-3xl">
+              <DialogHeader>
+                <DialogTitle>{selectedProduct?.id ? 'Редактиране на продукт' : 'Нов продукт'}</DialogTitle>
+              </DialogHeader>
+              <ProductForm 
+                product={selectedProduct} 
+                onSave={handleSave} 
+                onCancel={() => setIsDialogOpen(false)} 
+              />
+            </DialogContent>
+          </Dialog>
+        </div>
       </div>
 
       <Tabs value={activeTab} onValueChange={setActiveTab}>
@@ -379,14 +541,73 @@ export default function ProductCatalogManager() {
             </Select>
           </div>
 
+          {/* Bulk Actions Bar */}
+          {selectedIds.length > 0 && (
+            <div className="flex items-center gap-3 p-3 mb-4 bg-blue-50 border border-blue-200 rounded-lg">
+              <span className="text-sm font-medium text-blue-800">
+                {selectedIds.length} избрани
+              </span>
+              <div className="flex gap-2 ml-auto">
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  onClick={() => bulkUpdateMutation.mutate({ ids: selectedIds, data: { is_active: true } })}
+                  className="gap-1"
+                >
+                  <ToggleRight className="w-4 h-4" />
+                  Активирай
+                </Button>
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  onClick={() => bulkUpdateMutation.mutate({ ids: selectedIds, data: { is_active: false } })}
+                  className="gap-1"
+                >
+                  <ToggleLeft className="w-4 h-4" />
+                  Деактивирай
+                </Button>
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  onClick={() => {
+                    if (confirm(`Сигурни ли сте, че искате да изтриете ${selectedIds.length} продукта?`)) {
+                      bulkDeleteMutation.mutate(selectedIds);
+                    }
+                  }}
+                  className="gap-1 text-red-600 hover:text-red-700"
+                >
+                  <Trash2 className="w-4 h-4" />
+                  Изтрий
+                </Button>
+                <Button variant="ghost" size="sm" onClick={() => setSelectedIds([])}>
+                  Отмени
+                </Button>
+              </div>
+            </div>
+          )}
+
           {isLoading ? (
             <div className="text-center py-8 text-slate-500">Зареждане...</div>
           ) : (
             <div className="grid gap-4">
+              {/* Select All Header */}
+              <div className="flex items-center gap-2 px-2">
+                <Checkbox 
+                  checked={selectedIds.length === filteredProducts.length && filteredProducts.length > 0}
+                  onCheckedChange={toggleSelectAll}
+                />
+                <span className="text-sm text-slate-500">Избери всички</span>
+              </div>
+
               {filteredProducts.map(product => (
-                <Card key={product.id} className={`${!product.is_active ? 'opacity-50' : ''}`}>
+                <Card key={product.id} className={`${!product.is_active ? 'opacity-50' : ''} ${selectedIds.includes(product.id) ? 'ring-2 ring-blue-500' : ''}`}>
                   <CardContent className="p-4">
-                    <div className="flex items-start justify-between">
+                    <div className="flex items-start gap-3">
+                      <Checkbox 
+                        checked={selectedIds.includes(product.id)}
+                        onCheckedChange={() => toggleSelect(product.id)}
+                        className="mt-1"
+                      />
                       <div className="flex-1">
                         <div className="flex items-center gap-2 mb-1">
                           <h3 className="font-semibold text-lg">{product.product_name}</h3>

@@ -16,7 +16,7 @@ import MortgageCalculatorAdvanced from '../components/calculators/MortgageCalcul
 import ConsumerLoanCalculator from '../components/calculators/ConsumerLoanCalculator';
 import PensionCalculator from '../components/calculators/PensionCalculator';
 import InvestmentCalculatorAdvanced from '../components/calculators/InvestmentCalculatorAdvanced';
-import AuxiliaryToolsSection from '../components/calculators/AuxiliaryToolsSection';
+import AuxiliaryToolsSection from '@/components/calculators/AuxiliaryToolsSection';
 
 const MortgageCalculator = () => {
   const [offers, setOffers] = useState([

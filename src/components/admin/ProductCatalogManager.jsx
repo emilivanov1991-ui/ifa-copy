@@ -15,6 +15,7 @@ import { Plus, Pencil, Trash2, Package, DollarSign, Shield, Search, Copy, Downlo
 import { toast } from 'sonner';
 import ProductRateManager from './ProductRateManager';
 import ProductCoverageManager from './ProductCoverageManager';
+import ProductDocumentManager from './ProductDocumentManager';
 
 // Export to CSV utility
 const exportToCSV = (data, filename, columns) => {
@@ -47,7 +48,15 @@ const PRODUCT_TYPES = [
   { value: 'personal_accident', label: 'Злополука' },
   { value: 'property_insurance', label: 'Имуществена Застраховка' },
   { value: 'partners_regular', label: 'Partners Регулярна' },
-  { value: 'partners_single', label: 'Partners Еднократна' }
+  { value: 'partners_single', label: 'Partners Еднократна' },
+  { value: 'travel_insurance', label: 'Туристическа Застраховка' },
+  { value: 'car_insurance', label: 'Автомобилна Застраховка' },
+  { value: 'home_insurance', label: 'Застраховка за Дома' },
+  { value: 'mortgage_loan', label: 'Ипотечен Кредит' },
+  { value: 'consumer_loan', label: 'Потребителски Кредит' },
+  { value: 'business_insurance', label: 'Бизнес Застраховка' },
+  { value: 'mountain_insurance', label: 'Планинска Застраховка' },
+  { value: 'professional_liability', label: 'Професионална Отговорност' }
 ];
 
 const CATEGORIES = [
@@ -56,10 +65,15 @@ const CATEGORIES = [
   { value: 'health', label: 'Здраве' },
   { value: 'pension', label: 'Пенсия' },
   { value: 'property', label: 'Имущество' },
-  { value: 'children', label: 'Деца' }
+  { value: 'children', label: 'Деца' },
+  { value: 'travel', label: 'Пътуване' },
+  { value: 'auto', label: 'Автомобил' },
+  { value: 'home', label: 'Дом' },
+  { value: 'loans', label: 'Кредити' },
+  { value: 'business', label: 'Бизнес' }
 ];
 
-const PROVIDERS = ['MetLife', 'UNIQA', 'Generali', 'Partners Investments', 'ОББ Пенсионно', 'ДЗИ', 'Allianz', 'GRAWE'];
+const PROVIDERS = ['MetLife', 'UNIQA', 'Generali', 'Partners Investments', 'ОББ', 'ДЗИ', 'Allianz', 'GRAWE', 'Банка ДСК', 'Пощенска банка', 'УниКредит', 'Инстинкт'];
 
 function ProductForm({ product, onSave, onCancel }) {
   const [formData, setFormData] = useState(product || {
@@ -271,12 +285,18 @@ export default function ProductCatalogManager() {
     queryFn: () => base44.entities.ProductCoverage.list()
   });
 
+  const { data: documents = [] } = useQuery({
+    queryKey: ['productDocuments'],
+    queryFn: () => base44.entities.ProductDocument.list()
+  });
+
   // Metrics
   const metrics = {
     totalProducts: products.length,
     activeProducts: products.filter(p => p.is_active).length,
     totalRates: rates.length,
     totalCoverages: coverages.length,
+    totalDocuments: documents.length,
     providers: [...new Set(products.map(p => p.provider))].length
   };
 
@@ -515,7 +535,11 @@ export default function ProductCatalogManager() {
             <Shield className="w-4 h-4" />
             Покрития ({coverages.length})
           </TabsTrigger>
-        </TabsList>
+          <TabsTrigger value="documents" className="gap-2">
+            <Package className="w-4 h-4" />
+            Документи ({documents.length})
+          </TabsTrigger>
+          </TabsList>
 
         <TabsContent value="products" className="mt-4">
           <div className="flex gap-4 mb-4">
@@ -663,9 +687,13 @@ export default function ProductCatalogManager() {
         </TabsContent>
 
         <TabsContent value="coverages" className="mt-4">
-          <ProductCoverageManager />
+        <ProductCoverageManager />
         </TabsContent>
-      </Tabs>
+
+        <TabsContent value="documents" className="mt-4">
+        <ProductDocumentManager />
+        </TabsContent>
+        </Tabs>
     </div>
   );
 }

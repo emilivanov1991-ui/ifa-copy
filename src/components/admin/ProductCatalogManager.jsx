@@ -11,7 +11,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { Switch } from "@/components/ui/switch";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Plus, Pencil, Trash2, Package, DollarSign, Shield, Search, Copy, Download, ToggleLeft, ToggleRight, CheckSquare } from 'lucide-react';
+import { Plus, Pencil, Trash2, Package, DollarSign, Shield, Search, Copy, Download, ToggleLeft, ToggleRight, CheckSquare, Sparkles, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
 import ProductRateManager from './ProductRateManager';
 import ProductCoverageManager from './ProductCoverageManager';
@@ -269,6 +269,7 @@ export default function ProductCatalogManager() {
   const [filterType, setFilterType] = useState('all');
   const [activeTab, setActiveTab] = useState('products');
   const [selectedIds, setSelectedIds] = useState([]);
+  const [generatingAI, setGeneratingAI] = useState({});
 
   const { data: products = [], isLoading } = useQuery({
     queryKey: ['productCatalog'],
@@ -398,6 +399,81 @@ export default function ProductCatalogManager() {
     const { id, created_date, updated_date, created_by, ...rest } = product;
     setSelectedProduct({ ...rest, product_name: `${rest.product_name} (копие)` });
     setIsDialogOpen(true);
+  };
+
+  // AI Description Generator
+  const generateAIDescription = async (product) => {
+    setGeneratingAI(prev => ({ ...prev, [product.id]: true }));
+    
+    try {
+      const productType = PRODUCT_TYPES.find(t => t.value === product.product_type)?.label || product.product_type;
+      const category = CATEGORIES.find(c => c.value === product.category)?.label || product.category;
+      
+      const prompt = `Генерирай професионално описание на български език за следния финансов продукт:
+
+Продукт: ${product.product_name}
+Доставчик: ${product.provider}
+Тип: ${productType}
+Категория: ${category}
+Възрастов диапазон: ${product.min_age}-${product.max_age} години
+Срок: ${product.min_term_years}-${product.max_term_years} години
+Минимална премия: ${product.min_monthly_premium} ${product.currency}
+Характеристики: ${(product.features || []).join(', ') || 'Няма'}
+${product.tax_deductible ? 'Има данъчно облекчение' : ''}
+${product.expected_return_conservative ? `Очаквана доходност консервативна: ${product.expected_return_conservative}%` : ''}
+${product.expected_return_balanced ? `Очаквана доходност балансирана: ${product.expected_return_balanced}%` : ''}
+${product.expected_return_dynamic ? `Очаквана доходност динамична: ${product.expected_return_dynamic}%` : ''}
+${product.management_fee_percent ? `Такса управление: ${product.management_fee_percent}%` : ''}
+${product.entry_fee_percent ? `Входна такса: ${product.entry_fee_percent}%` : ''}
+
+Върни JSON обект със следните полета:
+- description: Подробно описание на продукта (2-3 изречения)
+- sales_pitch: Кратко и убедително описание за продажба (1-2 изречения)
+- target_profiles: Масив от целеви профили на клиенти (напр. ["families", "high_income", "retirees"])
+- risk_summary: Кратко описание на рисковия профил`;
+
+      const result = await base44.integrations.Core.InvokeLLM({
+        prompt,
+        response_json_schema: {
+          type: "object",
+          properties: {
+            description: { type: "string" },
+            sales_pitch: { type: "string" },
+            target_profiles: { type: "array", items: { type: "string" } },
+            risk_summary: { type: "string" }
+          },
+          required: ["description", "sales_pitch", "target_profiles"]
+        }
+      });
+
+      // Update product with AI-generated content
+      await base44.entities.ProductCatalog.update(product.id, {
+        description: result.description,
+        sales_pitch: result.sales_pitch,
+        target_profiles: result.target_profiles
+      });
+
+      queryClient.invalidateQueries({ queryKey: ['productCatalog'] });
+      toast.success(`Описанието за "${product.product_name}" е генерирано`);
+    } catch (error) {
+      console.error('AI generation error:', error);
+      toast.error('Грешка при генериране на описание');
+    } finally {
+      setGeneratingAI(prev => ({ ...prev, [product.id]: false }));
+    }
+  };
+
+  // Bulk AI Generation
+  const bulkGenerateAI = async () => {
+    const productsToGenerate = products.filter(p => selectedIds.includes(p.id));
+    toast.info(`Генериране на описания за ${productsToGenerate.length} продукта...`);
+    
+    for (const product of productsToGenerate) {
+      await generateAIDescription(product);
+    }
+    
+    setSelectedIds([]);
+    toast.success('Всички описания са генерирани');
   };
 
   const filteredProducts = products.filter(p => {
@@ -593,6 +669,15 @@ export default function ProductCatalogManager() {
                 <Button 
                   variant="outline" 
                   size="sm" 
+                  onClick={bulkGenerateAI}
+                  className="gap-1 text-violet-600 hover:text-violet-700"
+                >
+                  <Sparkles className="w-4 h-4" />
+                  AI Описания
+                </Button>
+                <Button 
+                  variant="outline" 
+                  size="sm" 
                   onClick={() => {
                     if (confirm(`Сигурни ли сте, че искате да изтриете ${selectedIds.length} продукта?`)) {
                       bulkDeleteMutation.mutate(selectedIds);
@@ -657,8 +742,26 @@ export default function ProductCatalogManager() {
                             )}
                           </div>
                         )}
+                        {product.sales_pitch && (
+                          <p className="text-sm text-slate-600 mt-2 italic border-l-2 border-violet-300 pl-2">
+                            {product.sales_pitch}
+                          </p>
+                        )}
                       </div>
                       <div className="flex gap-2">
+                        <Button 
+                          variant="ghost" 
+                          size="icon" 
+                          onClick={() => generateAIDescription(product)}
+                          disabled={generatingAI[product.id]}
+                          title="Генерирай AI описание"
+                        >
+                          {generatingAI[product.id] ? (
+                            <Loader2 className="w-4 h-4 animate-spin text-violet-500" />
+                          ) : (
+                            <Sparkles className="w-4 h-4 text-violet-500" />
+                          )}
+                        </Button>
                         <Button variant="ghost" size="icon" onClick={() => handleDuplicate(product)}>
                           <Copy className="w-4 h-4" />
                         </Button>

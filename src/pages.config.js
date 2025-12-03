@@ -10,6 +10,7 @@ import Calculators from './pages/Calculators';
 import FinancialPlanner from './pages/FinancialPlanner';
 import AuxiliaryTools from './pages/AuxiliaryTools';
 import FinancialPlanCreate from './pages/FinancialPlanCreate';
+import ProductCatalogAdmin from './pages/ProductCatalogAdmin';
 import __Layout from './Layout.jsx';
 
 
@@ -26,6 +27,7 @@ export const PAGES = {
     "FinancialPlanner": FinancialPlanner,
     "AuxiliaryTools": AuxiliaryTools,
     "FinancialPlanCreate": FinancialPlanCreate,
+    "ProductCatalogAdmin": ProductCatalogAdmin,
 }
 
 export const pagesConfig = {

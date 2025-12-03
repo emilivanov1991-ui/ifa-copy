@@ -50,6 +50,8 @@ import ConsultantNotifications from '@/components/consultant/ConsultantNotificat
 import AIAnalyticsDashboard from '@/components/consultant/AIAnalyticsDashboard';
 import RBACManager from '@/components/consultant/RBACManager';
 import CommissionsManager from '@/components/consultant/CommissionsManager';
+import ProductCatalogManager from '@/components/admin/ProductCatalogManager';
+import { Package } from 'lucide-react';
 
 const menuItems = [
   { id: 'dashboard', label: 'Табло', icon: LayoutDashboard, color: 'from-blue-500 to-blue-600' },
@@ -64,6 +66,7 @@ const menuItems = [
   { id: 'mail', label: 'Съобщения', icon: Mail, badge: '3', color: 'from-teal-500 to-teal-600' },
   { id: 'integrations', label: 'Интеграции', icon: Zap, color: 'from-orange-500 to-orange-600' },
   { id: 'notifications', label: 'Известия', icon: Bell, color: 'from-sky-500 to-sky-600' },
+  { id: 'product-catalog', label: 'Продуктов каталог', icon: Package, adminOnly: true, color: 'from-indigo-500 to-purple-600' },
   { id: 'rbac', label: 'Достъп', icon: Shield, adminOnly: true, color: 'from-slate-500 to-slate-600' },
 ];
 
@@ -130,7 +133,7 @@ export default function ConsultantPortal() {
         {/* Navigation */}
         <nav className="flex-1 p-3 overflow-y-auto scrollbar-thin">
           <div className="space-y-1">
-            {menuItems.map((item) => {
+            {menuItems.filter(item => !item.adminOnly || currentUser?.role === 'admin').map((item) => {
               const Icon = item.icon;
               const isActive = activeTab === item.id;
               return (
@@ -329,7 +332,8 @@ export default function ConsultantPortal() {
               {activeTab === 'mail' && <ConsultantMail />}
               {activeTab === 'integrations' && <ConsultantIntegrations />}
               {activeTab === 'notifications' && <ConsultantNotifications />}
-              {activeTab === 'rbac' && <RBACManager />}
+              {activeTab === 'product-catalog' && currentUser?.role === 'admin' && <ProductCatalogManager />}
+              {activeTab === 'rbac' && currentUser?.role === 'admin' && <RBACManager />}
             </motion.div>
           </AnimatePresence>
         </div>

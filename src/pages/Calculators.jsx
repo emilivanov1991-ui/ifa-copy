@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Calculator, Home, Plus, Trash2, ArrowRight, TrendingUp, PiggyBank, Percent, TrendingDown, CreditCard, Landmark, BarChart3 } from 'lucide-react';
+import { Calculator, Home, Plus, Trash2, ArrowRight, TrendingUp, PiggyBank, Percent, TrendingDown, CreditCard, Landmark, BarChart3, BookOpen } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -16,6 +16,7 @@ import MortgageCalculatorAdvanced from '../components/calculators/MortgageCalcul
 import ConsumerLoanCalculator from '../components/calculators/ConsumerLoanCalculator';
 import PensionCalculator from '../components/calculators/PensionCalculator';
 import InvestmentCalculatorAdvanced from '../components/calculators/InvestmentCalculatorAdvanced';
+import AuxiliaryToolsSection from '../components/calculators/AuxiliaryToolsSection';
 
 const MortgageCalculator = () => {
   const [offers, setOffers] = useState([
@@ -380,6 +381,20 @@ export default function Calculators() {
               <InflationCalculator />
             </TabsContent>
           </Tabs>
+
+          {/* Помощни средства секция */}
+          <div className="mt-12 pt-8 border-t border-slate-200">
+            <div className="flex items-center gap-3 mb-6">
+              <div className="w-10 h-10 rounded-xl bg-blue-100 flex items-center justify-center">
+                <BookOpen className="h-5 w-5 text-blue-600" />
+              </div>
+              <div>
+                <h2 className="text-xl font-semibold text-slate-900">Помощни средства</h2>
+                <p className="text-sm text-slate-500">Образователни материали за финансово планиране</p>
+              </div>
+            </div>
+            <AuxiliaryToolsSection />
+          </div>
         </motion.div>
       </div>
     </div>

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Calculator, Home, Plus, Trash2, ArrowRight, TrendingUp, PiggyBank, Percent, TrendingDown } from 'lucide-react';
+import { Calculator, Home, Plus, Trash2, ArrowRight, TrendingUp, PiggyBank, Percent, TrendingDown, CreditCard, Landmark, BarChart3 } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -12,6 +12,10 @@ import TermDepositCalculator from '../components/calculators/TermDepositCalculat
 import SavingsCalculator from '../components/calculators/SavingsCalculator';
 import InvestmentCalculator from '../components/calculators/InvestmentCalculator';
 import InflationCalculator from '../components/calculators/InflationCalculator';
+import MortgageCalculatorAdvanced from '../components/calculators/MortgageCalculatorAdvanced';
+import ConsumerLoanCalculator from '../components/calculators/ConsumerLoanCalculator';
+import PensionCalculator from '../components/calculators/PensionCalculator';
+import InvestmentCalculatorAdvanced from '../components/calculators/InvestmentCalculatorAdvanced';
 
 const MortgageCalculator = () => {
   const [offers, setOffers] = useState([
@@ -316,31 +320,52 @@ export default function Calculators() {
           className="bg-white rounded-2xl shadow-xl p-6 md:p-10"
         >
           <Tabs defaultValue="mortgage" className="space-y-6">
-            <TabsList className="grid w-full max-w-4xl mx-auto grid-cols-2 md:grid-cols-5 gap-2">
-              <TabsTrigger value="mortgage" className="gap-2">
-                <Home className="h-4 w-4" />
+            <TabsList className="grid w-full max-w-5xl mx-auto grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-2">
+              <TabsTrigger value="mortgage" className="gap-1 text-xs">
+                <Home className="h-3 w-3" />
                 Ипотечен
               </TabsTrigger>
-              <TabsTrigger value="deposit" className="gap-2">
-                <Percent className="h-4 w-4" />
-                Депозит
+              <TabsTrigger value="consumer" className="gap-1 text-xs">
+                <CreditCard className="h-3 w-3" />
+                Потребителски
               </TabsTrigger>
-              <TabsTrigger value="investment" className="gap-2">
-                <TrendingUp className="h-4 w-4" />
+              <TabsTrigger value="pension" className="gap-1 text-xs">
+                <Landmark className="h-3 w-3" />
+                Пенсия
+              </TabsTrigger>
+              <TabsTrigger value="investment-adv" className="gap-1 text-xs">
+                <BarChart3 className="h-3 w-3" />
                 Инвестиции
               </TabsTrigger>
-              <TabsTrigger value="savings" className="gap-2">
-                <PiggyBank className="h-4 w-4" />
+              <TabsTrigger value="deposit" className="gap-1 text-xs">
+                <Percent className="h-3 w-3" />
+                Депозит
+              </TabsTrigger>
+              <TabsTrigger value="investment" className="gap-1 text-xs">
+                <TrendingUp className="h-3 w-3" />
                 Спестявания
               </TabsTrigger>
-              <TabsTrigger value="inflation" className="gap-2">
-                <TrendingDown className="h-4 w-4" />
+              <TabsTrigger value="savings" className="gap-1 text-xs">
+                <PiggyBank className="h-3 w-3" />
+                Регулярни
+              </TabsTrigger>
+              <TabsTrigger value="inflation" className="gap-1 text-xs">
+                <TrendingDown className="h-3 w-3" />
                 Инфлация
               </TabsTrigger>
             </TabsList>
 
             <TabsContent value="mortgage">
-              <MortgageCalculator />
+              <MortgageCalculatorAdvanced />
+            </TabsContent>
+            <TabsContent value="consumer">
+              <ConsumerLoanCalculator />
+            </TabsContent>
+            <TabsContent value="pension">
+              <PensionCalculator />
+            </TabsContent>
+            <TabsContent value="investment-adv">
+              <InvestmentCalculatorAdvanced />
             </TabsContent>
             <TabsContent value="deposit">
               <TermDepositCalculator />

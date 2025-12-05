@@ -1,8 +1,6 @@
-import React, { useMemo } from 'react';
+import React from 'react';
 import DZICascoCalculator, { calculateDZICascoOffer } from '@/components/financial-plan/DZICascoCalculator';
 import DZICascoOfferPDF from '@/components/financial-plan/DZICascoOfferPDF';
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Separator } from "@/components/ui/separator";
 
 export default function CascoOfferDemo() {
   // Примерни данни: Toyota Corolla 2020 / 45000 лв.
@@ -16,59 +14,52 @@ export default function CascoOfferDemo() {
   };
 
   // Изчисляване на офертата
-  const offer = useMemo(() => calculateDZICascoOffer(carData), []);
+  const offer = calculateDZICascoOffer(carData);
 
   // Данни за PDF офертата
-  const pdfOfferData = useMemo(() => {
-    if (!offer.eligible) return null;
+  const pdfData = {
+    // Клиент
+    clientName: 'ИВАН ПЕТРОВ ИВАНОВ',
+    clientBirthDate: '1985-06-15',
     
-    const validUntil = new Date();
-    validUntil.setMonth(validUntil.getMonth() + 1);
+    // МПС
+    regNumber: 'СА1234КМ',
+    vin: 'JTDKN3DU5A0123456',
+    vehicleType: 'Лек автомобил',
+    brand: carData.brand,
+    model: carData.model,
+    year: carData.year,
+    firstRegDate: '2020-03-15',
+    purpose: 'Лично ползване',
+    rightHandDrive: 'Не',
     
-    return {
-      // Клиент
-      clientName: 'ИВАН ПЕТРОВ ИВАНОВ',
-      clientBirthdate: '1985-06-15',
-      
-      // МПС
-      regNumber: 'СА1234КМ',
-      vinNumber: 'JTDKN3DU5A0123456',
-      vehicleType: 'Лек автомобил',
-      brand: carData.brand.toUpperCase(),
-      model: carData.model.toUpperCase(),
-      productionYear: carData.year,
-      firstRegDate: `${carData.year}-03-15`,
-      purpose: 'Лично ползване',
-      rightHandDrive: 'Не',
-      
-      // Застраховка
-      clauseType: 'КЛАУЗА ПЪЛНО КАСКО',
-      additionalAgreements: 'ДОВЕРЕН СЕРВИЗ',
-      insuranceSum: offer.carInfo.valueBGN,
-      
-      // Помощ на пътя
-      roadsideAssistance: 'Клаузи "Премиум и Чужбина"',
-      
-      // Срокове
-      insuranceTerm: '12 месеца',
-      startDate: new Date(),
-      paymentMethod: 'Еднократно',
-      
-      // Премии
-      cascoPremium: offer.pricing.basePremium,
-      roadsidePremium: offer.pricing.roadsidePremium,
-      
-      // Отстъпки
-      discounts: ['Бонус-Малус стъпало', 'Валидна застраховка "ГО"', 'Еднократно плащане'],
-      
-      // Валидност
-      validUntil: validUntil
-    };
-  }, [offer]);
+    // Застраховка
+    insuranceClause: 'КЛАУЗА ПЪЛНО КАСКО',
+    additionalAgreements: 'ДОВЕРЕН СЕРВИЗ',
+    insuranceSum: carData.valueBGN,
+    roadsideAssistance: 'Клаузи "Премиум и Чужбина"',
+    term: '12 месеца',
+    paymentMethod: 'Еднократно',
+    
+    // Премии
+    cascoPremium: offer.eligible ? offer.pricing.basePremium : 0,
+    roadsidePremium: 20.00,
+    
+    // Отстъпки
+    discounts: [
+      'Бонус-Малус стъпало',
+      'Валидна застраховка "ГО"',
+      'Еднократно плащане'
+    ],
+    
+    // Агенция
+    agencyName: 'APEX FINANCIAL ADVISORS',
+    agencyCode: '12345678'
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 pt-24 pb-12">
-      <div className="max-w-3xl mx-auto px-6">
+      <div className="max-w-2xl mx-auto px-6">
         <div className="text-center mb-8">
           <h1 className="text-2xl font-bold text-slate-900 mb-2">
             Примерна оферта за ДЗИ Каско+
@@ -78,25 +69,14 @@ export default function CascoOfferDemo() {
           </p>
         </div>
 
-        {/* Калкулирана оферта */}
         <DZICascoCalculator carData={carData} showDetailed={true} />
 
         {/* PDF Генератор */}
-        {pdfOfferData && (
-          <Card className="mt-6">
-            <CardHeader>
-              <CardTitle className="text-lg">Генериране на официална оферта</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-sm text-slate-600 mb-4">
-                Генерирайте PDF документ с офертата във формата на ДЗИ за изпращане на клиента.
-              </p>
-              <DZICascoOfferPDF offerData={pdfOfferData} />
-            </CardContent>
-          </Card>
-        )}
+        <div className="mt-6 p-4 bg-white rounded-xl border border-slate-200">
+          <h3 className="font-semibold text-slate-900 mb-4">Генериране на официална оферта (PDF)</h3>
+          <DZICascoOfferPDF offerData={pdfData} />
+        </div>
 
-        {/* Детайли */}
         <div className="mt-8 bg-white rounded-xl p-6 border border-slate-200">
           <h3 className="font-semibold text-slate-900 mb-4">Детайли на изчислението:</h3>
           <ul className="space-y-2 text-sm text-slate-600">

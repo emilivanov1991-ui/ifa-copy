@@ -41,8 +41,8 @@ export default function Layout({ children, currentPageName }) {
 
   return (
     <div className="min-h-screen bg-white">
-      {/* Navigation - Hide on ConsultantPortal */}
-      {currentPageName !== 'ConsultantPortal' && (
+      {/* Navigation - Hide on ConsultantPortal and FinancialAnalysis */}
+      {currentPageName !== 'ConsultantPortal' && currentPageName !== 'FinancialAnalysis' && (
       <header 
         className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
           isScrolled 
@@ -184,12 +184,12 @@ export default function Layout({ children, currentPageName }) {
       )}
 
       {/* Main Content */}
-      <main className={currentPageName === 'ConsultantPortal' ? 'pt-0' : ''}>
+      <main className={currentPageName === 'ConsultantPortal' || currentPageName === 'FinancialAnalysis' ? 'pt-0' : ''}>
         {children}
       </main>
 
-      {/* Footer - Hide on ConsultantPortal */}
-      {currentPageName !== 'ConsultantPortal' && <footer className="bg-slate-900 text-white py-16">
+      {/* Footer - Hide on ConsultantPortal and FinancialAnalysis */}
+      {currentPageName !== 'ConsultantPortal' && currentPageName !== 'FinancialAnalysis' && <footer className="bg-slate-900 text-white py-16">
         <div className="max-w-6xl mx-auto px-6">
           <div className="grid md:grid-cols-4 gap-12 mb-12">
             {/* Brand */}

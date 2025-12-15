@@ -1902,6 +1902,110 @@ export const MODEL_COEFFICIENTS = {
 };
 
 // ============================================================
+// METLIFE CREDIT GUARD - Ипотечна застраховка
+// Базови премии за €100,000 покритие за "Основен" пакет
+// ============================================================
+
+// Базови годишни премии за €100,000 покритие - пакет "Основен"
+export const METLIFE_CREDIT_GUARD_BASIC_RATES = {
+  20: { 5: 147, 10: 147, 15: 147, 20: 147, 25: 147, 30: 147 },
+  25: { 5: 147, 10: 147, 15: 147, 20: 147, 25: 147, 30: 160 },
+  30: { 5: 160, 10: 160, 15: 160, 20: 160, 25: 172, 30: 184 },
+  35: { 5: 184, 10: 184, 15: 196, 20: 209, 25: 233, 30: null },
+  40: { 5: 245, 10: 245, 15: 270, 20: 294, 25: null, 30: null },
+  45: { 5: 331, 10: 355, 15: 392, 20: null, 25: null, 30: null },
+  50: { 5: 466, 10: 502, 15: null, 20: null, 25: null, 30: null }
+};
+
+// Пакет "Разширен" има фиксиран коефициент 0.25
+export const METLIFE_CREDIT_GUARD_EXTENDED_COEFFICIENT = 0.25;
+
+// Правила за Credit Guard
+export const METLIFE_CREDIT_GUARD_RULES = {
+  min_age: 20,
+  max_age: 70, // Възраст + срок <= 70
+  min_sum: 10000,
+  max_sum: 500000,
+  available_terms: [5, 10, 15, 20, 25, 30],
+  packages: ['Основен', 'Разширен']
+};
+
+/**
+ * Изчислява премия за MetLife Credit Guard
+ * @param {number} age - Възраст на осигурения
+ * @param {number} sum - Застрахователна сума в EUR
+ * @param {number} term - Срок в години
+ * @param {string} packageType - "Основен" или "Разширен"
+ * @returns {object} Резултат с премия или грешка
+ */
+export const calculateMetLifeCreditGuard = (age, sum, term, packageType = 'Основен') => {
+  // Валидация
+  if (age < METLIFE_CREDIT_GUARD_RULES.min_age || age + term > METLIFE_CREDIT_GUARD_RULES.max_age) {
+    return {
+      eligible: false,
+      reason: `Възрастта трябва да е между ${METLIFE_CREDIT_GUARD_RULES.min_age} и ${METLIFE_CREDIT_GUARD_RULES.max_age - term} години за срок от ${term} години`
+    };
+  }
+
+  if (sum < METLIFE_CREDIT_GUARD_RULES.min_sum || sum > METLIFE_CREDIT_GUARD_RULES.max_sum) {
+    return {
+      eligible: false,
+      reason: `Застрахователната сума трябва да е между €${METLIFE_CREDIT_GUARD_RULES.min_sum.toLocaleString()} и €${METLIFE_CREDIT_GUARD_RULES.max_sum.toLocaleString()}`
+    };
+  }
+
+  if (!METLIFE_CREDIT_GUARD_RULES.available_terms.includes(term)) {
+    return {
+      eligible: false,
+      reason: `Срокът трябва да е един от: ${METLIFE_CREDIT_GUARD_RULES.available_terms.join(', ')} години`
+    };
+  }
+
+  // Намираме базовата премия
+  let basePremium;
+
+  if (packageType === 'Разширен') {
+    // Разширен пакет - използваме коефициент 0.25
+    basePremium = sum * METLIFE_CREDIT_GUARD_EXTENDED_COEFFICIENT;
+  } else {
+    // Основен пакет - lookup в таблицата
+    // Намираме най-близката възраст
+    const availableAges = Object.keys(METLIFE_CREDIT_GUARD_BASIC_RATES).map(Number).sort((a, b) => a - b);
+    let selectedAge = availableAges[0];
+    
+    for (const a of availableAges) {
+      if (a <= age) selectedAge = a;
+      else break;
+    }
+
+    const ageRates = METLIFE_CREDIT_GUARD_BASIC_RATES[selectedAge];
+    if (!ageRates || ageRates[term] === null || ageRates[term] === undefined) {
+      return {
+        eligible: false,
+        reason: `Няма налична тарифа за възраст ${age} години и срок ${term} години`
+      };
+    }
+
+    // Премията за €100,000
+    const premiumPer100k = ageRates[term];
+    
+    // Мащабираме линейно
+    basePremium = (sum / 100000) * premiumPer100k;
+  }
+
+  return {
+    eligible: true,
+    annualPremium: Math.round(basePremium * 100) / 100,
+    monthlyPremium: Math.round((basePremium / 12) * 100) / 100,
+    packageType: packageType,
+    coverageAmount: sum,
+    term: term,
+    age: age,
+    currency: 'EUR'
+  };
+};
+
+// ============================================================
 // ПОМОЩНИ ФУНКЦИИ
 // ============================================================
 

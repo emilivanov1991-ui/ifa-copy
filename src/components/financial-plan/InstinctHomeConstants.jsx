@@ -6,6 +6,17 @@
 // Валутен курс EUR/BGN
 export const EUR_BGN_RATE = 1.96;
 
+// Коефициенти и капове за покритията (от Excel модела)
+export const INSTINCT_COVERAGE_COEFFICIENTS = {
+  FIRE: { coefficient: 1.0, cap: null, mandatory: true, name: 'Пожар и природни бедствия' },
+  WATER: { coefficient: 0.085, cap: 15000, mandatory: true, name: 'Изтичане на вода' },
+  THEFT: { coefficient: 0.03, cap: 15000, mandatory: true, name: 'Кражба чрез взлом' },
+  SPORT: { coefficient: 0.024, cap: 12000, mandatory: false, name: 'Спортна екипировка' }
+};
+
+// Данък върху застраховката
+export const INSURANCE_TAX = 0.02;
+
 // Основни пакети (от тарифната таблица)
 export const INSTINCT_PACKAGES = {
   package_1: {
@@ -74,9 +85,16 @@ export const INSTINCT_DETAILED_TARIFFS = {
 export const INSTINCT_RULES = {
   min_sum: 50000,
   max_sum: 500000,
-  currency: 'EUR',
+  currency: 'BGN',
   available_packages: ['Пакет 1', 'Пакет 2', 'Пакет 3', 'Персонализиран'],
-  payment_methods: ['annual', 'installments']
+  payment_methods: ['annual', 'installments'],
+  contract_term_months: 12,
+  building_requirements: [
+    'Въведена в експлоатация',
+    'Масивна конструкция (тухли/стоманобетон)',
+    'Обитавана постоянно',
+    'Не оставена без надзор над 60 дни'
+  ]
 };
 
 // Покрития включени в "Закрила на дома"
@@ -106,21 +124,36 @@ export const INSTINCT_COVERAGES = [
 ];
 
 /**
- * Изчислява премия за Инстинкт "Закрила на дома"
- * @param {number} sumInsured - Застрахователна сума в EUR
+ * Изчислява премия за Инстинкт "Закрила на дома" по правилната формула
+ * Формула: BasePremium = SUM(min(tariff * coefficient, cap))
+ * Tax = BasePremium * 2%
+ * FinalPremium = ceil((BasePremium + Tax)*100)/100
+ * 
+ * @param {number} sumInsured - Застрахователна сума в BGN
  * @param {string} packageType - Тип пакет
- * @returns {object} Премия в BGN и EUR
+ * @param {boolean} includeSport - Включва ли спортна екипировка
+ * @returns {object} Премия в BGN и EUR с разбивка по покрития
  */
-export const calculateInstinctHomePremium = (sumInsured, packageType = 'custom') => {
-  // Използваме пакетите ако са избрани
+export const calculateInstinctHomePremium = (sumInsured, packageType = 'custom', includeSport = false) => {
+  // Валидация
+  if (sumInsured < INSTINCT_RULES.min_sum || sumInsured > INSTINCT_RULES.max_sum) {
+    return {
+      eligible: false,
+      reason: `Застрахователната сума трябва да е между ${INSTINCT_RULES.min_sum.toLocaleString()} и ${INSTINCT_RULES.max_sum.toLocaleString()} BGN`
+    };
+  }
+
+  // Използваме директно тарифната таблица за пакетите
   if (packageType === 'Пакет 1') {
     return {
       eligible: true,
       sumInsured: INSTINCT_PACKAGES.package_1.sum_insured,
+      basePremium: INSTINCT_PACKAGES.package_1.premium_bgn / 1.02,
       annualPremiumBGN: INSTINCT_PACKAGES.package_1.premium_bgn,
       annualPremiumEUR: INSTINCT_PACKAGES.package_1.premium_eur,
       monthlyPremiumBGN: (INSTINCT_PACKAGES.package_1.premium_bgn / 12).toFixed(2),
-      monthlyPremiumEUR: (INSTINCT_PACKAGES.package_1.premium_eur / 12).toFixed(2)
+      monthlyPremiumEUR: (INSTINCT_PACKAGES.package_1.premium_eur / 12).toFixed(2),
+      breakdown: null
     };
   }
   
@@ -128,10 +161,12 @@ export const calculateInstinctHomePremium = (sumInsured, packageType = 'custom')
     return {
       eligible: true,
       sumInsured: INSTINCT_PACKAGES.package_2.sum_insured,
+      basePremium: INSTINCT_PACKAGES.package_2.premium_bgn / 1.02,
       annualPremiumBGN: INSTINCT_PACKAGES.package_2.premium_bgn,
       annualPremiumEUR: INSTINCT_PACKAGES.package_2.premium_eur,
       monthlyPremiumBGN: (INSTINCT_PACKAGES.package_2.premium_bgn / 12).toFixed(2),
-      monthlyPremiumEUR: (INSTINCT_PACKAGES.package_2.premium_eur / 12).toFixed(2)
+      monthlyPremiumEUR: (INSTINCT_PACKAGES.package_2.premium_eur / 12).toFixed(2),
+      breakdown: null
     };
   }
   
@@ -139,64 +174,62 @@ export const calculateInstinctHomePremium = (sumInsured, packageType = 'custom')
     return {
       eligible: true,
       sumInsured: INSTINCT_PACKAGES.package_3.sum_insured,
+      basePremium: INSTINCT_PACKAGES.package_3.premium_bgn / 1.02,
       annualPremiumBGN: INSTINCT_PACKAGES.package_3.premium_bgn,
       annualPremiumEUR: INSTINCT_PACKAGES.package_3.premium_eur,
       monthlyPremiumBGN: (INSTINCT_PACKAGES.package_3.premium_bgn / 12).toFixed(2),
-      monthlyPremiumEUR: (INSTINCT_PACKAGES.package_3.premium_eur / 12).toFixed(2)
+      monthlyPremiumEUR: (INSTINCT_PACKAGES.package_3.premium_eur / 12).toFixed(2),
+      breakdown: null
     };
   }
 
-  // Персонализиран пакет - линейна интерполация
-  if (sumInsured < INSTINCT_RULES.min_sum || sumInsured > INSTINCT_RULES.max_sum) {
-    return {
-      eligible: false,
-      reason: `Застрахователната сума трябва да е между ${INSTINCT_RULES.min_sum.toLocaleString()} и ${INSTINCT_RULES.max_sum.toLocaleString()} EUR`
-    };
+  // Персонализиран - използваме формулата от модела
+  // BasePremium = SUM(min(tariff * coefficient, cap))
+  const breakdown = {};
+  let basePremium = 0;
+
+  // FIRE - без cap, коефициент 1.0
+  const firePremium = sumInsured * INSTINCT_COVERAGE_COEFFICIENTS.FIRE.coefficient;
+  breakdown.fire = firePremium;
+  basePremium += firePremium;
+
+  // WATER - cap 15000, коефициент 0.085
+  const waterBase = sumInsured * INSTINCT_COVERAGE_COEFFICIENTS.WATER.coefficient;
+  const waterPremium = Math.min(waterBase, INSTINCT_COVERAGE_COEFFICIENTS.WATER.cap);
+  breakdown.water = waterPremium;
+  basePremium += waterPremium;
+
+  // THEFT - cap 15000, коефициент 0.03
+  const theftBase = sumInsured * INSTINCT_COVERAGE_COEFFICIENTS.THEFT.coefficient;
+  const theftPremium = Math.min(theftBase, INSTINCT_COVERAGE_COEFFICIENTS.THEFT.cap);
+  breakdown.theft = theftPremium;
+  basePremium += theftPremium;
+
+  // SPORT - опционално, cap 12000, коефициент 0.024
+  if (includeSport) {
+    const sportBase = sumInsured * INSTINCT_COVERAGE_COEFFICIENTS.SPORT.coefficient;
+    const sportPremium = Math.min(sportBase, INSTINCT_COVERAGE_COEFFICIENTS.SPORT.cap);
+    breakdown.sport = sportPremium;
+    basePremium += sportPremium;
   }
 
-  // Намираме най-близките суми в таблицата
-  const amounts = Object.keys(INSTINCT_DETAILED_TARIFFS).map(Number).sort((a, b) => a - b);
+  // Добавяме данък 2%
+  const tax = basePremium * INSURANCE_TAX;
   
-  // Точно съвпадение
-  if (INSTINCT_DETAILED_TARIFFS[sumInsured]) {
-    const tariff = INSTINCT_DETAILED_TARIFFS[sumInsured];
-    return {
-      eligible: true,
-      sumInsured: sumInsured,
-      annualPremiumBGN: tariff.bgn,
-      annualPremiumEUR: tariff.eur,
-      monthlyPremiumBGN: (tariff.bgn / 12).toFixed(2),
-      monthlyPremiumEUR: (tariff.eur / 12).toFixed(2)
-    };
-  }
-
-  // Интерполация между най-близките стойности
-  let lowerAmount = amounts[0];
-  let upperAmount = amounts[amounts.length - 1];
-  
-  for (let i = 0; i < amounts.length - 1; i++) {
-    if (amounts[i] <= sumInsured && amounts[i + 1] >= sumInsured) {
-      lowerAmount = amounts[i];
-      upperAmount = amounts[i + 1];
-      break;
-    }
-  }
-
-  const lowerTariff = INSTINCT_DETAILED_TARIFFS[lowerAmount];
-  const upperTariff = INSTINCT_DETAILED_TARIFFS[upperAmount];
-  
-  // Линейна интерполация
-  const ratio = (sumInsured - lowerAmount) / (upperAmount - lowerAmount);
-  const premiumBGN = lowerTariff.bgn + (upperTariff.bgn - lowerTariff.bgn) * ratio;
-  const premiumEUR = lowerTariff.eur + (upperTariff.eur - lowerTariff.eur) * ratio;
+  // Final Premium = ceil((BasePremium + Tax)*100)/100
+  const finalPremiumBGN = Math.ceil((basePremium + tax) * 100) / 100;
+  const finalPremiumEUR = Math.ceil((finalPremiumBGN / EUR_BGN_RATE) * 100) / 100;
 
   return {
     eligible: true,
     sumInsured: sumInsured,
-    annualPremiumBGN: Math.round(premiumBGN * 100) / 100,
-    annualPremiumEUR: Math.round(premiumEUR * 100) / 100,
-    monthlyPremiumBGN: Math.round((premiumBGN / 12) * 100) / 100,
-    monthlyPremiumEUR: Math.round((premiumEUR / 12) * 100) / 100
+    basePremium: Math.round(basePremium * 100) / 100,
+    tax: Math.round(tax * 100) / 100,
+    annualPremiumBGN: finalPremiumBGN,
+    annualPremiumEUR: finalPremiumEUR,
+    monthlyPremiumBGN: Math.round((finalPremiumBGN / 12) * 100) / 100,
+    monthlyPremiumEUR: Math.round((finalPremiumEUR / 12) * 100) / 100,
+    breakdown: breakdown
   };
 };
 

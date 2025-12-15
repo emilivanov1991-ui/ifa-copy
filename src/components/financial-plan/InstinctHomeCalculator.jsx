@@ -10,6 +10,7 @@ import {
   INSTINCT_PACKAGE_COVERAGES,
   INSTINCT_COVERAGES,
   INSTINCT_RULES,
+  INSTINCT_COVERAGE_COEFFICIENTS,
   calculateInstinctHomePremium,
   EUR_BGN_RATE
 } from './InstinctHomeConstants';
@@ -23,16 +24,17 @@ export default function InstinctHomeCalculator({ initialData = {}, onSave, analy
     address: initialData.address || '',
     packageType: initialData.packageType || 'Пакет 2',
     customSum: initialData.customSum || 100000,
-    currency: initialData.currency || 'EUR'
+    currency: initialData.currency || 'BGN',
+    includeSport: initialData.includeSport || false
   });
 
   // Calculate premium
   const result = useMemo(() => {
     if (formData.packageType === 'Персонализиран') {
-      return calculateInstinctHomePremium(formData.customSum, 'custom');
+      return calculateInstinctHomePremium(formData.customSum, 'custom', formData.includeSport);
     }
-    return calculateInstinctHomePremium(0, formData.packageType);
-  }, [formData.packageType, formData.customSum]);
+    return calculateInstinctHomePremium(0, formData.packageType, formData.includeSport);
+  }, [formData.packageType, formData.customSum, formData.includeSport]);
 
   // Get coverage details
   const coverageDetails = useMemo(() => {
@@ -142,7 +144,7 @@ export default function InstinctHomeCalculator({ initialData = {}, onSave, analy
 
               {formData.packageType === 'Персонализиран' && (
                 <div>
-                  <Label>Застрахователна сума (EUR)</Label>
+                  <Label>Застрахователна сума (BGN)</Label>
                   <Input 
                     type="number"
                     value={formData.customSum}
@@ -153,22 +155,35 @@ export default function InstinctHomeCalculator({ initialData = {}, onSave, analy
                     className="mt-2"
                   />
                   <p className="text-xs text-slate-500 mt-1">
-                    От 50,000 до 500,000 EUR
+                    От 50,000 до 500,000 BGN (≈ 25,500 до 255,000 EUR)
                   </p>
                 </div>
               )}
 
               <div>
-                <Label>Валута</Label>
+                <Label>Валута за показване</Label>
                 <Select value={formData.currency} onValueChange={(v) => handleInputChange('currency', v)}>
                   <SelectTrigger className="mt-2">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="EUR">EUR (Евро)</SelectItem>
                     <SelectItem value="BGN">BGN (Лева)</SelectItem>
+                    <SelectItem value="EUR">EUR (Евро)</SelectItem>
                   </SelectContent>
                 </Select>
+              </div>
+
+              <div className="flex items-center gap-2 pt-2">
+                <input 
+                  type="checkbox"
+                  id="sport"
+                  checked={formData.includeSport}
+                  onChange={(e) => handleInputChange('includeSport', e.target.checked)}
+                  className="rounded"
+                />
+                <Label htmlFor="sport" className="text-sm cursor-pointer">
+                  Включи спортна екипировка (опция)
+                </Label>
               </div>
             </CardContent>
           </Card>
@@ -205,19 +220,57 @@ export default function InstinctHomeCalculator({ initialData = {}, onSave, analy
                     </p>
                   </div>
 
+                  {/* Premium Breakdown */}
+                  {result.breakdown && (
+                    <div className="bg-slate-50 rounded-lg p-4 space-y-2 text-sm">
+                      <p className="font-medium text-slate-800 mb-2">Разбивка на премията (BGN):</p>
+                      <div className="flex justify-between">
+                        <span className="text-slate-600">Пожар и природни бедствия:</span>
+                        <span className="font-medium">{result.breakdown.fire.toFixed(2)} лв</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-slate-600">Изтичане на вода:</span>
+                        <span className="font-medium">{result.breakdown.water.toFixed(2)} лв</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-slate-600">Кражба:</span>
+                        <span className="font-medium">{result.breakdown.theft.toFixed(2)} лв</span>
+                      </div>
+                      {result.breakdown.sport && (
+                        <div className="flex justify-between">
+                          <span className="text-slate-600">Спортна екипировка:</span>
+                          <span className="font-medium">{result.breakdown.sport.toFixed(2)} лв</span>
+                        </div>
+                      )}
+                      <div className="flex justify-between border-t pt-2">
+                        <span className="text-slate-600">Основна премия:</span>
+                        <span className="font-semibold">{result.basePremium.toFixed(2)} лв</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-slate-600">Данък 2%:</span>
+                        <span className="font-medium">{result.tax.toFixed(2)} лв</span>
+                      </div>
+                    </div>
+                  )}
+
                   {/* Details */}
                   <div className="space-y-2 text-sm border-t pt-4">
                     <div className="flex justify-between">
                       <span className="text-slate-600">Застрахователна сума:</span>
-                      <span className="font-medium">{result.sumInsured.toLocaleString()} EUR</span>
+                      <span className="font-medium">
+                        {result.sumInsured.toLocaleString()} BGN
+                        <span className="text-xs text-slate-400 ml-1">
+                          (≈ {Math.round(result.sumInsured / EUR_BGN_RATE).toLocaleString()} EUR)
+                        </span>
+                      </span>
                     </div>
                     <div className="flex justify-between">
                       <span className="text-slate-600">Пакет:</span>
                       <span className="font-medium">{formData.packageType}</span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-slate-600">Валутен курс:</span>
-                      <span className="font-medium">1 EUR = {EUR_BGN_RATE} BGN</span>
+                      <span className="text-slate-600">Срок:</span>
+                      <span className="font-medium">12 месеца</span>
                     </div>
                   </div>
                 </div>

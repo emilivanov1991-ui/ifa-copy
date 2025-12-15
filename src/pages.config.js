@@ -12,6 +12,7 @@ import AuxiliaryTools from './pages/AuxiliaryTools';
 import FinancialPlanCreate from './pages/FinancialPlanCreate';
 import ProductCatalogAdmin from './pages/ProductCatalogAdmin';
 import CascoOfferDemo from './pages/CascoOfferDemo';
+import ProductConfigDemo from './pages/ProductConfigDemo';
 import __Layout from './Layout.jsx';
 
 
@@ -30,6 +31,7 @@ export const PAGES = {
     "FinancialPlanCreate": FinancialPlanCreate,
     "ProductCatalogAdmin": ProductCatalogAdmin,
     "CascoOfferDemo": CascoOfferDemo,
+    "ProductConfigDemo": ProductConfigDemo,
 }
 
 export const pagesConfig = {

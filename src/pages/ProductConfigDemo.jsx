@@ -2,6 +2,10 @@ import React from 'react';
 import UniversalProductCalculator from '../components/products/UniversalProductCalculator';
 import MetLifeMedicaCalculator from '../components/products/MetLifeMedicaCalculator';
 import MetLifeCreditGuardCalculator from '../components/products/MetLifeCreditGuardCalculator';
+import MetLifeULCalculator from '../components/financial-plan/MetLifeULCalculator';
+import MetLifeChildULCalculator from '../components/financial-plan/MetLifeChildULCalculator';
+import MetLifeCareCalculator from '../components/financial-plan/MetLifeCareCalculator';
+import MetLifeTermLifeCalculator from '../components/financial-plan/MetLifeTermLifeCalculator';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 export default function ProductConfigDemo() {
@@ -18,9 +22,13 @@ export default function ProductConfigDemo() {
         </div>
 
         <Tabs defaultValue="metlife-credit-guard" className="w-full">
-          <TabsList className="grid w-full grid-cols-3 mb-6">
+          <TabsList className="grid w-full grid-cols-7 mb-6 text-xs">
             <TabsTrigger value="metlife-credit-guard">Credit Guard</TabsTrigger>
-            <TabsTrigger value="metlife-medica">МетЛайф Медика</TabsTrigger>
+            <TabsTrigger value="metlife-predimstvo">Предимство</TabsTrigger>
+            <TabsTrigger value="metlife-detstvo">Детство</TabsTrigger>
+            <TabsTrigger value="metlife-grija">Грижа</TabsTrigger>
+            <TabsTrigger value="metlife-srochen">Срочен живот</TabsTrigger>
+            <TabsTrigger value="metlife-medica">Медика</TabsTrigger>
             <TabsTrigger value="dzi-zakrila">ДЗИ Закрила</TabsTrigger>
           </TabsList>
 
@@ -31,6 +39,62 @@ export default function ProductConfigDemo() {
                 sum: 100000,
                 term: 30,
                 packageType: 'Основен'
+              }}
+            />
+          </TabsContent>
+
+          <TabsContent value="metlife-predimstvo">
+            <MetLifeULCalculator 
+              initialData={{
+                clientName: 'Демо клиент',
+                age: 35,
+                riskClass: 1,
+                annualSavings: 1500,
+                integratedLifeCoverage: 5000,
+                globalStock: 0.5,
+                emergingMarkets: 0.5,
+                globalBond: 0,
+                expectedReturn: 0.08
+              }}
+            />
+          </TabsContent>
+
+          <TabsContent value="metlife-detstvo">
+            <MetLifeChildULCalculator 
+              initialData={{
+                policyholderName: 'Родител',
+                policyholderAge: 35,
+                childName: 'Дете',
+                childAge: 5,
+                annualSavings: 1200,
+                fundGlobalStocks: 50,
+                fundEmergingMarkets: 50,
+                fundBonds: 0,
+                childProtection: true
+              }}
+            />
+          </TabsContent>
+
+          <TabsContent value="metlife-grija">
+            <MetLifeCareCalculator 
+              initialData={{
+                clientName: 'Демо клиент',
+                age: 35,
+                riskClass: 1,
+                package: 'Сребърен'
+              }}
+            />
+          </TabsContent>
+
+          <TabsContent value="metlife-srochen">
+            <MetLifeTermLifeCalculator 
+              initialData={{
+                clientName: 'Демо клиент',
+                age: 35,
+                riskClass: 1,
+                termLifeCoverage: 50000,
+                termLifeYears: 10,
+                fracturesCoverage: 1500
               }}
             />
           </TabsContent>
@@ -59,7 +123,7 @@ export default function ProductConfigDemo() {
               }}
             />
           </TabsContent>
-        </Tabs>
+          </Tabs>
 
         <div className="mt-12 bg-white rounded-xl p-6 border border-slate-200">
           <h3 className="font-semibold text-slate-900 mb-4">Как работи системата:</h3>

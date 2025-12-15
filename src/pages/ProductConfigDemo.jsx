@@ -1,6 +1,7 @@
 import React from 'react';
 import UniversalProductCalculator from '../components/products/UniversalProductCalculator';
 import MetLifeMedicaCalculator from '../components/products/MetLifeMedicaCalculator';
+import MetLifeCreditGuardCalculator from '../components/products/MetLifeCreditGuardCalculator';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 export default function ProductConfigDemo() {
@@ -16,11 +17,23 @@ export default function ProductConfigDemo() {
           </p>
         </div>
 
-        <Tabs defaultValue="metlife-medica" className="w-full">
-          <TabsList className="grid w-full grid-cols-2 mb-6">
+        <Tabs defaultValue="metlife-credit-guard" className="w-full">
+          <TabsList className="grid w-full grid-cols-3 mb-6">
+            <TabsTrigger value="metlife-credit-guard">Credit Guard</TabsTrigger>
             <TabsTrigger value="metlife-medica">МетЛайф Медика</TabsTrigger>
             <TabsTrigger value="dzi-zakrila">ДЗИ Закрила</TabsTrigger>
           </TabsList>
+
+          <TabsContent value="metlife-credit-guard">
+            <MetLifeCreditGuardCalculator 
+              initialInputs={{
+                age: 18,
+                sum: 100000,
+                term: 30,
+                packageType: 'Основен'
+              }}
+            />
+          </TabsContent>
 
           <TabsContent value="metlife-medica">
             <MetLifeMedicaCalculator 

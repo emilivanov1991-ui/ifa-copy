@@ -1,0 +1,219 @@
+import React, { useState, useEffect } from 'react';
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Shield, AlertCircle, CheckCircle2 } from 'lucide-react';
+import { calculateMetLifeCreditGuard, METLIFE_CREDIT_GUARD_RULES } from '../financial-plan/FinancialPlanConstants';
+
+export default function MetLifeCreditGuardCalculator({ initialInputs = {} }) {
+  const [inputs, setInputs] = useState({
+    age: initialInputs.age || 34,
+    sum: initialInputs.sum || 100000,
+    term: initialInputs.term || 30,
+    packageType: initialInputs.packageType || 'Основен'
+  });
+
+  const [result, setResult] = useState(null);
+
+  useEffect(() => {
+    const offer = calculateMetLifeCreditGuard(
+      parseInt(inputs.age),
+      parseInt(inputs.sum),
+      parseInt(inputs.term),
+      inputs.packageType
+    );
+    setResult(offer);
+  }, [inputs]);
+
+  return (
+    <div className="space-y-6">
+      {/* Header */}
+      <Card className="border-blue-200 overflow-hidden">
+        <CardHeader className="bg-gradient-to-r from-blue-600 to-blue-700 text-white">
+          <div className="flex items-center gap-3">
+            <div className="w-12 h-12 bg-white/20 rounded-lg flex items-center justify-center backdrop-blur-sm">
+              <Shield className="h-6 w-6" />
+            </div>
+            <div>
+              <CardTitle className="text-xl">MetLife Credit Guard</CardTitle>
+              <p className="text-sm text-blue-100">Ипотечна застраховка</p>
+            </div>
+          </div>
+        </CardHeader>
+      </Card>
+
+      <div className="grid lg:grid-cols-2 gap-6">
+        {/* Inputs */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-lg">Параметри</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-5">
+            {/* Age */}
+            <div>
+              <Label>Възраст</Label>
+              <Input
+                type="number"
+                value={inputs.age}
+                onChange={(e) => setInputs({ ...inputs, age: e.target.value })}
+                placeholder={`${METLIFE_CREDIT_GUARD_RULES.min_age} - ${METLIFE_CREDIT_GUARD_RULES.max_age}`}
+                className="mt-2"
+              />
+              <p className="text-xs text-slate-500 mt-1">
+                От {METLIFE_CREDIT_GUARD_RULES.min_age} години, Възраст + Срок ≤ {METLIFE_CREDIT_GUARD_RULES.max_age}
+              </p>
+            </div>
+
+            {/* Sum */}
+            <div>
+              <Label>Застрахователна сума (EUR)</Label>
+              <Input
+                type="number"
+                value={inputs.sum}
+                onChange={(e) => setInputs({ ...inputs, sum: e.target.value })}
+                placeholder={`${METLIFE_CREDIT_GUARD_RULES.min_sum} - ${METLIFE_CREDIT_GUARD_RULES.max_sum}`}
+                className="mt-2"
+              />
+              <p className="text-xs text-slate-500 mt-1">
+                От €{METLIFE_CREDIT_GUARD_RULES.min_sum.toLocaleString()} до €{METLIFE_CREDIT_GUARD_RULES.max_sum.toLocaleString()}
+              </p>
+            </div>
+
+            {/* Term */}
+            <div>
+              <Label>Срок (години)</Label>
+              <Select value={inputs.term.toString()} onValueChange={(value) => setInputs({ ...inputs, term: parseInt(value) })}>
+                <SelectTrigger className="mt-2">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {METLIFE_CREDIT_GUARD_RULES.available_terms.map(term => (
+                    <SelectItem key={term} value={term.toString()}>{term} години</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            {/* Package Type */}
+            <div>
+              <Label>Пакет</Label>
+              <Select value={inputs.packageType} onValueChange={(value) => setInputs({ ...inputs, packageType: value })}>
+                <SelectTrigger className="mt-2">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="Основен">Основен</SelectItem>
+                  <SelectItem value="Разширен">Разширен</SelectItem>
+                </SelectContent>
+              </Select>
+              <p className="text-xs text-slate-500 mt-1">
+                {inputs.packageType === 'Разширен' 
+                  ? 'Коефициент 0.25 (фиксиран за всички възрасти и срокове)'
+                  : 'Променлив коефициент според възраст и срок'}
+              </p>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Results */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-lg">Оферта</CardTitle>
+          </CardHeader>
+          <CardContent>
+            {!result ? (
+              <p className="text-slate-500 text-sm">Попълнете всички параметри</p>
+            ) : !result.eligible ? (
+              <div className="bg-amber-50 border border-amber-200 rounded-lg p-4">
+                <div className="flex items-center gap-2 text-amber-700 mb-2">
+                  <AlertCircle className="h-5 w-5" />
+                  <span className="font-medium">Неподходящ</span>
+                </div>
+                <p className="text-sm text-amber-600">{result.reason}</p>
+              </div>
+            ) : (
+              <div className="space-y-4">
+                {/* Main Premium */}
+                <div className="bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl p-6 border border-blue-200">
+                  <p className="text-sm text-slate-600 mb-2">Годишна премия</p>
+                  <p className="text-4xl font-bold text-blue-600">
+                    {result.annualPremium.toLocaleString('bg-BG', { minimumFractionDigits: 2 })} €
+                  </p>
+                  <p className="text-sm text-slate-500 mt-2">
+                    или {result.monthlyPremium.toLocaleString('bg-BG', { minimumFractionDigits: 2 })} €/месец
+                  </p>
+                </div>
+
+                {/* Details */}
+                <div className="space-y-2 text-sm border-t pt-4">
+                  <div className="flex justify-between items-center">
+                    <span className="text-slate-600">Пакет:</span>
+                    <span className="font-medium">{result.packageType}</span>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span className="text-slate-600">Застрахователна сума:</span>
+                    <span className="font-medium">{result.coverageAmount.toLocaleString('bg-BG')} €</span>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span className="text-slate-600">Срок:</span>
+                    <span className="font-medium">{result.term} години</span>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span className="text-slate-600">Възраст:</span>
+                    <span className="font-medium">{result.age} години</span>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span className="text-slate-600">Крайна възраст:</span>
+                    <span className="font-medium">{result.age + result.term} години</span>
+                  </div>
+                </div>
+
+                {/* Coverage Info */}
+                <div className="bg-slate-50 rounded-lg p-4 border">
+                  <p className="font-medium text-slate-900 mb-3 text-sm">Покритие:</p>
+                  <div className="space-y-2 text-xs">
+                    <div className="flex items-start gap-2">
+                      <CheckCircle2 className="h-3 w-3 text-green-500 mt-0.5 flex-shrink-0" />
+                      <span className="text-slate-700">Смърт</span>
+                    </div>
+                    <div className="flex items-start gap-2">
+                      <CheckCircle2 className="h-3 w-3 text-green-500 mt-0.5 flex-shrink-0" />
+                      <span className="text-slate-700">Трайна загуба на работоспособност</span>
+                    </div>
+                    {result.packageType === 'Разширен' && (
+                      <>
+                        <div className="flex items-start gap-2">
+                          <CheckCircle2 className="h-3 w-3 text-green-500 mt-0.5 flex-shrink-0" />
+                          <span className="text-slate-700">40 тежки заболявания</span>
+                        </div>
+                        <div className="flex items-start gap-2">
+                          <CheckCircle2 className="h-3 w-3 text-green-500 mt-0.5 flex-shrink-0" />
+                          <span className="text-slate-700">Смърт от злополука</span>
+                        </div>
+                        <div className="flex items-start gap-2">
+                          <CheckCircle2 className="h-3 w-3 text-green-500 mt-0.5 flex-shrink-0" />
+                          <span className="text-slate-700">Фрактури и изгаряния</span>
+                        </div>
+                      </>
+                    )}
+                  </div>
+                </div>
+
+                {/* Formula Info */}
+                {result.packageType === 'Основен' && (
+                  <div className="bg-blue-50 rounded-lg p-3 border border-blue-200">
+                    <p className="text-xs text-blue-700">
+                      <strong>Формула:</strong> Премията се мащабира линейно според сумата.
+                      Премия = (Сума / €100,000) × БазоваПремия(възраст, срок)
+                    </p>
+                  </div>
+                )}
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      </div>
+    </div>
+  );
+}

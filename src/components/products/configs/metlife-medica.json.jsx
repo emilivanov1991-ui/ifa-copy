@@ -219,8 +219,7 @@
     "payment_frequency_multipliers": {
       "annual": 1.00,
       "semiannual": 1.02,
-      "quarterly": 1.04,
-      "monthly": 1.06
+      "quarterly": 1.04
     }
   },
   

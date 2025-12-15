@@ -44,8 +44,7 @@ export default function MetLifeMedicaCalculator({ initialInputs = {} }) {
     paymentFrequency: {
       'annual': { label: 'Годишно', multiplier: 1.00 },
       'semiannual': { label: 'Полугодишно', multiplier: 1.02 },
-      'quarterly': { label: 'Тримесечно', multiplier: 1.04 },
-      'monthly': { label: 'Месечно', multiplier: 1.06 }
+      'quarterly': { label: 'Тримесечно', multiplier: 1.04 }
     }
   };
 
@@ -127,9 +126,6 @@ export default function MetLifeMedicaCalculator({ initialInputs = {} }) {
     } else if (paymentFrequency === 'quarterly') {
       premiumPerPeriod = adjustedAnnualPremium / 4;
       periodsPerYear = 4;
-    } else if (paymentFrequency === 'monthly') {
-      premiumPerPeriod = adjustedAnnualPremium / 12;
-      periodsPerYear = 12;
     }
 
     setResult({

@@ -1908,6 +1908,8 @@ export const MODEL_COEFFICIENTS = {
 
 // Базови годишни премии за €100,000 покритие - пакет "Основен"
 export const METLIFE_CREDIT_GUARD_BASIC_RATES = {
+  18: { 5: 147, 10: 147, 15: 147, 20: 147, 25: 147, 30: 147 },
+  19: { 5: 147, 10: 147, 15: 147, 20: 147, 25: 147, 30: 147 },
   20: { 5: 147, 10: 147, 15: 147, 20: 147, 25: 147, 30: 147 },
   25: { 5: 147, 10: 147, 15: 147, 20: 147, 25: 147, 30: 160 },
   30: { 5: 160, 10: 160, 15: 160, 20: 160, 25: 172, 30: 184 },
@@ -1922,7 +1924,7 @@ export const METLIFE_CREDIT_GUARD_EXTENDED_COEFFICIENT = 0.25;
 
 // Правила за Credit Guard
 export const METLIFE_CREDIT_GUARD_RULES = {
-  min_age: 20,
+  min_age: 18,
   max_age: 70, // Възраст + срок <= 70
   min_sum: 10000,
   max_sum: 500000,

@@ -6,6 +6,7 @@ import MetLifeULCalculator from '../components/financial-plan/MetLifeULCalculato
 import MetLifeChildULCalculator from '../components/financial-plan/MetLifeChildULCalculator';
 import MetLifeCareCalculator from '../components/financial-plan/MetLifeCareCalculator';
 import MetLifeTermLifeCalculator from '../components/financial-plan/MetLifeTermLifeCalculator';
+import InstinctHomeCalculator from '../components/financial-plan/InstinctHomeCalculator';
 import SavedOffersManager from '../components/offers/SavedOffersManager';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Input } from "@/components/ui/input";
@@ -53,7 +54,7 @@ export default function ProductConfigDemo() {
         </div>
 
         <Tabs defaultValue="metlife-credit-guard" className="w-full">
-          <TabsList className="grid w-full grid-cols-8 mb-6 text-xs">
+          <TabsList className="grid w-full grid-cols-9 mb-6 text-xs">
             <TabsTrigger value="metlife-credit-guard">Credit Guard</TabsTrigger>
             <TabsTrigger value="metlife-predimstvo">Предимство</TabsTrigger>
             <TabsTrigger value="metlife-detstvo">Детство</TabsTrigger>
@@ -61,6 +62,7 @@ export default function ProductConfigDemo() {
             <TabsTrigger value="metlife-srochen">Срочен живот</TabsTrigger>
             <TabsTrigger value="metlife-medica">Медика</TabsTrigger>
             <TabsTrigger value="dzi-zakrila">ДЗИ Закрила</TabsTrigger>
+            <TabsTrigger value="instinct-home">Инстинкт</TabsTrigger>
             <TabsTrigger value="saved-offers">Запазени</TabsTrigger>
           </TabsList>
 
@@ -164,6 +166,19 @@ export default function ProductConfigDemo() {
                 sum: 50000,
                 term: 20,
                 isSmoker: false
+              }}
+              analysisId={demoAnalysisId}
+              clientId={demoClientId}
+            />
+          </TabsContent>
+
+          <TabsContent value="instinct-home">
+            <InstinctHomeCalculator 
+              initialData={{
+                clientName: 'Демо клиент',
+                address: 'гр. София',
+                packageType: 'Пакет 2',
+                currency: 'EUR'
               }}
               analysisId={demoAnalysisId}
               clientId={demoClientId}

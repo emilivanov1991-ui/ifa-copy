@@ -5,8 +5,10 @@ import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Switch } from "@/components/ui/switch";
-import { Shield, Calculator, CheckCircle2, AlertTriangle } from 'lucide-react';
+import { Shield, Calculator, CheckCircle2, AlertTriangle, Save } from 'lucide-react';
 import { calculateProductOffer, loadProductConfig } from './ProductConfigEngine';
+import { base44 } from '@/api/base44Client';
+import { toast } from 'sonner';
 
 /**
  * Universal Product Calculator Component
@@ -276,6 +278,22 @@ export default function UniversalProductCalculator({ productId, initialInputs = 
                 </div>
               ))}
             </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Save Button */}
+      {analysisId && result?.eligible && (
+        <Card>
+          <CardContent className="pt-6">
+            <Button 
+              onClick={handleSave} 
+              disabled={saving}
+              className="w-full"
+            >
+              <Save className="h-4 w-4 mr-2" />
+              {saving ? 'Записване...' : 'Запази офертата'}
+            </Button>
           </CardContent>
         </Card>
       )}

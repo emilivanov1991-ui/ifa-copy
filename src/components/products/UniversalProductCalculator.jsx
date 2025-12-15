@@ -12,11 +12,12 @@ import { calculateProductOffer, loadProductConfig } from './ProductConfigEngine'
  * Universal Product Calculator Component
  * Dynamically renders inputs and calculates based on product config
  */
-export default function UniversalProductCalculator({ productId, initialInputs = {} }) {
+export default function UniversalProductCalculator({ productId, initialInputs = {}, analysisId, clientId }) {
   const [config, setConfig] = useState(null);
   const [inputs, setInputs] = useState(initialInputs);
   const [result, setResult] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
 
   // Load config on mount
   useEffect(() => {
@@ -46,6 +47,34 @@ export default function UniversalProductCalculator({ productId, initialInputs = 
 
   const handleInputChange = (field, value) => {
     setInputs(prev => ({ ...prev, [field]: value }));
+  };
+
+  const handleSave = async () => {
+    if (!result?.eligible || !analysisId) return;
+    
+    setSaving(true);
+    try {
+      await base44.entities.ProductOffer.create({
+        analysis_id: analysisId,
+        client_id: clientId,
+        provider: config.provider,
+        product_name: config.name,
+        product_type: config.type,
+        beneficiary_age: parseInt(inputs.age),
+        term_years: parseInt(inputs.term),
+        monthly_premium: result.monthlyPremium,
+        annual_premium: result.annualPremium,
+        coverage_amount: parseInt(inputs.sum),
+        offer_status: 'generated',
+        ai_recommendation_reason: config.description
+      });
+      
+      toast.success('Офертата е запазена успешно');
+    } catch (error) {
+      toast.error('Грешка при записване: ' + error.message);
+    } finally {
+      setSaving(false);
+    }
   };
 
   return (

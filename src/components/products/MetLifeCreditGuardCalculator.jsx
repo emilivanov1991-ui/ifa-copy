@@ -3,10 +3,12 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Shield, AlertCircle, CheckCircle2 } from 'lucide-react';
+import { Shield, AlertCircle, CheckCircle2, Save } from 'lucide-react';
 import { calculateMetLifeCreditGuard, METLIFE_CREDIT_GUARD_RULES } from '../financial-plan/FinancialPlanConstants';
+import { base44 } from '@/api/base44Client';
+import { toast } from 'sonner';
 
-export default function MetLifeCreditGuardCalculator({ initialInputs = {} }) {
+export default function MetLifeCreditGuardCalculator({ initialInputs = {}, onSave, analysisId, clientId }) {
   const [inputs, setInputs] = useState({
     age: initialInputs.age || 34,
     sum: initialInputs.sum || 100000,
@@ -15,6 +17,7 @@ export default function MetLifeCreditGuardCalculator({ initialInputs = {} }) {
   });
 
   const [result, setResult] = useState(null);
+  const [saving, setSaving] = useState(false);
 
   useEffect(() => {
     const offer = calculateMetLifeCreditGuard(
@@ -25,6 +28,35 @@ export default function MetLifeCreditGuardCalculator({ initialInputs = {} }) {
     );
     setResult(offer);
   }, [inputs]);
+
+  const handleSave = async () => {
+    if (!result?.eligible || !analysisId) return;
+    
+    setSaving(true);
+    try {
+      await base44.entities.ProductOffer.create({
+        analysis_id: analysisId,
+        client_id: clientId,
+        provider: 'MetLife',
+        product_name: 'MetLife Credit Guard',
+        product_type: 'term_life',
+        beneficiary_age: parseInt(inputs.age),
+        term_years: parseInt(inputs.term),
+        monthly_premium: result.monthlyPremium,
+        annual_premium: result.annualPremium,
+        coverage_amount: parseInt(inputs.sum),
+        offer_status: 'generated',
+        ai_recommendation_reason: `Ипотечна застраховка ${inputs.packageType} пакет за ${inputs.term} години`
+      });
+      
+      toast.success('Офертата е запазена успешно');
+      if (onSave) onSave(result);
+    } catch (error) {
+      toast.error('Грешка при записване: ' + error.message);
+    } finally {
+      setSaving(false);
+    }
+  };
 
   return (
     <div className="space-y-6">

@@ -4,13 +4,16 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
-import { AlertTriangle, Info, Baby } from 'lucide-react';
+import { AlertTriangle, Info, Baby, Save } from 'lucide-react';
+import { base44 } from '@/api/base44Client';
+import { toast } from 'sonner';
 import {
   METLIFE_PA_CHILD_COVERAGES,
   getChildProtectionCoefficient
 } from './FinancialPlanConstants';
 
-export default function MetLifeChildULCalculator({ initialData = {}, onSave }) {
+export default function MetLifeChildULCalculator({ initialData = {}, onSave, analysisId, clientId }) {
+  const [saving, setSaving] = useState(false);
   const [formData, setFormData] = useState({
     // Policyholder (parent)
     policyholderName: initialData.policyholderName || '',
@@ -166,6 +169,34 @@ export default function MetLifeChildULCalculator({ initialData = {}, onSave }) {
 
   const handleInputChange = (field, value) => {
     setFormData(prev => ({ ...prev, [field]: value }));
+  };
+
+  const handleSaveOffer = async () => {
+    if (!analysisId || premiumBreakdown.errors.length > 0) return;
+    
+    setSaving(true);
+    try {
+      await base44.entities.ProductOffer.create({
+        analysis_id: analysisId,
+        client_id: clientId,
+        provider: 'MetLife',
+        product_name: 'MetLife Детство',
+        product_type: 'education_plan',
+        beneficiary_name: formData.childName,
+        beneficiary_age: formData.childAge,
+        monthly_premium: premiumBreakdown.annualPremium / 12,
+        annual_premium: premiumBreakdown.annualPremium,
+        offer_status: 'generated',
+        ai_recommendation_reason: `Детски UL план с очаквана доходност ${(premiumBreakdown.expectedReturn * 100).toFixed(2)}%`
+      });
+      
+      toast.success('Офертата е запазена успешно');
+      if (onSave) onSave(formData, premiumBreakdown);
+    } catch (error) {
+      toast.error('Грешка при записване: ' + error.message);
+    } finally {
+      setSaving(false);
+    }
   };
 
   return (
@@ -471,14 +502,14 @@ export default function MetLifeChildULCalculator({ initialData = {}, onSave }) {
             </CardContent>
           </Card>
 
-          {onSave && (
+          {analysisId && (
             <Button 
-              onClick={() => onSave(formData, premiumBreakdown)} 
+              onClick={handleSaveOffer} 
               className="w-full bg-purple-600 hover:bg-purple-700"
-              disabled={premiumBreakdown.errors.length > 0}
+              disabled={premiumBreakdown.errors.length > 0 || saving}
             >
-              <Baby className="w-4 h-4 mr-2" />
-              Запази офертата
+              <Save className="w-4 h-4 mr-2" />
+              {saving ? 'Записване...' : 'Запази офертата'}
             </Button>
           )}
         </div>

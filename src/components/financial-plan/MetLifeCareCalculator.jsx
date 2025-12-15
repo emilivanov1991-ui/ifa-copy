@@ -5,7 +5,9 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
-import { Shield, AlertTriangle, Info } from 'lucide-react';
+import { Shield, AlertTriangle, Info, Save } from 'lucide-react';
+import { base44 } from '@/api/base44Client';
+import { toast } from 'sonner';
 import {
   METLIFE_CARE_AGE_RATES,
   METLIFE_PA_RISK_CLASSES
@@ -20,7 +22,8 @@ const ML_CARE_PACKAGES = {
   'Персонализиран': { disability: 0, ptd: 0, ci40: 0, cancer: 0, inSitu: 0 }
 };
 
-export default function MetLifeCareCalculator({ initialData = {}, onSave }) {
+export default function MetLifeCareCalculator({ initialData = {}, onSave, analysisId, clientId }) {
+  const [saving, setSaving] = useState(false);
   const [formData, setFormData] = useState({
     clientName: initialData.clientName || '',
     age: initialData.age || 35,
@@ -176,6 +179,36 @@ export default function MetLifeCareCalculator({ initialData = {}, onSave }) {
 
   const handleInputChange = (field, value) => {
     setFormData(prev => ({ ...prev, [field]: value }));
+  };
+
+  const handleSaveOffer = async () => {
+    if (!analysisId || premiumBreakdown.errors.length > 0) return;
+    
+    setSaving(true);
+    try {
+      await base44.entities.ProductOffer.create({
+        analysis_id: analysisId,
+        client_id: clientId,
+        provider: 'MetLife',
+        product_name: 'MetLife Грижа',
+        product_type: 'health_insurance',
+        beneficiary_name: formData.clientName,
+        beneficiary_age: formData.age,
+        monthly_premium: premiumBreakdown.annualPremium / 12,
+        annual_premium: premiumBreakdown.annualPremium,
+        coverage_amount: formData.disabilityCoverage,
+        risk_class: formData.riskClass,
+        offer_status: 'generated',
+        ai_recommendation_reason: `Здравна застраховка пакет ${formData.package}`
+      });
+      
+      toast.success('Офертата е запазена успешно');
+      if (onSave) onSave(formData, premiumBreakdown);
+    } catch (error) {
+      toast.error('Грешка при записване: ' + error.message);
+    } finally {
+      setSaving(false);
+    }
   };
 
   return (
@@ -453,13 +486,14 @@ export default function MetLifeCareCalculator({ initialData = {}, onSave }) {
             </CardContent>
           </Card>
 
-          {onSave && (
+          {analysisId && (
             <Button 
-              onClick={() => onSave(formData, premiumBreakdown)} 
+              onClick={handleSaveOffer} 
               className="w-full bg-teal-600 hover:bg-teal-700"
-              disabled={premiumBreakdown.errors.length > 0}
+              disabled={premiumBreakdown.errors.length > 0 || saving}
             >
-              Запази офертата
+              <Save className="w-4 w-4 mr-2" />
+              {saving ? 'Записване...' : 'Запази офертата'}
             </Button>
           )}
         </div>

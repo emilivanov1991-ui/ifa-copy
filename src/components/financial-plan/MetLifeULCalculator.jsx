@@ -7,7 +7,9 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
-import { Calculator, Shield, TrendingUp, Info } from 'lucide-react';
+import { Calculator, Shield, TrendingUp, Info, Save } from 'lucide-react';
+import { base44 } from '@/api/base44Client';
+import { toast } from 'sonner';
 import {
   METLIFE_UL_FUND_ALLOCATION,
   TERM_LIFE_RIDER_RATES,
@@ -21,7 +23,8 @@ import {
   calculateStrategyReturn
 } from './FinancialPlanConstants';
 
-export default function MetLifeULCalculator({ initialData = {}, onSave }) {
+export default function MetLifeULCalculator({ initialData = {}, onSave, analysisId, clientId }) {
+  const [saving, setSaving] = useState(false);
   const [formData, setFormData] = useState({
     clientName: initialData.clientName || '',
     age: initialData.age || 35,
@@ -250,6 +253,37 @@ export default function MetLifeULCalculator({ initialData = {}, onSave }) {
   if (formData.integratedLifeCoverage > 14999) {
     warnings.push('За покритие над 15 000€ е необходим здравен въпросник');
   }
+
+  const handleSaveOffer = async () => {
+    if (!analysisId || warnings.length > 0) return;
+    
+    setSaving(true);
+    try {
+      await base44.entities.ProductOffer.create({
+        analysis_id: analysisId,
+        client_id: clientId,
+        provider: 'MetLife',
+        product_name: 'MetLife Предимство',
+        product_type: 'ul_investment',
+        beneficiary_name: formData.clientName,
+        beneficiary_age: formData.age,
+        strategy: 'custom',
+        monthly_premium: premiumBreakdown.monthly,
+        annual_premium: premiumBreakdown.totalAnnual,
+        coverage_amount: formData.integratedLifeCoverage,
+        risk_class: formData.riskClass,
+        offer_status: 'generated',
+        ai_recommendation_reason: `UL инвестиция с очаквана доходност ${(formData.expectedReturn * 100).toFixed(1)}%`
+      });
+      
+      toast.success('Офертата е запазена успешно');
+      if (onSave) onSave(formData, premiumBreakdown, projection);
+    } catch (error) {
+      toast.error('Грешка при записване: ' + error.message);
+    } finally {
+      setSaving(false);
+    }
+  };
 
   return (
     <div className="space-y-6">
@@ -716,9 +750,14 @@ export default function MetLifeULCalculator({ initialData = {}, onSave }) {
                 </div>
               </div>
 
-              {onSave && (
-                <Button onClick={() => onSave(formData, premiumBreakdown, projection)} className="w-full">
-                  Запази офертата
+              {analysisId && (
+                <Button 
+                  onClick={handleSaveOffer} 
+                  disabled={saving || warnings.length > 0}
+                  className="w-full bg-blue-600 hover:bg-blue-700"
+                >
+                  <Save className="h-4 w-4 mr-2" />
+                  {saving ? 'Записване...' : 'Запази офертата'}
                 </Button>
               )}
             </CardContent>

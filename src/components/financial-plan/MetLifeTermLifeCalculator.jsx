@@ -5,7 +5,9 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
-import { Shield, AlertTriangle, Info } from 'lucide-react';
+import { Shield, AlertTriangle, Info, Save } from 'lucide-react';
+import { base44 } from '@/api/base44Client';
+import { toast } from 'sonner';
 import {
   TERM_LIFE_RIDER_RATES,
   TERM_LIFE_BASIC_RATES,
@@ -14,7 +16,8 @@ import {
   METLIFE_PA_SECURITY_PLUS_COEFFICIENTS
 } from './FinancialPlanConstants';
 
-export default function MetLifeTermLifeCalculator({ initialData = {}, onSave }) {
+export default function MetLifeTermLifeCalculator({ initialData = {}, onSave, analysisId, clientId }) {
+  const [saving, setSaving] = useState(false);
   const [formData, setFormData] = useState({
     clientName: initialData.clientName || '',
     age: initialData.age || 35,
@@ -222,6 +225,37 @@ export default function MetLifeTermLifeCalculator({ initialData = {}, onSave }) 
 
   const handleInputChange = (field, value) => {
     setFormData(prev => ({ ...prev, [field]: value }));
+  };
+
+  const handleSaveOffer = async () => {
+    if (!analysisId || premiumBreakdown.errors.length > 0) return;
+    
+    setSaving(true);
+    try {
+      await base44.entities.ProductOffer.create({
+        analysis_id: analysisId,
+        client_id: clientId,
+        provider: 'MetLife',
+        product_name: 'MetLife Срочен живот',
+        product_type: 'term_life',
+        beneficiary_name: formData.clientName,
+        beneficiary_age: formData.age,
+        term_years: formData.termLifeYears,
+        monthly_premium: premiumBreakdown.annualPremium / 12,
+        annual_premium: premiumBreakdown.annualPremium,
+        coverage_amount: formData.termLifeCoverage,
+        risk_class: formData.riskClass,
+        offer_status: 'generated',
+        ai_recommendation_reason: `Срочна застраховка живот ${formData.termLifeYears} години`
+      });
+      
+      toast.success('Офертата е запазена успешно');
+      if (onSave) onSave(formData, premiumBreakdown);
+    } catch (error) {
+      toast.error('Грешка при записване: ' + error.message);
+    } finally {
+      setSaving(false);
+    }
   };
 
   const riskClassLabel = formData.riskClass === 1 ? 'I рисков клас' : formData.riskClass === 2 ? 'II рисков клас' : 'III рисков клас';
@@ -558,13 +592,14 @@ export default function MetLifeTermLifeCalculator({ initialData = {}, onSave }) 
             </CardContent>
           </Card>
 
-          {onSave && (
+          {analysisId && (
             <Button 
-              onClick={() => onSave(formData, premiumBreakdown)} 
-              className="w-full"
-              disabled={premiumBreakdown.errors.length > 0}
+              onClick={handleSaveOffer} 
+              className="w-full bg-blue-600 hover:bg-blue-700"
+              disabled={premiumBreakdown.errors.length > 0 || saving}
             >
-              Запази офертата
+              <Save className="w-4 h-4 mr-2" />
+              {saving ? 'Записване...' : 'Запази офертата'}
             </Button>
           )}
         </div>

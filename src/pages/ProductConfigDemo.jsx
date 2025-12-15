@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import UniversalProductCalculator from '../components/products/UniversalProductCalculator';
 import MetLifeMedicaCalculator from '../components/products/MetLifeMedicaCalculator';
 import MetLifeCreditGuardCalculator from '../components/products/MetLifeCreditGuardCalculator';
@@ -6,9 +6,15 @@ import MetLifeULCalculator from '../components/financial-plan/MetLifeULCalculato
 import MetLifeChildULCalculator from '../components/financial-plan/MetLifeChildULCalculator';
 import MetLifeCareCalculator from '../components/financial-plan/MetLifeCareCalculator';
 import MetLifeTermLifeCalculator from '../components/financial-plan/MetLifeTermLifeCalculator';
+import SavedOffersManager from '../components/offers/SavedOffersManager';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 
 export default function ProductConfigDemo() {
+  const [demoAnalysisId, setDemoAnalysisId] = useState('');
+  const [demoClientId, setDemoClientId] = useState('');
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 pt-24 pb-12">
       <div className="max-w-6xl mx-auto px-6">
@@ -21,8 +27,33 @@ export default function ProductConfigDemo() {
           </p>
         </div>
 
+        {/* Demo Analysis/Client IDs for testing save */}
+        <div className="bg-white rounded-lg p-4 mb-6 border border-slate-200">
+          <p className="text-sm font-medium text-slate-700 mb-3">Тестване на записване (опционално)</p>
+          <div className="grid md:grid-cols-2 gap-4">
+            <div>
+              <Label className="text-xs">Analysis ID</Label>
+              <Input 
+                value={demoAnalysisId}
+                onChange={(e) => setDemoAnalysisId(e.target.value)}
+                placeholder="Въведи analysis_id за тестване"
+                className="text-sm"
+              />
+            </div>
+            <div>
+              <Label className="text-xs">Client ID</Label>
+              <Input 
+                value={demoClientId}
+                onChange={(e) => setDemoClientId(e.target.value)}
+                placeholder="Въведи client_id за тестване"
+                className="text-sm"
+              />
+            </div>
+          </div>
+        </div>
+
         <Tabs defaultValue="metlife-credit-guard" className="w-full">
-          <TabsList className="grid w-full grid-cols-7 mb-6 text-xs">
+          <TabsList className="grid w-full grid-cols-8 mb-6 text-xs">
             <TabsTrigger value="metlife-credit-guard">Credit Guard</TabsTrigger>
             <TabsTrigger value="metlife-predimstvo">Предимство</TabsTrigger>
             <TabsTrigger value="metlife-detstvo">Детство</TabsTrigger>
@@ -30,6 +61,7 @@ export default function ProductConfigDemo() {
             <TabsTrigger value="metlife-srochen">Срочен живот</TabsTrigger>
             <TabsTrigger value="metlife-medica">Медика</TabsTrigger>
             <TabsTrigger value="dzi-zakrila">ДЗИ Закрила</TabsTrigger>
+            <TabsTrigger value="saved-offers">Запазени</TabsTrigger>
           </TabsList>
 
           <TabsContent value="metlife-credit-guard">
@@ -40,6 +72,8 @@ export default function ProductConfigDemo() {
                 term: 30,
                 packageType: 'Основен'
               }}
+              analysisId={demoAnalysisId}
+              clientId={demoClientId}
             />
           </TabsContent>
 
@@ -56,6 +90,8 @@ export default function ProductConfigDemo() {
                 globalBond: 0,
                 expectedReturn: 0.08
               }}
+              analysisId={demoAnalysisId}
+              clientId={demoClientId}
             />
           </TabsContent>
 
@@ -72,6 +108,8 @@ export default function ProductConfigDemo() {
                 fundBonds: 0,
                 childProtection: true
               }}
+              analysisId={demoAnalysisId}
+              clientId={demoClientId}
             />
           </TabsContent>
 
@@ -83,6 +121,8 @@ export default function ProductConfigDemo() {
                 riskClass: 1,
                 package: 'Сребърен'
               }}
+              analysisId={demoAnalysisId}
+              clientId={demoClientId}
             />
           </TabsContent>
 
@@ -96,6 +136,8 @@ export default function ProductConfigDemo() {
                 termLifeYears: 10,
                 fracturesCoverage: 1500
               }}
+              analysisId={demoAnalysisId}
+              clientId={demoClientId}
             />
           </TabsContent>
 
@@ -108,6 +150,8 @@ export default function ProductConfigDemo() {
                 riskClass: '1',
                 paymentFrequency: 'annual'
               }}
+              analysisId={demoAnalysisId}
+              clientId={demoClientId}
             />
           </TabsContent>
 
@@ -121,7 +165,22 @@ export default function ProductConfigDemo() {
                 term: 20,
                 isSmoker: false
               }}
+              analysisId={demoAnalysisId}
+              clientId={demoClientId}
             />
+          </TabsContent>
+
+          <TabsContent value="saved-offers">
+            {demoAnalysisId ? (
+              <SavedOffersManager 
+                analysisId={demoAnalysisId}
+                clientId={demoClientId}
+              />
+            ) : (
+              <div className="text-center py-12 text-slate-500">
+                Въведи Analysis ID за да видиш запазените оферти
+              </div>
+            )}
           </TabsContent>
           </Tabs>
 

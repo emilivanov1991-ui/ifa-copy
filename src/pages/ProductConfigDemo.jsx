@@ -1,5 +1,7 @@
 import React from 'react';
 import UniversalProductCalculator from '../components/products/UniversalProductCalculator';
+import MetLifeMedicaCalculator from '../components/products/MetLifeMedicaCalculator';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 export default function ProductConfigDemo() {
   return (
@@ -10,20 +12,41 @@ export default function ProductConfigDemo() {
             Универсална Продуктова Система
           </h1>
           <p className="text-slate-600">
-            Пример: ДЗИ Закрила (конфигуриран през JSON)
+            Конфигурирани продукти чрез JSON
           </p>
         </div>
 
-        <UniversalProductCalculator 
-          productId="dzi-zakrila"
-          initialInputs={{
-            age: 35,
-            gender: 'male',
-            sum: 50000,
-            term: 20,
-            isSmoker: false
-          }}
-        />
+        <Tabs defaultValue="metlife-medica" className="w-full">
+          <TabsList className="grid w-full grid-cols-2 mb-6">
+            <TabsTrigger value="metlife-medica">МетЛайф Медика</TabsTrigger>
+            <TabsTrigger value="dzi-zakrila">ДЗИ Закрила</TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="metlife-medica">
+            <MetLifeMedicaCalculator 
+              initialInputs={{
+                age: 34,
+                coverageType: '32_critical_illnesses',
+                plan: '100000',
+                riskClass: '1',
+                paymentFrequency: 'annual'
+              }}
+            />
+          </TabsContent>
+
+          <TabsContent value="dzi-zakrila">
+            <UniversalProductCalculator 
+              productId="dzi-zakrila"
+              initialInputs={{
+                age: 35,
+                gender: 'male',
+                sum: 50000,
+                term: 20,
+                isSmoker: false
+              }}
+            />
+          </TabsContent>
+        </Tabs>
 
         <div className="mt-12 bg-white rounded-xl p-6 border border-slate-200">
           <h3 className="font-semibold text-slate-900 mb-4">Как работи системата:</h3>

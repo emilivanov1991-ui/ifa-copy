@@ -313,21 +313,16 @@ export default function MetLifeULCalculator({ initialData = {}, onSave, analysis
         <TabsContent value="input" className="space-y-6">
           {/* Warnings */}
           {warnings.length > 0 && (
-            <motion.div
-              initial={{ opacity: 0, scale: 0.95 }}
-              animate={{ opacity: 1, scale: 1 }}
-            >
-              <Card className="border-amber-300 bg-gradient-to-r from-amber-50 to-orange-50 shadow-lg">
-                <CardContent className="pt-6">
-                  {warnings.map((warning, idx) => (
-                    <div key={idx} className="flex items-start gap-2 text-amber-800">
-                      <Info className="h-4 w-4 mt-0.5 flex-shrink-0" />
-                      <span className="text-sm font-medium">{warning}</span>
-                    </div>
-                  ))}
-                </CardContent>
-              </Card>
-            </motion.div>
+            <Card className="border-amber-300 bg-gradient-to-r from-amber-50 to-orange-50 shadow-lg">
+              <CardContent className="pt-6">
+                {warnings.map((warning, idx) => (
+                  <div key={idx} className="flex items-start gap-2 text-amber-800">
+                    <Info className="h-4 w-4 mt-0.5 flex-shrink-0" />
+                    <span className="text-sm font-medium">{warning}</span>
+                  </div>
+                ))}
+              </CardContent>
+            </Card>
           )}
 
           {/* Basic Info */}

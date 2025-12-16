@@ -87,27 +87,28 @@ export default function InstinctHomeCalculator({ initialData = {}, onSave, analy
   return (
     <div className="space-y-6">
       {/* Header */}
-      <Card className="bg-gradient-to-r from-purple-600 to-purple-700 overflow-hidden">
+      <Card className="bg-gradient-to-r from-purple-600 via-purple-700 to-blue-600 overflow-hidden shadow-2xl">
         <CardHeader>
-          <div className="flex items-center gap-3">
-            <div className="w-12 h-12 bg-white/20 rounded-lg flex items-center justify-center">
-              <Home className="h-6 w-6 text-white" />
+          <div className="flex items-center gap-4">
+            <div className="w-14 h-14 bg-white/20 backdrop-blur-sm rounded-xl flex items-center justify-center shadow-lg">
+              <Home className="h-7 w-7 text-white" />
             </div>
             <div>
-              <CardTitle className="text-white text-xl">Инстинкт - Закрила на дома</CardTitle>
-              <p className="text-purple-100 text-sm">Имуществена застраховка за жилища</p>
+              <CardTitle className="text-white text-2xl font-bold tracking-wide">Инстинкт - Закрила на дома</CardTitle>
+              <p className="text-purple-100 text-sm font-medium">Имуществена застраховка за жилища</p>
             </div>
           </div>
         </CardHeader>
       </Card>
 
       <Tabs defaultValue="comparison" className="w-full">
-        <TabsList className="grid w-full grid-cols-2">
-          <TabsTrigger value="comparison" className="gap-2">
+        <TabsList className="grid w-full grid-cols-2 h-12 bg-gradient-to-r from-purple-100 to-blue-100 p-1 rounded-lg">
+          <TabsTrigger value="comparison" className="gap-2 data-[state=active]:bg-white data-[state=active]:shadow-lg transition-all duration-300">
             <Grid3x3 className="h-4 w-4" />
-            Сравнение на пакетите
+            <span className="hidden sm:inline">Сравнение на пакетите</span>
+            <span className="sm:hidden">Сравнение</span>
           </TabsTrigger>
-          <TabsTrigger value="calculator" className="gap-2">
+          <TabsTrigger value="calculator" className="gap-2 data-[state=active]:bg-white data-[state=active]:shadow-lg transition-all duration-300">
             <Shield className="h-4 w-4" />
             Калкулатор
           </TabsTrigger>
@@ -126,9 +127,9 @@ export default function InstinctHomeCalculator({ initialData = {}, onSave, analy
         {/* Left Column - Input */}
         <div className="space-y-6">
           {/* Client Data */}
-          <Card>
-            <CardHeader className="bg-purple-50 py-3">
-              <CardTitle className="text-base text-purple-800">Данни за застрахования</CardTitle>
+          <Card className="shadow-lg hover:shadow-xl transition-shadow duration-300">
+            <CardHeader className="bg-gradient-to-r from-purple-50 to-blue-50 py-4">
+              <CardTitle className="text-base text-purple-800 font-semibold">Данни за застрахования</CardTitle>
             </CardHeader>
             <CardContent className="pt-4 space-y-4">
               <div>
@@ -151,9 +152,9 @@ export default function InstinctHomeCalculator({ initialData = {}, onSave, analy
           </Card>
 
           {/* Package Selection */}
-          <Card>
-            <CardHeader className="bg-blue-50 py-3">
-              <CardTitle className="text-base text-blue-800">Пакет на покритие</CardTitle>
+          <Card className="shadow-lg hover:shadow-xl transition-shadow duration-300">
+            <CardHeader className="bg-gradient-to-r from-blue-50 to-purple-50 py-4">
+              <CardTitle className="text-base text-blue-800 font-semibold">Пакет на покритие</CardTitle>
             </CardHeader>
             <CardContent className="pt-4 space-y-4">
               <div>
@@ -235,9 +236,9 @@ export default function InstinctHomeCalculator({ initialData = {}, onSave, analy
         {/* Right Column - Output */}
         <div className="space-y-6">
           {/* Premium Summary */}
-          <Card>
-            <CardHeader className="bg-purple-600 py-3">
-              <CardTitle className="text-base text-white">Оферта</CardTitle>
+          <Card className="shadow-xl">
+            <CardHeader className="bg-gradient-to-r from-purple-600 to-purple-700 py-4">
+              <CardTitle className="text-base text-white font-semibold">Оферта</CardTitle>
             </CardHeader>
             <CardContent className="pt-4">
               {!result?.eligible ? (
@@ -311,9 +312,9 @@ export default function InstinctHomeCalculator({ initialData = {}, onSave, analy
 
           {/* Detailed Coverages */}
           {result?.eligible && result?.coverages && (
-            <Card>
-              <CardHeader className="bg-green-50 py-3">
-                <CardTitle className="text-base text-green-800">Лимити на покритие (BGN)</CardTitle>
+            <Card className="shadow-lg">
+              <CardHeader className="bg-gradient-to-r from-green-50 to-blue-50 py-4">
+                <CardTitle className="text-base text-green-800 font-semibold">Лимити на покритие (BGN)</CardTitle>
               </CardHeader>
               <CardContent className="pt-4">
                 <div className="space-y-2 text-xs">
@@ -383,9 +384,9 @@ export default function InstinctHomeCalculator({ initialData = {}, onSave, analy
 
           {/* All Coverages */}
           {result?.eligible && (
-            <Card>
-              <CardHeader className="bg-slate-50 py-3">
-                <CardTitle className="text-base text-slate-800">Всички покрития</CardTitle>
+            <Card className="shadow-lg">
+              <CardHeader className="bg-gradient-to-r from-slate-50 to-slate-100 py-4">
+                <CardTitle className="text-base text-slate-800 font-semibold">Всички покрития</CardTitle>
               </CardHeader>
               <CardContent className="pt-4">
                 <div className="grid grid-cols-1 gap-2">
@@ -405,9 +406,9 @@ export default function InstinctHomeCalculator({ initialData = {}, onSave, analy
             <Button 
               onClick={handleSaveOffer} 
               disabled={saving}
-              className="w-full bg-purple-600 hover:bg-purple-700"
+              className="w-full bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 shadow-lg hover:shadow-xl transition-all duration-300 h-12 text-base font-semibold"
             >
-              <Save className="h-4 w-4 mr-2" />
+              <Save className="h-5 w-5 mr-2" />
               {saving ? 'Записване...' : 'Запази офертата'}
             </Button>
           )}
@@ -415,12 +416,17 @@ export default function InstinctHomeCalculator({ initialData = {}, onSave, analy
       </div>
 
       {/* Provider Info */}
-      <Card className="bg-slate-50 border-slate-200">
-        <CardContent className="pt-4 text-xs text-slate-600">
-          <p className="font-medium text-slate-800 mb-2">ЗД "Инстинкт" АД</p>
-          <p>Разрешение за застрахователна дейност № 180-ОЗ от 09.02.2023</p>
-          <p>гр. София, бул. "Джавахарлал Неру" №28, "Силвър център", етаж 3</p>
-          <p>Тел: 0700 20032 | Email: office@instinct-insurance.com</p>
+      <Card className="bg-gradient-to-br from-slate-50 to-slate-100 border-slate-200 shadow-md">
+        <CardContent className="pt-5 pb-5 text-xs text-slate-600">
+          <div className="flex items-start gap-3">
+            <div className="w-2 h-2 bg-purple-500 rounded-full mt-1.5"></div>
+            <div className="space-y-1">
+              <p className="font-bold text-slate-800 text-sm">ЗД "Инстинкт" АД</p>
+              <p className="leading-relaxed">Разрешение за застрахователна дейност № 180-ОЗ от 09.02.2023</p>
+              <p className="leading-relaxed">гр. София, бул. "Джавахарлал Неру" №28, "Силвър център", етаж 3</p>
+              <p className="leading-relaxed font-medium text-purple-700">Тел: 0700 20032 | Email: office@instinct-insurance.com</p>
+            </div>
+          </div>
         </CardContent>
       </Card>
       </TabsContent>

@@ -9,8 +9,10 @@ import MetLifeTermLifeCalculator from '../components/financial-plan/MetLifeTermL
 import InstinctHomeCalculator from '../components/financial-plan/InstinctHomeCalculator';
 import SavedOffersManager from '../components/offers/SavedOffersManager';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Package } from 'lucide-react';
 
 export default function ProductConfigDemo() {
   const [demoAnalysisId, setDemoAnalysisId] = useState('');
@@ -29,12 +31,7 @@ export default function ProductConfigDemo() {
         </div>
 
         {/* Demo Analysis/Client IDs for CRM Integration */}
-        <motion.div
-          initial={{ opacity: 0, y: -10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.1 }}
-        >
-          <Card className="bg-gradient-to-r from-blue-50 to-purple-50 border-blue-200 shadow-lg mb-6">
+        <Card className="bg-gradient-to-r from-blue-50 to-purple-50 border-blue-200 shadow-lg mb-6">
             <CardContent className="pt-6">
               <div className="flex items-start gap-4 mb-4">
                 <div className="w-10 h-10 rounded-lg bg-blue-600 flex items-center justify-center shadow-md">
@@ -75,8 +72,7 @@ export default function ProductConfigDemo() {
                 </p>
               </div>
             </CardContent>
-          </Card>
-        </motion.div>
+        </Card>
 
         <Tabs defaultValue="metlife-credit-guard" className="w-full">
           <TabsList className="grid w-full grid-cols-9 mb-6 text-xs">

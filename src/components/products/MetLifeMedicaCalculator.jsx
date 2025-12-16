@@ -6,14 +6,16 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Shield, Heart, Activity, CheckCircle2, AlertCircle, Globe } from 'lucide-react';
+import { Shield, Heart, Activity, CheckCircle2, AlertCircle, Globe, Save } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { base44 } from '@/api/base44Client';
+import { toast } from 'sonner';
 
 /**
  * MetLife Medica Calculator
  * Calculates premiums for critical illness + accident coverage
  */
-export default function MetLifeMedicaCalculator({ initialInputs = {} }) {
+export default function MetLifeMedicaCalculator({ initialInputs = {}, analysisId, clientId }) {
   const [inputs, setInputs] = useState({
     age: initialInputs.age || 35,
     coverageType: initialInputs.coverageType || '32_critical_illnesses',
@@ -24,6 +26,7 @@ export default function MetLifeMedicaCalculator({ initialInputs = {} }) {
   });
 
   const [result, setResult] = useState(null);
+  const [saving, setSaving] = useState(false);
 
   // Configuration
   const config = {
@@ -147,6 +150,33 @@ export default function MetLifeMedicaCalculator({ initialInputs = {} }) {
       paymentFrequencyName: config.paymentFrequency[paymentFrequency].label
     });
   }, [inputs]);
+
+  const handleSaveOffer = async () => {
+    if (!analysisId || !result?.eligible) return;
+    
+    setSaving(true);
+    try {
+      await base44.entities.ProductOffer.create({
+        analysis_id: analysisId,
+        client_id: clientId,
+        provider: 'MetLife',
+        product_name: 'MetLife Медика',
+        product_type: 'health_insurance',
+        beneficiary_age: inputs.age,
+        monthly_premium: result.annualPremium / 12,
+        annual_premium: result.annualPremium,
+        coverage_amount: result.coverageAmount,
+        offer_status: 'generated',
+        ai_recommendation_reason: `${result.coverageTypeName} - ${result.planName} план, ${result.riskClassName}`
+      });
+      
+      toast.success('Офертата е запазена успешно');
+    } catch (error) {
+      toast.error('Грешка при записване: ' + error.message);
+    } finally {
+      setSaving(false);
+    }
+  };
 
   return (
     <div className="space-y-6">
@@ -371,6 +401,18 @@ export default function MetLifeMedicaCalculator({ initialInputs = {} }) {
                     <span>Световно покритие 24/7/365</span>
                   </div>
                 </div>
+
+                {/* Save Button */}
+                {analysisId && (
+                  <Button 
+                    onClick={handleSaveOffer} 
+                    disabled={saving}
+                    className="w-full bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 shadow-lg hover:shadow-xl transition-all duration-300 h-12 text-base font-semibold mt-6"
+                  >
+                    <Save className="h-5 w-5 mr-2" />
+                    {saving ? 'Записване...' : 'Запази офертата'}
+                  </Button>
+                )}
               </div>
             )}
           </CardContent>

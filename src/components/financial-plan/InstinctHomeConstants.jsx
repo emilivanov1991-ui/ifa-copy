@@ -105,10 +105,11 @@ export const INSTINCT_COVERAGE_FORMULAS = {
     fixed: 500,
     mandatory: true
   },
-  // Хоби и спорт
+  // Хоби и спорт - cap при 267000 BGN
   hobby_sport: {
-    immovable: 0.045,
-    movable: 0.03,
+    coefficient: 0.045,
+    cap_threshold: 267000,
+    cap_value: 12000,
     mandatory: false
   },
   // Транспорт при смяна на адрес
@@ -362,10 +363,13 @@ export const calculateInstinctHomePremium = (sumInsured, packageType = 'custom',
   // Домашен любимец
   coverages.pet = INSTINCT_COVERAGE_FORMULAS.pet.fixed;
   
-  // Хоби и спорт (опционално)
+  // Хоби и спорт (опционално) - cap при 267000 BGN
   if (includeSport) {
-    coverages.hobby_sport_immovable = sumInsured * INSTINCT_COVERAGE_FORMULAS.hobby_sport.immovable;
-    coverages.hobby_sport_movable = sumInsured * INSTINCT_COVERAGE_FORMULAS.hobby_sport.movable;
+    if (sumInsured >= INSTINCT_COVERAGE_FORMULAS.hobby_sport.cap_threshold) {
+      coverages.hobby_sport = INSTINCT_COVERAGE_FORMULAS.hobby_sport.cap_value;
+    } else {
+      coverages.hobby_sport = sumInsured * INSTINCT_COVERAGE_FORMULAS.hobby_sport.coefficient;
+    }
   }
   
   // Транспорт при смяна на адрес (опционално)

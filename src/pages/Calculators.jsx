@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Calculator, Home, Plus, Trash2, ArrowRight, TrendingUp, PiggyBank, Percent, TrendingDown, CreditCard, Landmark, BarChart3, BookOpen } from 'lucide-react';
+import { Calculator, Home, Plus, Trash2, ArrowRight, TrendingUp, PiggyBank, Percent, TrendingDown, CreditCard, Landmark, BarChart3, BookOpen, Shield } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -17,6 +17,7 @@ import ConsumerLoanCalculator from '../components/calculators/ConsumerLoanCalcul
 import PensionCalculator from '../components/calculators/PensionCalculator';
 import InvestmentCalculatorAdvanced from '../components/calculators/InvestmentCalculatorAdvanced';
 import AuxiliaryToolsSection from '@/components/calculators/AuxiliaryToolsSection';
+import InstinctHomeCalculator from '../components/financial-plan/InstinctHomeCalculator';
 
 const MortgageCalculator = () => {
   const [offers, setOffers] = useState([
@@ -321,7 +322,7 @@ export default function Calculators() {
           className="bg-white rounded-2xl shadow-xl p-6 md:p-10"
         >
           <Tabs defaultValue="mortgage" className="space-y-6">
-            <TabsList className="grid w-full max-w-5xl mx-auto grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-2">
+            <TabsList className="grid w-full max-w-5xl mx-auto grid-cols-3 md:grid-cols-5 lg:grid-cols-9 gap-2">
               <TabsTrigger value="mortgage" className="gap-1 text-xs">
                 <Home className="h-3 w-3" />
                 Ипотечен
@@ -337,6 +338,10 @@ export default function Calculators() {
               <TabsTrigger value="investment-adv" className="gap-1 text-xs">
                 <BarChart3 className="h-3 w-3" />
                 Инвестиции
+              </TabsTrigger>
+              <TabsTrigger value="home-insurance" className="gap-1 text-xs">
+                <Shield className="h-3 w-3" />
+                Имот
               </TabsTrigger>
               <TabsTrigger value="deposit" className="gap-1 text-xs">
                 <Percent className="h-3 w-3" />
@@ -367,6 +372,9 @@ export default function Calculators() {
             </TabsContent>
             <TabsContent value="investment-adv">
               <InvestmentCalculatorAdvanced />
+            </TabsContent>
+            <TabsContent value="home-insurance">
+              <InstinctHomeCalculator />
             </TabsContent>
             <TabsContent value="deposit">
               <TermDepositCalculator />

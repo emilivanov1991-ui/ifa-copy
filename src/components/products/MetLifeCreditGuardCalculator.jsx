@@ -222,7 +222,7 @@ export default function MetLifeCreditGuardCalculator({ initialInputs = {}, onSav
                     <div className="text-xs text-blue-700">
                       <p className="font-medium mb-1">Формула за изчисление:</p>
                       <p>Премия = (Сума / €100,000) × {result.basePremiumFor100k}€</p>
-                      <p className="text-blue-600 mt-1">= ({sumNum.toLocaleString()}€ / 100,000) × {result.basePremiumFor100k}€ = {result.annualPremium}€</p>
+                      <p className="text-blue-600 mt-1">= ({result.coverageAmount.toLocaleString()}€ / 100,000) × {result.basePremiumFor100k}€ = {result.annualPremium}€</p>
                     </div>
                   </div>
                 </div>

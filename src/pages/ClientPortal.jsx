@@ -38,6 +38,7 @@ import ProposedProducts from '../components/portal/ProposedProducts';
 import DocumentsManager from '../components/portal/DocumentsManager';
 import NotificationsPanel from '../components/portal/NotificationsPanel';
 import CalendarIntegration from '../components/portal/CalendarIntegration';
+import ClientDossier from '../components/portal/ClientDossier';
 
 export default function ClientPortal() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -480,6 +481,10 @@ export default function ClientPortal() {
         <Tabs defaultValue="overview" className="space-y-6">
           <TabsList className="bg-white/70 backdrop-blur-sm p-1.5 rounded-2xl flex-wrap shadow-lg shadow-slate-200/50 border-0">
             <TabsTrigger value="overview" className="rounded-xl data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-500 data-[state=active]:to-indigo-600 data-[state=active]:text-white data-[state=active]:shadow-lg data-[state=active]:shadow-blue-500/25 transition-all px-4">Преглед</TabsTrigger>
+            <TabsTrigger value="dossier" className="rounded-xl data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-500 data-[state=active]:to-indigo-600 data-[state=active]:text-white data-[state=active]:shadow-lg data-[state=active]:shadow-blue-500/25 transition-all px-4">
+              <FileText className="h-4 w-4 mr-2" />
+              Досие
+            </TabsTrigger>
             <TabsTrigger value="products" className="rounded-xl data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-500 data-[state=active]:to-indigo-600 data-[state=active]:text-white data-[state=active]:shadow-lg data-[state=active]:shadow-blue-500/25 transition-all px-4">Продукти</TabsTrigger>
             <TabsTrigger value="payments" className="rounded-xl data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-500 data-[state=active]:to-indigo-600 data-[state=active]:text-white data-[state=active]:shadow-lg data-[state=active]:shadow-blue-500/25 transition-all px-4">Вноски</TabsTrigger>
             <TabsTrigger value="proposed" className="rounded-xl data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-500 data-[state=active]:to-indigo-600 data-[state=active]:text-white data-[state=active]:shadow-lg data-[state=active]:shadow-blue-500/25 transition-all px-4">
@@ -492,6 +497,10 @@ export default function ClientPortal() {
             <TabsTrigger value="notifications" className="rounded-xl data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-500 data-[state=active]:to-indigo-600 data-[state=active]:text-white data-[state=active]:shadow-lg data-[state=active]:shadow-blue-500/25 transition-all px-4">Известия</TabsTrigger>
             <TabsTrigger value="documents" className="rounded-xl data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-500 data-[state=active]:to-indigo-600 data-[state=active]:text-white data-[state=active]:shadow-lg data-[state=active]:shadow-blue-500/25 transition-all px-4">Документи</TabsTrigger>
           </TabsList>
+
+          <TabsContent value="dossier" className="space-y-6">
+            <ClientDossier clientId={clientData?.id} />
+          </TabsContent>
 
           <TabsContent value="overview" className="space-y-6">
             <div className="grid lg:grid-cols-3 gap-6">

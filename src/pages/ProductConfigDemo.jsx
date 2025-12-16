@@ -28,30 +28,55 @@ export default function ProductConfigDemo() {
           </p>
         </div>
 
-        {/* Demo Analysis/Client IDs for testing save */}
-        <div className="bg-white rounded-lg p-4 mb-6 border border-slate-200">
-          <p className="text-sm font-medium text-slate-700 mb-3">Тестване на записване (опционално)</p>
-          <div className="grid md:grid-cols-2 gap-4">
-            <div>
-              <Label className="text-xs">Analysis ID</Label>
-              <Input 
-                value={demoAnalysisId}
-                onChange={(e) => setDemoAnalysisId(e.target.value)}
-                placeholder="Въведи analysis_id за тестване"
-                className="text-sm"
-              />
-            </div>
-            <div>
-              <Label className="text-xs">Client ID</Label>
-              <Input 
-                value={demoClientId}
-                onChange={(e) => setDemoClientId(e.target.value)}
-                placeholder="Въведи client_id за тестване"
-                className="text-sm"
-              />
-            </div>
-          </div>
-        </div>
+        {/* Demo Analysis/Client IDs for CRM Integration */}
+        <motion.div
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.1 }}
+        >
+          <Card className="bg-gradient-to-r from-blue-50 to-purple-50 border-blue-200 shadow-lg mb-6">
+            <CardContent className="pt-6">
+              <div className="flex items-start gap-4 mb-4">
+                <div className="w-10 h-10 rounded-lg bg-blue-600 flex items-center justify-center shadow-md">
+                  <Package className="h-5 w-5 text-white" />
+                </div>
+                <div>
+                  <p className="text-sm font-bold text-slate-900">CRM Интеграция - Идентификатори</p>
+                  <p className="text-xs text-slate-600 mt-1">
+                    Въведете ID-та за автоматично запазване на офертите в клиентското досие
+                  </p>
+                </div>
+              </div>
+              <div className="grid md:grid-cols-2 gap-4">
+                <div>
+                  <Label className="text-xs font-semibold text-slate-700">Analysis ID (Финансов анализ)</Label>
+                  <Input 
+                    value={demoAnalysisId}
+                    onChange={(e) => setDemoAnalysisId(e.target.value)}
+                    placeholder="Въведи ID на финансов анализ"
+                    className="text-sm mt-1 border-blue-300 focus:border-blue-500"
+                  />
+                  <p className="text-xs text-slate-500 mt-1">Свързва офертата с конкретен финансов анализ</p>
+                </div>
+                <div>
+                  <Label className="text-xs font-semibold text-slate-700">Client ID (Клиент)</Label>
+                  <Input 
+                    value={demoClientId}
+                    onChange={(e) => setDemoClientId(e.target.value)}
+                    placeholder="Въведи ID на клиент"
+                    className="text-sm mt-1 border-purple-300 focus:border-purple-500"
+                  />
+                  <p className="text-xs text-slate-500 mt-1">Свързва офертата с клиентския профил</p>
+                </div>
+              </div>
+              <div className="mt-4 p-3 bg-blue-100 rounded-lg">
+                <p className="text-xs text-blue-800">
+                  ✓ Офертите се запазват автоматично в системата и са достъпни в "Досие" секцията на клиентския и консултантския портал
+                </p>
+              </div>
+            </CardContent>
+          </Card>
+        </motion.div>
 
         <Tabs defaultValue="metlife-credit-guard" className="w-full">
           <TabsList className="grid w-full grid-cols-9 mb-6 text-xs">

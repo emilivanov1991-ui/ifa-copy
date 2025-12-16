@@ -51,11 +51,13 @@ import AIAnalyticsDashboard from '@/components/consultant/AIAnalyticsDashboard';
 import RBACManager from '@/components/consultant/RBACManager';
 import CommissionsManager from '@/components/consultant/CommissionsManager';
 import ProductCatalogManager from '@/components/admin/ProductCatalogManager';
-import { Package } from 'lucide-react';
+import ClientDossierView from '@/components/consultant/ClientDossierView';
+import { Package, FolderOpen } from 'lucide-react';
 
 const menuItems = [
   { id: 'dashboard', label: 'Табло', icon: LayoutDashboard, color: 'from-blue-500 to-blue-600' },
   { id: 'crm', label: 'CRM / Клиенти', icon: Users, color: 'from-violet-500 to-violet-600' },
+  { id: 'dossiers', label: 'Досиета', icon: FolderOpen, color: 'from-blue-500 to-cyan-600' },
   { id: 'analysis', label: 'Финансов анализ', icon: FileText, color: 'from-emerald-500 to-emerald-600' },
   { id: 'commissions', label: 'Комисионни', icon: DollarSign, color: 'from-green-500 to-emerald-600' },
   { id: 'ai-analytics', label: 'AI Аналитика', icon: Brain, badge: 'AI', color: 'from-purple-500 to-pink-500' },
@@ -284,6 +286,7 @@ export default function ConsultantPortal() {
             >
               {activeTab === 'dashboard' && <ConsultantDashboard onNavigate={setActiveTab} />}
               {activeTab === 'crm' && <ConsultantCRMAdvanced isAdmin={currentUser?.role === 'admin'} />}
+              {activeTab === 'dossiers' && <ClientDossierView />}
               {activeTab === 'analysis' && (
                 <motion.div
                   initial={{ opacity: 0, scale: 0.95 }}

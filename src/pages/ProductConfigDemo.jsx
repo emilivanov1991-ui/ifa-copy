@@ -220,22 +220,10 @@ export default function ProductConfigDemo() {
           <TabsContent value="dzi" className="space-y-4">
             <Tabs defaultValue="zakrila" className="w-full">
               <TabsList className="grid w-full grid-cols-2 lg:grid-cols-4 mb-4 bg-blue-50 p-1 rounded-lg">
-                <TabsTrigger value="zakrila" className="flex items-center gap-2">
-                  <img src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6925a960748714fa4828395a/2485fdb3e_image.png" alt="ДЗИ" className="h-4" />
-                  Закрила
-                </TabsTrigger>
-                <TabsTrigger value="casco" className="flex items-center gap-2">
-                  <img src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6925a960748714fa4828395a/2485fdb3e_image.png" alt="ДЗИ" className="h-4" />
-                  Каско+
-                </TabsTrigger>
-                <TabsTrigger value="go" className="flex items-center gap-2">
-                  <img src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6925a960748714fa4828395a/2485fdb3e_image.png" alt="ДЗИ" className="h-4" />
-                  ГО
-                </TabsTrigger>
-                <TabsTrigger value="best-doctors" className="flex items-center gap-2">
-                  <img src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6925a960748714fa4828395a/2485fdb3e_image.png" alt="ДЗИ" className="h-4" />
-                  Бест Докторс
-                </TabsTrigger>
+                <TabsTrigger value="zakrila">Закрила</TabsTrigger>
+                <TabsTrigger value="casco">Каско+</TabsTrigger>
+                <TabsTrigger value="go">ГО</TabsTrigger>
+                <TabsTrigger value="best-doctors">Бест Докторс</TabsTrigger>
               </TabsList>
 
               <TabsContent value="zakrila">

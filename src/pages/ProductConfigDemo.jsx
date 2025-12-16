@@ -385,6 +385,7 @@ export default function ProductConfigDemo() {
                   productName="Ипотечен кредит"
                   provider="UniCredit"
                   description="Ипотечно кредитиране. Моля предоставете лихвени проценти, такси и условия."
+                  logoUrl="https://upload.wikimedia.org/wikipedia/commons/thumb/0/0f/UniCredit_logo_%282013%29.svg/320px-UniCredit_logo_%282013%29.svg.png"
                 />
               </TabsContent>
 
@@ -393,6 +394,7 @@ export default function ProductConfigDemo() {
                   productName="Ипотечен кредит"
                   provider="ДСК Банка"
                   description="Ипотечно кредитиране. Моля предоставете лихвени проценти, такси и условия."
+                  logoUrl="https://upload.wikimedia.org/wikipedia/commons/thumb/5/50/DSK_Bank_Logo.svg/320px-DSK_Bank_Logo.svg.png"
                 />
               </TabsContent>
 
@@ -401,6 +403,7 @@ export default function ProductConfigDemo() {
                   productName="Ипотечен кредит"
                   provider="ОББ"
                   description="Ипотечно кредитиране. Моля предоставете лихвени проценти, такси и условия."
+                  logoUrl="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6925a960748714fa4828395a/a4d9d2d02_image.png"
                 />
               </TabsContent>
 
@@ -409,6 +412,7 @@ export default function ProductConfigDemo() {
                   productName="Ипотечен кредит"
                   provider="Пощенска Банка"
                   description="Ипотечно кредитиране. Моля предоставете лихвени проценти, такси и условия."
+                  logoUrl="https://upload.wikimedia.org/wikipedia/commons/thumb/e/eb/Postbank_Logo_2018.svg/320px-Postbank_Logo_2018.svg.png"
                 />
               </TabsContent>
 
@@ -417,6 +421,7 @@ export default function ProductConfigDemo() {
                   productName="Потребителски кредит"
                   provider="UniCredit"
                   description="Потребителско кредитиране. Моля предоставете лихвени проценти, такси и условия."
+                  logoUrl="https://upload.wikimedia.org/wikipedia/commons/thumb/0/0f/UniCredit_logo_%282013%29.svg/320px-UniCredit_logo_%282013%29.svg.png"
                 />
               </TabsContent>
 
@@ -425,6 +430,7 @@ export default function ProductConfigDemo() {
                   productName="Потребителски кредит"
                   provider="ОББ"
                   description="Потребителско кредитиране. Моля предоставете лихвени проценти, такси и условия."
+                  logoUrl="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6925a960748714fa4828395a/a4d9d2d02_image.png"
                 />
               </TabsContent>
             </Tabs>

@@ -78,169 +78,385 @@ export default function ProductConfigDemo() {
             </CardContent>
         </Card>
 
-        <Tabs defaultValue="metlife-credit-guard" className="w-full">
-          <TabsList className="grid w-full grid-cols-4 lg:grid-cols-12 mb-6 text-xs gap-1">
-            <TabsTrigger value="metlife-credit-guard">Credit Guard</TabsTrigger>
-            <TabsTrigger value="metlife-predimstvo">Предимство</TabsTrigger>
-            <TabsTrigger value="metlife-detstvo">Детство</TabsTrigger>
-            <TabsTrigger value="metlife-grija">Грижа</TabsTrigger>
-            <TabsTrigger value="metlife-srochen">Срочен живот</TabsTrigger>
-            <TabsTrigger value="metlife-medica">Медика</TabsTrigger>
-            <TabsTrigger value="dzi-zakrila">ДЗИ Закрила</TabsTrigger>
-            <TabsTrigger value="dzi-casco">ДЗИ Каско</TabsTrigger>
-            <TabsTrigger value="generali-health">Generali Health</TabsTrigger>
-            <TabsTrigger value="uniqa-health">УНИКА Здраве</TabsTrigger>
-            <TabsTrigger value="instinct-home">Инстинкт</TabsTrigger>
-            <TabsTrigger value="saved-offers">Запазени</TabsTrigger>
-          </TabsList>
+        <Tabs defaultValue="metlife" className="w-full">
+        <TabsList className="grid w-full grid-cols-3 lg:grid-cols-7 mb-6 h-auto gap-2 bg-gradient-to-r from-slate-100 to-slate-200 p-2 rounded-xl">
+        <TabsTrigger value="metlife" className="flex-col h-auto py-3 data-[state=active]:bg-white data-[state=active]:shadow-lg">
+        <img src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6925a960748714fa4828395a/19121d3c7_image.png" alt="MetLife" className="h-8 mb-1" />
+        <span className="text-xs">MetLife</span>
+        </TabsTrigger>
+        <TabsTrigger value="dzi" className="flex-col h-auto py-3 data-[state=active]:bg-white data-[state=active]:shadow-lg">
+        <img src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6925a960748714fa4828395a/e19a17cb3_image.png" alt="ДЗИ" className="h-8 mb-1" />
+        <span className="text-xs">ДЗИ</span>
+        </TabsTrigger>
+        <TabsTrigger value="uniqa" className="flex-col h-auto py-3 data-[state=active]:bg-white data-[state=active]:shadow-lg">
+        <img src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6925a960748714fa4828395a/34826da0a_image.png" alt="УНИКА" className="h-8 mb-1" />
+        <span className="text-xs">УНИКА</span>
+        </TabsTrigger>
+        <TabsTrigger value="generali" className="flex-col h-auto py-3 data-[state=active]:bg-white data-[state=active]:shadow-lg">
+        <img src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6925a960748714fa4828395a/e8bce8654_image.png" alt="Generali" className="h-8 mb-1" />
+        <span className="text-xs">Generali</span>
+        </TabsTrigger>
+        <TabsTrigger value="credits" className="flex-col h-auto py-3 data-[state=active]:bg-white data-[state=active]:shadow-lg">
+        <span className="text-sm font-semibold">🏦</span>
+        <span className="text-xs">Кредити</span>
+        </TabsTrigger>
+        <TabsTrigger value="pension" className="flex-col h-auto py-3 data-[state=active]:bg-white data-[state=active]:shadow-lg">
+        <img src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6925a960748714fa4828395a/a4d9d2d02_image.png" alt="ОББ Пенсионно" className="h-8 mb-1" />
+        <span className="text-xs">Пенсии</span>
+        </TabsTrigger>
+        <TabsTrigger value="saved-offers" className="flex-col h-auto py-3 data-[state=active]:bg-white data-[state=active]:shadow-lg">
+        <Package className="h-6 w-6 mb-1 text-violet-600" />
+        <span className="text-xs">Запазени</span>
+        </TabsTrigger>
+        </TabsList>
 
-          <TabsContent value="metlife-credit-guard">
-            <MetLifeCreditGuardCalculator 
-              initialInputs={{
-                age: 18,
-                sum: 100000,
-                term: 30,
-                packageType: 'Основен'
-              }}
-              analysisId={demoAnalysisId}
-              clientId={demoClientId}
-            />
+          {/* MetLife Products */}
+          <TabsContent value="metlife" className="space-y-4">
+            <Tabs defaultValue="credit-guard" className="w-full">
+              <TabsList className="grid w-full grid-cols-3 lg:grid-cols-6 mb-4 bg-blue-50 p-1 rounded-lg">
+                <TabsTrigger value="credit-guard">Credit Guard</TabsTrigger>
+                <TabsTrigger value="ul">Unit Linked</TabsTrigger>
+                <TabsTrigger value="junior-ul">Junior Unit Linked</TabsTrigger>
+                <TabsTrigger value="care">Грижа</TabsTrigger>
+                <TabsTrigger value="term-life">Term Life</TabsTrigger>
+                <TabsTrigger value="medica">MetLife Medica</TabsTrigger>
+              </TabsList>
+
+              <TabsContent value="credit-guard">
+                <MetLifeCreditGuardCalculator 
+                  initialInputs={{
+                    age: 30,
+                    sum: 100000,
+                    term: 30,
+                    packageType: 'Основен'
+                  }}
+                  analysisId={demoAnalysisId}
+                  clientId={demoClientId}
+                />
+              </TabsContent>
+
+              <TabsContent value="ul">
+                <MetLifeULCalculator 
+                  initialData={{
+                    clientName: 'Демо клиент',
+                    age: 35,
+                    riskClass: 1,
+                    annualSavings: 1500,
+                    integratedLifeCoverage: 5000,
+                    globalStock: 0.5,
+                    emergingMarkets: 0.5,
+                    globalBond: 0,
+                    expectedReturn: 0.08
+                  }}
+                  analysisId={demoAnalysisId}
+                  clientId={demoClientId}
+                />
+              </TabsContent>
+
+              <TabsContent value="junior-ul">
+                <MetLifeChildULCalculator 
+                  initialData={{
+                    policyholderName: 'Родител',
+                    policyholderAge: 35,
+                    childName: 'Дете',
+                    childAge: 5,
+                    annualSavings: 1200,
+                    fundGlobalStocks: 50,
+                    fundEmergingMarkets: 50,
+                    fundBonds: 0,
+                    childProtection: true
+                  }}
+                  analysisId={demoAnalysisId}
+                  clientId={demoClientId}
+                />
+              </TabsContent>
+
+              <TabsContent value="care">
+                <MetLifeCareCalculator 
+                  initialData={{
+                    clientName: 'Демо клиент',
+                    age: 35,
+                    riskClass: 1,
+                    package: 'Сребърен'
+                  }}
+                  analysisId={demoAnalysisId}
+                  clientId={demoClientId}
+                />
+              </TabsContent>
+
+              <TabsContent value="term-life">
+                <MetLifeTermLifeCalculator 
+                  initialData={{
+                    clientName: 'Демо клиент',
+                    age: 35,
+                    riskClass: 1,
+                    termLifeCoverage: 50000,
+                    termLifeYears: 10,
+                    fracturesCoverage: 1500
+                  }}
+                  analysisId={demoAnalysisId}
+                  clientId={demoClientId}
+                />
+              </TabsContent>
+
+              <TabsContent value="medica">
+                <MetLifeMedicaCalculator 
+                  initialInputs={{
+                    age: 34,
+                    coverageType: '32_critical_illnesses',
+                    plan: '100000',
+                    riskClass: '1',
+                    paymentFrequency: 'annual'
+                  }}
+                  analysisId={demoAnalysisId}
+                  clientId={demoClientId}
+                />
+              </TabsContent>
+            </Tabs>
           </TabsContent>
 
-          <TabsContent value="metlife-predimstvo">
-            <MetLifeULCalculator 
-              initialData={{
-                clientName: 'Демо клиент',
-                age: 35,
-                riskClass: 1,
-                annualSavings: 1500,
-                integratedLifeCoverage: 5000,
-                globalStock: 0.5,
-                emergingMarkets: 0.5,
-                globalBond: 0,
-                expectedReturn: 0.08
-              }}
-              analysisId={demoAnalysisId}
-              clientId={demoClientId}
-            />
+          {/* ДЗИ Products */}
+          <TabsContent value="dzi" className="space-y-4">
+            <Tabs defaultValue="zakrila" className="w-full">
+              <TabsList className="grid w-full grid-cols-2 lg:grid-cols-4 mb-4 bg-blue-50 p-1 rounded-lg">
+                <TabsTrigger value="zakrila">Закрила</TabsTrigger>
+                <TabsTrigger value="casco">Каско+</TabsTrigger>
+                <TabsTrigger value="go">ГО</TabsTrigger>
+                <TabsTrigger value="best-doctors">Бест Докторс</TabsTrigger>
+              </TabsList>
+
+              <TabsContent value="zakrila">
+                <DZIZakrilaCalculator 
+                  analysisId={demoAnalysisId}
+                  clientId={demoClientId}
+                />
+              </TabsContent>
+
+              <TabsContent value="casco">
+                <DZICascoCalculator 
+                  carData={{
+                    brand: 'BMW',
+                    model: 'X5',
+                    year: 2020,
+                    valueEUR: 45000,
+                    hasCasco: false
+                  }}
+                />
+              </TabsContent>
+
+              <TabsContent value="go">
+                <PlaceholderCalculator 
+                  productName="ГО"
+                  provider="ДЗИ"
+                  description="Гражданска отговорност на автомобилистите. Моля предоставете тарифи и условия за конфигуриране."
+                />
+              </TabsContent>
+
+              <TabsContent value="best-doctors">
+                <PlaceholderCalculator 
+                  productName="Бест Докторс"
+                  provider="ДЗИ"
+                  description="Застраховка за допълнително здравно мнение. Моля предоставете тарифи и условия за конфигуриране."
+                />
+              </TabsContent>
+            </Tabs>
           </TabsContent>
 
-          <TabsContent value="metlife-detstvo">
-            <MetLifeChildULCalculator 
-              initialData={{
-                policyholderName: 'Родител',
-                policyholderAge: 35,
-                childName: 'Дете',
-                childAge: 5,
-                annualSavings: 1200,
-                fundGlobalStocks: 50,
-                fundEmergingMarkets: 50,
-                fundBonds: 0,
-                childProtection: true
-              }}
-              analysisId={demoAnalysisId}
-              clientId={demoClientId}
-            />
+          {/* УНИКА Products */}
+          <TabsContent value="uniqa" className="space-y-4">
+            <Tabs defaultValue="health-value" className="w-full">
+              <TabsList className="grid w-full grid-cols-2 lg:grid-cols-5 mb-4 bg-blue-50 p-1 rounded-lg">
+                <TabsTrigger value="health-value">Здраве и ценност</TabsTrigger>
+                <TabsTrigger value="our-health">За Нашето здраве</TabsTrigger>
+                <TabsTrigger value="home-happy">У дома и щастлив</TabsTrigger>
+                <TabsTrigger value="casco">Каско</TabsTrigger>
+                <TabsTrigger value="go">ГО</TabsTrigger>
+              </TabsList>
+
+              <TabsContent value="health-value">
+                <UniqaHealthValueCalculator 
+                  initialData={{
+                    clientName: 'Демо клиент',
+                    age: 35,
+                    plan: 'europa',
+                    frequency: 'annual'
+                  }}
+                  analysisId={demoAnalysisId}
+                  clientId={demoClientId}
+                />
+              </TabsContent>
+
+              <TabsContent value="our-health">
+                <PlaceholderCalculator 
+                  productName="За Нашето здраве"
+                  provider="УНИКА"
+                  description="Допълнително здравно осигуряване. Моля предоставете тарифи и условия."
+                />
+              </TabsContent>
+
+              <TabsContent value="home-happy">
+                <PlaceholderCalculator 
+                  productName="У дома и щастлив"
+                  provider="УНИКА"
+                  description="Имуществена застраховка. Моля предоставете тарифи и условия."
+                />
+              </TabsContent>
+
+              <TabsContent value="casco">
+                <PlaceholderCalculator 
+                  productName="Каско"
+                  provider="УНИКА"
+                  description="Застраховка Каско на автомобили. Моля предоставете тарифи и условия."
+                />
+              </TabsContent>
+
+              <TabsContent value="go">
+                <PlaceholderCalculator 
+                  productName="ГО"
+                  provider="УНИКА"
+                  description="Гражданска отговорност. Моля предоставете тарифи и условия."
+                />
+              </TabsContent>
+            </Tabs>
           </TabsContent>
 
-          <TabsContent value="metlife-grija">
-            <MetLifeCareCalculator 
-              initialData={{
-                clientName: 'Демо клиент',
-                age: 35,
-                riskClass: 1,
-                package: 'Сребърен'
-              }}
-              analysisId={demoAnalysisId}
-              clientId={demoClientId}
-            />
+          {/* Generali Products */}
+          <TabsContent value="generali" className="space-y-4">
+            <Tabs defaultValue="health" className="w-full">
+              <TabsList className="grid w-full grid-cols-2 lg:grid-cols-4 mb-4 bg-red-50 p-1 rounded-lg">
+                <TabsTrigger value="health">Health Line</TabsTrigger>
+                <TabsTrigger value="home">Домашно Имущество</TabsTrigger>
+                <TabsTrigger value="casco">Каско</TabsTrigger>
+                <TabsTrigger value="go">ГО</TabsTrigger>
+              </TabsList>
+
+              <TabsContent value="health">
+                <GeneraliHealthLineOffer 
+                  beneficiaryName="Демо клиент"
+                  plan="plus"
+                  monthlyPremium={85}
+                  annualPremium={1020}
+                  isInsured={true}
+                  showPrint={false}
+                />
+              </TabsContent>
+
+              <TabsContent value="home">
+                <PlaceholderCalculator 
+                  productName="Домашно Имущество"
+                  provider="Generali"
+                  description="Имуществена застраховка. Моля предоставете тарифи и условия."
+                />
+              </TabsContent>
+
+              <TabsContent value="casco">
+                <PlaceholderCalculator 
+                  productName="Каско"
+                  provider="Generali"
+                  description="Застраховка Каско. Моля предоставете тарифи и условия."
+                />
+              </TabsContent>
+
+              <TabsContent value="go">
+                <PlaceholderCalculator 
+                  productName="ГО"
+                  provider="Generali"
+                  description="Гражданска отговорност. Моля предоставете тарифи и условия."
+                />
+              </TabsContent>
+            </Tabs>
           </TabsContent>
 
-          <TabsContent value="metlife-srochen">
-            <MetLifeTermLifeCalculator 
-              initialData={{
-                clientName: 'Демо клиент',
-                age: 35,
-                riskClass: 1,
-                termLifeCoverage: 50000,
-                termLifeYears: 10,
-                fracturesCoverage: 1500
-              }}
-              analysisId={demoAnalysisId}
-              clientId={demoClientId}
-            />
+          {/* Credits */}
+          <TabsContent value="credits" className="space-y-4">
+            <Tabs defaultValue="unicredit-mortgage" className="w-full">
+              <TabsList className="grid w-full grid-cols-2 lg:grid-cols-6 mb-4 bg-green-50 p-1 rounded-lg text-xs">
+                <TabsTrigger value="unicredit-mortgage">UniCredit Ипотека</TabsTrigger>
+                <TabsTrigger value="dsk-mortgage">ДСК Ипотека</TabsTrigger>
+                <TabsTrigger value="ubb-mortgage">ОББ Ипотека</TabsTrigger>
+                <TabsTrigger value="postbank-mortgage">Пощенска Ипотека</TabsTrigger>
+                <TabsTrigger value="unicredit-consumer">UniCredit Потребителски</TabsTrigger>
+                <TabsTrigger value="ubb-consumer">ОББ Потребителски</TabsTrigger>
+              </TabsList>
+
+              <TabsContent value="unicredit-mortgage">
+                <PlaceholderCalculator 
+                  productName="Ипотечен кредит"
+                  provider="UniCredit"
+                  description="Ипотечно кредитиране. Моля предоставете лихвени проценти, такси и условия."
+                />
+              </TabsContent>
+
+              <TabsContent value="dsk-mortgage">
+                <PlaceholderCalculator 
+                  productName="Ипотечен кредит"
+                  provider="ДСК Банка"
+                  description="Ипотечно кредитиране. Моля предоставете лихвени проценти, такси и условия."
+                />
+              </TabsContent>
+
+              <TabsContent value="ubb-mortgage">
+                <PlaceholderCalculator 
+                  productName="Ипотечен кредит"
+                  provider="ОББ"
+                  description="Ипотечно кредитиране. Моля предоставете лихвени проценти, такси и условия."
+                />
+              </TabsContent>
+
+              <TabsContent value="postbank-mortgage">
+                <PlaceholderCalculator 
+                  productName="Ипотечен кредит"
+                  provider="Пощенска Банка"
+                  description="Ипотечно кредитиране. Моля предоставете лихвени проценти, такси и условия."
+                />
+              </TabsContent>
+
+              <TabsContent value="unicredit-consumer">
+                <PlaceholderCalculator 
+                  productName="Потребителски кредит"
+                  provider="UniCredit"
+                  description="Потребителско кредитиране. Моля предоставете лихвени проценти, такси и условия."
+                />
+              </TabsContent>
+
+              <TabsContent value="ubb-consumer">
+                <PlaceholderCalculator 
+                  productName="Потребителски кредит"
+                  provider="ОББ"
+                  description="Потребителско кредитиране. Моля предоставете лихвени проценти, такси и условия."
+                />
+              </TabsContent>
+            </Tabs>
           </TabsContent>
 
-          <TabsContent value="metlife-medica">
-            <MetLifeMedicaCalculator 
-              initialInputs={{
-                age: 34,
-                coverageType: '32_critical_illnesses',
-                plan: '100000',
-                riskClass: '1',
-                paymentFrequency: 'annual'
-              }}
-              analysisId={demoAnalysisId}
-              clientId={demoClientId}
-            />
+          {/* Pension Products */}
+          <TabsContent value="pension" className="space-y-4">
+            <Tabs defaultValue="pillar2" className="w-full">
+              <TabsList className="grid w-full grid-cols-2 mb-4 bg-blue-50 p-1 rounded-lg">
+                <TabsTrigger value="pillar2">Втори стълб - ДЗПО</TabsTrigger>
+                <TabsTrigger value="pillar3">Трети стълб - ДДПО</TabsTrigger>
+              </TabsList>
+
+              <TabsContent value="pillar2">
+                <PlaceholderCalculator 
+                  productName="Втори стълб - ДЗПО"
+                  provider="ОББ Пенсионно осигуряване"
+                  description="Допълнително задължително пенсионно осигуряване. Моля предоставете такси, доходност и условия."
+                />
+              </TabsContent>
+
+              <TabsContent value="pillar3">
+                <PlaceholderCalculator 
+                  productName="Трети стълб - ДДПО"
+                  provider="ОББ Пенсионно осигуряване"
+                  description="Допълнително доброволно пенсионно осигуряване. Моля предоставете такси, доходност и условия."
+                />
+              </TabsContent>
+            </Tabs>
           </TabsContent>
 
-          <TabsContent value="dzi-zakrila">
-            <DZIZakrilaCalculator 
-              analysisId={demoAnalysisId}
-              clientId={demoClientId}
-            />
-          </TabsContent>
-
-          <TabsContent value="dzi-casco">
-            <DZICascoCalculator 
-              carData={{
-                brand: 'BMW',
-                model: 'X5',
-                year: 2020,
-                valueEUR: 45000,
-                hasCasco: false
-              }}
-            />
-          </TabsContent>
-
-          <TabsContent value="generali-health">
-            <GeneraliHealthLineOffer 
-              beneficiaryName="Демо клиент"
-              plan="plus"
-              monthlyPremium={85}
-              annualPremium={1020}
-              isInsured={true}
-              showPrint={false}
-            />
-          </TabsContent>
-
-          <TabsContent value="uniqa-health">
-            <UniqaHealthValueCalculator 
-              initialData={{
-                clientName: 'Демо клиент',
-                age: 35,
-                plan: 'europa',
-                frequency: 'annual'
-              }}
-              analysisId={demoAnalysisId}
-              clientId={demoClientId}
-            />
-          </TabsContent>
-
-          <TabsContent value="instinct-home">
-            <InstinctHomeCalculator 
-              initialData={{
-                clientName: 'Демо клиент',
-                address: 'гр. София',
-                packageType: 'Пакет 2',
-                currency: 'EUR'
-              }}
-              analysisId={demoAnalysisId}
-              clientId={demoClientId}
-            />
-          </TabsContent>
-
+          {/* Instinct - Keep for backwards compatibility */}
+          {/* Saved Offers */}
           <TabsContent value="saved-offers">
             {demoAnalysisId ? (
               <SavedOffersManager 

@@ -1,4 +1,5 @@
 import React, { useState, useMemo } from 'react';
+import { motion } from 'framer-motion';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -6,8 +7,8 @@ import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
-import { Calculator, Shield, TrendingUp, Info, Save } from 'lucide-react';
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, Area, AreaChart } from 'recharts';
+import { Calculator, Shield, TrendingUp, Info, Save, Zap, PieChart } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
 import { toast } from 'sonner';
 import {
@@ -288,42 +289,52 @@ export default function MetLifeULCalculator({ initialData = {}, onSave, analysis
   return (
     <div className="space-y-6">
       {/* Header */}
-      <Card>
+      <Card className="bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 overflow-hidden shadow-2xl">
         <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Calculator className="h-5 w-5 text-blue-600" />
-            MetLife Unit Linked - Калкулатор за предложение
-          </CardTitle>
+          <div className="flex items-center gap-4">
+            <div className="w-14 h-14 bg-white/20 backdrop-blur-sm rounded-xl flex items-center justify-center shadow-lg">
+              <TrendingUp className="h-7 w-7 text-white" />
+            </div>
+            <div>
+              <CardTitle className="text-white text-2xl font-bold tracking-wide">MetLife Предимство</CardTitle>
+              <p className="text-blue-100 text-sm font-medium">Unit Linked - Инвестиционна застраховка</p>
+            </div>
+          </div>
         </CardHeader>
       </Card>
 
       <Tabs defaultValue="input" className="w-full">
-        <TabsList className="grid w-full grid-cols-3">
-          <TabsTrigger value="input">Данни</TabsTrigger>
-          <TabsTrigger value="offer">Оферта</TabsTrigger>
-          <TabsTrigger value="projection">Проекция</TabsTrigger>
+        <TabsList className="grid w-full grid-cols-3 h-12 bg-gradient-to-r from-blue-100 to-purple-100 p-1 rounded-lg">
+          <TabsTrigger value="input" className="data-[state=active]:bg-white data-[state=active]:shadow-lg transition-all duration-300">Данни</TabsTrigger>
+          <TabsTrigger value="offer" className="data-[state=active]:bg-white data-[state=active]:shadow-lg transition-all duration-300">Оферта</TabsTrigger>
+          <TabsTrigger value="projection" className="data-[state=active]:bg-white data-[state=active]:shadow-lg transition-all duration-300">Проекция</TabsTrigger>
         </TabsList>
 
         {/* Input Tab */}
         <TabsContent value="input" className="space-y-6">
           {/* Warnings */}
           {warnings.length > 0 && (
-            <Card className="border-amber-200 bg-amber-50">
-              <CardContent className="pt-6">
-                {warnings.map((warning, idx) => (
-                  <div key={idx} className="flex items-start gap-2 text-amber-800">
-                    <Info className="h-4 w-4 mt-0.5 flex-shrink-0" />
-                    <span className="text-sm">{warning}</span>
-                  </div>
-                ))}
-              </CardContent>
-            </Card>
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+            >
+              <Card className="border-amber-300 bg-gradient-to-r from-amber-50 to-orange-50 shadow-lg">
+                <CardContent className="pt-6">
+                  {warnings.map((warning, idx) => (
+                    <div key={idx} className="flex items-start gap-2 text-amber-800">
+                      <Info className="h-4 w-4 mt-0.5 flex-shrink-0" />
+                      <span className="text-sm font-medium">{warning}</span>
+                    </div>
+                  ))}
+                </CardContent>
+              </Card>
+            </motion.div>
           )}
 
           {/* Basic Info */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-lg">Основна информация</CardTitle>
+          <Card className="shadow-lg hover:shadow-xl transition-shadow duration-300">
+            <CardHeader className="bg-gradient-to-r from-blue-50 to-indigo-50 py-4">
+              <CardTitle className="text-lg font-semibold text-blue-800">Основна информация</CardTitle>
             </CardHeader>
             <CardContent className="grid md:grid-cols-2 gap-4">
               <div>
@@ -380,10 +391,10 @@ export default function MetLifeULCalculator({ initialData = {}, onSave, analysis
           </Card>
 
           {/* Investment Funds */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-lg flex items-center gap-2">
-                <TrendingUp className="h-5 w-5 text-blue-600" />
+          <Card className="shadow-lg hover:shadow-xl transition-shadow duration-300">
+            <CardHeader className="bg-gradient-to-r from-indigo-50 to-purple-50 py-4">
+              <CardTitle className="text-lg font-semibold text-indigo-800 flex items-center gap-2">
+                <PieChart className="h-5 w-5" />
                 Инвестиционни фондове
               </CardTitle>
             </CardHeader>
@@ -432,9 +443,10 @@ export default function MetLifeULCalculator({ initialData = {}, onSave, analysis
                   />
                 </div>
               </div>
-              <div className="bg-slate-50 p-3 rounded-lg">
-                <div className="text-sm text-slate-600">
-                  Общо разпределение: <span className={`font-semibold ${Math.abs(totalAllocation - 1) < 0.001 ? 'text-green-600' : 'text-red-600'}`}>
+              <div className={`bg-gradient-to-r p-4 rounded-lg border ${Math.abs(totalAllocation - 1) < 0.001 ? 'from-green-50 to-emerald-50 border-green-200' : 'from-red-50 to-rose-50 border-red-200'}`}>
+                <div className="flex items-center justify-between">
+                  <span className="text-sm font-medium text-slate-700">Общо разпределение:</span>
+                  <span className={`text-2xl font-bold ${Math.abs(totalAllocation - 1) < 0.001 ? 'text-green-600' : 'text-red-600'}`}>
                     {Math.round(totalAllocation * 100)}%
                   </span>
                 </div>
@@ -443,10 +455,10 @@ export default function MetLifeULCalculator({ initialData = {}, onSave, analysis
           </Card>
 
           {/* Additional Coverages */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-lg flex items-center gap-2">
-                <Shield className="h-5 w-5 text-blue-600" />
+          <Card className="shadow-lg hover:shadow-xl transition-shadow duration-300">
+            <CardHeader className="bg-gradient-to-r from-green-50 to-emerald-50 py-4">
+              <CardTitle className="text-lg font-semibold text-green-800 flex items-center gap-2">
+                <Shield className="h-5 w-5" />
                 Допълнителни застрахователни покрития
               </CardTitle>
             </CardHeader>
@@ -571,20 +583,23 @@ export default function MetLifeULCalculator({ initialData = {}, onSave, analysis
 
         {/* Offer Tab */}
         <TabsContent value="offer" className="space-y-6">
-          <Card>
-            <CardHeader>
-              <CardTitle>Застрахователна оферта - {formData.clientName}</CardTitle>
-              <div className="text-sm text-slate-600">
+          <Card className="shadow-xl">
+            <CardHeader className="bg-gradient-to-r from-blue-50 to-purple-50 py-5">
+              <CardTitle className="text-xl font-bold text-slate-900">Застрахователна оферта - {formData.clientName}</CardTitle>
+              <div className="text-sm text-slate-600 mt-2">
                 Възраст: {formData.age} г. | Рисков клас: {formData.riskClass === 1 ? 'I' : formData.riskClass === 2 ? 'II' : 'III'}
               </div>
             </CardHeader>
             <CardContent className="space-y-6">
               {/* Savings Program */}
               <div>
-                <h3 className="font-semibold text-lg mb-3 text-blue-600">СПЕСТОВНА ПРОГРАМА</h3>
+                <h3 className="font-semibold text-lg mb-4 text-blue-600 flex items-center gap-2">
+                  <TrendingUp className="h-5 w-5" />
+                  СПЕСТОВНА ПРОГРАМА
+                </h3>
                 <div className="grid md:grid-cols-2 gap-6">
-                  <div>
-                    <h4 className="font-medium mb-2">Основни характеристики</h4>
+                  <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl p-5 border border-blue-200">
+                    <h4 className="font-semibold mb-3 text-blue-800">Основни характеристики</h4>
                     <div className="space-y-2 text-sm">
                       <div className="flex justify-between">
                         <span className="text-slate-600">Годишна вноска:</span>
@@ -605,8 +620,8 @@ export default function MetLifeULCalculator({ initialData = {}, onSave, analysis
                     </div>
                   </div>
                   
-                  <div>
-                    <h4 className="font-medium mb-2">Инвестиционни фондове</h4>
+                  <div className="bg-gradient-to-br from-purple-50 to-pink-50 rounded-xl p-5 border border-purple-200">
+                    <h4 className="font-semibold mb-3 text-purple-800">Инвестиционни фондове</h4>
                     <div className="space-y-2 text-sm">
                       <div className="flex justify-between">
                         <span className="text-slate-600">Световни акции:</span>
@@ -631,14 +646,17 @@ export default function MetLifeULCalculator({ initialData = {}, onSave, analysis
 
               {/* Coverages */}
               <div>
-                <h3 className="font-semibold text-lg mb-3 text-blue-600">ДОПЪЛНИТЕЛНИ ПОКРИТИЯ И ОБЕЗЩЕТЕНИЯ</h3>
-                <div className="overflow-x-auto">
+                <h3 className="font-semibold text-lg mb-4 text-green-600 flex items-center gap-2">
+                  <Shield className="h-5 w-5" />
+                  ДОПЪЛНИТЕЛНИ ПОКРИТИЯ И ОБЕЗЩЕТЕНИЯ
+                </h3>
+                <div className="overflow-x-auto bg-white rounded-xl shadow-lg border border-slate-200">
                   <table className="w-full text-sm">
-                    <thead className="bg-slate-50">
+                    <thead className="bg-gradient-to-r from-slate-50 to-blue-50">
                       <tr>
-                        <th className="text-left p-3 font-medium">Застрахователно покритие</th>
-                        <th className="text-right p-3 font-medium">Обезщетение</th>
-                        <th className="text-right p-3 font-medium">Цена (€/год)</th>
+                        <th className="text-left p-4 font-semibold text-slate-700">Застрахователно покритие</th>
+                        <th className="text-right p-4 font-semibold text-slate-700">Обезщетение</th>
+                        <th className="text-right p-4 font-semibold text-slate-700">Цена (€/год)</th>
                       </tr>
                     </thead>
                     <tbody className="divide-y">
@@ -711,40 +729,43 @@ export default function MetLifeULCalculator({ initialData = {}, onSave, analysis
               </div>
 
               {/* Pricing */}
-              <div className="border-t pt-4">
-                <h3 className="font-semibold text-lg mb-3 text-blue-600">ЦЕНА И НАЧИНИ НА ПЛАЩАНЕ</h3>
-                <div className="grid md:grid-cols-2 gap-4">
-                  <div className="space-y-2">
+              <div className="border-t pt-6">
+                <h3 className="font-semibold text-lg mb-4 text-blue-600 flex items-center gap-2">
+                  <Zap className="h-5 w-5" />
+                  ЦЕНА И НАЧИНИ НА ПЛАЩАНЕ
+                </h3>
+                <div className="grid md:grid-cols-2 gap-6">
+                  <div className="space-y-3 bg-slate-50 rounded-xl p-5 border border-slate-200">
                     <div className="flex justify-between text-sm">
                       <span className="text-slate-600">Нетна сума за спестяване:</span>
-                      <span className="font-semibold">{formData.annualSavings.toFixed(2)} €</span>
+                      <span className="font-semibold text-slate-900">{formData.annualSavings.toFixed(2)} €</span>
                     </div>
                     <div className="flex justify-between text-sm">
                       <span className="text-slate-600">Покрития:</span>
-                      <span className="font-semibold">{premiumBreakdown.totalCoverages.toFixed(2)} €</span>
+                      <span className="font-semibold text-slate-900">{premiumBreakdown.totalCoverages.toFixed(2)} €</span>
                     </div>
                     <div className="flex justify-between text-sm">
                       <span className="text-slate-600">Административна такса:</span>
-                      <span className="font-semibold">15.00 €</span>
+                      <span className="font-semibold text-slate-900">15.00 €</span>
                     </div>
                   </div>
                   
-                  <div className="space-y-2 bg-blue-50 p-4 rounded-lg">
-                    <div className="flex justify-between font-semibold text-blue-900">
+                  <div className="space-y-3 bg-gradient-to-br from-blue-50 via-blue-100 to-indigo-100 p-5 rounded-xl border border-blue-300 shadow-md">
+                    <div className="flex justify-between font-bold text-blue-900">
                       <span>Годишно плащане:</span>
-                      <span>{premiumBreakdown.totalAnnual.toFixed(2)} €</span>
+                      <span className="text-xl">{premiumBreakdown.totalAnnual.toFixed(2)} €</span>
                     </div>
                     <div className="flex justify-between text-sm">
-                      <span className="text-slate-600">Полугодишно:</span>
-                      <span>{premiumBreakdown.semiAnnual.toFixed(2)} €</span>
+                      <span className="text-blue-700">Полугодишно:</span>
+                      <span className="font-semibold">{premiumBreakdown.semiAnnual.toFixed(2)} €</span>
                     </div>
                     <div className="flex justify-between text-sm">
-                      <span className="text-slate-600">Тримесечно:</span>
-                      <span>{premiumBreakdown.quarterly.toFixed(2)} €</span>
+                      <span className="text-blue-700">Тримесечно:</span>
+                      <span className="font-semibold">{premiumBreakdown.quarterly.toFixed(2)} €</span>
                     </div>
                     <div className="flex justify-between text-sm">
-                      <span className="text-slate-600">Месечно:</span>
-                      <span>{premiumBreakdown.monthly.toFixed(2)} €</span>
+                      <span className="text-blue-700">Месечно:</span>
+                      <span className="font-semibold">{premiumBreakdown.monthly.toFixed(2)} €</span>
                     </div>
                   </div>
                 </div>
@@ -754,9 +775,9 @@ export default function MetLifeULCalculator({ initialData = {}, onSave, analysis
                 <Button 
                   onClick={handleSaveOffer} 
                   disabled={saving || warnings.length > 0}
-                  className="w-full bg-blue-600 hover:bg-blue-700"
+                  className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 shadow-lg hover:shadow-xl transition-all duration-300 h-12 text-base font-semibold"
                 >
-                  <Save className="h-4 w-4 mr-2" />
+                  <Save className="h-5 w-5 mr-2" />
                   {saving ? 'Записване...' : 'Запази офертата'}
                 </Button>
               )}
@@ -766,61 +787,97 @@ export default function MetLifeULCalculator({ initialData = {}, onSave, analysis
 
         {/* Projection Tab */}
         <TabsContent value="projection" className="space-y-6">
-          <Card>
-            <CardHeader>
-              <CardTitle>Проекция за развитието на клиентска сметка</CardTitle>
+          <Card className="shadow-xl">
+            <CardHeader className="bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 py-5">
+              <CardTitle className="text-white text-xl font-bold">Проекция за развитието на клиентска сметка</CardTitle>
+              <p className="text-purple-100 text-sm mt-1">Детайлна финансова симулация за {Math.min(80 - formData.age, 49)} години</p>
             </CardHeader>
-            <CardContent>
-              <div className="h-80 mb-6">
+            <CardContent className="pt-6">
+              <div className="h-96 mb-8">
                 <ResponsiveContainer width="100%" height="100%">
-                  <LineChart data={projection}>
+                  <AreaChart data={projection}>
+                    <defs>
+                      <linearGradient id="colorPaid" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="5%" stopColor="#94a3b8" stopOpacity={0.3}/>
+                        <stop offset="95%" stopColor="#94a3b8" stopOpacity={0}/>
+                      </linearGradient>
+                      <linearGradient id="colorAccount" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.4}/>
+                        <stop offset="95%" stopColor="#3b82f6" stopOpacity={0}/>
+                      </linearGradient>
+                      <linearGradient id="colorDeath" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="5%" stopColor="#10b981" stopOpacity={0.3}/>
+                        <stop offset="95%" stopColor="#10b981" stopOpacity={0}/>
+                      </linearGradient>
+                    </defs>
                     <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
-                    <XAxis dataKey="year" label={{ value: 'Година', position: 'insideBottom', offset: -5 }} />
-                    <YAxis label={{ value: '€', angle: -90, position: 'insideLeft' }} />
+                    <XAxis dataKey="year" label={{ value: 'Година', position: 'insideBottom', offset: -5 }} stroke="#64748b" />
+                    <YAxis label={{ value: '€', angle: -90, position: 'insideLeft' }} stroke="#64748b" />
                     <Tooltip 
                       formatter={(value) => `${Math.round(value).toLocaleString()} €`}
                       labelFormatter={(label) => `Година ${label}`}
+                      contentStyle={{ backgroundColor: 'rgba(255, 255, 255, 0.95)', border: '1px solid #e2e8f0', borderRadius: '8px' }}
                     />
-                    <Legend />
-                    <Line type="monotone" dataKey="totalPremiumsPaid" stroke="#94a3b8" name="Платени премии" strokeWidth={2} />
-                    <Line type="monotone" dataKey="accountValue" stroke="#3b82f6" name="Стойност на сметката" strokeWidth={2} />
-                    <Line type="monotone" dataKey="deathBenefit" stroke="#10b981" name="Обезщетение при смърт" strokeWidth={2} />
+                    <Legend wrapperStyle={{ paddingTop: '20px' }} />
+                    <Area type="monotone" dataKey="totalPremiumsPaid" stroke="#94a3b8" fill="url(#colorPaid)" name="Платени премии" strokeWidth={2} />
+                    <Area type="monotone" dataKey="accountValue" stroke="#3b82f6" fill="url(#colorAccount)" name="Стойност на сметката" strokeWidth={3} />
+                    <Area type="monotone" dataKey="deathBenefit" stroke="#10b981" fill="url(#colorDeath)" name="Обезщетение при смърт" strokeWidth={2} />
                     <Line type="monotone" dataKey="netSurrenderValue" stroke="#f59e0b" name="Нетна откупна стойност" strokeWidth={2} strokeDasharray="5 5" />
-                  </LineChart>
+                  </AreaChart>
                 </ResponsiveContainer>
               </div>
               
-              <div className="overflow-x-auto">
+              <div className="overflow-x-auto rounded-xl border border-slate-200 shadow-lg">
                 <table className="w-full text-sm">
-                  <thead className="bg-slate-50 sticky top-0">
+                  <thead className="bg-gradient-to-r from-slate-100 to-blue-100 sticky top-0">
                     <tr>
-                      <th className="text-left p-2 font-medium">Година</th>
-                      <th className="text-right p-2 font-medium">Възраст</th>
-                      <th className="text-right p-2 font-medium">Платени премии</th>
-                      <th className="text-right p-2 font-medium">Обезщетение при смърт</th>
-                      <th className="text-right p-2 font-medium">Стойност на сметката</th>
-                      <th className="text-right p-2 font-medium">Нетна откупна стойност</th>
+                      <th className="text-left p-3 font-semibold text-slate-700">Година</th>
+                      <th className="text-right p-3 font-semibold text-slate-700">Възраст</th>
+                      <th className="text-right p-3 font-semibold text-slate-700">Платени премии</th>
+                      <th className="text-right p-3 font-semibold text-slate-700">Обезщетение при смърт</th>
+                      <th className="text-right p-3 font-semibold text-slate-700">Стойност на сметката</th>
+                      <th className="text-right p-3 font-semibold text-slate-700">Нетна откупна стойност</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y">
+                  <tbody className="divide-y divide-slate-100">
                     {projection.map((row) => (
-                      <tr key={row.year} className="hover:bg-slate-50">
-                        <td className="p-2">{row.year}</td>
-                        <td className="text-right p-2">{row.age}</td>
-                        <td className="text-right p-2">{row.totalPremiumsPaid.toLocaleString()} €</td>
-                        <td className="text-right p-2">{row.deathBenefit.toLocaleString()} €</td>
-                        <td className="text-right p-2 font-semibold text-blue-600">{row.accountValue.toLocaleString()} €</td>
-                        <td className="text-right p-2">{row.netSurrenderValue.toLocaleString()} €</td>
+                      <tr key={row.year} className="hover:bg-gradient-to-r hover:from-blue-50 hover:to-indigo-50 transition-all duration-200">
+                        <td className="p-3 font-medium">{row.year}</td>
+                        <td className="text-right p-3">{row.age}</td>
+                        <td className="text-right p-3 text-slate-600">{row.totalPremiumsPaid.toLocaleString()} €</td>
+                        <td className="text-right p-3 text-green-600 font-medium">{row.deathBenefit.toLocaleString()} €</td>
+                        <td className="text-right p-3 font-bold text-blue-600">{row.accountValue.toLocaleString()} €</td>
+                        <td className="text-right p-3 text-amber-600 font-medium">{row.netSurrenderValue.toLocaleString()} €</td>
                       </tr>
                     ))}
                   </tbody>
                 </table>
               </div>
 
-              <div className="mt-4 p-4 bg-slate-50 rounded-lg text-xs text-slate-600 space-y-1">
-                <p>• При изготвянето на тази проекция са калкулирани всички бонуси и разходи на база общите условия на спестовно-инвестиционната програма.</p>
-                <p>• Информацията и числата в тази проекция са базирани на допускания за бъдещ период. Те се предоставят с информационна цел и не представляват обещание или гаранция за бъдещи финансови резултати.</p>
-                <p>• Всички права и задължения на МетЛайф и на застрахованото лице ще бъдат определени в разпоредбите на конкретен застрахователен договор.</p>
+              {analysisId && (
+                <Button 
+                  onClick={handleSaveOffer} 
+                  disabled={saving || warnings.length > 0}
+                  className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 shadow-lg hover:shadow-xl transition-all duration-300 h-12 text-base font-semibold mt-6"
+                >
+                  <Save className="h-5 w-5 mr-2" />
+                  {saving ? 'Записване...' : 'Запази офертата'}
+                </Button>
+              )}
+
+              <div className="mt-6 p-5 bg-gradient-to-br from-slate-50 to-blue-50 rounded-xl border border-slate-200 text-xs text-slate-600 space-y-2">
+                <div className="flex items-start gap-2">
+                  <div className="w-1.5 h-1.5 bg-blue-500 rounded-full mt-1.5"></div>
+                  <p>При изготвянето на тази проекция са калкулирани всички бонуси и разходи на база общите условия на спестовно-инвестиционната програма.</p>
+                </div>
+                <div className="flex items-start gap-2">
+                  <div className="w-1.5 h-1.5 bg-blue-500 rounded-full mt-1.5"></div>
+                  <p>Информацията и числата в тази проекция са базирани на допускания за бъдещ период. Те се предоставят с информационна цел и не представляват обещание или гаранция за бъдещи финансови резултати.</p>
+                </div>
+                <div className="flex items-start gap-2">
+                  <div className="w-1.5 h-1.5 bg-blue-500 rounded-full mt-1.5"></div>
+                  <p>Всички права и задължения на МетЛайф и на застрахованото лице ще бъдат определени в разпоредбите на конкретен застрахователен договор.</p>
+                </div>
               </div>
             </CardContent>
           </Card>

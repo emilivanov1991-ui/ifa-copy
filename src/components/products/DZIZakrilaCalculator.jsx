@@ -7,7 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Shield, Save, CheckCircle2, AlertCircle, Info } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
 import { toast } from 'sonner';
-import config from './configs/dzi-zakrila.json';
+import config from './configs/dzi-zakrila.js';
 
 export default function DZIZakrilaCalculator({ analysisId, clientId }) {
   const [saving, setSaving] = useState(false);

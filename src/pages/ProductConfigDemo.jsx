@@ -94,7 +94,7 @@ export default function ProductConfigDemo() {
         <span className="text-xs">УНИКА</span>
         </TabsTrigger>
         <TabsTrigger value="generali" className="flex-col h-auto py-3 data-[state=active]:bg-white data-[state=active]:shadow-lg">
-        <img src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6925a960748714fa4828395a/e8bce8654_image.png" alt="Generali" className="h-8 mb-1" />
+        <img src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6925a960748714fa4828395a/1a98c2c51_image.png" alt="Generali" className="h-8 mb-1" />
         <span className="text-xs">Generali</span>
         </TabsTrigger>
         <TabsTrigger value="credits" className="flex-col h-auto py-3 data-[state=active]:bg-white data-[state=active]:shadow-lg">

@@ -106,7 +106,7 @@ export default function ProductConfigDemo() {
         <span className="text-xs">Кредити</span>
         </TabsTrigger>
         <TabsTrigger value="pension" className="flex-col h-auto py-3 data-[state=active]:bg-white data-[state=active]:shadow-lg">
-        <img src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6925a960748714fa4828395a/a4d9d2d02_image.png" alt="ОББ Пенсионно" className="h-8 mb-1" />
+        <img src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6925a960748714fa4828395a/838db6bfd_image.png" alt="ОББ Пенсионно" className="h-8 mb-1" />
         <span className="text-xs">Пенсии</span>
         </TabsTrigger>
         <TabsTrigger value="saved-offers" className="flex-col h-auto py-3 data-[state=active]:bg-white data-[state=active]:shadow-lg">

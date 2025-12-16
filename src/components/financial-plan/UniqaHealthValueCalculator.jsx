@@ -69,9 +69,11 @@ export default function UniqaHealthValueCalculator({ initialData = {}, onSave, a
       <Card className="bg-gradient-to-r from-blue-600 via-blue-700 to-cyan-600 overflow-hidden shadow-2xl">
         <CardHeader>
           <div className="flex items-center gap-4">
-            <div className="w-14 h-14 bg-white/20 backdrop-blur-sm rounded-xl flex items-center justify-center shadow-lg">
-              <Heart className="h-7 w-7 text-white" />
-            </div>
+            <img 
+              src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6925a960748714fa4828395a/c923181b0_image.png" 
+              alt="УНИКА" 
+              className="h-12 bg-white px-4 py-2 rounded-xl shadow-lg"
+            />
             <div>
               <CardTitle className="text-white text-2xl font-bold tracking-wide">УNIKA Здраве и ценност Селект</CardTitle>
               <p className="text-blue-100 text-sm font-medium">Лечение на критични заболявания при болничен престой</p>

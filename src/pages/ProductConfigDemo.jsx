@@ -13,6 +13,7 @@ import DZICascoCalculator from '../components/financial-plan/DZICascoCalculator'
 import GeneraliHealthLineOffer from '../components/financial-plan/GeneraliHealthLineOffer';
 import UniqaHealthValueCalculator from '../components/financial-plan/UniqaHealthValueCalculator';
 import PlaceholderCalculator from '../components/products/PlaceholderCalculator';
+import InstinctHomeCalculator from '../components/financial-plan/InstinctHomeCalculator';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -80,7 +81,7 @@ export default function ProductConfigDemo() {
         </Card>
 
         <Tabs defaultValue="metlife" className="w-full">
-        <TabsList className="grid w-full grid-cols-3 lg:grid-cols-7 mb-6 h-auto gap-2 bg-gradient-to-r from-slate-100 to-slate-200 p-2 rounded-xl">
+        <TabsList className="grid w-full grid-cols-4 lg:grid-cols-8 mb-6 h-auto gap-2 bg-gradient-to-r from-slate-100 to-slate-200 p-2 rounded-xl">
         <TabsTrigger value="metlife" className="flex-col h-auto py-3 data-[state=active]:bg-white data-[state=active]:shadow-lg">
         <img src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6925a960748714fa4828395a/d26d48d16_image.png" alt="MetLife" className="h-8 mb-1" />
         <span className="text-xs">MetLife</span>
@@ -96,6 +97,10 @@ export default function ProductConfigDemo() {
         <TabsTrigger value="generali" className="flex-col h-auto py-3 data-[state=active]:bg-white data-[state=active]:shadow-lg">
         <img src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6925a960748714fa4828395a/1a98c2c51_image.png" alt="Generali" className="h-8 mb-1" />
         <span className="text-xs">Generali</span>
+        </TabsTrigger>
+        <TabsTrigger value="instinct" className="flex-col h-auto py-3 data-[state=active]:bg-white data-[state=active]:shadow-lg">
+        <img src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6925a960748714fa4828395a/09a600ebb_image.png" alt="Инстинкт" className="h-8 mb-1" />
+        <span className="text-xs">Инстинкт</span>
         </TabsTrigger>
         <TabsTrigger value="credits" className="flex-col h-auto py-3 data-[state=active]:bg-white data-[state=active]:shadow-lg">
         <span className="text-sm font-semibold">🏦</span>
@@ -366,6 +371,14 @@ export default function ProductConfigDemo() {
                 />
               </TabsContent>
             </Tabs>
+          </TabsContent>
+
+          {/* Instinct Products */}
+          <TabsContent value="instinct" className="space-y-4">
+            <InstinctHomeCalculator 
+              analysisId={demoAnalysisId}
+              clientId={demoClientId}
+            />
           </TabsContent>
 
           {/* Credits */}

@@ -11,7 +11,7 @@ export default function PlaceholderCalculator({ productName, provider, descripti
             <img 
               src={logoUrl} 
               alt={provider} 
-              className="h-24"
+              className="h-8"
             />
           )}
           <CardTitle className="text-lg text-slate-700">

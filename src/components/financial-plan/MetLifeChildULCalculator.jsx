@@ -1,10 +1,11 @@
 import React, { useState, useMemo } from 'react';
+import { motion } from 'framer-motion';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
-import { AlertTriangle, Info, Baby, Save } from 'lucide-react';
+import { AlertTriangle, Info, Baby, Save, Sparkles, Heart, TrendingUp } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
 import { toast } from 'sonner';
 import {
@@ -202,13 +203,15 @@ export default function MetLifeChildULCalculator({ initialData = {}, onSave, ana
   return (
     <div className="space-y-6">
       {/* Header */}
-      <Card className="bg-gradient-to-r from-pink-600 to-purple-600">
+      <Card className="bg-gradient-to-r from-pink-600 via-rose-600 to-purple-600 overflow-hidden shadow-2xl">
         <CardHeader>
-          <div className="flex items-center gap-3">
-            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/6/66/MetLife_logo.svg/200px-MetLife_logo.svg.png" alt="MetLife" className="h-8 bg-white rounded px-2 py-1" />
+          <div className="flex items-center gap-4">
+            <div className="w-14 h-14 bg-white/20 backdrop-blur-sm rounded-xl flex items-center justify-center shadow-lg">
+              <Baby className="h-7 w-7 text-white" />
+            </div>
             <div>
-              <CardTitle className="text-white">Калкулатор "МетЛайф Детство Акции и Облигации"</CardTitle>
-              <p className="text-pink-100 text-sm">MetLife UL Junior - Детски Unit Linked</p>
+              <CardTitle className="text-white text-2xl font-bold tracking-wide">МетЛайф Детство</CardTitle>
+              <p className="text-pink-100 text-sm font-medium">Unit Linked - Детска инвестиционна застраховка</p>
             </div>
           </div>
         </CardHeader>
@@ -216,31 +219,39 @@ export default function MetLifeChildULCalculator({ initialData = {}, onSave, ana
 
       {/* Errors and Warnings */}
       {(premiumBreakdown.errors.length > 0 || premiumBreakdown.warnings.length > 0) && (
-        <Card className="border-amber-200 bg-amber-50">
-          <CardContent className="pt-4 space-y-2">
-            {premiumBreakdown.errors.map((error, idx) => (
-              <div key={`err-${idx}`} className="flex items-start gap-2 text-red-700">
-                <AlertTriangle className="h-4 w-4 mt-0.5 flex-shrink-0" />
-                <span className="text-sm">{error}</span>
-              </div>
-            ))}
-            {premiumBreakdown.warnings.map((warning, idx) => (
-              <div key={`warn-${idx}`} className="flex items-start gap-2 text-amber-700">
-                <Info className="h-4 w-4 mt-0.5 flex-shrink-0" />
-                <span className="text-sm">{warning}</span>
-              </div>
-            ))}
-          </CardContent>
-        </Card>
+        <motion.div
+          initial={{ opacity: 0, scale: 0.95 }}
+          animate={{ opacity: 1, scale: 1 }}
+        >
+          <Card className="border-amber-300 bg-gradient-to-r from-amber-50 to-orange-50 shadow-lg">
+            <CardContent className="pt-6 space-y-3">
+              {premiumBreakdown.errors.map((error, idx) => (
+                <div key={`err-${idx}`} className="flex items-start gap-2 text-red-700">
+                  <AlertTriangle className="h-5 w-5 mt-0.5 flex-shrink-0" />
+                  <span className="text-sm font-medium">{error}</span>
+                </div>
+              ))}
+              {premiumBreakdown.warnings.map((warning, idx) => (
+                <div key={`warn-${idx}`} className="flex items-start gap-2 text-amber-700">
+                  <Info className="h-5 w-5 mt-0.5 flex-shrink-0" />
+                  <span className="text-sm font-medium">{warning}</span>
+                </div>
+              ))}
+            </CardContent>
+          </Card>
+        </motion.div>
       )}
 
       <div className="grid lg:grid-cols-2 gap-6">
         {/* Left Column - Input */}
         <div className="space-y-6">
           {/* Policyholder & Child Data */}
-          <Card>
-            <CardHeader className="bg-purple-50 py-3">
-              <CardTitle className="text-base text-purple-800">Данни за кандидатите за застраховащ и застрахован</CardTitle>
+          <Card className="shadow-lg hover:shadow-xl transition-shadow duration-300">
+            <CardHeader className="bg-gradient-to-r from-purple-50 to-pink-50 py-4">
+              <CardTitle className="text-base text-purple-800 font-semibold flex items-center gap-2">
+                <Heart className="h-5 w-5" />
+                Данни за кандидатите за застраховащ и застрахован
+              </CardTitle>
             </CardHeader>
             <CardContent className="pt-4 space-y-4">
               <div>
@@ -292,9 +303,12 @@ export default function MetLifeChildULCalculator({ initialData = {}, onSave, ana
           </Card>
 
           {/* Fund Allocation */}
-          <Card>
-            <CardHeader className="bg-blue-50 py-3">
-              <CardTitle className="text-base text-blue-800">Инвестиционни фондове</CardTitle>
+          <Card className="shadow-lg hover:shadow-xl transition-shadow duration-300">
+            <CardHeader className="bg-gradient-to-r from-blue-50 to-indigo-50 py-4">
+              <CardTitle className="text-base text-blue-800 font-semibold flex items-center gap-2">
+                <TrendingUp className="h-5 w-5" />
+                Инвестиционни фондове
+              </CardTitle>
             </CardHeader>
             <CardContent className="pt-4 space-y-4">
               <div className="grid grid-cols-2 gap-3 items-center">
@@ -327,23 +341,28 @@ export default function MetLifeChildULCalculator({ initialData = {}, onSave, ana
                   max={100}
                 />
               </div>
-              <div className="flex justify-between items-center pt-2 border-t">
-                <span className="text-sm font-medium">Общо:</span>
-                <span className={`font-bold ${formData.fundGlobalStocks + formData.fundEmergingMarkets + formData.fundBonds === 100 ? 'text-green-600' : 'text-red-600'}`}>
-                  {formData.fundGlobalStocks + formData.fundEmergingMarkets + formData.fundBonds}%
-                </span>
-              </div>
-              <div className="flex justify-between items-center text-sm text-slate-600">
-                <span>Средна годишна доходност:</span>
-                <span className="font-semibold text-blue-700">{(expectedReturn * 100).toFixed(2)}%</span>
+              <div className={`bg-gradient-to-r p-4 rounded-lg border mt-4 ${formData.fundGlobalStocks + formData.fundEmergingMarkets + formData.fundBonds === 100 ? 'from-green-50 to-emerald-50 border-green-200' : 'from-red-50 to-rose-50 border-red-200'}`}>
+                <div className="flex justify-between items-center mb-2">
+                  <span className="text-sm font-medium text-slate-700">Общо разпределение:</span>
+                  <span className={`text-2xl font-bold ${formData.fundGlobalStocks + formData.fundEmergingMarkets + formData.fundBonds === 100 ? 'text-green-600' : 'text-red-600'}`}>
+                    {formData.fundGlobalStocks + formData.fundEmergingMarkets + formData.fundBonds}%
+                  </span>
+                </div>
+                <div className="flex justify-between items-center text-sm border-t border-white/50 pt-2">
+                  <span className="text-slate-600 font-medium">Очаквана годишна доходност:</span>
+                  <span className="text-lg font-bold text-blue-700">{(expectedReturn * 100).toFixed(2)}%</span>
+                </div>
               </div>
             </CardContent>
           </Card>
 
           {/* Coverages Input */}
-          <Card>
-            <CardHeader className="bg-amber-50 py-3">
-              <CardTitle className="text-base text-amber-800">Застрахователни покрития</CardTitle>
+          <Card className="shadow-lg hover:shadow-xl transition-shadow duration-300">
+            <CardHeader className="bg-gradient-to-r from-amber-50 to-yellow-50 py-4">
+              <CardTitle className="text-base text-amber-800 font-semibold flex items-center gap-2">
+                <Sparkles className="h-5 w-5" />
+                Застрахователни покрития
+              </CardTitle>
             </CardHeader>
             <CardContent className="pt-4 space-y-4">
               {/* PTD */}
@@ -420,9 +439,9 @@ export default function MetLifeChildULCalculator({ initialData = {}, onSave, ana
         {/* Right Column - Output */}
         <div className="space-y-6">
           {/* Coverage Summary */}
-          <Card>
-            <CardHeader className="bg-green-50 py-3">
-              <CardTitle className="text-base text-green-800">Преглед на покритията и цените</CardTitle>
+          <Card className="shadow-xl">
+            <CardHeader className="bg-gradient-to-r from-green-50 to-emerald-50 py-4">
+              <CardTitle className="text-base text-green-800 font-semibold">Преглед на покритията и цените</CardTitle>
             </CardHeader>
             <CardContent className="pt-4">
               <div className="space-y-3">
@@ -435,13 +454,13 @@ export default function MetLifeChildULCalculator({ initialData = {}, onSave, ana
                 </div>
 
                 {/* Annual Savings */}
-                <div className="flex justify-between text-sm py-1.5 border-b border-slate-100 bg-blue-50 -mx-4 px-4">
-                  <span className="text-blue-700 font-medium">Годишна сума за спестяване</span>
+                <div className="flex justify-between text-sm py-2.5 border-b border-blue-200 bg-gradient-to-r from-blue-50 to-indigo-50 -mx-4 px-4 rounded-lg mb-2">
+                  <span className="text-blue-800 font-semibold">Годишна сума за спестяване</span>
                   <div className="flex gap-8">
-                    <span className="w-24 text-right font-medium text-blue-700">
+                    <span className="w-24 text-right font-semibold text-blue-700">
                       {formData.annualSavings.toLocaleString()} €
                     </span>
-                    <span className="w-20 text-right font-semibold text-blue-700">
+                    <span className="w-20 text-right font-bold text-blue-800">
                       {formData.annualSavings.toFixed(2)}
                     </span>
                   </div>
@@ -471,32 +490,32 @@ export default function MetLifeChildULCalculator({ initialData = {}, onSave, ana
           </Card>
 
           {/* Pricing Summary */}
-          <Card>
-            <CardHeader className="bg-purple-600 py-3">
-              <CardTitle className="text-base text-white">Обобщение на цената</CardTitle>
+          <Card className="shadow-xl">
+            <CardHeader className="bg-gradient-to-r from-purple-600 via-pink-600 to-rose-600 py-4">
+              <CardTitle className="text-base text-white font-bold">Обобщение на цената</CardTitle>
             </CardHeader>
-            <CardContent className="pt-4 space-y-3">
-              <div className="flex justify-between text-sm">
-                <span className="text-slate-600">Обща нетна цена на застрахователния план:</span>
-                <span className="font-semibold">{premiumBreakdown.netPremium.toFixed(2)} €</span>
+            <CardContent className="pt-6 space-y-4">
+              <div className="flex justify-between text-sm bg-slate-50 rounded-lg p-3">
+                <span className="text-slate-600 font-medium">Обща нетна цена на застрахователния план:</span>
+                <span className="font-bold text-slate-900">{premiumBreakdown.netPremium.toFixed(2)} €</span>
               </div>
-              <div className="flex justify-between text-sm">
-                <span className="text-slate-600">Админ. такса:</span>
-                <span className="font-semibold">{premiumBreakdown.adminFee} € /година</span>
+              <div className="flex justify-between text-sm bg-slate-50 rounded-lg p-3">
+                <span className="text-slate-600 font-medium">Админ. такса:</span>
+                <span className="font-bold text-slate-900">{premiumBreakdown.adminFee} € /година</span>
               </div>
               
-              <div className="border-t pt-3 space-y-2">
-                <div className="flex justify-between text-lg font-bold text-purple-700">
+              <div className="border-t pt-4 space-y-3">
+                <div className="flex justify-between text-lg font-bold text-purple-700 bg-gradient-to-r from-purple-50 to-pink-50 rounded-lg p-4 border border-purple-200">
                   <span>Годишно плащане:</span>
-                  <span>{premiumBreakdown.annualPremium.toFixed(2)} €</span>
+                  <span className="text-2xl">{premiumBreakdown.annualPremium.toFixed(2)} €</span>
                 </div>
-                <div className="flex justify-between text-sm">
-                  <span className="text-slate-600">6 м. плащане:</span>
-                  <span className="font-semibold">{premiumBreakdown.semiAnnualPremium.toFixed(2)} € /полугодие</span>
+                <div className="flex justify-between text-sm bg-white rounded-lg p-3 border border-slate-200">
+                  <span className="text-slate-600 font-medium">6 м. плащане:</span>
+                  <span className="font-bold text-purple-600">{premiumBreakdown.semiAnnualPremium.toFixed(2)} € /полугодие</span>
                 </div>
-                <div className="flex justify-between text-sm">
-                  <span className="text-slate-600">3 м. плащане:</span>
-                  <span className="font-semibold">{premiumBreakdown.quarterlyPremium.toFixed(2)} € /тримесечие</span>
+                <div className="flex justify-between text-sm bg-white rounded-lg p-3 border border-slate-200">
+                  <span className="text-slate-600 font-medium">3 м. плащане:</span>
+                  <span className="font-bold text-purple-600">{premiumBreakdown.quarterlyPremium.toFixed(2)} € /тримесечие</span>
                 </div>
               </div>
             </CardContent>
@@ -505,10 +524,10 @@ export default function MetLifeChildULCalculator({ initialData = {}, onSave, ana
           {analysisId && (
             <Button 
               onClick={handleSaveOffer} 
-              className="w-full bg-purple-600 hover:bg-purple-700"
+              className="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 shadow-lg hover:shadow-xl transition-all duration-300 h-12 text-base font-semibold"
               disabled={premiumBreakdown.errors.length > 0 || saving}
             >
-              <Save className="w-4 h-4 mr-2" />
+              <Save className="w-5 h-5 mr-2" />
               {saving ? 'Записване...' : 'Запази офертата'}
             </Button>
           )}

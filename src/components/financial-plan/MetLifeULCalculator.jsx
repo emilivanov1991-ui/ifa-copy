@@ -291,9 +291,11 @@ export default function MetLifeULCalculator({ initialData = {}, onSave, analysis
       <Card className="bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 overflow-hidden shadow-2xl">
         <CardHeader>
           <div className="flex items-center gap-4">
-            <div className="w-14 h-14 bg-white/20 backdrop-blur-sm rounded-xl flex items-center justify-center shadow-lg">
-              <TrendingUp className="h-7 w-7 text-white" />
-            </div>
+            <img 
+              src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6925a960748714fa4828395a/d26d48d16_image.png" 
+              alt="MetLife" 
+              className="h-12 bg-white px-4 py-2 rounded-xl shadow-lg"
+            />
             <div>
               <CardTitle className="text-white text-2xl font-bold tracking-wide">MetLife Предимство</CardTitle>
               <p className="text-blue-100 text-sm font-medium">Unit Linked - Инвестиционна застраховка</p>

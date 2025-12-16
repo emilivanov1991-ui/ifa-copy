@@ -13,18 +13,20 @@ export const PROPERTY_SPLIT = {
 };
 
 // Коефициенти за изчисление на покритията (от Excel таблицата)
-// За застрахователни суми >= 151000 BGN
 export const INSTINCT_COVERAGE_FORMULAS = {
-  // Пожар, Мълния, Буря, Пороен дъжд, Градушка, Наводнение и др.
+  // Пожар, Мълния, Буря и др. природни бедствия
   fire_perils: {
     immovable: 0.85,
     movable: 0.15,
     mandatory: true
   },
-  // Свличане и срутване на земни пластове
+  // Свличане и срутване на земни пластове - cap при 201000 BGN
   landslide: {
-    immovable: 0.0637499, // до 151000, после различно
-    movable: 0.01125,
+    immovable_coef: 0.0637499,
+    movable_coef: 0.01125,
+    cap_threshold: 201000,
+    cap_immovable: 12750,
+    cap_movable: 2250,
     mandatory: true
   },
   // Изтичане на вода и пара
@@ -44,13 +46,13 @@ export const INSTINCT_COVERAGE_FORMULAS = {
     movable: 0.15,
     mandatory: true
   },
-  // Злоумишлени действия
+  // Злоумишлени действия, вкл. Палеж
   vandalism: {
     immovable: 0.34,
     movable: 0.06,
     mandatory: true
   },
-  // Удар от ПТС
+  // Удар от пътно превозно средство
   vehicle_impact: {
     immovable: 0.85,
     movable: 0.15,
@@ -68,28 +70,29 @@ export const INSTINCT_COVERAGE_FORMULAS = {
     movable: 0.15,
     mandatory: true
   },
-  // Тежест от сняг и лед
+  // Тежест от естествено натрупване на сняг и лед
   snow_ice: {
     immovable: 0.85,
     movable: 0.15,
     mandatory: true
   },
-  // Счупване на стъкла (фиксирано до 151k)
+  // Счупване на стъкла (фиксирано)
   glass: {
     fixed_immovable: 10000,
     fixed_movable: 10000,
     mandatory: true
   },
-  // Късо съединение
+  // Късо съединение и токов удар
   short_circuit: {
     immovable: 0.85,
     movable: 0.15,
     mandatory: true
   },
-  // Кражба чрез взлом
+  // Кражба чрез взлом - cap при 201000 BGN -> 15000 лимит
   theft: {
     coefficient: 0.075,
-    cap: 201000, // tier 1 cap
+    cap_threshold: 201000,
+    cap_value: 15000,
     mandatory: true
   },
   // Временно настаняване (фиксирано)
@@ -298,9 +301,14 @@ export const calculateInstinctHomePremium = (sumInsured, packageType = 'custom',
   coverages.fire_immovable = immovable;
   coverages.fire_movable = movable;
   
-  // Свличане и срутване
-  coverages.landslide_immovable = sumInsured * INSTINCT_COVERAGE_FORMULAS.landslide.immovable;
-  coverages.landslide_movable = sumInsured * INSTINCT_COVERAGE_FORMULAS.landslide.movable;
+  // Свличане и срутване - с cap при 201000 BGN
+  if (sumInsured >= INSTINCT_COVERAGE_FORMULAS.landslide.cap_threshold) {
+    coverages.landslide_immovable = INSTINCT_COVERAGE_FORMULAS.landslide.cap_immovable;
+    coverages.landslide_movable = INSTINCT_COVERAGE_FORMULAS.landslide.cap_movable;
+  } else {
+    coverages.landslide_immovable = sumInsured * INSTINCT_COVERAGE_FORMULAS.landslide.immovable_coef;
+    coverages.landslide_movable = sumInsured * INSTINCT_COVERAGE_FORMULAS.landslide.movable_coef;
+  }
   
   // Изтичане на вода
   coverages.water_immovable = immovable;
@@ -333,7 +341,7 @@ export const calculateInstinctHomePremium = (sumInsured, packageType = 'custom',
   coverages.snow_immovable = immovable;
   coverages.snow_movable = movable;
   
-  // Счупване на стъкла
+  // Счупване на стъкла (фиксирано)
   coverages.glass_immovable = INSTINCT_COVERAGE_FORMULAS.glass.fixed_immovable;
   coverages.glass_movable = INSTINCT_COVERAGE_FORMULAS.glass.fixed_movable;
   
@@ -341,9 +349,12 @@ export const calculateInstinctHomePremium = (sumInsured, packageType = 'custom',
   coverages.short_circuit_immovable = immovable;
   coverages.short_circuit_movable = movable;
   
-  // Кражба - с cap
-  const theftBase = sumInsured * INSTINCT_COVERAGE_FORMULAS.theft.coefficient;
-  coverages.theft = Math.min(theftBase, INSTINCT_COVERAGE_FORMULAS.theft.cap);
+  // Кражба - с cap при 201000 BGN -> 15000 лимит
+  if (sumInsured >= INSTINCT_COVERAGE_FORMULAS.theft.cap_threshold) {
+    coverages.theft = INSTINCT_COVERAGE_FORMULAS.theft.cap_value;
+  } else {
+    coverages.theft = sumInsured * INSTINCT_COVERAGE_FORMULAS.theft.coefficient;
+  }
   
   // Временно настаняване
   coverages.temporary_accommodation = INSTINCT_COVERAGE_FORMULAS.temporary_accommodation.fixed;

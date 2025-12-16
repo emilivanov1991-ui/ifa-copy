@@ -385,7 +385,7 @@ export default function ProductConfigDemo() {
                   productName="Ипотечен кредит"
                   provider="UniCredit"
                   description="Ипотечно кредитиране. Моля предоставете лихвени проценти, такси и условия."
-                  logoUrl="https://upload.wikimedia.org/wikipedia/commons/thumb/0/0f/UniCredit_logo_%282013%29.svg/320px-UniCredit_logo_%282013%29.svg.png"
+                  logoUrl="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6925a960748714fa4828395a/d2215799e_image.png"
                 />
               </TabsContent>
 
@@ -421,7 +421,7 @@ export default function ProductConfigDemo() {
                   productName="Потребителски кредит"
                   provider="UniCredit"
                   description="Потребителско кредитиране. Моля предоставете лихвени проценти, такси и условия."
-                  logoUrl="https://upload.wikimedia.org/wikipedia/commons/thumb/0/0f/UniCredit_logo_%282013%29.svg/320px-UniCredit_logo_%282013%29.svg.png"
+                  logoUrl="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6925a960748714fa4828395a/d2215799e_image.png"
                 />
               </TabsContent>
 

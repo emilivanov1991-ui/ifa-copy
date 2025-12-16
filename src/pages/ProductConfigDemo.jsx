@@ -412,7 +412,7 @@ export default function ProductConfigDemo() {
                   productName="Ипотечен кредит"
                   provider="Пощенска Банка"
                   description="Ипотечно кредитиране. Моля предоставете лихвени проценти, такси и условия."
-                  logoUrl="https://upload.wikimedia.org/wikipedia/commons/thumb/e/eb/Postbank_Logo_2018.svg/320px-Postbank_Logo_2018.svg.png"
+                  logoUrl="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6925a960748714fa4828395a/97f069381_image.png"
                 />
               </TabsContent>
 

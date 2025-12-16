@@ -217,7 +217,11 @@ export default function MetLifeCareCalculator({ initialData = {}, onSave, analys
       <Card className="bg-gradient-to-r from-teal-600 to-teal-700">
         <CardHeader>
           <div className="flex items-center gap-3">
-            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/6/66/MetLife_logo.svg/200px-MetLife_logo.svg.png" alt="MetLife" className="h-8 bg-white rounded px-2 py-1" />
+            <img 
+              src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6925a960748714fa4828395a/d26d48d16_image.png" 
+              alt="MetLife" 
+              className="h-10 bg-white rounded-lg px-3 py-1"
+            />
             <div>
               <CardTitle className="text-white">Калкулатор за изчисляване на цена на Метлайф Грижа</CardTitle>
               <p className="text-teal-100 text-sm">MetLife Care - Здравна застраховка</p>

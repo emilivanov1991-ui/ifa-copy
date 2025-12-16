@@ -184,9 +184,11 @@ export default function MetLifeMedicaCalculator({ initialInputs = {}, analysisId
       <Card className="border-blue-200 overflow-hidden">
         <CardHeader className="bg-gradient-to-r from-blue-600 to-blue-700 text-white">
           <div className="flex items-center gap-3">
-            <div className="w-12 h-12 bg-white/20 rounded-lg flex items-center justify-center backdrop-blur-sm">
-              <Heart className="h-6 w-6" />
-            </div>
+            <img 
+              src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6925a960748714fa4828395a/d26d48d16_image.png" 
+              alt="MetLife" 
+              className="h-10 bg-white rounded-lg px-3 py-1"
+            />
             <div>
               <CardTitle className="text-xl">МетЛайф Медика</CardTitle>
               <p className="text-sm text-blue-100">Застраховка при тежки заболявания + WorldCare</p>

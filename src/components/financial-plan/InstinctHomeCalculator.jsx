@@ -25,16 +25,21 @@ export default function InstinctHomeCalculator({ initialData = {}, onSave, analy
     packageType: initialData.packageType || 'Пакет 2',
     customSum: initialData.customSum || 100000,
     currency: initialData.currency || 'BGN',
-    includeSport: initialData.includeSport || false
+    includeSport: initialData.includeSport || false,
+    includeRelocation: initialData.includeRelocation || false
   });
 
   // Calculate premium
   const result = useMemo(() => {
+    const options = {
+      includeSport: formData.includeSport,
+      includeRelocation: formData.includeRelocation
+    };
     if (formData.packageType === 'Персонализиран') {
-      return calculateInstinctHomePremium(formData.customSum, 'custom', formData.includeSport);
+      return calculateInstinctHomePremium(formData.customSum, 'custom', options);
     }
-    return calculateInstinctHomePremium(0, formData.packageType, formData.includeSport);
-  }, [formData.packageType, formData.customSum, formData.includeSport]);
+    return calculateInstinctHomePremium(0, formData.packageType, options);
+  }, [formData.packageType, formData.customSum, formData.includeSport, formData.includeRelocation]);
 
   // Get coverage details
   const coverageDetails = useMemo(() => {
@@ -173,17 +178,31 @@ export default function InstinctHomeCalculator({ initialData = {}, onSave, analy
                 </Select>
               </div>
 
-              <div className="flex items-center gap-2 pt-2">
-                <input 
-                  type="checkbox"
-                  id="sport"
-                  checked={formData.includeSport}
-                  onChange={(e) => handleInputChange('includeSport', e.target.checked)}
-                  className="rounded"
-                />
-                <Label htmlFor="sport" className="text-sm cursor-pointer">
-                  Включи спортна екипировка (опция)
-                </Label>
+              <div className="space-y-2 pt-2 border-t">
+                <div className="flex items-center gap-2">
+                  <input 
+                    type="checkbox"
+                    id="sport"
+                    checked={formData.includeSport}
+                    onChange={(e) => handleInputChange('includeSport', e.target.checked)}
+                    className="rounded"
+                  />
+                  <Label htmlFor="sport" className="text-sm cursor-pointer">
+                    Спортна екипировка (опция)
+                  </Label>
+                </div>
+                <div className="flex items-center gap-2">
+                  <input 
+                    type="checkbox"
+                    id="relocation"
+                    checked={formData.includeRelocation}
+                    onChange={(e) => handleInputChange('includeRelocation', e.target.checked)}
+                    className="rounded"
+                  />
+                  <Label htmlFor="relocation" className="text-sm cursor-pointer">
+                    Транспорт при смяна на адрес (опция)
+                  </Label>
+                </div>
               </div>
             </CardContent>
           </Card>
@@ -220,38 +239,26 @@ export default function InstinctHomeCalculator({ initialData = {}, onSave, analy
                     </p>
                   </div>
 
-                  {/* Premium Breakdown */}
-                  {result.breakdown && (
-                    <div className="bg-slate-50 rounded-lg p-4 space-y-2 text-sm">
-                      <p className="font-medium text-slate-800 mb-2">Разбивка на премията (BGN):</p>
-                      <div className="flex justify-between">
-                        <span className="text-slate-600">Пожар и природни бедствия:</span>
-                        <span className="font-medium">{result.breakdown.fire.toFixed(2)} лв</span>
+                  {/* Property Split */}
+                  <div className="bg-gradient-to-br from-slate-50 to-slate-100 rounded-lg p-4 border border-slate-200">
+                    <p className="text-xs text-slate-600 mb-3">Разпределение на застрахователната сума:</p>
+                    <div className="grid grid-cols-2 gap-3">
+                      <div className="text-center p-3 bg-white rounded-lg">
+                        <p className="text-xs text-slate-500 mb-1">Недвижимо имущество</p>
+                        <p className="text-lg font-bold text-blue-600">
+                          {result.immovable?.toLocaleString() || 0} <span className="text-sm">BGN</span>
+                        </p>
+                        <p className="text-xs text-slate-400">85%</p>
                       </div>
-                      <div className="flex justify-between">
-                        <span className="text-slate-600">Изтичане на вода:</span>
-                        <span className="font-medium">{result.breakdown.water.toFixed(2)} лв</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span className="text-slate-600">Кражба:</span>
-                        <span className="font-medium">{result.breakdown.theft.toFixed(2)} лв</span>
-                      </div>
-                      {result.breakdown.sport && (
-                        <div className="flex justify-between">
-                          <span className="text-slate-600">Спортна екипировка:</span>
-                          <span className="font-medium">{result.breakdown.sport.toFixed(2)} лв</span>
-                        </div>
-                      )}
-                      <div className="flex justify-between border-t pt-2">
-                        <span className="text-slate-600">Основна премия:</span>
-                        <span className="font-semibold">{result.basePremium.toFixed(2)} лв</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span className="text-slate-600">Данък 2%:</span>
-                        <span className="font-medium">{result.tax.toFixed(2)} лв</span>
+                      <div className="text-center p-3 bg-white rounded-lg">
+                        <p className="text-xs text-slate-500 mb-1">Движимо имущество</p>
+                        <p className="text-lg font-bold text-purple-600">
+                          {result.movable?.toLocaleString() || 0} <span className="text-sm">BGN</span>
+                        </p>
+                        <p className="text-xs text-slate-400">15%</p>
                       </div>
                     </div>
-                  )}
+                  </div>
 
                   {/* Details */}
                   <div className="space-y-2 text-sm border-t pt-4">
@@ -278,37 +285,72 @@ export default function InstinctHomeCalculator({ initialData = {}, onSave, analy
             </CardContent>
           </Card>
 
-          {/* Coverages */}
-          {result?.eligible && coverageDetails && (
+          {/* Detailed Coverages */}
+          {result?.eligible && result?.coverages && (
             <Card>
               <CardHeader className="bg-green-50 py-3">
-                <CardTitle className="text-base text-green-800">Основни лимити на покритие</CardTitle>
+                <CardTitle className="text-base text-green-800">Лимити на покритие (BGN)</CardTitle>
               </CardHeader>
               <CardContent className="pt-4">
-                <div className="space-y-2 text-sm">
-                  <div className="flex justify-between items-center py-1.5 border-b">
-                    <span className="text-slate-700">Пожар - Недвижимо:</span>
-                    <span className="font-semibold">{coverageDetails.property_fire.toLocaleString()} EUR</span>
+                <div className="space-y-2 text-xs">
+                  {/* Пожар */}
+                  <div className="grid grid-cols-3 gap-2 py-1.5 border-b items-center">
+                    <span className="text-slate-700 font-medium">Пожар:</span>
+                    <span className="text-right text-blue-600">{Math.round(result.coverages.fire_immovable || 0).toLocaleString()}</span>
+                    <span className="text-right text-purple-600">{Math.round(result.coverages.fire_movable || 0).toLocaleString()}</span>
                   </div>
-                  <div className="flex justify-between items-center py-1.5 border-b">
-                    <span className="text-slate-700">Пожар - Движимо:</span>
-                    <span className="font-semibold">{coverageDetails.contents_fire.toLocaleString()} EUR</span>
+                  
+                  {/* Вода */}
+                  <div className="grid grid-cols-3 gap-2 py-1.5 border-b items-center">
+                    <span className="text-slate-700 font-medium">Вода:</span>
+                    <span className="text-right text-blue-600">{Math.round(result.coverages.water_immovable || 0).toLocaleString()}</span>
+                    <span className="text-right text-purple-600">{Math.round(result.coverages.water_movable || 0).toLocaleString()}</span>
                   </div>
-                  <div className="flex justify-between items-center py-1.5 border-b">
-                    <span className="text-slate-700">Гражданска отговорност:</span>
-                    <span className="font-semibold">{coverageDetails.liability.toLocaleString()} EUR</span>
+                  
+                  {/* Земетресение */}
+                  <div className="grid grid-cols-3 gap-2 py-1.5 border-b items-center">
+                    <span className="text-slate-700 font-medium">Земетресение:</span>
+                    <span className="text-right text-blue-600">{Math.round(result.coverages.earthquake_immovable || 0).toLocaleString()}</span>
+                    <span className="text-right text-purple-600">{Math.round(result.coverages.earthquake_movable || 0).toLocaleString()}</span>
                   </div>
-                  <div className="flex justify-between items-center py-1.5 border-b">
-                    <span className="text-slate-700">Земетресение - Недвижимо:</span>
-                    <span className="font-semibold">{coverageDetails.earthquake_property.toLocaleString()} EUR</span>
+                  
+                  {/* Злоумишлени действия */}
+                  <div className="grid grid-cols-3 gap-2 py-1.5 border-b items-center">
+                    <span className="text-slate-700 font-medium">Вандализъм:</span>
+                    <span className="text-right text-blue-600">{Math.round(result.coverages.vandalism_immovable || 0).toLocaleString()}</span>
+                    <span className="text-right text-purple-600">{Math.round(result.coverages.vandalism_movable || 0).toLocaleString()}</span>
                   </div>
-                  <div className="flex justify-between items-center py-1.5 border-b">
-                    <span className="text-slate-700">Кражба (лимит):</span>
-                    <span className="font-semibold">{coverageDetails.theft_limit.toLocaleString()} EUR</span>
+                  
+                  {/* Стъкла */}
+                  <div className="grid grid-cols-3 gap-2 py-1.5 border-b items-center">
+                    <span className="text-slate-700 font-medium">Стъкла:</span>
+                    <span className="text-right text-blue-600">{(result.coverages.glass_immovable || 0).toLocaleString()}</span>
+                    <span className="text-right text-purple-600">{(result.coverages.glass_movable || 0).toLocaleString()}</span>
                   </div>
-                  <div className="flex justify-between items-center py-1.5">
-                    <span className="text-slate-700">Временно настаняване:</span>
-                    <span className="font-semibold">{coverageDetails.temporary_accommodation.toLocaleString()} EUR</span>
+                  
+                  {/* Кражба */}
+                  <div className="grid grid-cols-3 gap-2 py-1.5 border-b items-center">
+                    <span className="text-slate-700 font-medium">Кражба (общо):</span>
+                    <span className="text-right font-semibold col-span-2">{Math.round(result.coverages.theft || 0).toLocaleString()}</span>
+                  </div>
+                  
+                  {/* Гражданска отговорност */}
+                  <div className="grid grid-cols-3 gap-2 py-1.5 border-b items-center">
+                    <span className="text-slate-700 font-medium">ГО:</span>
+                    <span className="text-right font-semibold col-span-2">{(result.coverages.liability || 0).toLocaleString()}</span>
+                  </div>
+                  
+                  {/* Временно настаняване */}
+                  <div className="grid grid-cols-3 gap-2 py-1.5 items-center">
+                    <span className="text-slate-700 font-medium">Настаняване:</span>
+                    <span className="text-right font-semibold col-span-2">{(result.coverages.temporary_accommodation || 0).toLocaleString()}</span>
+                  </div>
+                  
+                  {/* Legend */}
+                  <div className="grid grid-cols-3 gap-2 pt-3 border-t text-xs">
+                    <span></span>
+                    <span className="text-right text-blue-600 font-medium">Недвижимо</span>
+                    <span className="text-right text-purple-600 font-medium">Движимо</span>
                   </div>
                 </div>
               </CardContent>

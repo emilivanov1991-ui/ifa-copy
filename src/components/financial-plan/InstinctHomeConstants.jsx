@@ -6,16 +6,114 @@
 // Валутен курс EUR/BGN
 export const EUR_BGN_RATE = 1.96;
 
-// Коефициенти и капове за покритията (от Excel модела)
-export const INSTINCT_COVERAGE_COEFFICIENTS = {
-  FIRE: { coefficient: 1.0, cap: null, mandatory: true, name: 'Пожар и природни бедствия' },
-  WATER: { coefficient: 0.085, cap: 15000, mandatory: true, name: 'Изтичане на вода' },
-  THEFT: { coefficient: 0.03, cap: 15000, mandatory: true, name: 'Кражба чрез взлом' },
-  SPORT: { coefficient: 0.024, cap: 12000, mandatory: false, name: 'Спортна екипировка' }
+// Разпределение недвижимо/движимо имущество
+export const PROPERTY_SPLIT = {
+  immovable: 0.85, // 85% недвижимо
+  movable: 0.15    // 15% движимо
 };
 
-// Данък върху застраховката
-export const INSURANCE_TAX = 0.02;
+// Коефициенти за изчисление на покритията (от Excel таблицата)
+// За застрахователни суми >= 151000 BGN
+export const INSTINCT_COVERAGE_FORMULAS = {
+  // Пожар, Мълния, Буря, Пороен дъжд, Градушка, Наводнение и др.
+  fire_perils: {
+    immovable: 0.85,
+    movable: 0.15,
+    mandatory: true
+  },
+  // Свличане и срутване на земни пластове
+  landslide: {
+    immovable: 0.0637499, // до 151000, после различно
+    movable: 0.01125,
+    mandatory: true
+  },
+  // Изтичане на вода и пара
+  water_leakage: {
+    immovable: 0.85,
+    movable: 0.15,
+    mandatory: true
+  },
+  // Гражданска отговорност (фиксирана)
+  liability: {
+    fixed: 2000,
+    mandatory: true
+  },
+  // Земетресение
+  earthquake: {
+    immovable: 0.7,
+    movable: 0.15,
+    mandatory: true
+  },
+  // Злоумишлени действия
+  vandalism: {
+    immovable: 0.34,
+    movable: 0.06,
+    mandatory: true
+  },
+  // Удар от ПТС
+  vehicle_impact: {
+    immovable: 0.85,
+    movable: 0.15,
+    mandatory: true
+  },
+  // Допълнителни разходи за разчистване
+  cleanup_costs: {
+    immovable: 0.0425,
+    movable: 0.007499,
+    mandatory: true
+  },
+  // Замръзване
+  freezing: {
+    immovable: 0.85,
+    movable: 0.15,
+    mandatory: true
+  },
+  // Тежест от сняг и лед
+  snow_ice: {
+    immovable: 0.85,
+    movable: 0.15,
+    mandatory: true
+  },
+  // Счупване на стъкла (фиксирано до 151k)
+  glass: {
+    fixed_immovable: 10000,
+    fixed_movable: 10000,
+    mandatory: true
+  },
+  // Късо съединение
+  short_circuit: {
+    immovable: 0.85,
+    movable: 0.15,
+    mandatory: true
+  },
+  // Кражба чрез взлом
+  theft: {
+    coefficient: 0.075,
+    cap: 201000, // tier 1 cap
+    mandatory: true
+  },
+  // Временно настаняване (фиксирано)
+  temporary_accommodation: {
+    fixed: 3000,
+    mandatory: true
+  },
+  // Домашен любимец (фиксирано)
+  pet: {
+    fixed: 500,
+    mandatory: true
+  },
+  // Хоби и спорт
+  hobby_sport: {
+    immovable: 0.045,
+    movable: 0.03,
+    mandatory: false
+  },
+  // Транспорт при смяна на адрес
+  relocation_transport: {
+    coefficient: 0.045,
+    mandatory: false
+  }
+};
 
 // Основни пакети (от тарифната таблица)
 export const INSTINCT_PACKAGES = {
@@ -124,112 +222,185 @@ export const INSTINCT_COVERAGES = [
 ];
 
 /**
- * Изчислява премия за Инстинкт "Закрила на дома" по правилната формула
- * Формула: BasePremium = SUM(min(tariff * coefficient, cap))
- * Tax = BasePremium * 2%
- * FinalPremium = ceil((BasePremium + Tax)*100)/100
- * 
+ * Изчислява премия за Инстинкт "Закрила на дома" според Excel таблицата
  * @param {number} sumInsured - Застрахователна сума в BGN
  * @param {string} packageType - Тип пакет
- * @param {boolean} includeSport - Включва ли спортна екипировка
+ * @param {object} options - Опции за изчисление
  * @returns {object} Премия в BGN и EUR с разбивка по покрития
  */
-export const calculateInstinctHomePremium = (sumInsured, packageType = 'custom', includeSport = false) => {
+export const calculateInstinctHomePremium = (sumInsured, packageType = 'custom', options = {}) => {
+  const { includeSport = false, includeRelocation = false } = options;
+
   // Валидация
   if (sumInsured < INSTINCT_RULES.min_sum || sumInsured > INSTINCT_RULES.max_sum) {
     return {
       eligible: false,
-      reason: `Застрахователната сума трябва да е между ${INSTINCT_RULES.min_sum.toLocaleString()} и ${INSTINCT_RULES.max_sum.toLocaleString()} BGN`
+      reason: `Застрахователната сума трябва да е між ${INSTINCT_RULES.min_sum.toLocaleString()} и ${INSTINCT_RULES.max_sum.toLocaleString()} BGN`
     };
   }
 
-  // Използваме директно тарифната таблица за пакетите
+  // Използваме директно тарифната таблица за фиксираните пакети
   if (packageType === 'Пакет 1') {
+    const pkg = INSTINCT_PACKAGES.package_1;
+    const coverages = INSTINCT_PACKAGE_COVERAGES.package_1;
     return {
       eligible: true,
-      sumInsured: INSTINCT_PACKAGES.package_1.sum_insured,
-      basePremium: INSTINCT_PACKAGES.package_1.premium_bgn / 1.02,
-      annualPremiumBGN: INSTINCT_PACKAGES.package_1.premium_bgn,
-      annualPremiumEUR: INSTINCT_PACKAGES.package_1.premium_eur,
-      monthlyPremiumBGN: (INSTINCT_PACKAGES.package_1.premium_bgn / 12).toFixed(2),
-      monthlyPremiumEUR: (INSTINCT_PACKAGES.package_1.premium_eur / 12).toFixed(2),
-      breakdown: null
+      sumInsured: pkg.sum_insured,
+      immovable: pkg.sum_insured * PROPERTY_SPLIT.immovable,
+      movable: pkg.sum_insured * PROPERTY_SPLIT.movable,
+      annualPremiumBGN: pkg.premium_bgn,
+      annualPremiumEUR: pkg.premium_eur,
+      monthlyPremiumBGN: (pkg.premium_bgn / 12).toFixed(2),
+      monthlyPremiumEUR: (pkg.premium_eur / 12).toFixed(2),
+      coverages: coverages
     };
   }
   
   if (packageType === 'Пакет 2') {
+    const pkg = INSTINCT_PACKAGES.package_2;
+    const coverages = INSTINCT_PACKAGE_COVERAGES.package_2;
     return {
       eligible: true,
-      sumInsured: INSTINCT_PACKAGES.package_2.sum_insured,
-      basePremium: INSTINCT_PACKAGES.package_2.premium_bgn / 1.02,
-      annualPremiumBGN: INSTINCT_PACKAGES.package_2.premium_bgn,
-      annualPremiumEUR: INSTINCT_PACKAGES.package_2.premium_eur,
-      monthlyPremiumBGN: (INSTINCT_PACKAGES.package_2.premium_bgn / 12).toFixed(2),
-      monthlyPremiumEUR: (INSTINCT_PACKAGES.package_2.premium_eur / 12).toFixed(2),
-      breakdown: null
+      sumInsured: pkg.sum_insured,
+      immovable: pkg.sum_insured * PROPERTY_SPLIT.immovable,
+      movable: pkg.sum_insured * PROPERTY_SPLIT.movable,
+      annualPremiumBGN: pkg.premium_bgn,
+      annualPremiumEUR: pkg.premium_eur,
+      monthlyPremiumBGN: (pkg.premium_bgn / 12).toFixed(2),
+      monthlyPremiumEUR: (pkg.premium_eur / 12).toFixed(2),
+      coverages: coverages
     };
   }
   
   if (packageType === 'Пакет 3') {
+    const pkg = INSTINCT_PACKAGES.package_3;
+    const coverages = INSTINCT_PACKAGE_COVERAGES.package_3;
     return {
       eligible: true,
-      sumInsured: INSTINCT_PACKAGES.package_3.sum_insured,
-      basePremium: INSTINCT_PACKAGES.package_3.premium_bgn / 1.02,
-      annualPremiumBGN: INSTINCT_PACKAGES.package_3.premium_bgn,
-      annualPremiumEUR: INSTINCT_PACKAGES.package_3.premium_eur,
-      monthlyPremiumBGN: (INSTINCT_PACKAGES.package_3.premium_bgn / 12).toFixed(2),
-      monthlyPremiumEUR: (INSTINCT_PACKAGES.package_3.premium_eur / 12).toFixed(2),
-      breakdown: null
+      sumInsured: pkg.sum_insured,
+      immovable: pkg.sum_insured * PROPERTY_SPLIT.immovable,
+      movable: pkg.sum_insured * PROPERTY_SPLIT.movable,
+      annualPremiumBGN: pkg.premium_bgn,
+      annualPremiumEUR: pkg.premium_eur,
+      monthlyPremiumBGN: (pkg.premium_bgn / 12).toFixed(2),
+      monthlyPremiumEUR: (pkg.premium_eur / 12).toFixed(2),
+      coverages: coverages
     };
   }
 
-  // Персонализиран - използваме формулата от модела
-  // BasePremium = SUM(min(tariff * coefficient, cap))
-  const breakdown = {};
-  let basePremium = 0;
-
-  // FIRE - без cap, коефициент 1.0
-  const firePremium = sumInsured * INSTINCT_COVERAGE_COEFFICIENTS.FIRE.coefficient;
-  breakdown.fire = firePremium;
-  basePremium += firePremium;
-
-  // WATER - cap 15000, коефициент 0.085
-  const waterBase = sumInsured * INSTINCT_COVERAGE_COEFFICIENTS.WATER.coefficient;
-  const waterPremium = Math.min(waterBase, INSTINCT_COVERAGE_COEFFICIENTS.WATER.cap);
-  breakdown.water = waterPremium;
-  basePremium += waterPremium;
-
-  // THEFT - cap 15000, коефициент 0.03
-  const theftBase = sumInsured * INSTINCT_COVERAGE_COEFFICIENTS.THEFT.coefficient;
-  const theftPremium = Math.min(theftBase, INSTINCT_COVERAGE_COEFFICIENTS.THEFT.cap);
-  breakdown.theft = theftPremium;
-  basePremium += theftPremium;
-
-  // SPORT - опционално, cap 12000, коефициент 0.024
+  // Персонализиран пакет - използваме формулите от Excel за суми >= 151000
+  const immovable = sumInsured * PROPERTY_SPLIT.immovable;
+  const movable = sumInsured * PROPERTY_SPLIT.movable;
+  
+  const coverages = {};
+  
+  // Пожар и свързани природни бедствия
+  coverages.fire_immovable = immovable;
+  coverages.fire_movable = movable;
+  
+  // Свличане и срутване
+  coverages.landslide_immovable = sumInsured * INSTINCT_COVERAGE_FORMULAS.landslide.immovable;
+  coverages.landslide_movable = sumInsured * INSTINCT_COVERAGE_FORMULAS.landslide.movable;
+  
+  // Изтичане на вода
+  coverages.water_immovable = immovable;
+  coverages.water_movable = movable;
+  
+  // Гражданска отговорност (фиксирано)
+  coverages.liability = INSTINCT_COVERAGE_FORMULAS.liability.fixed;
+  
+  // Земетресение
+  coverages.earthquake_immovable = sumInsured * INSTINCT_COVERAGE_FORMULAS.earthquake.immovable;
+  coverages.earthquake_movable = sumInsured * INSTINCT_COVERAGE_FORMULAS.earthquake.movable;
+  
+  // Злоумишлени действия
+  coverages.vandalism_immovable = sumInsured * INSTINCT_COVERAGE_FORMULAS.vandalism.immovable;
+  coverages.vandalism_movable = sumInsured * INSTINCT_COVERAGE_FORMULAS.vandalism.movable;
+  
+  // Удар от ПТС
+  coverages.vehicle_immovable = immovable;
+  coverages.vehicle_movable = movable;
+  
+  // Разчистване
+  coverages.cleanup_immovable = sumInsured * INSTINCT_COVERAGE_FORMULAS.cleanup_costs.immovable;
+  coverages.cleanup_movable = sumInsured * INSTINCT_COVERAGE_FORMULAS.cleanup_costs.movable;
+  
+  // Замръзване
+  coverages.freezing_immovable = immovable;
+  coverages.freezing_movable = movable;
+  
+  // Сняг и лед
+  coverages.snow_immovable = immovable;
+  coverages.snow_movable = movable;
+  
+  // Счупване на стъкла
+  coverages.glass_immovable = INSTINCT_COVERAGE_FORMULAS.glass.fixed_immovable;
+  coverages.glass_movable = INSTINCT_COVERAGE_FORMULAS.glass.fixed_movable;
+  
+  // Късо съединение
+  coverages.short_circuit_immovable = immovable;
+  coverages.short_circuit_movable = movable;
+  
+  // Кражба - с cap
+  const theftBase = sumInsured * INSTINCT_COVERAGE_FORMULAS.theft.coefficient;
+  coverages.theft = Math.min(theftBase, INSTINCT_COVERAGE_FORMULAS.theft.cap);
+  
+  // Временно настаняване
+  coverages.temporary_accommodation = INSTINCT_COVERAGE_FORMULAS.temporary_accommodation.fixed;
+  
+  // Домашен любимец
+  coverages.pet = INSTINCT_COVERAGE_FORMULAS.pet.fixed;
+  
+  // Хоби и спорт (опционално)
   if (includeSport) {
-    const sportBase = sumInsured * INSTINCT_COVERAGE_COEFFICIENTS.SPORT.coefficient;
-    const sportPremium = Math.min(sportBase, INSTINCT_COVERAGE_COEFFICIENTS.SPORT.cap);
-    breakdown.sport = sportPremium;
-    basePremium += sportPremium;
+    coverages.hobby_sport_immovable = sumInsured * INSTINCT_COVERAGE_FORMULAS.hobby_sport.immovable;
+    coverages.hobby_sport_movable = sumInsured * INSTINCT_COVERAGE_FORMULAS.hobby_sport.movable;
+  }
+  
+  // Транспорт при смяна на адрес (опционално)
+  if (includeRelocation) {
+    coverages.relocation_transport = sumInsured * INSTINCT_COVERAGE_FORMULAS.relocation_transport.coefficient;
   }
 
-  // Добавяме данък 2%
-  const tax = basePremium * INSURANCE_TAX;
+  // Изчисляване на премията чрез линейна интерполация от тарифната таблица
+  const amounts = Object.keys(INSTINCT_DETAILED_TARIFFS).map(Number).sort((a, b) => a - b);
   
-  // Final Premium = ceil((BasePremium + Tax)*100)/100
-  const finalPremiumBGN = Math.ceil((basePremium + tax) * 100) / 100;
-  const finalPremiumEUR = Math.ceil((finalPremiumBGN / EUR_BGN_RATE) * 100) / 100;
+  let premiumBGN;
+  
+  if (INSTINCT_DETAILED_TARIFFS[sumInsured]) {
+    premiumBGN = INSTINCT_DETAILED_TARIFFS[sumInsured].bgn;
+  } else {
+    // Интерполация
+    let lowerAmount = amounts[0];
+    let upperAmount = amounts[amounts.length - 1];
+    
+    for (let i = 0; i < amounts.length - 1; i++) {
+      if (amounts[i] <= sumInsured && amounts[i + 1] >= sumInsured) {
+        lowerAmount = amounts[i];
+        upperAmount = amounts[i + 1];
+        break;
+      }
+    }
+    
+    const lowerTariff = INSTINCT_DETAILED_TARIFFS[lowerAmount];
+    const upperTariff = INSTINCT_DETAILED_TARIFFS[upperAmount];
+    const ratio = (sumInsured - lowerAmount) / (upperAmount - lowerAmount);
+    premiumBGN = lowerTariff.bgn + (upperTariff.bgn - lowerTariff.bgn) * ratio;
+  }
+  
+  premiumBGN = Math.ceil(premiumBGN * 100) / 100;
+  const premiumEUR = Math.ceil((premiumBGN / EUR_BGN_RATE) * 100) / 100;
 
   return {
     eligible: true,
     sumInsured: sumInsured,
-    basePremium: Math.round(basePremium * 100) / 100,
-    tax: Math.round(tax * 100) / 100,
-    annualPremiumBGN: finalPremiumBGN,
-    annualPremiumEUR: finalPremiumEUR,
-    monthlyPremiumBGN: Math.round((finalPremiumBGN / 12) * 100) / 100,
-    monthlyPremiumEUR: Math.round((finalPremiumEUR / 12) * 100) / 100,
-    breakdown: breakdown
+    immovable: Math.round(immovable),
+    movable: Math.round(movable),
+    annualPremiumBGN: premiumBGN,
+    annualPremiumEUR: premiumEUR,
+    monthlyPremiumBGN: Math.round((premiumBGN / 12) * 100) / 100,
+    monthlyPremiumEUR: Math.round((premiumEUR / 12) * 100) / 100,
+    coverages: coverages
   };
 };
 

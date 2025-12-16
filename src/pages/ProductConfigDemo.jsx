@@ -394,7 +394,7 @@ export default function ProductConfigDemo() {
                   productName="Ипотечен кредит"
                   provider="ДСК Банка"
                   description="Ипотечно кредитиране. Моля предоставете лихвени проценти, такси и условия."
-                  logoUrl="https://upload.wikimedia.org/wikipedia/commons/thumb/5/50/DSK_Bank_Logo.svg/320px-DSK_Bank_Logo.svg.png"
+                  logoUrl="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6925a960748714fa4828395a/4edc7ab0b_image.png"
                 />
               </TabsContent>
 

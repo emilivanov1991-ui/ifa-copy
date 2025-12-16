@@ -1,5 +1,4 @@
 import React, { useMemo } from 'react';
-import { motion } from 'framer-motion';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -44,18 +43,9 @@ export default function InstinctHomePackageComparison({ customSum = 500000, onCu
   ];
 
   return (
-    <motion.div 
-      initial={{ opacity: 0, y: 10 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.3 }}
-      className="space-y-6"
-    >
+    <div className="space-y-6">
       {/* Custom Sum Input */}
-      <motion.div
-        initial={{ opacity: 0, x: -20 }}
-        animate={{ opacity: 1, x: 0 }}
-        transition={{ delay: 0.1 }}
-      >
+      <div>
         <Card className="bg-gradient-to-br from-purple-50 via-purple-100 to-blue-50 border-purple-200 shadow-lg">
           <CardContent className="pt-5 pb-5">
             <div className="flex flex-col md:flex-row md:items-center gap-4">
@@ -79,14 +69,10 @@ export default function InstinctHomePackageComparison({ customSum = 500000, onCu
             <p className="text-xs text-purple-600 mt-2 ml-7">Изберете сума между 50,000 и 500,000 лв за персонализирано покритие</p>
           </CardContent>
         </Card>
-      </motion.div>
+      </div>
 
       {/* Comparison Table */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.2 }}
-      >
+      <div>
         <Card className="shadow-2xl overflow-hidden">
           <CardHeader className="bg-gradient-to-r from-purple-600 via-purple-700 to-blue-600 py-5">
             <CardTitle className="text-white text-center text-xl font-bold tracking-wide">Сравнение на покрития</CardTitle>
@@ -100,11 +86,7 @@ export default function InstinctHomePackageComparison({ customSum = 500000, onCu
                   <th className="text-left p-4 font-bold text-purple-900 min-w-[280px] sticky left-0 bg-gradient-to-r from-purple-100 to-purple-50 z-10 shadow-sm"></th>
                   {packages.map((pkg, idx) => (
                     <th key={idx} className="text-center p-4 font-semibold text-purple-900 border-l border-purple-200 min-w-[160px] transition-all hover:bg-purple-50">
-                      <motion.div
-                        initial={{ opacity: 0, scale: 0.9 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                        transition={{ delay: idx * 0.1 }}
-                      >
+                      <div>
                         <div className="mb-2 text-sm font-bold">{pkg.name}</div>
                         <div className="text-base font-extrabold text-purple-600 bg-white rounded-lg py-2 px-3 shadow-sm">
                           {(pkg.sum / EUR_BGN_RATE).toLocaleString()} лв
@@ -113,18 +95,15 @@ export default function InstinctHomePackageComparison({ customSum = 500000, onCu
                           <div className="text-blue-700 bg-blue-50 rounded-md py-1">Недвижимо</div>
                           <div className="text-purple-700 bg-purple-50 rounded-md py-1">Движимо</div>
                         </div>
-                      </motion.div>
+                      </div>
                     </th>
                   ))}
                 </tr>
               </thead>
               <tbody>
                 {coverageRows.map((row, rowIdx) => (
-                  <motion.tr 
+                  <tr 
                     key={rowIdx} 
-                    initial={{ opacity: 0, x: -10 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: 0.3 + rowIdx * 0.02 }}
                     className="border-b border-slate-100 hover:bg-gradient-to-r hover:from-purple-50 hover:to-blue-50 transition-all duration-200 group"
                   >
                     <td className="p-3 text-slate-700 font-medium sticky left-0 bg-white z-10 group-hover:bg-gradient-to-r group-hover:from-purple-50 group-hover:to-transparent transition-all shadow-sm">
@@ -154,7 +133,7 @@ export default function InstinctHomePackageComparison({ customSum = 500000, onCu
                         )}
                       </td>
                     ))}
-                  </motion.tr>
+                  </tr>
                 ))}
               </tbody>
               <tfoot className="bg-gradient-to-r from-purple-600 to-purple-700 text-white">
@@ -172,11 +151,8 @@ export default function InstinctHomePackageComparison({ customSum = 500000, onCu
           <div className="bg-gradient-to-br from-purple-50 via-purple-100 to-blue-50 p-6 border-t-4 border-purple-300">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
               {packages.map((pkg, idx) => (
-                <motion.div 
+                <div 
                   key={idx}
-                  initial={{ opacity: 0, scale: 0.9 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  transition={{ delay: 0.5 + idx * 0.1 }}
                   className="bg-white rounded-xl shadow-lg p-5 hover:shadow-2xl transition-all duration-300 hover:-translate-y-1 border border-purple-200"
                 >
                   <div className="text-center space-y-2">
@@ -191,20 +167,16 @@ export default function InstinctHomePackageComparison({ customSum = 500000, onCu
                       Годишна премия
                     </div>
                   </div>
-                </motion.div>
+                </div>
               ))}
             </div>
           </div>
         </CardContent>
         </Card>
-      </motion.div>
+      </div>
 
       {/* Provider Info */}
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 0.8 }}
-      >
+      <div>
         <Card className="bg-gradient-to-br from-slate-50 to-slate-100 border-slate-200 shadow-md">
           <CardContent className="pt-5 pb-5 text-xs text-slate-600">
             <div className="flex items-start gap-3">
@@ -218,7 +190,7 @@ export default function InstinctHomePackageComparison({ customSum = 500000, onCu
             </div>
           </CardContent>
         </Card>
-      </motion.div>
-    </motion.div>
+      </div>
+    </div>
   );
 }

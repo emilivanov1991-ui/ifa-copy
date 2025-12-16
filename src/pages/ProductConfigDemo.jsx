@@ -115,30 +115,12 @@ export default function ProductConfigDemo() {
           <TabsContent value="metlife" className="space-y-4">
             <Tabs defaultValue="credit-guard" className="w-full">
               <TabsList className="grid w-full grid-cols-3 lg:grid-cols-6 mb-4 bg-blue-50 p-1 rounded-lg">
-                <TabsTrigger value="credit-guard" className="flex items-center gap-2">
-                  <img src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6925a960748714fa4828395a/d26d48d16_image.png" alt="MetLife" className="h-4" />
-                  Credit Guard
-                </TabsTrigger>
-                <TabsTrigger value="ul" className="flex items-center gap-2">
-                  <img src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6925a960748714fa4828395a/d26d48d16_image.png" alt="MetLife" className="h-4" />
-                  Unit Linked
-                </TabsTrigger>
-                <TabsTrigger value="junior-ul" className="flex items-center gap-2">
-                  <img src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6925a960748714fa4828395a/d26d48d16_image.png" alt="MetLife" className="h-4" />
-                  Junior Unit Linked
-                </TabsTrigger>
-                <TabsTrigger value="care" className="flex items-center gap-2">
-                  <img src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6925a960748714fa4828395a/d26d48d16_image.png" alt="MetLife" className="h-4" />
-                  Грижа
-                </TabsTrigger>
-                <TabsTrigger value="term-life" className="flex items-center gap-2">
-                  <img src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6925a960748714fa4828395a/d26d48d16_image.png" alt="MetLife" className="h-4" />
-                  Term Life
-                </TabsTrigger>
-                <TabsTrigger value="medica" className="flex items-center gap-2">
-                  <img src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6925a960748714fa4828395a/d26d48d16_image.png" alt="MetLife" className="h-4" />
-                  MetLife Medica
-                </TabsTrigger>
+                <TabsTrigger value="credit-guard">Credit Guard</TabsTrigger>
+                <TabsTrigger value="ul">Unit Linked</TabsTrigger>
+                <TabsTrigger value="junior-ul">Junior Unit Linked</TabsTrigger>
+                <TabsTrigger value="care">Грижа</TabsTrigger>
+                <TabsTrigger value="term-life">Term Life</TabsTrigger>
+                <TabsTrigger value="medica">MetLife Medica</TabsTrigger>
               </TabsList>
 
               <TabsContent value="credit-guard">

@@ -220,9 +220,11 @@ export default function DZIZakrilaCalculator({ analysisId, clientId }) {
       <Card className="bg-gradient-to-r from-blue-600 via-blue-700 to-indigo-700 overflow-hidden shadow-2xl">
         <CardHeader>
           <div className="flex items-center gap-4">
-            <div className="w-14 h-14 bg-white/20 backdrop-blur-sm rounded-xl flex items-center justify-center shadow-lg">
-              <Shield className="h-7 w-7 text-white" />
-            </div>
+            <img 
+              src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6925a960748714fa4828395a/2485fdb3e_image.png" 
+              alt="ДЗИ" 
+              className="h-12 bg-white px-4 py-2 rounded-xl shadow-lg"
+            />
             <div>
               <CardTitle className="text-white text-2xl font-bold tracking-wide">{config.productName}</CardTitle>
               <p className="text-blue-100 text-sm font-medium">{config.description}</p>

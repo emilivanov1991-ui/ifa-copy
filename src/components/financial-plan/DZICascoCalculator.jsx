@@ -189,9 +189,11 @@ export default function DZICascoCalculator({ carData, showDetailed = true }) {
       <CardHeader className="bg-gradient-to-r from-blue-600 to-blue-700 text-white pb-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-12 h-12 rounded-xl bg-white/20 flex items-center justify-center">
-              <Shield className="h-6 w-6" />
-            </div>
+            <img 
+              src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6925a960748714fa4828395a/2485fdb3e_image.png" 
+              alt="ДЗИ" 
+              className="h-10 bg-white px-3 py-1 rounded-lg shadow-lg"
+            />
             <div>
               <CardTitle className="text-lg">{offer.provider} {offer.productName}</CardTitle>
               <p className="text-blue-100 text-sm">{offer.coverage.type}</p>

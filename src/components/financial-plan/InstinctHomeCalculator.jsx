@@ -4,7 +4,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
-import { Home, Shield, CheckCircle2, Save } from 'lucide-react';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Home, Shield, CheckCircle2, Save, Grid3x3 } from 'lucide-react';
 import {
   INSTINCT_PACKAGES,
   INSTINCT_PACKAGE_COVERAGES,
@@ -16,9 +17,11 @@ import {
 } from './InstinctHomeConstants';
 import { base44 } from '@/api/base44Client';
 import { toast } from 'sonner';
+import InstinctHomePackageComparison from './InstinctHomePackageComparison';
 
 export default function InstinctHomeCalculator({ initialData = {}, onSave, analysisId, clientId }) {
   const [saving, setSaving] = useState(false);
+  const [customSum, setCustomSum] = useState(500000);
   const [formData, setFormData] = useState({
     clientName: initialData.clientName || '',
     address: initialData.address || '',
@@ -97,6 +100,27 @@ export default function InstinctHomeCalculator({ initialData = {}, onSave, analy
           </div>
         </CardHeader>
       </Card>
+
+      <Tabs defaultValue="comparison" className="w-full">
+        <TabsList className="grid w-full grid-cols-2">
+          <TabsTrigger value="comparison" className="gap-2">
+            <Grid3x3 className="h-4 w-4" />
+            Сравнение на пакетите
+          </TabsTrigger>
+          <TabsTrigger value="calculator" className="gap-2">
+            <Shield className="h-4 w-4" />
+            Калкулатор
+          </TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="comparison" className="mt-6">
+          <InstinctHomePackageComparison 
+            customSum={customSum}
+            onCustomSumChange={setCustomSum}
+          />
+        </TabsContent>
+
+        <TabsContent value="calculator" className="mt-6">
 
       <div className="grid lg:grid-cols-2 gap-6">
         {/* Left Column - Input */}
@@ -399,6 +423,8 @@ export default function InstinctHomeCalculator({ initialData = {}, onSave, analy
           <p>Тел: 0700 20032 | Email: office@instinct-insurance.com</p>
         </CardContent>
       </Card>
+      </TabsContent>
+      </Tabs>
     </div>
   );
 }

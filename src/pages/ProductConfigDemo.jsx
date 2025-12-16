@@ -86,7 +86,7 @@ export default function ProductConfigDemo() {
         <span className="text-xs">MetLife</span>
         </TabsTrigger>
         <TabsTrigger value="dzi" className="flex-col h-auto py-3 data-[state=active]:bg-white data-[state=active]:shadow-lg">
-        <img src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6925a960748714fa4828395a/e703e13c7_image.png" alt="ДЗИ" className="h-8 mb-1" />
+        <img src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6925a960748714fa4828395a/2485fdb3e_image.png" alt="ДЗИ" className="h-8 mb-1" />
         <span className="text-xs">ДЗИ</span>
         </TabsTrigger>
         <TabsTrigger value="uniqa" className="flex-col h-auto py-3 data-[state=active]:bg-white data-[state=active]:shadow-lg">
@@ -221,19 +221,19 @@ export default function ProductConfigDemo() {
             <Tabs defaultValue="zakrila" className="w-full">
               <TabsList className="grid w-full grid-cols-2 lg:grid-cols-4 mb-4 bg-blue-50 p-1 rounded-lg">
                 <TabsTrigger value="zakrila" className="flex items-center gap-2">
-                  <img src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6925a960748714fa4828395a/e703e13c7_image.png" alt="ДЗИ" className="h-4" />
+                  <img src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6925a960748714fa4828395a/2485fdb3e_image.png" alt="ДЗИ" className="h-4" />
                   Закрила
                 </TabsTrigger>
                 <TabsTrigger value="casco" className="flex items-center gap-2">
-                  <img src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6925a960748714fa4828395a/e703e13c7_image.png" alt="ДЗИ" className="h-4" />
+                  <img src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6925a960748714fa4828395a/2485fdb3e_image.png" alt="ДЗИ" className="h-4" />
                   Каско+
                 </TabsTrigger>
                 <TabsTrigger value="go" className="flex items-center gap-2">
-                  <img src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6925a960748714fa4828395a/e703e13c7_image.png" alt="ДЗИ" className="h-4" />
+                  <img src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6925a960748714fa4828395a/2485fdb3e_image.png" alt="ДЗИ" className="h-4" />
                   ГО
                 </TabsTrigger>
                 <TabsTrigger value="best-doctors" className="flex items-center gap-2">
-                  <img src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6925a960748714fa4828395a/e703e13c7_image.png" alt="ДЗИ" className="h-4" />
+                  <img src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6925a960748714fa4828395a/2485fdb3e_image.png" alt="ДЗИ" className="h-4" />
                   Бест Докторс
                 </TabsTrigger>
               </TabsList>

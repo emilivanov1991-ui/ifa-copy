@@ -19,20 +19,18 @@ export default function InstinctHomePackageComparison({ customSum = 500000, onCu
       onCustomSumChange?.(150000);
     }
   };
-  // Calculate all 4 packages
+  // Calculate packages based on selection
   const packages = useMemo(() => {
-    const pkg1 = calculateInstinctHomePremium(0, 'Пакет 1', {});
-    const pkg2 = calculateInstinctHomePremium(0, 'Пакет 2', {});
-    const pkg3 = calculateInstinctHomePremium(0, 'Пакет 3', {});
-    const custom = calculateInstinctHomePremium(customSum, 'custom', {});
+    const allPackages = {
+      package1: { name: 'Пакет 1', sum: 50000, ...calculateInstinctHomePremium(0, 'Пакет 1', {}) },
+      package2: { name: 'Пакет 2', sum: 100000, ...calculateInstinctHomePremium(0, 'Пакет 2', {}) },
+      package3: { name: 'Пакет 3', sum: 150000, ...calculateInstinctHomePremium(0, 'Пакет 3', {}) },
+      custom: { name: 'Пакет "Избор"', sum: customSum, ...calculateInstinctHomePremium(customSum, 'custom', {}) }
+    };
     
-    return [
-      { name: 'Пакет 1', sum: 50000, ...pkg1 },
-      { name: 'Пакет 2', sum: 100000, ...pkg2 },
-      { name: 'Пакет 3', sum: 150000, ...pkg3 },
-      { name: 'Пакет "Избор"', sum: customSum, ...custom }
-    ];
-  }, [customSum]);
+    // Show only selected package
+    return [allPackages[selectedPackage]];
+  }, [customSum, selectedPackage]);
 
   const coverageRows = [
     { label: 'Пожар, Гръмотевична буря, Градушка, Наводнение вследствие на природни бедствия, Експлозия, Имплозия, Падане на летателен апарат, негови части или товар', keys: ['fire_immovable', 'fire_movable'] },
@@ -132,7 +130,7 @@ export default function InstinctHomePackageComparison({ customSum = 500000, onCu
                       <div>
                         <div className="mb-2 text-sm font-bold">{pkg.name}</div>
                         <div className="text-base font-extrabold text-purple-600 bg-white rounded-lg py-2 px-3 shadow-sm">
-                          {(pkg.sum / EUR_BGN_RATE).toLocaleString()} лв
+                          {pkg.sum.toLocaleString()} лв
                         </div>
                         <div className="grid grid-cols-2 gap-2 mt-3 text-xs font-semibold">
                           <div className="text-blue-700 bg-blue-50 rounded-md py-1">Недвижимо</div>
@@ -192,21 +190,21 @@ export default function InstinctHomePackageComparison({ customSum = 500000, onCu
 
           {/* Premium Summary Row */}
           <div className="bg-gradient-to-br from-purple-50 via-purple-100 to-blue-50 p-6 border-t-4 border-purple-300">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div className="flex justify-center">
               {packages.map((pkg, idx) => (
                 <div 
                   key={idx}
-                  className="bg-white rounded-xl shadow-lg p-5 hover:shadow-2xl transition-all duration-300 hover:-translate-y-1 border border-purple-200"
+                  className="bg-white rounded-xl shadow-lg p-6 hover:shadow-2xl transition-all duration-300 hover:-translate-y-1 border border-purple-200 max-w-sm"
                 >
-                  <div className="text-center space-y-2">
-                    <div className="text-xs font-semibold text-purple-600 uppercase tracking-wide">{pkg.name}</div>
-                    <div className="text-2xl font-extrabold text-purple-700">
+                  <div className="text-center space-y-3">
+                    <div className="text-sm font-semibold text-purple-600 uppercase tracking-wide">{pkg.name}</div>
+                    <div className="text-3xl font-extrabold text-purple-700">
                       {pkg.annualPremiumBGN?.toFixed(2)} лв
                     </div>
-                    <div className="text-xs text-slate-500 font-medium">
+                    <div className="text-sm text-slate-500 font-medium">
                       {(pkg.annualPremiumBGN / 12).toFixed(2)} лв/мес
                     </div>
-                    <div className="text-xs text-purple-500 bg-purple-50 rounded-full py-1 px-3 inline-block">
+                    <div className="text-xs text-purple-500 bg-purple-50 rounded-full py-1.5 px-4 inline-block">
                       Годишна премия
                     </div>
                   </div>

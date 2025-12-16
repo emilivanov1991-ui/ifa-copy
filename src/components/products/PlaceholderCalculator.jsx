@@ -2,13 +2,22 @@ import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { AlertCircle } from 'lucide-react';
 
-export default function PlaceholderCalculator({ productName, provider, description }) {
+export default function PlaceholderCalculator({ productName, provider, description, logoUrl }) {
   return (
     <Card className="border-blue-200 shadow-lg">
       <CardHeader className="bg-gradient-to-r from-slate-100 to-blue-100">
-        <CardTitle className="text-lg text-slate-700">
-          {provider} - {productName}
-        </CardTitle>
+        <div className="flex items-center gap-4">
+          {logoUrl && (
+            <img 
+              src={logoUrl} 
+              alt={provider} 
+              className="h-24"
+            />
+          )}
+          <CardTitle className="text-lg text-slate-700">
+            {provider} - {productName}
+          </CardTitle>
+        </div>
       </CardHeader>
       <CardContent className="pt-6">
         <div className="flex items-start gap-3 bg-blue-50 border border-blue-200 rounded-lg p-6">

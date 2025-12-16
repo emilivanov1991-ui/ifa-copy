@@ -3,8 +3,9 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Shield, AlertCircle, CheckCircle2, Save } from 'lucide-react';
-import { calculateMetLifeCreditGuard, METLIFE_CREDIT_GUARD_RULES } from '../financial-plan/FinancialPlanConstants';
+import { Shield, AlertCircle, CheckCircle2, Save, Info } from 'lucide-react';
+import { Button } from "@/components/ui/button";
+import { calculateCreditGuardPremium, CREDIT_GUARD_RULES } from './MetLifeCreditGuardConstants';
 import { base44 } from '@/api/base44Client';
 import { toast } from 'sonner';
 
@@ -20,7 +21,7 @@ export default function MetLifeCreditGuardCalculator({ initialInputs = {}, onSav
   const [saving, setSaving] = useState(false);
 
   useEffect(() => {
-    const offer = calculateMetLifeCreditGuard(
+    const offer = calculateCreditGuardPremium(
       parseInt(inputs.age),
       parseInt(inputs.sum),
       parseInt(inputs.term),
@@ -89,11 +90,11 @@ export default function MetLifeCreditGuardCalculator({ initialInputs = {}, onSav
                 type="number"
                 value={inputs.age}
                 onChange={(e) => setInputs({ ...inputs, age: e.target.value })}
-                placeholder={`${METLIFE_CREDIT_GUARD_RULES.min_age} - ${METLIFE_CREDIT_GUARD_RULES.max_age}`}
+                placeholder={`${CREDIT_GUARD_RULES.min_age} - ${CREDIT_GUARD_RULES.max_age}`}
                 className="mt-2"
               />
               <p className="text-xs text-slate-500 mt-1">
-                От {METLIFE_CREDIT_GUARD_RULES.min_age} години, Възраст + Срок ≤ {METLIFE_CREDIT_GUARD_RULES.max_age}
+                От {CREDIT_GUARD_RULES.min_age} години, Възраст + Срок ≤ {CREDIT_GUARD_RULES.max_age}
               </p>
             </div>
 
@@ -104,11 +105,11 @@ export default function MetLifeCreditGuardCalculator({ initialInputs = {}, onSav
                 type="number"
                 value={inputs.sum}
                 onChange={(e) => setInputs({ ...inputs, sum: e.target.value })}
-                placeholder={`${METLIFE_CREDIT_GUARD_RULES.min_sum} - ${METLIFE_CREDIT_GUARD_RULES.max_sum}`}
+                placeholder={`${CREDIT_GUARD_RULES.min_sum} - ${CREDIT_GUARD_RULES.max_sum}`}
                 className="mt-2"
               />
               <p className="text-xs text-slate-500 mt-1">
-                От €{METLIFE_CREDIT_GUARD_RULES.min_sum.toLocaleString()} до €{METLIFE_CREDIT_GUARD_RULES.max_sum.toLocaleString()}
+                От €{CREDIT_GUARD_RULES.min_sum.toLocaleString()} до €{CREDIT_GUARD_RULES.max_sum.toLocaleString()}
               </p>
             </div>
 
@@ -120,7 +121,7 @@ export default function MetLifeCreditGuardCalculator({ initialInputs = {}, onSav
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  {METLIFE_CREDIT_GUARD_RULES.available_terms.map(term => (
+                  {CREDIT_GUARD_RULES.available_terms.map(term => (
                     <SelectItem key={term} value={term.toString()}>{term} години</SelectItem>
                   ))}
                 </SelectContent>
@@ -141,8 +142,8 @@ export default function MetLifeCreditGuardCalculator({ initialInputs = {}, onSav
               </Select>
               <p className="text-xs text-slate-500 mt-1">
                 {inputs.packageType === 'Разширен' 
-                  ? 'Коефициент 0.25 (фиксиран за всички възрасти и срокове)'
-                  : 'Променлив коефициент според възраст и срок'}
+                  ? 'Включва допълнителни покрития: 40 тежки заболявания, смърт от злополука, фрактури'
+                  : 'Основни покрития: смърт и трайна загуба на работоспособност'}
               </p>
             </div>
           </CardContent>
@@ -203,43 +204,39 @@ export default function MetLifeCreditGuardCalculator({ initialInputs = {}, onSav
 
                 {/* Coverage Info */}
                 <div className="bg-slate-50 rounded-lg p-4 border">
-                  <p className="font-medium text-slate-900 mb-3 text-sm">Покритие:</p>
+                  <p className="font-medium text-slate-900 mb-3 text-sm">Включени покрития:</p>
                   <div className="space-y-2 text-xs">
-                    <div className="flex items-start gap-2">
-                      <CheckCircle2 className="h-3 w-3 text-green-500 mt-0.5 flex-shrink-0" />
-                      <span className="text-slate-700">Смърт</span>
-                    </div>
-                    <div className="flex items-start gap-2">
-                      <CheckCircle2 className="h-3 w-3 text-green-500 mt-0.5 flex-shrink-0" />
-                      <span className="text-slate-700">Трайна загуба на работоспособност</span>
-                    </div>
-                    {result.packageType === 'Разширен' && (
-                      <>
-                        <div className="flex items-start gap-2">
-                          <CheckCircle2 className="h-3 w-3 text-green-500 mt-0.5 flex-shrink-0" />
-                          <span className="text-slate-700">40 тежки заболявания</span>
-                        </div>
-                        <div className="flex items-start gap-2">
-                          <CheckCircle2 className="h-3 w-3 text-green-500 mt-0.5 flex-shrink-0" />
-                          <span className="text-slate-700">Смърт от злополука</span>
-                        </div>
-                        <div className="flex items-start gap-2">
-                          <CheckCircle2 className="h-3 w-3 text-green-500 mt-0.5 flex-shrink-0" />
-                          <span className="text-slate-700">Фрактури и изгаряния</span>
-                        </div>
-                      </>
-                    )}
+                    {result.coverages?.map((coverage, idx) => (
+                      <div key={idx} className="flex items-start gap-2">
+                        <CheckCircle2 className="h-3 w-3 text-green-500 mt-0.5 flex-shrink-0" />
+                        <span className="text-slate-700">{coverage}</span>
+                      </div>
+                    ))}
                   </div>
                 </div>
 
                 {/* Formula Info */}
-                {result.packageType === 'Основен' && (
-                  <div className="bg-blue-50 rounded-lg p-3 border border-blue-200">
-                    <p className="text-xs text-blue-700">
-                      <strong>Формула:</strong> Премията се мащабира линейно според сумата.
-                      Премия = (Сума / €100,000) × БазоваПремия(възраст, срок)
-                    </p>
+                <div className="bg-blue-50 rounded-lg p-3 border border-blue-200">
+                  <div className="flex items-start gap-2">
+                    <Info className="h-4 w-4 text-blue-600 mt-0.5 flex-shrink-0" />
+                    <div className="text-xs text-blue-700">
+                      <p className="font-medium mb-1">Формула за изчисление:</p>
+                      <p>Премия = (Сума / €100,000) × {result.basePremiumFor100k}€</p>
+                      <p className="text-blue-600 mt-1">= ({sumNum.toLocaleString()}€ / 100,000) × {result.basePremiumFor100k}€ = {result.annualPremium}€</p>
+                    </div>
                   </div>
+                </div>
+
+                {/* Save Button */}
+                {analysisId && (
+                  <Button 
+                    onClick={handleSave} 
+                    disabled={saving}
+                    className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 shadow-lg h-11 text-base font-semibold"
+                  >
+                    <Save className="h-5 w-5 mr-2" />
+                    {saving ? 'Записване...' : 'Запази офертата'}
+                  </Button>
                 )}
               </div>
             )}

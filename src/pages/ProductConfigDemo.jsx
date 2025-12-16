@@ -9,6 +9,8 @@ import MetLifeTermLifeCalculator from '../components/financial-plan/MetLifeTermL
 import InstinctHomeCalculator from '../components/financial-plan/InstinctHomeCalculator';
 import SavedOffersManager from '../components/offers/SavedOffersManager';
 import DZIZakrilaCalculator from '../components/products/DZIZakrilaCalculator';
+import DZICascoCalculator from '../components/financial-plan/DZICascoCalculator';
+import GeneraliHealthLineOffer from '../components/financial-plan/GeneraliHealthLineOffer';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -76,7 +78,7 @@ export default function ProductConfigDemo() {
         </Card>
 
         <Tabs defaultValue="metlife-credit-guard" className="w-full">
-          <TabsList className="grid w-full grid-cols-9 mb-6 text-xs">
+          <TabsList className="grid w-full grid-cols-5 lg:grid-cols-11 mb-6 text-xs gap-1">
             <TabsTrigger value="metlife-credit-guard">Credit Guard</TabsTrigger>
             <TabsTrigger value="metlife-predimstvo">Предимство</TabsTrigger>
             <TabsTrigger value="metlife-detstvo">Детство</TabsTrigger>
@@ -84,6 +86,8 @@ export default function ProductConfigDemo() {
             <TabsTrigger value="metlife-srochen">Срочен живот</TabsTrigger>
             <TabsTrigger value="metlife-medica">Медика</TabsTrigger>
             <TabsTrigger value="dzi-zakrila">ДЗИ Закрила</TabsTrigger>
+            <TabsTrigger value="dzi-casco">ДЗИ Каско</TabsTrigger>
+            <TabsTrigger value="generali-health">Generali Health</TabsTrigger>
             <TabsTrigger value="instinct-home">Инстинкт</TabsTrigger>
             <TabsTrigger value="saved-offers">Запазени</TabsTrigger>
           </TabsList>
@@ -183,6 +187,29 @@ export default function ProductConfigDemo() {
             <DZIZakrilaCalculator 
               analysisId={demoAnalysisId}
               clientId={demoClientId}
+            />
+          </TabsContent>
+
+          <TabsContent value="dzi-casco">
+            <DZICascoCalculator 
+              carData={{
+                brand: 'BMW',
+                model: 'X5',
+                year: 2020,
+                valueEUR: 45000,
+                hasCasco: false
+              }}
+            />
+          </TabsContent>
+
+          <TabsContent value="generali-health">
+            <GeneraliHealthLineOffer 
+              beneficiaryName="Демо клиент"
+              plan="plus"
+              monthlyPremium={85}
+              annualPremium={1020}
+              isInsured={true}
+              showPrint={false}
             />
           </TabsContent>
 

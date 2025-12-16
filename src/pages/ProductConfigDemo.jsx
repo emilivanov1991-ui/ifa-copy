@@ -11,6 +11,7 @@ import SavedOffersManager from '../components/offers/SavedOffersManager';
 import DZIZakrilaCalculator from '../components/products/DZIZakrilaCalculator';
 import DZICascoCalculator from '../components/financial-plan/DZICascoCalculator';
 import GeneraliHealthLineOffer from '../components/financial-plan/GeneraliHealthLineOffer';
+import UniqaHealthValueCalculator from '../components/financial-plan/UniqaHealthValueCalculator';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -78,7 +79,7 @@ export default function ProductConfigDemo() {
         </Card>
 
         <Tabs defaultValue="metlife-credit-guard" className="w-full">
-          <TabsList className="grid w-full grid-cols-5 lg:grid-cols-11 mb-6 text-xs gap-1">
+          <TabsList className="grid w-full grid-cols-4 lg:grid-cols-12 mb-6 text-xs gap-1">
             <TabsTrigger value="metlife-credit-guard">Credit Guard</TabsTrigger>
             <TabsTrigger value="metlife-predimstvo">Предимство</TabsTrigger>
             <TabsTrigger value="metlife-detstvo">Детство</TabsTrigger>
@@ -88,6 +89,7 @@ export default function ProductConfigDemo() {
             <TabsTrigger value="dzi-zakrila">ДЗИ Закрила</TabsTrigger>
             <TabsTrigger value="dzi-casco">ДЗИ Каско</TabsTrigger>
             <TabsTrigger value="generali-health">Generali Health</TabsTrigger>
+            <TabsTrigger value="uniqa-health">УНИКА Здраве</TabsTrigger>
             <TabsTrigger value="instinct-home">Инстинкт</TabsTrigger>
             <TabsTrigger value="saved-offers">Запазени</TabsTrigger>
           </TabsList>
@@ -210,6 +212,19 @@ export default function ProductConfigDemo() {
               annualPremium={1020}
               isInsured={true}
               showPrint={false}
+            />
+          </TabsContent>
+
+          <TabsContent value="uniqa-health">
+            <UniqaHealthValueCalculator 
+              initialData={{
+                clientName: 'Демо клиент',
+                age: 35,
+                plan: 'europa',
+                frequency: 'annual'
+              }}
+              analysisId={demoAnalysisId}
+              clientId={demoClientId}
             />
           </TabsContent>
 

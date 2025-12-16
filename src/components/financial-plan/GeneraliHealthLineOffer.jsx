@@ -99,10 +99,11 @@ export default function GeneraliHealthLineOffer({
           
           <div className="flex items-center gap-4">
             {/* Generali Logo */}
-            <div className="text-right">
-              <div className="text-red-700 font-bold text-2xl tracking-wider">GENERALI</div>
-              <div className="text-red-600 text-4xl">🦁</div>
-            </div>
+            <img 
+              src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6925a960748714fa4828395a/1a98c2c51_image.png" 
+              alt="Generali" 
+              className="h-16"
+            />
             
             {showPrint && (
               <Button variant="outline" onClick={handlePrint} className="no-print gap-2" size="sm">

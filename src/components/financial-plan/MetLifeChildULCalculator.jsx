@@ -219,27 +219,22 @@ export default function MetLifeChildULCalculator({ initialData = {}, onSave, ana
 
       {/* Errors and Warnings */}
       {(premiumBreakdown.errors.length > 0 || premiumBreakdown.warnings.length > 0) && (
-        <motion.div
-          initial={{ opacity: 0, scale: 0.95 }}
-          animate={{ opacity: 1, scale: 1 }}
-        >
-          <Card className="border-amber-300 bg-gradient-to-r from-amber-50 to-orange-50 shadow-lg">
-            <CardContent className="pt-6 space-y-3">
-              {premiumBreakdown.errors.map((error, idx) => (
-                <div key={`err-${idx}`} className="flex items-start gap-2 text-red-700">
-                  <AlertTriangle className="h-5 w-5 mt-0.5 flex-shrink-0" />
-                  <span className="text-sm font-medium">{error}</span>
-                </div>
-              ))}
-              {premiumBreakdown.warnings.map((warning, idx) => (
-                <div key={`warn-${idx}`} className="flex items-start gap-2 text-amber-700">
-                  <Info className="h-5 w-5 mt-0.5 flex-shrink-0" />
-                  <span className="text-sm font-medium">{warning}</span>
-                </div>
-              ))}
-            </CardContent>
-          </Card>
-        </motion.div>
+        <Card className="border-amber-300 bg-gradient-to-r from-amber-50 to-orange-50 shadow-lg">
+          <CardContent className="pt-6 space-y-3">
+            {premiumBreakdown.errors.map((error, idx) => (
+              <div key={`err-${idx}`} className="flex items-start gap-2 text-red-700">
+                <AlertTriangle className="h-5 w-5 mt-0.5 flex-shrink-0" />
+                <span className="text-sm font-medium">{error}</span>
+              </div>
+            ))}
+            {premiumBreakdown.warnings.map((warning, idx) => (
+              <div key={`warn-${idx}`} className="flex items-start gap-2 text-amber-700">
+                <Info className="h-5 w-5 mt-0.5 flex-shrink-0" />
+                <span className="text-sm font-medium">{warning}</span>
+              </div>
+            ))}
+          </CardContent>
+        </Card>
       )}
 
       <div className="grid lg:grid-cols-2 gap-6">

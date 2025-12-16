@@ -82,7 +82,7 @@ export default function ProductConfigDemo() {
         <Tabs defaultValue="metlife" className="w-full">
         <TabsList className="grid w-full grid-cols-3 lg:grid-cols-7 mb-6 h-auto gap-2 bg-gradient-to-r from-slate-100 to-slate-200 p-2 rounded-xl">
         <TabsTrigger value="metlife" className="flex-col h-auto py-3 data-[state=active]:bg-white data-[state=active]:shadow-lg">
-        <img src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6925a960748714fa4828395a/19121d3c7_image.png" alt="MetLife" className="h-8 mb-1" />
+        <img src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6925a960748714fa4828395a/d26d48d16_image.png" alt="MetLife" className="h-8 mb-1" />
         <span className="text-xs">MetLife</span>
         </TabsTrigger>
         <TabsTrigger value="dzi" className="flex-col h-auto py-3 data-[state=active]:bg-white data-[state=active]:shadow-lg">

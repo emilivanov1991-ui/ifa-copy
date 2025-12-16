@@ -10,7 +10,7 @@ import {
   INSTINCT_PACKAGE_COVERAGES,
   INSTINCT_COVERAGES,
   INSTINCT_RULES,
-  INSTINCT_COVERAGE_COEFFICIENTS,
+  PROPERTY_SPLIT,
   calculateInstinctHomePremium,
   EUR_BGN_RATE
 } from './InstinctHomeConstants';

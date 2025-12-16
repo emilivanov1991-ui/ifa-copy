@@ -8,6 +8,7 @@ import MetLifeCareCalculator from '../components/financial-plan/MetLifeCareCalcu
 import MetLifeTermLifeCalculator from '../components/financial-plan/MetLifeTermLifeCalculator';
 import InstinctHomeCalculator from '../components/financial-plan/InstinctHomeCalculator';
 import SavedOffersManager from '../components/offers/SavedOffersManager';
+import DZIZakrilaCalculator from '../components/products/DZIZakrilaCalculator';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -179,15 +180,7 @@ export default function ProductConfigDemo() {
           </TabsContent>
 
           <TabsContent value="dzi-zakrila">
-            <UniversalProductCalculator 
-              productId="dzi-zakrila"
-              initialInputs={{
-                age: 35,
-                gender: 'male',
-                sum: 50000,
-                term: 20,
-                isSmoker: false
-              }}
+            <DZIZakrilaCalculator 
               analysisId={demoAnalysisId}
               clientId={demoClientId}
             />

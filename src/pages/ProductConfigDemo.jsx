@@ -403,7 +403,7 @@ export default function ProductConfigDemo() {
                   productName="Ипотечен кредит"
                   provider="ОББ"
                   description="Ипотечно кредитиране. Моля предоставете лихвени проценти, такси и условия."
-                  logoUrl="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6925a960748714fa4828395a/a4d9d2d02_image.png"
+                  logoUrl="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6925a960748714fa4828395a/8a6c6726e_image.png"
                 />
               </TabsContent>
 
@@ -430,7 +430,7 @@ export default function ProductConfigDemo() {
                   productName="Потребителски кредит"
                   provider="ОББ"
                   description="Потребителско кредитиране. Моля предоставете лихвени проценти, такси и условия."
-                  logoUrl="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6925a960748714fa4828395a/a4d9d2d02_image.png"
+                  logoUrl="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6925a960748714fa4828395a/8a6c6726e_image.png"
                 />
               </TabsContent>
             </Tabs>

@@ -1,4 +1,4 @@
-import { LanguageProvider } from './components/LanguageProvider';
+import { LanguageProvider } from '../components/LanguageProvider';
 
 export default function App({ children }) {
   return (

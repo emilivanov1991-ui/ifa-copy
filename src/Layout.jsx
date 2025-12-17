@@ -4,7 +4,7 @@ import { createPageUrl } from './utils';
 import { Menu, X, TrendingUp, LogIn, User, Briefcase, Languages } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { motion, AnimatePresence } from 'framer-motion';
-import { useLanguage } from './components/LanguageProvider';
+import { LanguageProvider, useLanguage } from './components/LanguageProvider';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -15,7 +15,7 @@ import {
 // Pages that have dark hero sections (header should be transparent with white text initially)
 const DARK_HERO_PAGES = ['Home', 'FinancialPlanner'];
 
-export default function Layout({ children, currentPageName }) {
+function LayoutContent({ children, currentPageName }) {
   const { language, toggleLanguage, t } = useLanguage();
   
   const navLinks = [
@@ -258,4 +258,12 @@ export default function Layout({ children, currentPageName }) {
           </footer>}
           </div>
   );
-}
+  }
+
+  export default function Layout(props) {
+  return (
+  <LanguageProvider>
+  <LayoutContent {...props} />
+  </LanguageProvider>
+  );
+  }

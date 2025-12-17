@@ -8,51 +8,50 @@ export default function About() {
   const { t } = useLanguage();
 
   const statsData = [
-  { value: '25+', labelBg: 'Години опит', labelEn: 'Years of Experience' },
-  { value: '€500M+', labelBg: 'Управлявани активи', labelEn: 'Assets Under Management' },
-  { value: '5,000+', labelBg: 'Доволни клиенти', labelEn: 'Happy Clients' },
-  { value: '98%', labelBg: 'Задържане на клиенти', labelEn: 'Client Retention' },
-];
+    { value: '25+', labelBg: 'Години опит', labelEn: 'Years of Experience' },
+    { value: '€500M+', labelBg: 'Управлявани активи', labelEn: 'Assets Under Management' },
+    { value: '5,000+', labelBg: 'Доволни клиенти', labelEn: 'Happy Clients' },
+    { value: '98%', labelBg: 'Задържане на клиенти', labelEn: 'Client Retention' },
+  ];
 
   const stats = statsData.map(s => ({ value: s.value, label: t(s.labelBg, s.labelEn) }));
 
   const valuesData = [
-  {
-    icon: Target,
-    titleBg: 'Клиентът на първо място',
-    titleEn: 'Client First',
-    descBg: 'Вашите цели са наш приоритет. Изграждаме стратегии около вашите уникални нужди.',
-    descEn: 'Your goals are our priority. We build strategies around your unique needs.'
-  },
-  {
-    icon: Award,
-    titleBg: 'Независимо финансово консултиране',
-    titleEn: 'Independent Financial Consulting',
-    descBg: 'Ние сме законово задължени да действаме във ваш най-добър интерес.',
-    descEn: 'We are legally obligated to act in your best interest.'
-  },
-  {
-    icon: Users,
-    titleBg: 'Независими съвети',
-    titleEn: 'Independent Advice',
-    descBg: 'Без конфликт на интереси. Препоръчваме това, което работи най-добре за вас.',
-    descEn: 'No conflict of interest. We recommend what works best for you.'
-  },
-  {
-    icon: TrendingUp,
-    titleBg: 'Доказани резултати',
-    titleEn: 'Proven Results',
-    descBg: 'Десетилетия опит в постигането на последователна, надеждна възвръщаемост.',
-    descEn: 'Decades of experience delivering consistent, reliable returns.'
-  },
-];
+    {
+      icon: Target,
+      titleBg: 'Клиентът на първо място',
+      titleEn: 'Client First',
+      descBg: 'Вашите цели са наш приоритет. Изграждаме стратегии около вашите уникални нужди.',
+      descEn: 'Your goals are our priority. We build strategies around your unique needs.'
+    },
+    {
+      icon: Award,
+      titleBg: 'Независимо финансово консултиране',
+      titleEn: 'Independent Financial Consulting',
+      descBg: 'Ние сме законово задължени да действаме във ваш най-добър интерес.',
+      descEn: 'We are legally obligated to act in your best interest.'
+    },
+    {
+      icon: Users,
+      titleBg: 'Независими съвети',
+      titleEn: 'Independent Advice',
+      descBg: 'Без конфликт на интереси. Препоръчваме това, което работи най-добре за вас.',
+      descEn: 'No conflict of interest. We recommend what works best for you.'
+    },
+    {
+      icon: TrendingUp,
+      titleBg: 'Доказани резултати',
+      titleEn: 'Proven Results',
+      descBg: 'Десетилетия опит в постигането на последователна, надеждна възвръщаемост.',
+      descEn: 'Decades of experience delivering consistent, reliable returns.'
+    },
+  ];
 
   const values = valuesData.map(v => ({ 
     icon: v.icon, 
     title: t(v.titleBg, v.titleEn), 
     description: t(v.descBg, v.descEn) 
   }));
-
   return (
     <div className="pt-20">
       {/* Hero */}

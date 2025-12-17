@@ -28,52 +28,52 @@ export default function Services() {
       featuresBg: ['Диверсифицирани портфолиа', 'Оценка на риска', 'Редовно ребалансиране', 'Данъчно ефективно инвестиране'],
       featuresEn: ['Diversified portfolios', 'Risk assessment', 'Regular rebalancing', 'Tax-efficient investing']
     },
-  {
-    icon: PiggyBank,
-    titleBg: 'Пенсионно планиране',
-    titleEn: 'Retirement Planning',
-    descBg: 'Изчерпателни пенсионни стратегии, за да се насладите на заслужения начин на живот в златните години.',
-    descEn: 'Comprehensive retirement strategies to enjoy the lifestyle you deserve in your golden years.',
-    featuresBg: ['Оптимизация на пенсии', 'Стратегии за спестяване', 'Планиране на доходи', 'Прогнози за бъдещето'],
-    featuresEn: ['Pension optimization', 'Savings strategies', 'Income planning', 'Future projections']
-  },
-  {
-    icon: Shield,
-    titleBg: 'Защита на богатството',
-    titleEn: 'Wealth Protection',
-    descBg: 'Защитете активите и наследството си със сложни застрахователни и наследствени решения.',
-    descEn: 'Protect your assets and legacy with sophisticated insurance and estate solutions.',
-    featuresBg: ['Наследствено планиране', 'Тръстови услуги', 'Застрахователен анализ', 'Защита на активи'],
-    featuresEn: ['Estate planning', 'Trust services', 'Insurance analysis', 'Asset protection']
-  },
-  {
-    icon: Wallet,
-    titleBg: 'Данъчно планиране',
-    titleEn: 'Tax Planning',
-    descBg: 'Стратегическо данъчно планиране за минимизиране на данъчната тежест и максимизиране на натрупването на богатство.',
-    descEn: 'Strategic tax planning to minimize tax burden and maximize wealth accumulation.',
-    featuresBg: ['Данъчна оптимизация', 'Данъчни облекчения', 'Благотворителни дарения', 'Бизнес данъчни стратегии'],
-    featuresEn: ['Tax optimization', 'Tax relief', 'Charitable giving', 'Business tax strategies']
-  },
-  {
-    icon: GraduationCap,
-    titleBg: 'Финансиране на образование',
-    titleEn: 'Education Funding',
-    descBg: 'Планирайте образованието на децата си с интелигентни стратегии за спестяване и инвестиционни инструменти.',
-    descEn: 'Plan your children\'s education with smart savings strategies and investment vehicles.',
-    featuresBg: ['Образователни планове', 'Спестовни сметки', 'Детски фондове', 'Планиране на помощи'],
-    featuresEn: ['Education plans', 'Savings accounts', 'Children\'s funds', 'Aid planning']
-  },
-  {
-    icon: Building2,
-    titleBg: 'Бизнес планиране',
-    titleEn: 'Business Planning',
-    descBg: 'Финансови стратегии за собственици на бизнес, включително наследствено планиране и служителски придобивки.',
-    descEn: 'Financial strategies for business owners, including succession planning and employee benefits.',
-    featuresBg: ['Планиране на наследство', 'Ключова застраховка', 'Служителски придобивки', 'Бизнес оценка'],
-    featuresEn: ['Succession planning', 'Key person insurance', 'Employee benefits', 'Business valuation']
-  },
-];
+    {
+      icon: PiggyBank,
+      titleBg: 'Пенсионно планиране',
+      titleEn: 'Retirement Planning',
+      descBg: 'Изчерпателни пенсионни стратегии, за да се насладите на заслужения начин на живот в златните години.',
+      descEn: 'Comprehensive retirement strategies to enjoy the lifestyle you deserve in your golden years.',
+      featuresBg: ['Оптимизация на пенсии', 'Стратегии за спестяване', 'Планиране на доходи', 'Прогнози за бъдещето'],
+      featuresEn: ['Pension optimization', 'Savings strategies', 'Income planning', 'Future projections']
+    },
+    {
+      icon: Shield,
+      titleBg: 'Защита на богатството',
+      titleEn: 'Wealth Protection',
+      descBg: 'Защитете активите и наследството си със сложни застрахователни и наследствени решения.',
+      descEn: 'Protect your assets and legacy with sophisticated insurance and estate solutions.',
+      featuresBg: ['Наследствено планиране', 'Тръстови услуги', 'Застрахователен анализ', 'Защита на активи'],
+      featuresEn: ['Estate planning', 'Trust services', 'Insurance analysis', 'Asset protection']
+    },
+    {
+      icon: Wallet,
+      titleBg: 'Данъчно планиране',
+      titleEn: 'Tax Planning',
+      descBg: 'Стратегическо данъчно планиране за минимизиране на данъчната тежест и максимизиране на натрупването на богатство.',
+      descEn: 'Strategic tax planning to minimize tax burden and maximize wealth accumulation.',
+      featuresBg: ['Данъчна оптимизация', 'Данъчни облекчения', 'Благотворителни дарения', 'Бизнес данъчни стратегии'],
+      featuresEn: ['Tax optimization', 'Tax relief', 'Charitable giving', 'Business tax strategies']
+    },
+    {
+      icon: GraduationCap,
+      titleBg: 'Финансиране на образование',
+      titleEn: 'Education Funding',
+      descBg: 'Планирайте образованието на децата си с интелигентни стратегии за спестяване и инвестиционни инструменти.',
+      descEn: 'Plan your children\'s education with smart savings strategies and investment vehicles.',
+      featuresBg: ['Образователни планове', 'Спестовни сметки', 'Детски фондове', 'Планиране на помощи'],
+      featuresEn: ['Education plans', 'Savings accounts', 'Children\'s funds', 'Aid planning']
+    },
+    {
+      icon: Building2,
+      titleBg: 'Бизнес планиране',
+      titleEn: 'Business Planning',
+      descBg: 'Финансови стратегии за собственици на бизнес, включително наследствено планиране и служителски придобивки.',
+      descEn: 'Financial strategies for business owners, including succession planning and employee benefits.',
+      featuresBg: ['Планиране на наследство', 'Ключова застраховка', 'Служителски придобивки', 'Бизнес оценка'],
+      featuresEn: ['Succession planning', 'Key person insurance', 'Employee benefits', 'Business valuation']
+    },
+  ];
 
   const services = servicesData.map(s => ({ 
     icon: s.icon, 
@@ -81,7 +81,6 @@ export default function Services() {
     description: t(s.descBg, s.descEn),
     features: s.featuresBg.map((fb, i) => t(fb, s.featuresEn[i]))
   }));
-
   return (
     <div className="pt-20">
       {/* Hero */}

@@ -4,7 +4,7 @@ import { createPageUrl } from './utils';
 import { Menu, X, TrendingUp, LogIn, User, Briefcase, Languages } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { motion, AnimatePresence } from 'framer-motion';
-import { useLanguage } from './contexts/LanguageContext';
+import { useLanguage } from './components/LanguageProvider';
 import {
   DropdownMenu,
   DropdownMenuContent,

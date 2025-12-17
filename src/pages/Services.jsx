@@ -13,8 +13,12 @@ import {
   Building2,
   Wallet
 } from 'lucide-react';
+import { useLanguage } from '../components/LanguageProvider';
 
-const services = [
+export default function Services() {
+  const { t } = useLanguage();
+
+const servicesData = [
   {
     icon: TrendingUp,
     title: 'Управление на инвестиции',
@@ -23,37 +27,57 @@ const services = [
   },
   {
     icon: PiggyBank,
-    title: 'Пенсионно планиране',
-    description: 'Изчерпателни пенсионни стратегии, за да се насладите на заслужения начин на живот в златните години.',
-    features: ['Оптимизация на пенсии', 'Стратегии за спестяване', 'Планиране на доходи', 'Прогнози за бъдещето']
+    titleBg: 'Пенсионно планиране',
+    titleEn: 'Retirement Planning',
+    descBg: 'Изчерпателни пенсионни стратегии, за да се насладите на заслужения начин на живот в златните години.',
+    descEn: 'Comprehensive retirement strategies to enjoy the lifestyle you deserve in your golden years.',
+    featuresBg: ['Оптимизация на пенсии', 'Стратегии за спестяване', 'Планиране на доходи', 'Прогнози за бъдещето'],
+    featuresEn: ['Pension optimization', 'Savings strategies', 'Income planning', 'Future projections']
   },
   {
     icon: Shield,
-    title: 'Защита на богатството',
-    description: 'Защитете активите и наследството си със сложни застрахователни и наследствени решения.',
-    features: ['Наследствено планиране', 'Тръстови услуги', 'Застрахователен анализ', 'Защита на активи']
+    titleBg: 'Защита на богатството',
+    titleEn: 'Wealth Protection',
+    descBg: 'Защитете активите и наследството си със сложни застрахователни и наследствени решения.',
+    descEn: 'Protect your assets and legacy with sophisticated insurance and estate solutions.',
+    featuresBg: ['Наследствено планиране', 'Тръстови услуги', 'Застрахователен анализ', 'Защита на активи'],
+    featuresEn: ['Estate planning', 'Trust services', 'Insurance analysis', 'Asset protection']
   },
   {
     icon: Wallet,
-    title: 'Данъчно планиране',
-    description: 'Стратегическо данъчно планиране за минимизиране на данъчната тежест и максимизиране на натрупването на богатство.',
-    features: ['Данъчна оптимизация', 'Данъчни облекчения', 'Благотворителни дарения', 'Бизнес данъчни стратегии']
+    titleBg: 'Данъчно планиране',
+    titleEn: 'Tax Planning',
+    descBg: 'Стратегическо данъчно планиране за минимизиране на данъчната тежест и максимизиране на натрупването на богатство.',
+    descEn: 'Strategic tax planning to minimize tax burden and maximize wealth accumulation.',
+    featuresBg: ['Данъчна оптимизация', 'Данъчни облекчения', 'Благотворителни дарения', 'Бизнес данъчни стратегии'],
+    featuresEn: ['Tax optimization', 'Tax relief', 'Charitable giving', 'Business tax strategies']
   },
   {
     icon: GraduationCap,
-    title: 'Финансиране на образование',
-    description: 'Планирайте образованието на децата си с интелигентни стратегии за спестяване и инвестиционни инструменти.',
-    features: ['Образователни планове', 'Спестовни сметки', 'Детски фондове', 'Планиране на помощи']
+    titleBg: 'Финансиране на образование',
+    titleEn: 'Education Funding',
+    descBg: 'Планирайте образованието на децата си с интелигентни стратегии за спестяване и инвестиционни инструменти.',
+    descEn: 'Plan your children\'s education with smart savings strategies and investment vehicles.',
+    featuresBg: ['Образователни планове', 'Спестовни сметки', 'Детски фондове', 'Планиране на помощи'],
+    featuresEn: ['Education plans', 'Savings accounts', 'Children\'s funds', 'Aid planning']
   },
   {
     icon: Building2,
-    title: 'Бизнес планиране',
-    description: 'Финансови стратегии за собственици на бизнес, включително наследствено планиране и служителски придобивки.',
-    features: ['Планиране на наследство', 'Ключова застраховка', 'Служителски придобивки', 'Бизнес оценка']
+    titleBg: 'Бизнес планиране',
+    titleEn: 'Business Planning',
+    descBg: 'Финансови стратегии за собственици на бизнес, включително наследствено планиране и служителски придобивки.',
+    descEn: 'Financial strategies for business owners, including succession planning and employee benefits.',
+    featuresBg: ['Планиране на наследство', 'Ключова застраховка', 'Служителски придобивки', 'Бизнес оценка'],
+    featuresEn: ['Succession planning', 'Key person insurance', 'Employee benefits', 'Business valuation']
   },
 ];
 
-export default function Services() {
+const services = servicesData.map(s => ({ 
+  icon: s.icon, 
+  title: t(s.titleBg, s.titleEn), 
+  description: t(s.descBg, s.descEn),
+  features: s.featuresBg.map((fb, i) => t(fb, s.featuresEn[i]))
+}));
   return (
     <div className="pt-20">
       {/* Hero */}
@@ -66,14 +90,16 @@ export default function Services() {
             className="text-center max-w-3xl mx-auto"
           >
             <span className="text-blue-600 font-medium text-sm tracking-widest uppercase mb-4 block">
-              Нашите услуги
+              {t('Нашите услуги', 'Our Services')}
             </span>
             <h1 className="text-4xl md:text-6xl font-light text-slate-900 mb-6">
-              Цялостни <span className="font-semibold text-blue-600">финансови</span> решения
+              {t('Цялостни', 'Comprehensive')} <span className="font-semibold text-blue-600">{t('финансови', 'financial')}</span> {t('решения', 'solutions')}
             </h1>
             <p className="text-lg text-slate-600 font-light leading-relaxed">
-              От управление на инвестиции до наследствено планиране, предлагаме пълен набор от 
-              услуги, съобразени с вашата уникална финансова ситуация.
+              {t(
+                'От управление на инвестиции до наследствено планиране, предлагаме пълен набор от услуги, съобразени с вашата уникална финансова ситуация.',
+                'From investment management to estate planning, we offer a full range of services tailored to your unique financial situation.'
+              )}
             </p>
           </motion.div>
         </div>
@@ -130,19 +156,19 @@ export default function Services() {
             className="text-center mb-16"
           >
             <span className="text-blue-600 font-medium text-sm tracking-widest uppercase mb-4 block">
-              Нашият процес
+              {t('Нашият процес', 'Our Process')}
             </span>
             <h2 className="text-3xl md:text-4xl font-light text-slate-900">
-              Как <span className="font-semibold text-blue-600">работим</span>
+              {t('Как', 'How we')} <span className="font-semibold text-blue-600">{t('работим', 'work')}</span>
             </h2>
           </motion.div>
 
           <div className="grid md:grid-cols-4 gap-8">
             {[
-              { step: '01', title: 'Проучване', desc: 'Научаваме за вашите цели, ценности и текуща ситуация' },
-              { step: '02', title: 'Анализ', desc: 'Нашият екип анализира финансите ви и идентифицира възможности' },
-              { step: '03', title: 'Стратегия', desc: 'Създаваме персонализиран план, съобразен с вашите нужди' },
-              { step: '04', title: 'Изпълнение', desc: 'Изпълняваме плана и осигуряваме текущо управление' },
+              { step: '01', titleBg: 'Проучване', titleEn: 'Discovery', descBg: 'Научаваме за вашите цели, ценности и текуща ситуация', descEn: 'We learn about your goals, values and current situation' },
+              { step: '02', titleBg: 'Анализ', titleEn: 'Analysis', descBg: 'Нашият екип анализира финансите ви и идентифицира възможности', descEn: 'Our team analyzes your finances and identifies opportunities' },
+              { step: '03', titleBg: 'Стратегия', titleEn: 'Strategy', descBg: 'Създаваме персонализиран план, съобразен с вашите нужди', descEn: 'We create a personalized plan tailored to your needs' },
+              { step: '04', titleBg: 'Изпълнение', titleEn: 'Execution', descBg: 'Изпълняваме плана и осигуряваме текущо управление', descEn: 'We execute the plan and provide ongoing management' },
             ].map((item, index) => (
               <motion.div
                 key={item.step}
@@ -153,8 +179,8 @@ export default function Services() {
                 className="text-center"
               >
                 <div className="text-6xl font-bold text-blue-100 mb-4">{item.step}</div>
-                <h3 className="text-lg font-semibold text-slate-900 mb-2">{item.title}</h3>
-                <p className="text-slate-600 font-light text-sm">{item.desc}</p>
+                <h3 className="text-lg font-semibold text-slate-900 mb-2">{t(item.titleBg, item.titleEn)}</h3>
+                <p className="text-slate-600 font-light text-sm">{t(item.descBg, item.descEn)}</p>
               </motion.div>
             ))}
           </div>
@@ -171,16 +197,16 @@ export default function Services() {
             transition={{ duration: 0.8 }}
           >
             <h2 className="text-3xl md:text-4xl font-light text-white mb-6">
-              Нека изградим финансовото ви бъдеще заедно
+              {t('Нека изградим финансовото ви бъдеще заедно', 'Let\'s build your financial future together')}
             </h2>
             <p className="text-xl text-blue-100 mb-10 font-light">
-              Запазете безплатна консултация, за да обсъдим как можем да ви помогнем да постигнете целите си.
+              {t('Запазете безплатна консултация, за да обсъдим как можем да ви помогнем да постигнете целите си.', 'Schedule a free consultation to discuss how we can help you achieve your goals.')}
             </p>
             <Button 
               size="lg" 
               className="bg-white text-blue-700 hover:bg-blue-50 px-10 py-6 text-lg rounded-full"
             >
-              Запазете консултация
+              {t('Запазете консултация', 'Book Consultation')}
               <ArrowRight className="ml-2 h-5 w-5" />
             </Button>
           </motion.div>

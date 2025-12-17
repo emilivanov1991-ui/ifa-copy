@@ -2,8 +2,10 @@ import React from 'react';
 import { Button } from "@/components/ui/button";
 import { ChevronDown, ArrowRight } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { useLanguage } from '../LanguageProvider';
 
 export default function HeroSection() {
+  const { t } = useLanguage();
   const scrollToServices = () => {
     document.getElementById('services')?.scrollIntoView({ behavior: 'smooth' });
   };
@@ -37,9 +39,9 @@ export default function HeroSection() {
           transition={{ duration: 0.8 }}
         >
           <h1 className="text-4xl md:text-6xl lg:text-7xl font-light text-white leading-tight mb-6">
-            Вашият път към{' '}
+            {t('Вашият път към', 'Your path to')}{' '}
             <span className="font-semibold bg-gradient-to-r from-blue-400 to-cyan-300 bg-clip-text text-transparent">
-              Финансова свобода
+              {t('Финансова свобода', 'Financial Freedom')}
             </span>
           </h1>
         </motion.div>
@@ -50,8 +52,10 @@ export default function HeroSection() {
           transition={{ duration: 0.8, delay: 0.2 }}
           className="text-lg md:text-xl text-blue-100/80 max-w-3xl mx-auto mb-10 font-light leading-relaxed"
         >
-          Независими финансови съвети, съобразени с вашите уникални цели. Помагаме ви да изградите 
-          богатство, да защитите активите си и да осигурите бъдещето на семейството си.
+          {t(
+            'Независими финансови съвети, съобразени с вашите уникални цели. Помагаме ви да изградите богатство, да защитите активите си и да осигурите бъдещето на семейството си.',
+            'Independent financial advice tailored to your unique goals. We help you build wealth, protect your assets, and secure your family\'s future.'
+          )}
         </motion.p>
 
         <motion.div
@@ -64,7 +68,7 @@ export default function HeroSection() {
             size="lg" 
             className="bg-blue-500 hover:bg-blue-600 text-white px-8 py-6 text-lg rounded-full transition-all duration-300 hover:scale-105 hover:shadow-xl hover:shadow-blue-500/25"
           >
-            Започнете сега
+            {t('Започнете сега', 'Get Started')}
             <ArrowRight className="ml-2 h-5 w-5" />
           </Button>
           <Button 
@@ -73,7 +77,7 @@ export default function HeroSection() {
             className="border-white/50 text-white bg-white/10 hover:bg-white/20 px-8 py-6 text-lg rounded-full transition-all duration-300 backdrop-blur-sm"
             onClick={scrollToServices}
           >
-            Научете повече
+            {t('Научете повече', 'Learn More')}
           </Button>
         </motion.div>
       </div>

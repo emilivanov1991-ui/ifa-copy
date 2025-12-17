@@ -2,38 +2,56 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { Button } from "@/components/ui/button";
 import { ArrowRight, Award, Users, Target, TrendingUp, CheckCircle } from 'lucide-react';
+import { useLanguage } from '../components/LanguageProvider';
 
-const stats = [
-  { value: '25+', label: 'Години опит' },
-  { value: '€500M+', label: 'Управлявани активи' },
-  { value: '5,000+', label: 'Доволни клиенти' },
-  { value: '98%', label: 'Задържане на клиенти' },
+export default function About() {
+  const { t } = useLanguage();
+
+const statsData = [
+  { value: '25+', labelBg: 'Години опит', labelEn: 'Years of Experience' },
+  { value: '€500M+', labelBg: 'Управлявани активи', labelEn: 'Assets Under Management' },
+  { value: '5,000+', labelBg: 'Доволни клиенти', labelEn: 'Happy Clients' },
+  { value: '98%', labelBg: 'Задържане на клиенти', labelEn: 'Client Retention' },
 ];
 
-const values = [
+const stats = statsData.map(s => ({ value: s.value, label: t(s.labelBg, s.labelEn) }));
+
+const valuesData = [
   {
     icon: Target,
-    title: 'Клиентът на първо място',
-    description: 'Вашите цели са наш приоритет. Изграждаме стратегии около вашите уникални нужди.'
+    titleBg: 'Клиентът на първо място',
+    titleEn: 'Client First',
+    descBg: 'Вашите цели са наш приоритет. Изграждаме стратегии около вашите уникални нужди.',
+    descEn: 'Your goals are our priority. We build strategies around your unique needs.'
   },
   {
     icon: Award,
-    title: 'Независимо финансово консултиране',
-    description: 'Ние сме законово задължени да действаме във ваш най-добър интерес.'
+    titleBg: 'Независимо финансово консултиране',
+    titleEn: 'Independent Financial Consulting',
+    descBg: 'Ние сме законово задължени да действаме във ваш най-добър интерес.',
+    descEn: 'We are legally obligated to act in your best interest.'
   },
   {
     icon: Users,
-    title: 'Независими съвети',
-    description: 'Без конфликт на интереси. Препоръчваме това, което работи най-добре за вас.'
+    titleBg: 'Независими съвети',
+    titleEn: 'Independent Advice',
+    descBg: 'Без конфликт на интереси. Препоръчваме това, което работи най-добре за вас.',
+    descEn: 'No conflict of interest. We recommend what works best for you.'
   },
   {
     icon: TrendingUp,
-    title: 'Доказани резултати',
-    description: 'Десетилетия опит в постигането на последователна, надеждна възвръщаемост.'
+    titleBg: 'Доказани резултати',
+    titleEn: 'Proven Results',
+    descBg: 'Десетилетия опит в постигането на последователна, надеждна възвръщаемост.',
+    descEn: 'Decades of experience delivering consistent, reliable returns.'
   },
 ];
 
-export default function About() {
+const values = valuesData.map(v => ({ 
+  icon: v.icon, 
+  title: t(v.titleBg, v.titleEn), 
+  description: t(v.descBg, v.descEn) 
+}));
   return (
     <div className="pt-20">
       {/* Hero */}
@@ -46,14 +64,16 @@ export default function About() {
             className="text-center max-w-3xl mx-auto"
           >
             <span className="text-blue-600 font-medium text-sm tracking-widest uppercase mb-4 block">
-              За нас
+              {t('За нас', 'About Us')}
             </span>
             <h1 className="text-4xl md:text-6xl font-light text-slate-900 mb-6">
-              Вашият доверен <span className="font-semibold text-blue-600">финансов</span> партньор
+              {t('Вашият доверен', 'Your trusted')} <span className="font-semibold text-blue-600">{t('финансов', 'financial')}</span> {t('партньор', 'partner')}
             </h1>
             <p className="text-lg text-slate-600 font-light leading-relaxed">
-              Повече от две десетилетия помагаме на хора и семейства 
-              да постигнат финансовите си мечти чрез персонализирани, независими съвети.
+              {t(
+                'Повече от две десетилетия помагаме на хора и семейства да постигнат финансовите си мечти чрез персонализирани, независими съвети.',
+                'For over two decades, we have been helping individuals and families achieve their financial dreams through personalized, independent advice.'
+              )}
             </p>
           </motion.div>
         </div>
@@ -93,25 +113,29 @@ export default function About() {
               transition={{ duration: 0.8 }}
             >
               <span className="text-blue-600 font-medium text-sm tracking-widest uppercase mb-4 block">
-                Нашата история
+                {t('Нашата история', 'Our Story')}
               </span>
               <h2 className="text-3xl md:text-4xl font-light text-slate-900 mb-6">
-                Изградени върху <span className="font-semibold">доверие</span> и <span className="font-semibold">почтеност</span>
+                {t('Изградени върху', 'Built on')} <span className="font-semibold">{t('доверие', 'trust')}</span> {t('и', 'and')} <span className="font-semibold">{t('почтеност', 'integrity')}</span>
               </h2>
               <div className="space-y-4 text-slate-600 font-light leading-relaxed">
                 <p>
-                  Основани през 1998 г. от проста вяра: 
-                  всеки заслужава достъп до честни, безпристрастни финансови съвети.
+                  {t(
+                    'Основани през 1998 г. от проста вяра: всеки заслужава достъп до честни, безпристрастни финансови съвети.',
+                    'Founded in 1998 with a simple belief: everyone deserves access to honest, unbiased financial advice.'
+                  )}
                 </p>
                 <p>
-                  Нашите основатели, бивши финансови директори, станаха свидетели на това как 
-                  конфликтите на интереси често водят консултантите да приоритизират комисионите 
-                  пред резултатите на клиентите. Те решиха да изградят нещо различно.
+                  {t(
+                    'Нашите основатели, бивши финансови директори, станаха свидетели на това как конфликтите на интереси често водят консултантите да приоритизират комисионите пред резултатите на клиентите. Те решиха да изградят нещо различно.',
+                    'Our founders, former financial executives, witnessed how conflicts of interest often led advisors to prioritize commissions over client outcomes. They decided to build something different.'
+                  )}
                 </p>
                 <p>
-                  Днес ние оставаме категорично независими, служейки като истински фидуциари, 
-                  законово задължени да поставяме вашите интереси на първо място. Без скрити такси - 
-                  само прозрачни, ориентирани към клиента съвети.
+                  {t(
+                    'Днес ние оставаме категорично независими, служейки като истински фидуциари, законово задължени да поставяме вашите интереси на първо място. Без скрити такси - само прозрачни, ориентирани към клиента съвети.',
+                    'Today we remain fiercely independent, serving as true fiduciaries legally obligated to put your interests first. No hidden fees - just transparent, client-centered advice.'
+                  )}
                 </p>
               </div>
             </motion.div>
@@ -132,7 +156,7 @@ export default function About() {
               </div>
               <div className="absolute -bottom-6 -left-6 bg-blue-600 text-white p-6 rounded-xl shadow-xl">
                 <div className="text-3xl font-bold">25+</div>
-                <div className="text-blue-100 text-sm">Години съвършенство</div>
+                <div className="text-blue-100 text-sm">{t('Години съвършенство', 'Years of Excellence')}</div>
               </div>
             </motion.div>
           </div>
@@ -150,10 +174,10 @@ export default function About() {
             className="text-center mb-16"
           >
             <span className="text-blue-600 font-medium text-sm tracking-widest uppercase mb-4 block">
-              Нашите ценности
+              {t('Нашите ценности', 'Our Values')}
             </span>
             <h2 className="text-3xl md:text-4xl font-light text-slate-900">
-              Това, в което <span className="font-semibold text-blue-600">вярваме</span>
+              {t('Това, в което', 'What we')} <span className="font-semibold text-blue-600">{t('вярваме', 'believe in')}</span>
             </h2>
           </motion.div>
 
@@ -188,16 +212,16 @@ export default function About() {
             transition={{ duration: 0.8 }}
           >
             <h2 className="text-3xl md:text-4xl font-light text-white mb-6">
-              Готови ли сте да започнете пътуването си?
+              {t('Готови ли сте да започнете пътуването си?', 'Ready to start your journey?')}
             </h2>
             <p className="text-xl text-blue-100 mb-10 font-light">
-              Запазете безплатна консултация с един от нашите консултанти днес.
+              {t('Запазете безплатна консултация с един от нашите консултанти днес.', 'Schedule a free consultation with one of our advisors today.')}
             </p>
             <Button 
               size="lg" 
               className="bg-white text-blue-700 hover:bg-blue-50 px-10 py-6 text-lg rounded-full"
             >
-              Започнете сега
+              {t('Започнете сега', 'Get Started')}
               <ArrowRight className="ml-2 h-5 w-5" />
             </Button>
           </motion.div>

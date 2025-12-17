@@ -1,7 +1,9 @@
 import React from 'react';
 import { motion } from 'framer-motion';
+import { useLanguage } from '../LanguageProvider';
 
 export default function MissionSection() {
+  const { t } = useLanguage();
   return (
     <section className="py-24 bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900 relative overflow-hidden">
       {/* Decorative elements */}
@@ -17,15 +19,16 @@ export default function MissionSection() {
           className="text-center"
         >
           <span className="text-blue-400 font-medium text-sm tracking-widest uppercase mb-4 block">
-            Нашата мисия
+            {t('Нашата мисия', 'Our Mission')}
           </span>
           <h2 className="text-3xl md:text-5xl font-light text-white mb-8">
-            Нашата <span className="font-semibold text-blue-400">мисия</span>
+            {t('Нашата', 'Our')} <span className="font-semibold text-blue-400">{t('мисия', 'mission')}</span>
           </h2>
           <p className="text-xl md:text-2xl text-blue-100/80 leading-relaxed font-light">
-            Посветени сме на осигуряването на балансиран и устойчив финансов растеж чрез интелигентни 
-            решения и персонализирани стратегии. Помагаме ви да се ориентирате в сложността на 
-            управлението на богатството, за да постигнете житейските си цели.
+            {t(
+              'Посветени сме на осигуряването на балансиран и устойчив финансов растеж чрез интелигентни решения и персонализирани стратегии. Помагаме ви да се ориентирате в сложността на управлението на богатството, за да постигнете житейските си цели.',
+              'We are dedicated to providing balanced and sustainable financial growth through intelligent solutions and personalized strategies. We help you navigate the complexity of wealth management to achieve your life goals.'
+            )}
           </p>
         </motion.div>
       </div>

@@ -18,13 +18,16 @@ import { useLanguage } from '../components/LanguageProvider';
 export default function Services() {
   const { t } = useLanguage();
 
-const servicesData = [
-  {
-    icon: TrendingUp,
-    title: 'Управление на инвестиции',
-    description: 'Персонализирано управление на портфолио, проектирано да постигне вашите дългосрочни финансови цели с подходящи стратегии за риска.',
-    features: ['Диверсифицирани портфолиа', 'Оценка на риска', 'Редовно ребалансиране', 'Данъчно ефективно инвестиране']
-  },
+  const servicesData = [
+    {
+      icon: TrendingUp,
+      titleBg: 'Управление на инвестиции',
+      titleEn: 'Investment Management',
+      descBg: 'Персонализирано управление на портфолио, проектирано да постигне вашите дългосрочни финансови цели с подходящи стратегии за риска.',
+      descEn: 'Personalized portfolio management designed to achieve your long-term financial goals with appropriate risk strategies.',
+      featuresBg: ['Диверсифицирани портфолиа', 'Оценка на риска', 'Редовно ребалансиране', 'Данъчно ефективно инвестиране'],
+      featuresEn: ['Diversified portfolios', 'Risk assessment', 'Regular rebalancing', 'Tax-efficient investing']
+    },
   {
     icon: PiggyBank,
     titleBg: 'Пенсионно планиране',
@@ -72,12 +75,13 @@ const servicesData = [
   },
 ];
 
-const services = servicesData.map(s => ({ 
-  icon: s.icon, 
-  title: t(s.titleBg, s.titleEn), 
-  description: t(s.descBg, s.descEn),
-  features: s.featuresBg.map((fb, i) => t(fb, s.featuresEn[i]))
-}));
+  const services = servicesData.map(s => ({ 
+    icon: s.icon, 
+    title: t(s.titleBg, s.titleEn), 
+    description: t(s.descBg, s.descEn),
+    features: s.featuresBg.map((fb, i) => t(fb, s.featuresEn[i]))
+  }));
+
   return (
     <div className="pt-20">
       {/* Hero */}

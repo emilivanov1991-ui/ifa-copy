@@ -7,16 +7,16 @@ import { useLanguage } from '../components/LanguageProvider';
 export default function About() {
   const { t } = useLanguage();
 
-const statsData = [
+  const statsData = [
   { value: '25+', labelBg: 'Години опит', labelEn: 'Years of Experience' },
   { value: '€500M+', labelBg: 'Управлявани активи', labelEn: 'Assets Under Management' },
   { value: '5,000+', labelBg: 'Доволни клиенти', labelEn: 'Happy Clients' },
   { value: '98%', labelBg: 'Задържане на клиенти', labelEn: 'Client Retention' },
 ];
 
-const stats = statsData.map(s => ({ value: s.value, label: t(s.labelBg, s.labelEn) }));
+  const stats = statsData.map(s => ({ value: s.value, label: t(s.labelBg, s.labelEn) }));
 
-const valuesData = [
+  const valuesData = [
   {
     icon: Target,
     titleBg: 'Клиентът на първо място',
@@ -47,11 +47,12 @@ const valuesData = [
   },
 ];
 
-const values = valuesData.map(v => ({ 
-  icon: v.icon, 
-  title: t(v.titleBg, v.titleEn), 
-  description: t(v.descBg, v.descEn) 
-}));
+  const values = valuesData.map(v => ({ 
+    icon: v.icon, 
+    title: t(v.titleBg, v.titleEn), 
+    description: t(v.descBg, v.descEn) 
+  }));
+
   return (
     <div className="pt-20">
       {/* Hero */}

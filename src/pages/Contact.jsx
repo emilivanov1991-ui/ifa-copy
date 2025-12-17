@@ -24,7 +24,7 @@ import { useLanguage } from '../components/LanguageProvider';
 export default function Contact() {
   const { t } = useLanguage();
 
-const contactInfoData = [
+  const contactInfoData = [
   {
     icon: MapPin,
     titleBg: 'Посетете ни',
@@ -55,11 +55,12 @@ const contactInfoData = [
   },
 ];
 
-const contactInfo = contactInfoData.map(c => ({ 
-  icon: c.icon, 
-  title: t(c.titleBg, c.titleEn), 
-  details: c.detailsBg.map((db, i) => t(db, c.detailsEn[i]))
-}));
+  const contactInfo = contactInfoData.map(c => ({ 
+    icon: c.icon, 
+    title: t(c.titleBg, c.titleEn), 
+    details: c.detailsBg.map((db, i) => t(db, c.detailsEn[i]))
+  }));
+
   const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',

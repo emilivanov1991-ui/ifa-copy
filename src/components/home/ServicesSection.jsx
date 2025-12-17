@@ -7,28 +7,39 @@ import { useLanguage } from '../LanguageProvider';
 export default function ServicesSection() {
   const { t } = useLanguage();
 
-const servicesData = [
-  {
-    icon: Shield,
-    title: 'Сигурност',
-    description: 'Вашите активи са защитени с водещи мерки за сигурност и регулаторно съответствие.',
-    color: 'blue'
-  },
-  {
-    icon: Sliders,
-    title: 'Контрол',
-    description: 'Пълна прозрачност и контрол върху вашите инвестиции. Достъп до портфолиото по всяко време.',
-    color: 'cyan'
-  },
-  {
-    icon: Heart,
-    title: 'Грижа',
-    description: 'Вашият личен консултант осигурява персонализирано обслужване и неограничена подкрепа.',
-    color: 'indigo'
-  }
-];
+  const servicesData = [
+    {
+      icon: Shield,
+      titleBg: 'Сигурност',
+      titleEn: 'Security',
+      descBg: 'Вашите активи са защитени с водещи мерки за сигурност и регулаторно съответствие.',
+      descEn: 'Your assets are protected with leading security measures and regulatory compliance.',
+      color: 'blue'
+    },
+    {
+      icon: Sliders,
+      titleBg: 'Контрол',
+      titleEn: 'Control',
+      descBg: 'Пълна прозрачност и контрол върху вашите инвестиции. Достъп до портфолиото по всяко време.',
+      descEn: 'Full transparency and control over your investments. Access your portfolio anytime.',
+      color: 'cyan'
+    },
+    {
+      icon: Heart,
+      titleBg: 'Грижа',
+      titleEn: 'Care',
+      descBg: 'Вашият личен консултант осигурява персонализирано обслужване и неограничена подкрепа.',
+      descEn: 'Your personal advisor provides personalized service and unlimited support.',
+      color: 'indigo'
+    }
+  ];
 
-export default function ServicesSection() {
+  const services = servicesData.map(s => ({ 
+    icon: s.icon, 
+    title: t(s.titleBg, s.titleEn), 
+    description: t(s.descBg, s.descEn),
+    color: s.color
+  }));
   return (
     <section id="services" className="py-24 bg-white">
       <div className="max-w-6xl mx-auto px-6">

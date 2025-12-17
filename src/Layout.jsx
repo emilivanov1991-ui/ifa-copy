@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { createPageUrl } from './utils';
-import { Menu, X, TrendingUp, LogIn, User, Briefcase } from 'lucide-react';
+import { Menu, X, TrendingUp, LogIn, User, Briefcase, Languages } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { motion, AnimatePresence } from 'framer-motion';
+import { useLanguage } from './contexts/LanguageContext';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -11,20 +12,21 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
-const navLinks = [
-  { name: 'Начало', page: 'Home' },
-  { name: 'За нас', page: 'About' },
-  { name: 'Услуги', page: 'Services' },
-  { name: 'Калкулатори', page: 'Calculators' },
-  { name: 'Financial Planner', page: 'FinancialPlanner' },
-  { name: 'Безплатен анализ', page: 'FinancialAnalysis' },
-  { name: 'Контакти', page: 'Contact' },
-];
-
 // Pages that have dark hero sections (header should be transparent with white text initially)
 const DARK_HERO_PAGES = ['Home', 'FinancialPlanner'];
 
 export default function Layout({ children, currentPageName }) {
+  const { language, toggleLanguage, t } = useLanguage();
+  
+  const navLinks = [
+    { name: t('Начало', 'Home'), page: 'Home' },
+    { name: t('За нас', 'About'), page: 'About' },
+    { name: t('Услуги', 'Services'), page: 'Services' },
+    { name: t('Калкулатори', 'Calculators'), page: 'Calculators' },
+    { name: 'Financial Planner', page: 'FinancialPlanner' },
+    { name: t('Безплатен анализ', 'Free Analysis'), page: 'FinancialAnalysis' },
+    { name: t('Контакти', 'Contact'), page: 'Contact' },
+  ];
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   
@@ -75,6 +77,20 @@ export default function Layout({ children, currentPageName }) {
                 {link.name}
               </Link>
             ))}
+
+            {/* Language Toggle */}
+            <button
+              onClick={toggleLanguage}
+              className={`flex items-center gap-1 text-xs font-medium px-3 py-1.5 rounded-full border transition-all ${
+                isScrolled || !hasDarkHero 
+                  ? 'border-slate-300 text-slate-700 hover:bg-slate-100' 
+                  : 'border-white/30 text-white hover:bg-white/10'
+              }`}
+            >
+              <Languages className="h-3.5 w-3.5" />
+              {language === 'bg' ? 'EN' : 'BG'}
+            </button>
+
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button 
@@ -85,7 +101,7 @@ export default function Layout({ children, currentPageName }) {
                   }`}
                 >
                   <LogIn className="h-4 w-4 mr-2" />
-                  Вход
+                  {t('Вход', 'Login')}
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-56 p-2 bg-white/95 backdrop-blur-md border-slate-200/50 shadow-xl">
@@ -95,8 +111,8 @@ export default function Layout({ children, currentPageName }) {
                       <User className="h-4 w-4 text-blue-600" />
                     </div>
                     <div>
-                      <p className="font-medium text-slate-900">Вход за клиенти</p>
-                      <p className="text-xs text-slate-500">Достъп до вашия портал</p>
+                      <p className="font-medium text-slate-900">{t('Вход за клиенти', 'Client Login')}</p>
+                      <p className="text-xs text-slate-500">{t('Достъп до вашия портал', 'Access your portal')}</p>
                     </div>
                   </Link>
                 </DropdownMenuItem>
@@ -106,8 +122,8 @@ export default function Layout({ children, currentPageName }) {
                       <Briefcase className="h-4 w-4 text-violet-600" />
                     </div>
                     <div>
-                      <p className="font-medium text-slate-900">Вход за консултанти</p>
-                      <p className="text-xs text-slate-500">Администрация и CRM</p>
+                      <p className="font-medium text-slate-900">{t('Вход за консултанти', 'Consultant Login')}</p>
+                      <p className="text-xs text-slate-500">{t('Администрация и CRM', 'Admin & CRM')}</p>
                     </div>
                   </Link>
                 </DropdownMenuItem>
@@ -150,17 +166,24 @@ export default function Layout({ children, currentPageName }) {
                     {link.name}
                   </Link>
                 ))}
+                <button
+                  onClick={toggleLanguage}
+                  className="flex items-center gap-2 text-slate-600 font-medium py-2 hover:text-blue-600"
+                >
+                  <Languages className="h-4 w-4" />
+                  {language === 'bg' ? 'English' : 'Български'}
+                </button>
                 <div className="space-y-2 mt-2">
                   <Link to={createPageUrl('ClientPortal')} onClick={() => setMobileMenuOpen(false)}>
                     <Button className="w-full bg-blue-600 hover:bg-blue-700 text-white rounded-full">
                       <User className="h-4 w-4 mr-2" />
-                      Вход за клиенти
+                      {t('Вход за клиенти', 'Client Login')}
                     </Button>
                   </Link>
                   <Link to={createPageUrl('ConsultantPortal')} onClick={() => setMobileMenuOpen(false)}>
                     <Button variant="outline" className="w-full border-violet-300 text-violet-700 hover:bg-violet-50 rounded-full">
                       <Briefcase className="h-4 w-4 mr-2" />
-                      Вход за консултанти
+                      {t('Вход за консултанти', 'Consultant Login')}
                     </Button>
                   </Link>
                 </div>
@@ -195,7 +218,7 @@ export default function Layout({ children, currentPageName }) {
 
             {/* Quick Links */}
             <div>
-              <h4 className="font-semibold mb-4">Бързи връзки</h4>
+              <h4 className="font-semibold mb-4">{t('Бързи връзки', 'Quick Links')}</h4>
               <ul className="space-y-3">
                 {navLinks.map((link) => (
                   <li key={link.name}>
@@ -212,11 +235,11 @@ export default function Layout({ children, currentPageName }) {
 
             {/* Contact */}
             <div>
-              <h4 className="font-semibold mb-4">Контакти</h4>
+              <h4 className="font-semibold mb-4">{t('Контакти', 'Contact')}</h4>
               <ul className="space-y-3 text-slate-400 font-light">
                 <li>+359 2 123 4567</li>
-                <li>info@apexfinancial.bg</li>
-                <li>бул. Витоша 100<br />София 1000</li>
+                <li>info@example.bg</li>
+                <li>{t('бул. Витоша 100', 'Vitosha Blvd 100')}<br />{t('София 1000', 'Sofia 1000')}</li>
               </ul>
             </div>
           </div>
@@ -226,9 +249,9 @@ export default function Layout({ children, currentPageName }) {
               © {new Date().getFullYear()} Всички права запазени.
             </p>
             <div className="flex gap-6 text-sm text-slate-500">
-              <a href="#" className="hover:text-white transition-colors">Политика за поверителност</a>
-              <a href="#" className="hover:text-white transition-colors">Условия за ползване</a>
-              <a href="#" className="hover:text-white transition-colors">Разкрития</a>
+              <a href="#" className="hover:text-white transition-colors">{t('Политика за поверителност', 'Privacy Policy')}</a>
+              <a href="#" className="hover:text-white transition-colors">{t('Условия за ползване', 'Terms of Use')}</a>
+              <a href="#" className="hover:text-white transition-colors">{t('Разкрития', 'Disclosures')}</a>
             </div>
           </div>
           </div>

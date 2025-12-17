@@ -1,8 +1,12 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { UserPlus, Target, TrendingUp, Sparkles } from 'lucide-react';
+import { useLanguage } from '../LanguageProvider';
 
-const steps = [
+export default function ProcessSteps() {
+  const { t } = useLanguage();
+
+const stepsData = [
   {
     number: '01',
     title: 'Запазете консултация',
@@ -41,11 +45,11 @@ export default function ProcessSteps() {
           className="text-center mb-16"
         >
           <span className="text-blue-600 font-medium text-sm tracking-widest uppercase mb-4 block">
-            Как работи
+            {t('Как работи', 'How It Works')}
           </span>
           <h2 className="text-3xl md:text-5xl font-light text-slate-900">
-            Започването е наистина{' '}
-            <span className="font-semibold text-blue-600">лесно!</span>
+            {t('Започването е наистина', 'Getting started is truly')}{' '}
+            <span className="font-semibold text-blue-600">{t('лесно!', 'easy!')}</span>
           </h2>
         </motion.div>
 

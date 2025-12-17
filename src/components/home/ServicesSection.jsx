@@ -2,8 +2,12 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { Shield, Sliders, Heart, TrendingUp, PiggyBank, Users } from 'lucide-react';
 import { Button } from "@/components/ui/button";
+import { useLanguage } from '../LanguageProvider';
 
-const services = [
+export default function ServicesSection() {
+  const { t } = useLanguage();
+
+const servicesData = [
   {
     icon: Shield,
     title: 'Сигурност',
@@ -37,15 +41,17 @@ export default function ServicesSection() {
           className="text-center mb-16"
         >
           <span className="text-blue-600 font-medium text-sm tracking-widest uppercase mb-4 block">
-            Защо да изберете нас
+            {t('Защо да изберете нас', 'Why Choose Us')}
           </span>
           <h2 className="text-3xl md:text-5xl font-light text-slate-900 mb-6">
-            Независимо{' '}
-            <span className="font-semibold text-blue-600">Финансово</span> консултиране
+            {t('Независимо', 'Independent')}{' '}
+            <span className="font-semibold text-blue-600">{t('Финансово', 'Financial')}</span> {t('консултиране', 'Consulting')}
           </h2>
           <p className="text-lg text-slate-600 max-w-2xl mx-auto font-light">
-            Използвайки нашия богат опит на капиталовите пазари, заедно с иновативни стратегии 
-            и персонализирано планиране, осигуряваме вашия финансов успех.
+            {t(
+              'Използвайки нашия богат опит на капиталовите пазари, заедно с иновативни стратегии и персонализирано планиране, осигуряваме вашия финансов успех.',
+              'Leveraging our extensive capital markets experience, along with innovative strategies and personalized planning, we ensure your financial success.'
+            )}
           </p>
         </motion.div>
 
@@ -87,14 +93,14 @@ export default function ServicesSection() {
             size="lg" 
             className="bg-blue-600 hover:bg-blue-700 text-white px-8 rounded-full"
           >
-            Започнете сега
+            {t('Започнете сега', 'Get Started')}
           </Button>
           <Button 
             variant="outline" 
             size="lg"
             className="border-slate-300 text-slate-700 hover:bg-slate-50 px-8 rounded-full"
           >
-            Научете повече
+            {t('Научете повече', 'Learn More')}
           </Button>
         </motion.div>
       </div>

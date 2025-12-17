@@ -13,6 +13,7 @@ import FinancialPlanCreate from './pages/FinancialPlanCreate';
 import ProductCatalogAdmin from './pages/ProductCatalogAdmin';
 import CascoOfferDemo from './pages/CascoOfferDemo';
 import ProductConfigDemo from './pages/ProductConfigDemo';
+import app from './pages/_app';
 import __Layout from './Layout.jsx';
 
 
@@ -32,6 +33,7 @@ export const PAGES = {
     "ProductCatalogAdmin": ProductCatalogAdmin,
     "CascoOfferDemo": CascoOfferDemo,
     "ProductConfigDemo": ProductConfigDemo,
+    "_app": app,
 }
 
 export const pagesConfig = {

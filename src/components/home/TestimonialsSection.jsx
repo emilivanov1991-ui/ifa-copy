@@ -2,8 +2,12 @@ import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronLeft, ChevronRight, Quote } from 'lucide-react';
 import { Button } from "@/components/ui/button";
+import { useLanguage } from '../LanguageProvider';
 
-const testimonials = [
+export default function TestimonialsSection() {
+  const { t } = useLanguage();
+
+const testimonialsData = [
   {
     quote: "Управлявам малък бизнес и наистина нямам много свободно време. С Apex Financial мога да се съсредоточа върху бизнеса си, докато експерти се грижат за богатството ми. Определено страхотен избор!",
     name: "Мария Петрова",
@@ -41,10 +45,10 @@ export default function TestimonialsSection() {
           className="text-center mb-16"
         >
           <span className="text-blue-600 font-medium text-sm tracking-widest uppercase mb-4 block">
-            Отзиви
+            {t('Отзиви', 'Testimonials')}
           </span>
           <h2 className="text-3xl md:text-5xl font-light text-slate-900">
-            Какво казват нашите <span className="font-semibold text-blue-600">клиенти</span>
+            {t('Какво казват нашите', 'What our')} <span className="font-semibold text-blue-600">{t('клиенти', 'clients say')}</span>
           </h2>
         </motion.div>
 

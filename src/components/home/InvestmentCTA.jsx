@@ -2,8 +2,12 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { Button } from "@/components/ui/button";
 import { ArrowRight, Shield, Award, CheckCircle, BadgeCheck } from 'lucide-react';
+import { useLanguage } from '../LanguageProvider';
 
-const badges = [
+export default function InvestmentCTA() {
+  const { t } = useLanguage();
+
+const badgesData = [
   { icon: Shield, label: 'КФН лиценз' },
   { icon: Award, label: 'CFP сертификат' },
   { icon: CheckCircle, label: 'Фидуциар' },
@@ -34,19 +38,20 @@ export default function InvestmentCTA() {
           className="text-center"
         >
           <h2 className="text-3xl md:text-5xl font-light text-white mb-6">
-            <span className="font-semibold">Инвестирайте</span> в бъдещето си
+            <span className="font-semibold">{t('Инвестирайте', 'Invest')}</span> {t('в бъдещето си', 'in your future')}
           </h2>
           <p className="text-lg md:text-xl text-blue-100/90 max-w-2xl mx-auto mb-10 font-light leading-relaxed">
-            В свят на финансова несигурност, ние предлагаме крайното решение. Нека ви помогнем 
-            да постигнете дългосрочните си цели и да осигурите финансовата си свобода. Грижете се за 
-            семейството си, докато ние се грижим за инвестициите ви.
+            {t(
+              'В свят на финансова несигурност, ние предлагаме крайното решение. Нека ви помогнем да постигнете дългосрочните си цели и да осигурите финансовата си свобода. Грижете се за семейството си, докато ние се грижим за инвестициите ви.',
+              'In a world of financial uncertainty, we offer the ultimate solution. Let us help you achieve your long-term goals and secure your financial freedom. Take care of your family while we take care of your investments.'
+            )}
           </p>
 
           <Button 
             size="lg" 
             className="bg-white text-blue-700 hover:bg-blue-50 px-10 py-6 text-lg rounded-full transition-all duration-300 hover:scale-105 hover:shadow-xl shadow-lg"
           >
-            Запазете безплатна консултация
+            {t('Запазете безплатна консултация', 'Book a Free Consultation')}
             <ArrowRight className="ml-2 h-5 w-5" />
           </Button>
         </motion.div>

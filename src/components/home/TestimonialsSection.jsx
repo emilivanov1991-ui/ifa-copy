@@ -9,27 +9,42 @@ export default function TestimonialsSection() {
 
 const testimonialsData = [
   {
-    quote: "Управлявам малък бизнес и наистина нямам много свободно време. С Apex Financial мога да се съсредоточа върху бизнеса си, докато експерти се грижат за богатството ми. Определено страхотен избор!",
-    name: "Мария Петрова",
-    role: "Собственик на бизнес",
+    quoteBg: "Управлявам малък бизнес и наистина нямам много свободно време. Мога да се съсредоточа върху бизнеса си, докато експерти се грижат за богатството ми. Определено страхотен избор!",
+    quoteEn: "I run a small business and truly don't have much free time. I can focus on my business while experts take care of my wealth. Definitely a great choice!",
+    nameBg: "Мария Петрова",
+    nameEn: "Maria Petrova",
+    roleBg: "Собственик на бизнес",
+    roleEn: "Business Owner",
     image: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150&h=150&fit=crop&crop=face"
   },
   {
-    quote: "Имам работа на пълен работен ден и управлението на инвестициите сама не е вариант. Наличието на надеждна компания, която управлява финансите ми, е от голямо значение! Не бих могла да се надявам на по-професионален подход.",
-    name: "Георги Димитров",
-    role: "Здравен мениджър",
+    quoteBg: "Имам работа на пълен работен ден и управлението на инвестициите сама не е вариант. Наличието на надеждна компания, която управлява финансите ми, е от голямо значение! Не бих могла да се надявам на по-професионален подход.",
+    quoteEn: "I have a full-time job and managing investments myself is not an option. Having a reliable company managing my finances is invaluable! I couldn't hope for a more professional approach.",
+    nameBg: "Георги Димитров",
+    nameEn: "Georgi Dimitrov",
+    roleBg: "Здравен мениджър",
+    roleEn: "Healthcare Manager",
     image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face"
   },
   {
-    quote: "Нова съм в инвестирането и наличието на личен финансов консултант, който ми помага на всяка стъпка - търсейки най-добрите възможности - е просто фантастично. Не бих могла да съм по-доволна от резултатите!",
-    name: "Елена Иванова",
-    role: "Маркетинг директор",
+    quoteBg: "Нова съм в инвестирането и наличието на личен финансов консултант, който ми помага на всяка стъпка - търсейки най-добрите възможности - е просто фантастично. Не бих могла да съм по-доволна от резултатите!",
+    quoteEn: "I'm new to investing and having a personal financial advisor who helps me at every step - seeking the best opportunities - is simply fantastic. I couldn't be happier with the results!",
+    nameBg: "Елена Иванова",
+    nameEn: "Elena Ivanova",
+    roleBg: "Маркетинг директор",
+    roleEn: "Marketing Director",
     image: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=150&h=150&fit=crop&crop=face"
   }
 ];
 
-export default function TestimonialsSection() {
-  const [current, setCurrent] = useState(0);
+const testimonials = testimonialsData.map(td => ({ 
+  quote: t(td.quoteBg, td.quoteEn), 
+  name: t(td.nameBg, td.nameEn), 
+  role: t(td.roleBg, td.roleEn),
+  image: td.image
+}));
+
+const [current, setCurrent] = useState(0);
 
   const next = () => setCurrent((prev) => (prev + 1) % testimonials.length);
   const prev = () => setCurrent((prev) => (prev - 1 + testimonials.length) % testimonials.length);

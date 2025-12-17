@@ -8,13 +8,13 @@ export default function InvestmentCTA() {
   const { t } = useLanguage();
 
 const badgesData = [
-  { icon: Shield, label: 'КФН лиценз' },
-  { icon: Award, label: 'CFP сертификат' },
-  { icon: CheckCircle, label: 'Фидуциар' },
-  { icon: BadgeCheck, label: 'ISO сертификат' },
+  { icon: Shield, labelBg: 'КФН лиценз', labelEn: 'FSC License' },
+  { icon: Award, labelBg: 'CFP сертификат', labelEn: 'CFP Certificate' },
+  { icon: CheckCircle, labelBg: 'Фидуциар', labelEn: 'Fiduciary' },
+  { icon: BadgeCheck, labelBg: 'ISO сертификат', labelEn: 'ISO Certificate' },
 ];
 
-export default function InvestmentCTA() {
+const badges = badgesData.map(b => ({ icon: b.icon, label: t(b.labelBg, b.labelEn) }));
   return (
     <section className="py-24 bg-gradient-to-br from-blue-600 via-blue-700 to-indigo-800 relative overflow-hidden">
       {/* Background pattern */}

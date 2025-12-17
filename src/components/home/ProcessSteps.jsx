@@ -9,31 +9,44 @@ export default function ProcessSteps() {
 const stepsData = [
   {
     number: '01',
-    title: 'Запазете консултация',
-    description: 'Резервирайте безплатна консултация с нашите експерти',
+    titleBg: 'Запазете консултация',
+    titleEn: 'Book Consultation',
+    descBg: 'Резервирайте безплатна консултация с нашите експерти',
+    descEn: 'Schedule a free consultation with our experts',
     icon: UserPlus
   },
   {
     number: '02',
-    title: 'Определете целите си',
-    description: 'Създаваме персонализирана финансова пътна карта',
+    titleBg: 'Определете целите си',
+    titleEn: 'Define Your Goals',
+    descBg: 'Създаваме персонализирана финансова пътна карта',
+    descEn: 'We create a personalized financial roadmap',
     icon: Target
   },
   {
     number: '03',
-    title: 'Инвестирайте разумно',
-    description: 'Прилагаме вашата инвестиционна стратегия',
+    titleBg: 'Инвестирайте разумно',
+    titleEn: 'Invest Wisely',
+    descBg: 'Прилагаме вашата инвестиционна стратегия',
+    descEn: 'We implement your investment strategy',
     icon: TrendingUp
   },
   {
     number: '04',
-    title: 'Постигнете успех',
-    description: 'Наблюдавайте растежа на богатството си с постоянни насоки',
+    titleBg: 'Постигнете успех',
+    titleEn: 'Achieve Success',
+    descBg: 'Наблюдавайте растежа на богатството си с постоянни насоки',
+    descEn: 'Watch your wealth grow with ongoing guidance',
     icon: Sparkles
   }
 ];
 
-export default function ProcessSteps() {
+const steps = stepsData.map(s => ({ 
+  number: s.number, 
+  title: t(s.titleBg, s.titleEn), 
+  description: t(s.descBg, s.descEn),
+  icon: s.icon
+}));
   return (
     <section className="py-24 bg-slate-50">
       <div className="max-w-6xl mx-auto px-6">

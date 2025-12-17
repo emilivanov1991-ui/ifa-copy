@@ -60,18 +60,6 @@ export default function Layout({ children, currentPageName }) {
             }`}>
               <TrendingUp className="h-5 w-5 text-white" />
             </div>
-            <div>
-              <span className={`font-semibold text-lg tracking-tight transition-colors duration-300 ${
-                isScrolled || !hasDarkHero ? 'text-slate-900' : 'text-white'
-              }`}>
-                APEX
-              </span>
-              <span className={`hidden sm:inline ml-1 font-light transition-colors duration-300 ${
-                isScrolled || !hasDarkHero ? 'text-slate-600' : 'text-blue-100'
-              }`}>
-                Financial
-              </span>
-            </div>
           </Link>
 
           {/* Desktop Nav */}
@@ -198,7 +186,6 @@ export default function Layout({ children, currentPageName }) {
                 <div className="w-10 h-10 rounded-xl bg-blue-600 flex items-center justify-center">
                   <TrendingUp className="h-5 w-5 text-white" />
                 </div>
-                <span className="font-semibold text-xl">APEX Financial</span>
               </div>
               <p className="text-slate-400 font-light leading-relaxed max-w-md">
                 Независими финансови консултанти, посветени на постигането на вашите 
@@ -236,7 +223,7 @@ export default function Layout({ children, currentPageName }) {
 
           <div className="border-t border-slate-800 pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
             <p className="text-slate-500 text-sm font-light">
-              © {new Date().getFullYear()} Apex Financial Advisors. Всички права запазени.
+              © {new Date().getFullYear()} Всички права запазени.
             </p>
             <div className="flex gap-6 text-sm text-slate-500">
               <a href="#" className="hover:text-white transition-colors">Политика за поверителност</a>

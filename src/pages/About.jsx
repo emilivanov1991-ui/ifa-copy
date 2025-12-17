@@ -52,7 +52,7 @@ export default function About() {
               Вашият доверен <span className="font-semibold text-blue-600">финансов</span> партньор
             </h1>
             <p className="text-lg text-slate-600 font-light leading-relaxed">
-              Повече от две десетилетия Apex Financial помага на хора и семейства 
+              Повече от две десетилетия помагаме на хора и семейства 
               да постигнат финансовите си мечти чрез персонализирани, независими съвети.
             </p>
           </motion.div>
@@ -100,7 +100,7 @@ export default function About() {
               </h2>
               <div className="space-y-4 text-slate-600 font-light leading-relaxed">
                 <p>
-                  Основана през 1998 г., Apex Financial Advisors се роди от проста вяра: 
+                  Основани през 1998 г. от проста вяра: 
                   всеки заслужава достъп до честни, безпристрастни финансови съвети.
                 </p>
                 <p>

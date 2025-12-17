@@ -34,7 +34,7 @@ const contactInfo = [
   {
     icon: Mail,
     title: 'Пишете ни',
-    details: ['info@apexfinancial.bg', 'support@apexfinancial.bg']
+    details: ['info@example.bg', 'support@example.bg']
   },
   {
     icon: Clock,

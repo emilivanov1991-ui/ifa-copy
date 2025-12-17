@@ -23,8 +23,7 @@ export default function MissionSection() {
             Нашата <span className="font-semibold text-blue-400">мисия</span>
           </h2>
           <p className="text-xl md:text-2xl text-blue-100/80 leading-relaxed font-light">
-            В <span className="text-white font-medium">Apex Financial Advisors</span> сме посветени 
-            на осигуряването на балансиран и устойчив финансов растеж чрез интелигентни 
+            Посветени сме на осигуряването на балансиран и устойчив финансов растеж чрез интелигентни 
             решения и персонализирани стратегии. Помагаме ви да се ориентирате в сложността на 
             управлението на богатството, за да постигнете житейските си цели.
           </p>

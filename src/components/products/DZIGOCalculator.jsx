@@ -9,6 +9,35 @@ import { Calculator, Save, FileText } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
 import { toast } from 'sonner';
 
+// Short-term tariff percentages
+const SHORT_TERM_TARIFF = {
+  12: 1.00, 11: 0.98, 10: 0.90, 9: 0.81, 8: 0.73, 7: 0.65,
+  6: 0.56, 5: 0.48, 4: 0.39, 3: 0.31, 2: 0.23, 1: 0.15
+};
+
+// Other vehicle types tariffs
+const OTHER_VEHICLES_TARIFFS = {
+  cargo_up_to_3_5: 385.00,
+  cargo_3_5_to_6: 810.12,
+  cargo_6_to_8: 1000.00,
+  cargo_8_to_15: 2650.00,
+  cargo_15_to_25: 4300.00,
+  cargo_over_25: 4500.00,
+  tractor: 8200.00,
+  trailer_luggage: 120.00,
+  trailer_up_to_14: 168.86,
+  trailer_over_14: 252.86,
+  bus_up_to_20: 950.00,
+  bus_20_to_40: 1800.00,
+  bus_over_40: 4200.00,
+  motorcycle_up_to_50: 192.00,
+  motorcycle_50_to_500: 285.00,
+  motorcycle_over_500: 338.29,
+  agricultural: 139.32,
+  construction: 162.02,
+  trolleybus: 421.14
+};
+
 const DZI_GO_TARIFFS = {
   region1: { // София
     individual: {
@@ -98,6 +127,7 @@ const DZI_GO_TARIFFS = {
 
 export default function DZIGOCalculator({ analysisId, clientId }) {
   const [inputs, setInputs] = useState({
+    vehicleType: 'passenger_car', // passenger_car, cargo, bus, motorcycle, etc.
     registrationNumber: '',
     ownerType: 'individual', // individual / company
     ownerAge: 35,
@@ -105,17 +135,30 @@ export default function DZIGOCalculator({ analysisId, clientId }) {
     region: 'region1',
     vehicleAge: 5,
     hasKasko: false,
+    insuranceDuration: 12, // months
     paymentType: 'single', // single / 2_installments / 4_installments
     addRoadAssistance: true,
     roadAssistancePackage: 'premium', // premium / vip / abroad
     addAccidentInsurance: false,
     accidentCoveragePerPerson: 1000,
-    seatsCount: 1
+    seatsCount: 1,
+    // For other vehicle types
+    otherVehicleSubtype: 'cargo_up_to_3_5',
+    // Cross-selling
+    hasDZIKaskoPlus: false,
+    hasDZIHome: false,
+    hasDZIBusiness: false
   });
 
   const [result, setResult] = useState(null);
 
   const getBasePremium = () => {
+    // Other vehicle types
+    if (inputs.vehicleType !== 'passenger_car') {
+      return OTHER_VEHICLES_TARIFFS[inputs.otherVehicleSubtype] || 0;
+    }
+
+    // Passenger cars
     const region = DZI_GO_TARIFFS[inputs.region];
     if (!region) return 0;
 
@@ -136,22 +179,35 @@ export default function DZIGOCalculator({ analysisId, clientId }) {
   const calculate = () => {
     let premium = getBasePremium();
 
-    // Apply discounts
+    // Apply short-term tariff
+    const shortTermMultiplier = SHORT_TERM_TARIFF[inputs.insuranceDuration] || 1.0;
+    premium = premium * shortTermMultiplier;
+
+    // Apply discounts (only for passenger cars)
     let discount = 0;
-    if (inputs.hasKasko) {
-      discount = inputs.ownerType === 'company' ? 0.25 : 0.10;
-    } else if (inputs.vehicleAge > 15) {
-      discount = inputs.ownerType === 'company' ? 0.30 : 0.10;
-    } else if (inputs.vehicleAge > 20) {
-      discount = 0.10;
+    if (inputs.vehicleType === 'passenger_car') {
+      if (inputs.hasKasko) {
+        discount = inputs.ownerType === 'company' ? 0.25 : 0.10;
+      } else if (inputs.vehicleAge > 15) {
+        discount = inputs.ownerType === 'company' ? 0.30 : 0.10;
+      } else if (inputs.vehicleAge > 20) {
+        discount = 0.10;
+      }
+    }
+
+    // For cargo vehicles with Kasko
+    if (inputs.vehicleType === 'cargo' && inputs.hasKasko && inputs.otherVehicleSubtype.startsWith('cargo_')) {
+      discount = 0.30;
     }
 
     premium = premium * (1 - discount);
 
-    // Payment type multiplier
+    // Payment type multiplier (only for 12-month policies)
     let installmentMultiplier = 1.0;
-    if (inputs.paymentType === '2_installments') installmentMultiplier = 1.03;
-    if (inputs.paymentType === '4_installments') installmentMultiplier = 1.046;
+    if (inputs.insuranceDuration === 12) {
+      if (inputs.paymentType === '2_installments') installmentMultiplier = 1.03;
+      if (inputs.paymentType === '4_installments') installmentMultiplier = 1.046;
+    }
 
     premium = premium * installmentMultiplier;
 
@@ -173,7 +229,19 @@ export default function DZIGOCalculator({ analysisId, clientId }) {
     }
 
     const gfOf = 12; // ГФ + ОФ
-    const totalPremium = premium + dzp + roadAssistancePremium + accidentPremium + gfOf;
+    let totalPremium = premium + dzp + roadAssistancePremium + accidentPremium + gfOf;
+
+    // Cross-selling discounts (10% on Kasko+, Home, Business when purchasing GO)
+    let crossSellingInfo = [];
+    if (inputs.hasDZIKaskoPlus) {
+      crossSellingInfo.push('10% отстъпка при закупуване на Каско+');
+    }
+    if (inputs.hasDZIHome) {
+      crossSellingInfo.push('10% отстъпка при закупуване на "Комфорт за дома"');
+    }
+    if (inputs.hasDZIBusiness) {
+      crossSellingInfo.push('10% отстъпка при закупуване на "Комфорт за бизнеса"');
+    }
 
     setResult({
       basePremium: premium.toFixed(2),
@@ -182,7 +250,9 @@ export default function DZIGOCalculator({ analysisId, clientId }) {
       accidentInsurance: accidentPremium.toFixed(2),
       gfOf: gfOf.toFixed(2),
       totalPremium: totalPremium.toFixed(2),
-      discount: (discount * 100).toFixed(0)
+      discount: (discount * 100).toFixed(0),
+      shortTermMultiplier: shortTermMultiplier,
+      crossSellingInfo: crossSellingInfo
     });
   };
 
@@ -237,6 +307,75 @@ export default function DZIGOCalculator({ analysisId, clientId }) {
 
       <CardContent className="p-6 space-y-6">
         <div className="grid md:grid-cols-2 gap-6">
+          <div>
+            <Label>Тип МПС</Label>
+            <Select value={inputs.vehicleType} onValueChange={(v) => setInputs({...inputs, vehicleType: v})}>
+              <SelectTrigger>
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="passenger_car">Лек автомобил</SelectItem>
+                <SelectItem value="cargo">Товарен автомобил</SelectItem>
+                <SelectItem value="bus">Автобус</SelectItem>
+                <SelectItem value="motorcycle">Мотоциклет</SelectItem>
+                <SelectItem value="trailer">Ремарке</SelectItem>
+                <SelectItem value="agricultural">Земеделска техника</SelectItem>
+                <SelectItem value="construction">Строителна техника</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          {inputs.vehicleType !== 'passenger_car' && (
+            <div>
+              <Label>Подтип</Label>
+              <Select value={inputs.otherVehicleSubtype} onValueChange={(v) => setInputs({...inputs, otherVehicleSubtype: v})}>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {inputs.vehicleType === 'cargo' && (
+                    <>
+                      <SelectItem value="cargo_up_to_3_5">До 3.5 т</SelectItem>
+                      <SelectItem value="cargo_3_5_to_6">3.5-6 т</SelectItem>
+                      <SelectItem value="cargo_6_to_8">6-8 т</SelectItem>
+                      <SelectItem value="cargo_8_to_15">8-15 т</SelectItem>
+                      <SelectItem value="cargo_15_to_25">15-25 т</SelectItem>
+                      <SelectItem value="cargo_over_25">Над 25 т</SelectItem>
+                      <SelectItem value="tractor">Седлови влекачи</SelectItem>
+                    </>
+                  )}
+                  {inputs.vehicleType === 'bus' && (
+                    <>
+                      <SelectItem value="bus_up_to_20">До 20 места</SelectItem>
+                      <SelectItem value="bus_20_to_40">20-40 места</SelectItem>
+                      <SelectItem value="bus_over_40">Над 40 места</SelectItem>
+                    </>
+                  )}
+                  {inputs.vehicleType === 'motorcycle' && (
+                    <>
+                      <SelectItem value="motorcycle_up_to_50">До 50 куб.см</SelectItem>
+                      <SelectItem value="motorcycle_50_to_500">50-500 куб.см</SelectItem>
+                      <SelectItem value="motorcycle_over_500">Над 500 куб.см</SelectItem>
+                    </>
+                  )}
+                  {inputs.vehicleType === 'trailer' && (
+                    <>
+                      <SelectItem value="trailer_luggage">Багажни/къмпинг</SelectItem>
+                      <SelectItem value="trailer_up_to_14">До 14 т</SelectItem>
+                      <SelectItem value="trailer_over_14">Над 14 т</SelectItem>
+                    </>
+                  )}
+                  {inputs.vehicleType === 'agricultural' && (
+                    <SelectItem value="agricultural">Земеделска техника</SelectItem>
+                  )}
+                  {inputs.vehicleType === 'construction' && (
+                    <SelectItem value="construction">Строителна техника</SelectItem>
+                  )}
+                </SelectContent>
+              </Select>
+            </div>
+          )}
+
           <div>
             <Label>Регистрационен номер</Label>
             <Input
@@ -322,18 +461,43 @@ export default function DZIGOCalculator({ analysisId, clientId }) {
           </div>
 
           <div>
-            <Label>Начин на плащане</Label>
-            <Select value={inputs.paymentType} onValueChange={(v) => setInputs({...inputs, paymentType: v})}>
+            <Label>Срок на застраховката</Label>
+            <Select value={inputs.insuranceDuration.toString()} onValueChange={(v) => setInputs({...inputs, insuranceDuration: parseInt(v)})}>
               <SelectTrigger>
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="single">Еднократно</SelectItem>
-                <SelectItem value="2_installments">2 вноски</SelectItem>
-                <SelectItem value="4_installments">4 вноски</SelectItem>
+                <SelectItem value="12">12 месеца (100%)</SelectItem>
+                <SelectItem value="11">11 месеца (98%)</SelectItem>
+                <SelectItem value="10">10 месеца (90%)</SelectItem>
+                <SelectItem value="9">9 месеца (81%)</SelectItem>
+                <SelectItem value="8">8 месеца (73%)</SelectItem>
+                <SelectItem value="7">7 месеца (65%)</SelectItem>
+                <SelectItem value="6">6 месеца (56%)</SelectItem>
+                <SelectItem value="5">5 месеца (48%)</SelectItem>
+                <SelectItem value="4">4 месеца (39%)</SelectItem>
+                <SelectItem value="3">3 месеца (31%)</SelectItem>
+                <SelectItem value="2">2 месеца (23%)</SelectItem>
+                <SelectItem value="1">1 месец (15%)</SelectItem>
               </SelectContent>
             </Select>
           </div>
+
+          {inputs.insuranceDuration === 12 && (
+            <div>
+              <Label>Начин на плащане</Label>
+              <Select value={inputs.paymentType} onValueChange={(v) => setInputs({...inputs, paymentType: v})}>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="single">Еднократно</SelectItem>
+                  <SelectItem value="2_installments">2 вноски (+3%)</SelectItem>
+                  <SelectItem value="4_installments">4 вноски (+4.6%)</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          )}
 
           <div className="flex items-center space-x-2 pt-6">
             <Checkbox
@@ -346,6 +510,44 @@ export default function DZIGOCalculator({ analysisId, clientId }) {
             </label>
           </div>
         </div>
+
+        {inputs.vehicleType === 'passenger_car' && inputs.insuranceDuration === 12 && (
+          <div className="border-t pt-6 space-y-4">
+            <h4 className="font-semibold text-slate-900">Кръстосани продажби (Cross-selling)</h4>
+            <div className="space-y-3 bg-green-50 p-4 rounded-lg">
+              <div className="flex items-center space-x-2">
+                <Checkbox
+                  checked={inputs.hasDZIKaskoPlus}
+                  onCheckedChange={(checked) => setInputs({...inputs, hasDZIKaskoPlus: checked})}
+                  id="crossell-kasko"
+                />
+                <label htmlFor="crossell-kasko" className="text-sm font-medium cursor-pointer text-green-800">
+                  ✓ Получи 10% отстъпка при закупуване на ДЗИ Каско+
+                </label>
+              </div>
+              <div className="flex items-center space-x-2">
+                <Checkbox
+                  checked={inputs.hasDZIHome}
+                  onCheckedChange={(checked) => setInputs({...inputs, hasDZIHome: checked})}
+                  id="crossell-home"
+                />
+                <label htmlFor="crossell-home" className="text-sm font-medium cursor-pointer text-green-800">
+                  ✓ Получи 10% отстъпка при закупуване на "Комфорт за дома"
+                </label>
+              </div>
+              <div className="flex items-center space-x-2">
+                <Checkbox
+                  checked={inputs.hasDZIBusiness}
+                  onCheckedChange={(checked) => setInputs({...inputs, hasDZIBusiness: checked})}
+                  id="crossell-business"
+                />
+                <label htmlFor="crossell-business" className="text-sm font-medium cursor-pointer text-green-800">
+                  ✓ Получи 10% отстъпка при закупуване на "Комфорт за бизнеса"
+                </label>
+              </div>
+            </div>
+          </div>
+        )}
 
         <div className="border-t pt-6 space-y-4">
           <h4 className="font-semibold text-slate-900">Допълнителни покрития</h4>
@@ -488,6 +690,17 @@ export default function DZIGOCalculator({ analysisId, clientId }) {
                 </div>
               )}
             </div>
+
+            {result.crossSellingInfo && result.crossSellingInfo.length > 0 && (
+              <div className="mt-4 p-3 bg-green-50 rounded-lg text-xs text-green-800">
+                <strong>🎁 Кръстосани продажби:</strong>
+                <ul className="mt-1 space-y-1">
+                  {result.crossSellingInfo.map((info, idx) => (
+                    <li key={idx}>• {info}</li>
+                  ))}
+                </ul>
+              </div>
+            )}
 
             <div className="mt-4 p-3 bg-white rounded-lg text-xs text-slate-600">
               <strong>Лимити на покритие:</strong>

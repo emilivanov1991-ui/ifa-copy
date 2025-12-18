@@ -12,6 +12,7 @@ import DZIZakrilaCalculator from '../components/products/DZIZakrilaCalculator';
 import DZICascoCalculator from '../components/financial-plan/DZICascoCalculator';
 import DZIGOCalculator from '../components/products/DZIGOCalculator';
 import DZIBestDoctorsCalculator from '../components/products/DZIBestDoctorsCalculator';
+import UniqaZaNashetoZdraveCalculator from '../components/products/UniqaZaNashetoZdraveCalculator';
 import GeneraliHealthLineOffer from '../components/financial-plan/GeneraliHealthLineOffer';
 import UniqaHealthValueCalculator from '../components/financial-plan/UniqaHealthValueCalculator';
 import PlaceholderCalculator from '../components/products/PlaceholderCalculator';
@@ -270,7 +271,7 @@ export default function ProductConfigDemo() {
           {/* УНИКА Products */}
           <TabsContent value="uniqa" className="space-y-4">
             <Tabs defaultValue="health-value" className="w-full">
-              <TabsList className="grid w-full grid-cols-2 lg:grid-cols-5 mb-4 bg-blue-50 p-1 rounded-lg">
+              <TabsList className="grid w-full grid-cols-2 lg:grid-cols-5 mb-4 bg-orange-50 p-1 rounded-lg">
                 <TabsTrigger value="health-value">Здраве и ценност</TabsTrigger>
                 <TabsTrigger value="our-health">За Нашето здраве</TabsTrigger>
                 <TabsTrigger value="home-happy">У дома и щастлив</TabsTrigger>
@@ -292,10 +293,9 @@ export default function ProductConfigDemo() {
               </TabsContent>
 
               <TabsContent value="our-health">
-                <PlaceholderCalculator 
-                  productName="За Нашето здраве"
-                  provider="УНИКА"
-                  description="Допълнително здравно осигуряване. Моля предоставете тарифи и условия."
+                <UniqaZaNashetoZdraveCalculator 
+                  analysisId={demoAnalysisId}
+                  clientId={demoClientId}
                 />
               </TabsContent>
 

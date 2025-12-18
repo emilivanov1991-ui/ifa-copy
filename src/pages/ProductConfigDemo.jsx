@@ -10,6 +10,7 @@ import InstinctHomeCalculator from '../components/financial-plan/InstinctHomeCal
 import SavedOffersManager from '../components/offers/SavedOffersManager';
 import DZIZakrilaCalculator from '../components/products/DZIZakrilaCalculator';
 import DZICascoCalculator from '../components/financial-plan/DZICascoCalculator';
+import DZIGOCalculator from '../components/products/DZIGOCalculator';
 import GeneraliHealthLineOffer from '../components/financial-plan/GeneraliHealthLineOffer';
 import UniqaHealthValueCalculator from '../components/financial-plan/UniqaHealthValueCalculator';
 import PlaceholderCalculator from '../components/products/PlaceholderCalculator';
@@ -250,10 +251,9 @@ export default function ProductConfigDemo() {
               </TabsContent>
 
               <TabsContent value="go">
-                <PlaceholderCalculator 
-                  productName="ГО"
-                  provider="ДЗИ"
-                  description="Гражданска отговорност на автомобилистите. Моля предоставете тарифи и условия за конфигуриране."
+                <DZIGOCalculator 
+                  analysisId={demoAnalysisId}
+                  clientId={demoClientId}
                 />
               </TabsContent>
 

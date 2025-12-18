@@ -13,6 +13,7 @@ import DZICascoCalculator from '../components/financial-plan/DZICascoCalculator'
 import DZIGOCalculator from '../components/products/DZIGOCalculator';
 import DZIBestDoctorsCalculator from '../components/products/DZIBestDoctorsCalculator';
 import UniqaZaNashetoZdraveCalculator from '../components/products/UniqaZaNashetoZdraveCalculator';
+import UniqaHomeCalculator from '../components/products/UniqaHomeCalculator';
 import GeneraliHealthLineOffer from '../components/financial-plan/GeneraliHealthLineOffer';
 import UniqaHealthValueCalculator from '../components/financial-plan/UniqaHealthValueCalculator';
 import PlaceholderCalculator from '../components/products/PlaceholderCalculator';
@@ -300,10 +301,9 @@ export default function ProductConfigDemo() {
               </TabsContent>
 
               <TabsContent value="home-happy">
-                <PlaceholderCalculator 
-                  productName="У дома и щастлив"
-                  provider="УНИКА"
-                  description="Имуществена застраховка. Моля предоставете тарифи и условия."
+                <UniqaHomeCalculator 
+                  analysisId={demoAnalysisId}
+                  clientId={demoClientId}
                 />
               </TabsContent>
 

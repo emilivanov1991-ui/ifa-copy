@@ -16,7 +16,6 @@ export default function OBBPillar3Calculator({ analysisId, clientId }) {
     retirementAge: 65,
     monthlyContribution: 100, // BGN
     monthlyGrossSalary: 2000, // BGN за данъчно облекчение
-    fundType: 'universal', // universal / balanced / dynamic
     expectedReturn: 6.0, // % годишна доходност
     useTaxRelief: true // данъчно облекчение
   });
@@ -33,20 +32,27 @@ export default function OBBPillar3Calculator({ analysisId, clientId }) {
       taxRelief = deductibleAmount * 0.10; // 10% данък върху приспадната сума
     }
     
-    // Такси за управление (годишни)
-    const managementFee = inputs.fundType === 'universal' ? 1.5 : 
-                          inputs.fundType === 'balanced' ? 1.8 : 2.0; // % от активи
+    // Такси ОББ ДДПО към 01.01.2026
+    const entryFee = 3.40; // % входна такса от всяка вноска
+    const managementFee = 0.66; // % годишна такса от активи
     
     // Прогноза на натрупана сума с реинвестиране
     let balance = 0;
+    let totalEntryFees = 0;
     const yearlyData = [];
     
     for (let year = 1; year <= yearsToRetirement; year++) {
       const annualContribution = monthlyContribution * 12;
       const annualTaxRelief = taxRelief * 12;
-      balance += annualContribution;
       
-      // Приход от инвестиции (след такси)
+      // Приспадаме входната такса
+      const entryFeeAmount = annualContribution * (entryFee / 100);
+      const netContribution = annualContribution - entryFeeAmount;
+      totalEntryFees += entryFeeAmount;
+      
+      balance += netContribution;
+      
+      // Приход от инвестиции (след такса управление)
       const netReturn = inputs.expectedReturn - managementFee;
       const investmentGain = balance * (netReturn / 100);
       balance += investmentGain;
@@ -76,12 +82,15 @@ export default function OBBPillar3Calculator({ analysisId, clientId }) {
       netMonthlyCost: (monthlyContribution - taxRelief).toFixed(2),
       annualContribution: (monthlyContribution * 12).toFixed(2),
       totalContributions: totalContributions.toFixed(2),
+      totalEntryFees: totalEntryFees.toFixed(2),
       totalTaxRelief: totalTaxRelief.toFixed(2),
       investmentGains: investmentGains.toFixed(2),
       finalBalance: balance.toFixed(2),
       monthlyPension: monthlyPension.toFixed(2),
       yearsToRetirement,
-      yearlyData
+      yearlyData,
+      entryFeePercent: entryFee,
+      managementFeePercent: managementFee
     };
   }, [inputs]);
 
@@ -186,20 +195,6 @@ export default function OBBPillar3Calculator({ analysisId, clientId }) {
           </div>
 
           <div>
-            <Label>Тип фонд</Label>
-            <Select value={inputs.fundType} onValueChange={(v) => setInputs({...inputs, fundType: v})}>
-              <SelectTrigger>
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="universal">Универсален (такса 1.5%, консервативен)</SelectItem>
-                <SelectItem value="balanced">Балансиран (такса 1.8%, умерен риск)</SelectItem>
-                <SelectItem value="dynamic">Динамичен (такса 2.0%, висок риск)</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-
-          <div>
             <Label>Очаквана годишна доходност (%)</Label>
             <Input
               type="number"
@@ -209,7 +204,7 @@ export default function OBBPillar3Calculator({ analysisId, clientId }) {
               min="0"
               max="20"
             />
-            <p className="text-xs text-slate-500 mt-1">Универсален: 4-6%, Балансиран: 5-8%, Динамичен: 7-12%</p>
+            <p className="text-xs text-slate-500 mt-1">Историческа средна: 5-8%</p>
           </div>
 
           <div className="flex items-center space-x-2 col-span-2">
@@ -250,6 +245,10 @@ export default function OBBPillar3Calculator({ analysisId, clientId }) {
                   <span className="text-slate-600">Месечна вноска:</span>
                   <span className="font-semibold">{result.monthlyContribution} BGN</span>
                 </div>
+                <div className="flex justify-between text-orange-600">
+                  <span>Входна такса ({result.entryFeePercent}%):</span>
+                  <span className="font-semibold">-{(parseFloat(result.monthlyContribution) * result.entryFeePercent / 100).toFixed(2)} BGN/мес</span>
+                </div>
                 {inputs.useTaxRelief && parseFloat(result.monthlyTaxRelief) > 0 && (
                   <>
                     <div className="flex justify-between text-green-600">
@@ -270,6 +269,10 @@ export default function OBBPillar3Calculator({ analysisId, clientId }) {
                   <span className="text-slate-600">Общо внесени средства:</span>
                   <span className="font-semibold">{result.totalContributions} BGN</span>
                 </div>
+                <div className="flex justify-between text-orange-600">
+                  <span>Общи входни такси:</span>
+                  <span className="font-semibold">-{result.totalEntryFees} BGN</span>
+                </div>
                 {inputs.useTaxRelief && (
                   <div className="flex justify-between text-green-600">
                     <span>Обща данъчна икономия:</span>
@@ -277,7 +280,7 @@ export default function OBBPillar3Calculator({ analysisId, clientId }) {
                   </div>
                 )}
                 <div className="flex justify-between text-green-600">
-                  <span>Инвестиционен доход:</span>
+                  <span>Инвестиционен доход (след {result.managementFeePercent}% такса):</span>
                   <span className="font-semibold">+{result.investmentGains} BGN</span>
                 </div>
                 <div className="border-t pt-2 mt-2 flex justify-between text-lg">

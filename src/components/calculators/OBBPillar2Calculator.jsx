@@ -15,7 +15,6 @@ export default function OBBPillar2Calculator({ analysisId, clientId }) {
     retirementAge: 65,
     monthlyGrossSalary: 2000, // BGN
     contributionRate: 5, // % от БОД
-    fundType: 'universal', // universal / professional
     expectedReturn: 5.5 // % годишна доходност
   });
 
@@ -29,18 +28,26 @@ export default function OBBPillar2Calculator({ analysisId, clientId }) {
     
     const monthlyContribution = cappedSalary * (inputs.contributionRate / 100);
     
-    // Такси за управление (годишни)
-    const managementFee = inputs.fundType === 'universal' ? 0.95 : 1.05; // % от активи
+    // Такси ОББ УПФ към 01.01.2026
+    const entryFee = 3.75; // % входна такса от всяка вноска
+    const managementFee = 0.75; // % годишна такса от активи
     
     // Прогноза на натрупана сума с реинвестиране
     let balance = 0;
+    let totalEntryFees = 0;
     const yearlyData = [];
     
     for (let year = 1; year <= yearsToRetirement; year++) {
       const annualContribution = monthlyContribution * 12;
-      balance += annualContribution;
       
-      // Приход от инвестиции (след такси)
+      // Приспадаме входната такса
+      const entryFeeAmount = annualContribution * (entryFee / 100);
+      const netContribution = annualContribution - entryFeeAmount;
+      totalEntryFees += entryFeeAmount;
+      
+      balance += netContribution;
+      
+      // Приход от инвестиции (след такса управление)
       const netReturn = inputs.expectedReturn - managementFee;
       const investmentGain = balance * (netReturn / 100);
       balance += investmentGain;
@@ -66,13 +73,16 @@ export default function OBBPillar2Calculator({ analysisId, clientId }) {
       monthlyContribution: monthlyContribution.toFixed(2),
       annualContribution: (monthlyContribution * 12).toFixed(2),
       totalContributions: totalContributions.toFixed(2),
+      totalEntryFees: totalEntryFees.toFixed(2),
       investmentGains: investmentGains.toFixed(2),
       finalBalance: balance.toFixed(2),
       monthlyPension: monthlyPension.toFixed(2),
       yearsToRetirement,
       yearlyData,
       isCapped,
-      cappedSalary: cappedSalary.toFixed(2)
+      cappedSalary: cappedSalary.toFixed(2),
+      entryFeePercent: entryFee,
+      managementFeePercent: managementFee
     };
   }, [inputs]);
 
@@ -188,19 +198,6 @@ export default function OBBPillar2Calculator({ analysisId, clientId }) {
           </div>
 
           <div>
-            <Label>Тип фонд</Label>
-            <Select value={inputs.fundType} onValueChange={(v) => setInputs({...inputs, fundType: v})}>
-              <SelectTrigger>
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="universal">Универсален (такса 0.95%)</SelectItem>
-                <SelectItem value="professional">Професионален (такса 1.05%)</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-
-          <div>
             <Label>Очаквана годишна доходност (%)</Label>
             <Input
               type="number"
@@ -237,12 +234,12 @@ export default function OBBPillar2Calculator({ analysisId, clientId }) {
               
               <div className="space-y-2 text-sm">
                 <div className="flex justify-between">
-                  <span className="text-slate-600">Месечна вноска:</span>
+                  <span className="text-slate-600">Месечна вноска (5% от БОД):</span>
                   <span className="font-semibold">{result.monthlyContribution} BGN</span>
                 </div>
-                <div className="flex justify-between">
-                  <span className="text-slate-600">Годишна вноска:</span>
-                  <span className="font-semibold">{result.annualContribution} BGN</span>
+                <div className="flex justify-between text-orange-600">
+                  <span>Входна такса ({result.entryFeePercent}%):</span>
+                  <span className="font-semibold">-{(parseFloat(result.monthlyContribution) * result.entryFeePercent / 100).toFixed(2)} BGN/мес</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-slate-600">Години до пенсия:</span>
@@ -252,8 +249,12 @@ export default function OBBPillar2Calculator({ analysisId, clientId }) {
                   <span className="text-slate-600">Общо внесени средства:</span>
                   <span className="font-semibold">{result.totalContributions} BGN</span>
                 </div>
+                <div className="flex justify-between text-orange-600">
+                  <span>Общи входни такси:</span>
+                  <span className="font-semibold">-{result.totalEntryFees} BGN</span>
+                </div>
                 <div className="flex justify-between text-green-600">
-                  <span>Инвестиционен доход:</span>
+                  <span>Инвестиционен доход (след {result.managementFeePercent}% такса):</span>
                   <span className="font-semibold">+{result.investmentGains} BGN</span>
                 </div>
                 <div className="border-t pt-2 mt-2 flex justify-between text-lg">

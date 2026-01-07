@@ -21,7 +21,13 @@ export default function OBBPillar2Calculator({ analysisId, clientId }) {
 
   const result = useMemo(() => {
     const yearsToRetirement = inputs.retirementAge - inputs.age;
-    const monthlyContribution = inputs.monthlyGrossSalary * (inputs.contributionRate / 100);
+    
+    // Максимален осигурителен праг към 01.01.2026
+    const maxInsurableIncome = 4600; // BGN
+    const cappedSalary = Math.min(inputs.monthlyGrossSalary, maxInsurableIncome);
+    const isCapped = inputs.monthlyGrossSalary > maxInsurableIncome;
+    
+    const monthlyContribution = cappedSalary * (inputs.contributionRate / 100);
     
     // Такси за управление (годишни)
     const managementFee = inputs.fundType === 'universal' ? 0.95 : 1.05; // % от активи
@@ -64,7 +70,9 @@ export default function OBBPillar2Calculator({ analysisId, clientId }) {
       finalBalance: balance.toFixed(2),
       monthlyPension: monthlyPension.toFixed(2),
       yearsToRetirement,
-      yearlyData
+      yearlyData,
+      isCapped,
+      cappedSalary: cappedSalary.toFixed(2)
     };
   }, [inputs]);
 
@@ -118,8 +126,19 @@ export default function OBBPillar2Calculator({ analysisId, clientId }) {
           <p className="text-xs text-blue-800">
             <strong>Важно:</strong> Вторият стълб е задължителен за лица родени след 1959 година. 
             Вноската е 5% от БОД (брутното осигурително доход) и се удържа от работодателя.
+            <br />
+            <strong>Максимален осигурителен праг 2026:</strong> 4,600 BGN месечно - вноските се изчисляват до този таван.
           </p>
         </div>
+
+        {result?.isCapped && (
+          <div className="bg-amber-50 border border-amber-200 rounded-lg p-4">
+            <p className="text-xs text-amber-800">
+              ⚠️ Заплатата от {inputs.monthlyGrossSalary} BGN надвишава максималния осигурителен праг. 
+              Вноската се изчислява върху {result.cappedSalary} BGN.
+            </p>
+          </div>
+        )}
 
         <div className="grid md:grid-cols-2 gap-6">
           <div>

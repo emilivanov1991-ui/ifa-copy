@@ -1,38 +1,38 @@
-import Home from './pages/Home';
 import About from './pages/About';
-import Services from './pages/Services';
-import Contact from './pages/Contact';
-import FinancialAnalysis from './pages/FinancialAnalysis';
+import AuxiliaryTools from './pages/AuxiliaryTools';
 import CRM from './pages/CRM';
+import Calculators from './pages/Calculators';
+import CascoOfferDemo from './pages/CascoOfferDemo';
 import ClientPortal from './pages/ClientPortal';
 import ConsultantPortal from './pages/ConsultantPortal';
-import Calculators from './pages/Calculators';
-import FinancialPlanner from './pages/FinancialPlanner';
-import AuxiliaryTools from './pages/AuxiliaryTools';
+import Contact from './pages/Contact';
+import FinancialAnalysis from './pages/FinancialAnalysis';
 import FinancialPlanCreate from './pages/FinancialPlanCreate';
+import FinancialPlanner from './pages/FinancialPlanner';
+import Home from './pages/Home';
 import ProductCatalogAdmin from './pages/ProductCatalogAdmin';
-import CascoOfferDemo from './pages/CascoOfferDemo';
 import ProductConfigDemo from './pages/ProductConfigDemo';
+import Services from './pages/Services';
 import app from './pages/_app';
 import __Layout from './Layout.jsx';
 
 
 export const PAGES = {
-    "Home": Home,
     "About": About,
-    "Services": Services,
-    "Contact": Contact,
-    "FinancialAnalysis": FinancialAnalysis,
+    "AuxiliaryTools": AuxiliaryTools,
     "CRM": CRM,
+    "Calculators": Calculators,
+    "CascoOfferDemo": CascoOfferDemo,
     "ClientPortal": ClientPortal,
     "ConsultantPortal": ConsultantPortal,
-    "Calculators": Calculators,
-    "FinancialPlanner": FinancialPlanner,
-    "AuxiliaryTools": AuxiliaryTools,
+    "Contact": Contact,
+    "FinancialAnalysis": FinancialAnalysis,
     "FinancialPlanCreate": FinancialPlanCreate,
+    "FinancialPlanner": FinancialPlanner,
+    "Home": Home,
     "ProductCatalogAdmin": ProductCatalogAdmin,
-    "CascoOfferDemo": CascoOfferDemo,
     "ProductConfigDemo": ProductConfigDemo,
+    "Services": Services,
     "_app": app,
 }
 

@@ -17,6 +17,8 @@ import UniqaHomeCalculator from '../components/products/UniqaHomeCalculator';
 import GeneraliHealthLineOffer from '../components/financial-plan/GeneraliHealthLineOffer';
 import UniqaHealthValueCalculator from '../components/financial-plan/UniqaHealthValueCalculator';
 import PlaceholderCalculator from '../components/products/PlaceholderCalculator';
+import MortgageCalculator from '../components/calculators/MortgageCalculator';
+import ConsumerLoanCalculator from '../components/calculators/ConsumerLoanCalculator';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";

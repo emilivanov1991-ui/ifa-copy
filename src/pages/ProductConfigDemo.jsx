@@ -14,7 +14,8 @@ import DZIGOCalculator from '../components/products/DZIGOCalculator';
 import DZIBestDoctorsCalculator from '../components/products/DZIBestDoctorsCalculator';
 import UniqaZaNashetoZdraveCalculator from '../components/products/UniqaZaNashetoZdraveCalculator';
 import UniqaHomeCalculator from '../components/products/UniqaHomeCalculator';
-import GeneraliHealthLineOffer from '../components/financial-plan/GeneraliHealthLineOffer';
+import GeneraliHealthLineBasic from '../components/financial-plan/GeneraliHealthLineBasic';
+import GeneraliHealthLinePlus from '../components/financial-plan/GeneraliHealthLinePlus';
 import UniqaHealthValueCalculator from '../components/financial-plan/UniqaHealthValueCalculator';
 import PlaceholderCalculator from '../components/products/PlaceholderCalculator';
 import MortgageCalculator from '../components/calculators/MortgageCalculator';
@@ -329,23 +330,21 @@ export default function ProductConfigDemo() {
 
           {/* Generali Products */}
           <TabsContent value="generali" className="space-y-4">
-            <Tabs defaultValue="health" className="w-full">
-              <TabsList className="grid w-full grid-cols-2 lg:grid-cols-4 mb-4 bg-red-50 p-1 rounded-lg">
-                <TabsTrigger value="health">Health Line</TabsTrigger>
+            <Tabs defaultValue="health-basic" className="w-full">
+              <TabsList className="grid w-full grid-cols-2 lg:grid-cols-5 mb-4 bg-red-50 p-1 rounded-lg text-xs">
+                <TabsTrigger value="health-basic">Health Line Basic</TabsTrigger>
+                <TabsTrigger value="health-plus">Health Line Plus</TabsTrigger>
                 <TabsTrigger value="home">Домашно Имущество</TabsTrigger>
                 <TabsTrigger value="casco">Каско</TabsTrigger>
                 <TabsTrigger value="go">ГО</TabsTrigger>
               </TabsList>
 
-              <TabsContent value="health">
-                <GeneraliHealthLineOffer 
-                  beneficiaryName="Демо клиент"
-                  plan="plus"
-                  monthlyPremium={85}
-                  annualPremium={1020}
-                  isInsured={true}
-                  showPrint={false}
-                />
+              <TabsContent value="health-basic">
+                <GeneraliHealthLineBasic />
+              </TabsContent>
+
+              <TabsContent value="health-plus">
+                <GeneraliHealthLinePlus />
               </TabsContent>
 
               <TabsContent value="home">

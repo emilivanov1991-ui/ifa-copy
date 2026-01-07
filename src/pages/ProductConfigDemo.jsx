@@ -20,6 +20,8 @@ import UniqaHealthValueCalculator from '../components/financial-plan/UniqaHealth
 import PlaceholderCalculator from '../components/products/PlaceholderCalculator';
 import MortgageCalculator from '../components/calculators/MortgageCalculator';
 import ConsumerLoanCalculator from '../components/calculators/ConsumerLoanCalculator';
+import OBBPillar2Calculator from '../components/calculators/OBBPillar2Calculator';
+import OBBPillar3Calculator from '../components/calculators/OBBPillar3Calculator';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -458,18 +460,16 @@ export default function ProductConfigDemo() {
               </TabsList>
 
               <TabsContent value="pillar2">
-                <PlaceholderCalculator 
-                  productName="Втори стълб - ДЗПО"
-                  provider="ОББ Пенсионно осигуряване"
-                  description="Допълнително задължително пенсионно осигуряване. Моля предоставете такси, доходност и условия."
+                <OBBPillar2Calculator 
+                  analysisId={demoAnalysisId}
+                  clientId={demoClientId}
                 />
               </TabsContent>
 
               <TabsContent value="pillar3">
-                <PlaceholderCalculator 
-                  productName="Трети стълб - ДДПО"
-                  provider="ОББ Пенсионно осигуряване"
-                  description="Допълнително доброволно пенсионно осигуряване. Моля предоставете такси, доходност и условия."
+                <OBBPillar3Calculator 
+                  analysisId={demoAnalysisId}
+                  clientId={demoClientId}
                 />
               </TabsContent>
             </Tabs>

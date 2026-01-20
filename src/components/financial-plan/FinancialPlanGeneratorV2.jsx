@@ -145,6 +145,7 @@ export default function FinancialPlanGeneratorV2({ analysisId, analysisData }) {
       const totalTaxRelief = monthlyPremium * 12 * 0.10 * clientData.yearsToRetirement;
       const projectedValue = monthlyPremium * 12 * clientData.yearsToRetirement * 1.08; // 8% доходност
       const dailyCostInsurance = (monthlyPremium * 12 / 365).toFixed(2);
+      const monthlyBalance = clientData.monthlyBalance;
 
       // Създаваме записа за плана
       const plan = {
@@ -159,7 +160,8 @@ export default function FinancialPlanGeneratorV2({ analysisId, analysisData }) {
           projectedValue,
           dailyCostInsurance,
           reserveAfterPlan: reserveAfterAnnualPlan,
-          reserveMonths: reserveInMonths
+          reserveMonths: reserveInMonths,
+          monthlyBalance
         }
       };
 

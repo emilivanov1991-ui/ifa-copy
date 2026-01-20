@@ -7,6 +7,100 @@ import { ChevronLeft, ChevronRight, Download, X, CheckCircle, TrendingUp, Shield
 import { downloadFinancialPlanPDF } from './FinancialPlanPDFGenerator';
 import { toast } from 'sonner';
 
+// Calculate wealth projection with correct formulas
+const calculateWealthProjection = (planData, clientData, analysisData) => {
+  const monthsToRetirement = (clientData.yearsToRetirement || 0) * 12;
+  const monthlyBalance = planData.calculations?.monthlyBalance || 0;
+  const totalMonthlyPremium = planData.total_monthly_premium || 0;
+  const monthlyReserve = monthlyBalance - totalMonthlyPremium;
+  
+  // WITHOUT PLAN - just monthly savings
+  const withoutPlan = monthlyBalance * monthsToRetirement;
+  
+  // WITH PLAN - detailed calculation
+  
+  // 1. УПФ accumulated (using 5% contribution, 6% return, до 65г)
+  const grossIncome = (analysisData?.client_gross_income || 0) + (analysisData?.partner_gross_income || 0);
+  const maxInsurableIncome = 3400; // BGN cap
+  const monthlyContribution = Math.min(grossIncome, maxInsurableIncome) * 0.05;
+  const yearsToRetirement = clientData.yearsToRetirement || 30;
+  const upfReturn = 0.06 / 12; // 6% annual = 0.5% monthly
+  const upfMonths = yearsToRetirement * 12;
+  const upfValue = monthlyContribution * (((Math.pow(1 + upfReturn, upfMonths) - 1) / upfReturn) * (1 + upfReturn));
+  
+  // 2. 30% от надплатени лихви по ипотека
+  const mortgageAmount = analysisData?.liability_mortgage || 0;
+  const mortgageRate = 0.06; // 6% средно
+  const mortgageTerm = 20; // средно 20 години
+  let mortgageInterestSavings = 0;
+  if (mortgageAmount > 0) {
+    const totalInterestPaid = (mortgageAmount * mortgageRate * mortgageTerm) * 0.5; // approximate
+    mortgageInterestSavings = totalInterestPaid * 0.3;
+  }
+  
+  // 3. Стойност на имот (ако ще се закупува)
+  const propertyValue = analysisData?.planning_housing_change && analysisData?.planned_housing_value 
+    ? analysisData.planned_housing_value 
+    : 0;
+  
+  // 4. Unit Linked инвестиции до 65г (8% доходност)
+  const ulProducts = (planData.products || []).filter(p => 
+    p.name.includes('Unit Linked') && !p.name.includes('Junior')
+  );
+  const ulMonthlyPremium = ulProducts.reduce((sum, p) => sum + (p.monthlyPremium || 0), 0);
+  const ulReturn = 0.08 / 12; // 8% annual
+  const ulValue = ulMonthlyPremium * (((Math.pow(1 + ulReturn, upfMonths) - 1) / ulReturn) * (1 + ulReturn));
+  
+  // 5. Unit Linked Junior до 19г
+  const juniorProducts = (planData.products || []).filter(p => p.name.includes('Junior'));
+  const juniorMonthlyPremium = juniorProducts.reduce((sum, p) => sum + (p.monthlyPremium || 0), 0);
+  const juniorYears = Math.max(19 - 5, 0); // assume child is 5 years old
+  const juniorMonths = juniorYears * 12;
+  const juniorValue = juniorMonthlyPremium > 0 
+    ? juniorMonthlyPremium * (((Math.pow(1 + ulReturn, juniorMonths) - 1) / ulReturn) * (1 + ulReturn))
+    : 0;
+  
+  // 6. Резервен остатък * месеци
+  const reserveAccumulation = monthlyReserve * monthsToRetirement;
+  
+  const withPlan = upfValue + mortgageInterestSavings + propertyValue + ulValue + juniorValue + reserveAccumulation;
+  
+  return { withoutPlan, withPlan, monthlyReserve };
+};
+
+// Calculate allocation breakdown including reserve
+const calculateAllocation = (planData, monthlyReserve) => {
+  const products = planData.products || [];
+  let investments = 0;
+  let incomeProtection = 0;
+  let propertyProtection = 0;
+  let loans = 0;
+  
+  products.forEach(p => {
+    const premium = p.monthlyPremium || 0;
+    if (p.name.includes('Unit Linked') || p.name.includes('УПФ')) {
+      investments += premium;
+    } else if (p.name.includes('Uniqa') || p.name.includes('Generali') || p.name.includes('Срочен живот') || p.name.includes('Care')) {
+      incomeProtection += premium;
+    } else if (p.name.includes('Дом') || p.name.includes('Каско')) {
+      propertyProtection += premium;
+    } else if (p.name.includes('кредит') || p.name.includes('Ипотека')) {
+      loans += premium;
+    }
+  });
+  
+  const reserve = Math.max(monthlyReserve, 0);
+  const total = investments + incomeProtection + propertyProtection + loans + reserve || 1;
+  
+  return {
+    investments: { amount: investments, percent: (investments / total) * 100 },
+    incomeProtection: { amount: incomeProtection, percent: (incomeProtection / total) * 100 },
+    propertyProtection: { amount: propertyProtection, percent: (propertyProtection / total) * 100 },
+    loans: { amount: loans, percent: (loans / total) * 100 },
+    reserve: { amount: reserve, percent: (reserve / total) * 100 }
+  };
+};
+
 export default function FinancialPlanPresentation({ planData, clientData, analysisData, onClose }) {
   const [currentSlide, setCurrentSlide] = useState(0);
 

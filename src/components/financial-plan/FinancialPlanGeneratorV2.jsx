@@ -27,6 +27,7 @@ import FinancialPlanPresentation from './FinancialPlanPresentation';
 export default function FinancialPlanGeneratorV2({ analysisId, analysisData }) {
   const [isGenerating, setIsGenerating] = useState(false);
   const [generatedPlan, setGeneratedPlan] = useState(null);
+  const [showPresentation, setShowPresentation] = useState(false);
 
   // Извличане на данни от анализа
   const clientData = useMemo(() => {
@@ -195,8 +196,25 @@ export default function FinancialPlanGeneratorV2({ analysisId, analysisData }) {
     );
   }
 
+  const handleShowPresentation = async () => {
+    if (!generatedPlan) {
+      await calculatePlan();
+    }
+    setShowPresentation(true);
+  };
+
   return (
-    <div className="space-y-6">
+    <>
+      {showPresentation && generatedPlan && (
+        <FinancialPlanPresentation
+          planData={generatedPlan}
+          clientData={clientData}
+          analysisData={analysisData}
+          onClose={() => setShowPresentation(false)}
+        />
+      )}
+      
+      <div className="space-y-6">
       {/* Hero Section - Value Proposition */}
       <Card className="bg-gradient-to-br from-blue-600 via-indigo-600 to-violet-700 text-white shadow-2xl border-0 overflow-hidden">
         <CardContent className="p-8 md:p-12 relative">
@@ -221,7 +239,7 @@ export default function FinancialPlanGeneratorV2({ analysisId, analysisData }) {
 
             {!generatedPlan && (
               <Button 
-                onClick={calculatePlan}
+                onClick={handleShowPresentation}
                 disabled={isGenerating}
                 size="lg"
                 className="bg-white text-blue-700 hover:bg-blue-50 shadow-xl text-lg px-8 py-6 rounded-xl font-semibold"
@@ -238,6 +256,18 @@ export default function FinancialPlanGeneratorV2({ analysisId, analysisData }) {
                     <ArrowRight className="w-5 h-5 ml-2" />
                   </>
                 )}
+              </Button>
+            )}
+            
+            {generatedPlan && (
+              <Button 
+                onClick={handleShowPresentation}
+                size="lg"
+                className="bg-white text-blue-700 hover:bg-blue-50 shadow-xl text-lg px-8 py-6 rounded-xl font-semibold"
+              >
+                <FileText className="w-5 h-5 mr-2" />
+                Презентирай плана
+                <ArrowRight className="w-5 h-5 ml-2" />
               </Button>
             )}
           </div>
@@ -464,6 +494,7 @@ export default function FinancialPlanGeneratorV2({ analysisId, analysisData }) {
           </Card>
         </motion.div>
       )}
-    </div>
+      </div>
+    </>
   );
 }

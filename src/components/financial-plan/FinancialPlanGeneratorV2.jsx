@@ -21,6 +21,7 @@ import {
 import { base44 } from '@/api/base44Client';
 import { toast } from 'sonner';
 import { motion } from 'framer-motion';
+import { downloadFinancialPlanPDF } from './FinancialPlanPDFGenerator';
 
 export default function FinancialPlanGeneratorV2({ analysisId, analysisData }) {
   const [isGenerating, setIsGenerating] = useState(false);
@@ -402,6 +403,16 @@ export default function FinancialPlanGeneratorV2({ analysisId, analysisData }) {
                 <Button 
                   size="lg" 
                   variant="outline"
+                  onClick={() => {
+                    const clientInfo = {
+                      name: `${analysisData?.client_first_name || ''} ${analysisData?.client_last_name || ''}`.trim(),
+                      age: clientData?.age,
+                      retirementAge: clientData?.retirementAge,
+                      yearsToRetirement: clientData?.yearsToRetirement
+                    };
+                    downloadFinancialPlanPDF(generatedPlan, clientInfo);
+                    toast.success('✓ PDF файлът се изтегля');
+                  }}
                   className="flex-1 border-2 border-blue-600 text-blue-700 hover:bg-blue-50 text-lg py-6"
                 >
                   <Download className="w-5 h-5 mr-2" />

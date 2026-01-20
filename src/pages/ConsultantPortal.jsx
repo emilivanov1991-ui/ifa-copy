@@ -286,7 +286,7 @@ export default function ConsultantPortal() {
             >
               {activeTab === 'dashboard' && <ConsultantDashboard onNavigate={setActiveTab} />}
               {activeTab === 'crm' && <ConsultantCRMAdvanced isAdmin={currentUser?.role === 'admin'} />}
-              {activeTab === 'dossiers' && <ClientDossierView />}
+              {activeTab === 'dossiers' && <DossiersManager />}
               {activeTab === 'analysis' && (
                 <motion.div
                   initial={{ opacity: 0, scale: 0.95 }}

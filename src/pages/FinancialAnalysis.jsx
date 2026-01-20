@@ -715,14 +715,15 @@ export default function FinancialAnalysis() {
       }
     });
 
-    await base44.entities.FinancialAnalysisSubmission.create(cleanData);
+    // Създаваме анализа
+    const analysisSubmission = await base44.entities.FinancialAnalysisSubmission.create(cleanData);
 
     // Generate passwords for portal access
     const clientPassword = generatePassword();
     const partnerPassword = generatePassword();
 
-    // Create Client record for client
-    await base44.entities.Client.create({
+    // Create Client record for client с връзка към анализа
+    const clientRecord = await base44.entities.Client.create({
       first_name: formData.client_first_name,
       last_name: formData.client_last_name,
       email: formData.client_email,
@@ -742,6 +743,11 @@ export default function FinancialAnalysis() {
         status: 'pending'
       });
     }
+
+    // Обновяваме анализа с връзка към клиента
+    await base44.entities.FinancialAnalysisSubmission.update(analysisSubmission.id, {
+      client_id: clientRecord.id
+    });
 
     // Send emails to client and partner
     const clientName = `${formData.client_first_name} ${formData.client_last_name}`;

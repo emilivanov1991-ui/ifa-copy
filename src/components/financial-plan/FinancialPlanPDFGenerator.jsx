@@ -1,440 +1,322 @@
+import html2canvas from 'html2canvas';
 import { jsPDF } from 'jspdf';
 
-export const generateFinancialPlanPDF = (planData, clientData) => {
-  const doc = new jsPDF();
-  const pageWidth = doc.internal.pageSize.getWidth();
-  const pageHeight = doc.internal.pageSize.getHeight();
-  
-  // Colors (RGB)
-  const primaryBlue = [37, 99, 235]; // blue-600
-  const secondaryIndigo = [99, 102, 241]; // indigo-500
-  const accentGreen = [34, 197, 94]; // green-500
-  const textDark = [15, 23, 42]; // slate-900
-  const textGray = [100, 116, 139]; // slate-500
-  
-  let yPos = 20;
+// Helper to create HTML template for PDF
+const createPDFTemplate = (planData, clientData) => {
+  return `
+    <div id="pdf-content" style="font-family: Arial, sans-serif; width: 210mm; background: white;">
+      <!-- Page 1 - Cover -->
+      <div style="height: 297mm; display: flex; flex-direction: column; position: relative; overflow: hidden;">
+        <!-- Gradient Header -->
+        <div style="height: 180px; background: linear-gradient(135deg, #2563eb 0%, #4f46e5 50%, #7c3aed 100%); position: relative;">
+          <div style="position: absolute; top: 20px; left: 20px; width: 50px; height: 50px; background: white; border-radius: 50%;"></div>
+        </div>
+        
+        <!-- Title -->
+        <div style="text-align: center; margin-top: 40px;">
+          <h1 style="font-size: 42px; font-weight: bold; color: #0f172a; margin: 0; line-height: 1.2;">
+            Персонализиран<br/>Финансов план
+          </h1>
+          <p style="color: #64748b; font-size: 16px; margin-top: 10px;">
+            Вашият път към финансова свобода
+          </p>
+        </div>
+        
+        <!-- Client Info -->
+        <div style="text-align: center; margin-top: 30px;">
+          <p style="color: #64748b; font-size: 14px; margin-bottom: 5px;">Подготвен за:</p>
+          <p style="font-size: 24px; font-weight: bold; color: #0f172a; margin: 5px 0;">
+            ${clientData.name || 'Клиент'}
+          </p>
+          ${clientData.age ? `<p style="color: #64748b; font-size: 14px; margin-top: 5px;">${clientData.age} години</p>` : ''}
+        </div>
+        
+        <!-- Date Info -->
+        <div style="text-align: center; margin-top: 20px;">
+          <p style="color: #64748b; font-size: 12px;">
+            Дата: ${new Date().toLocaleDateString('bg-BG')}<br/>
+            Валидност: 30 дни
+          </p>
+        </div>
+        
+        <!-- Guarantees Box -->
+        <div style="margin: 30px 40px; padding: 25px; background: #f8fafc; border-radius: 12px;">
+          <h3 style="color: #2563eb; font-size: 16px; margin-bottom: 15px;">🛡️ Вашите гаранции</h3>
+          <div style="font-size: 12px; color: #0f172a; line-height: 1.8;">
+            <div>✓ 20 дни за канселиране с пълно възстановяване</div>
+            <div>✓ Данъчно облекчение до 10% годишно</div>
+            <div>✓ 24/7 Customer Support винаги на линия</div>
+            <div>✓ Личен консултант - среща в рамките на 3 работни дни</div>
+          </div>
+        </div>
+        
+        <!-- Footer -->
+        <div style="position: absolute; bottom: 20px; left: 0; right: 0; text-align: center; color: #94a3b8; font-size: 11px;">
+          APEX Financial - Независими финансови консултанти
+        </div>
+      </div>
 
-  // Helper function to add gradient header (simulated with rectangles)
-  const addGradientHeader = () => {
-    doc.setFillColor(...primaryBlue);
-    doc.rect(0, 0, pageWidth / 2, 60, 'F');
-    doc.setFillColor(...secondaryIndigo);
-    doc.rect(pageWidth / 2, 0, pageWidth / 2, 60, 'F');
-  };
+      <!-- Page 2 - Investment Summary -->
+      <div style="height: 297mm; display: flex; flex-direction: column; page-break-before: always;">
+        <!-- Header -->
+        <div style="background: #2563eb; padding: 20px 40px; color: white;">
+          <h2 style="font-size: 26px; margin: 0; font-weight: bold;">Инвестиционен план</h2>
+        </div>
+        
+        <!-- Price Box -->
+        <div style="margin: 30px 40px; padding: 25px; background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%); border-radius: 16px; text-align: center; border: 2px solid #bfdbfe;">
+          <p style="color: #64748b; font-size: 13px; margin-bottom: 5px;">Инвестиция от само</p>
+          <div style="display: flex; align-items: center; justify-content: center; gap: 10px;">
+            <span style="font-size: 56px; font-weight: bold; color: #2563eb;">
+              ${planData.total_monthly_premium?.toFixed(0) || '0'}
+            </span>
+            <div style="text-align: left;">
+              <p style="font-size: 20px; font-weight: 600; color: #0f172a; margin: 0;">лв/месец</p>
+              <p style="font-size: 13px; color: #64748b; margin: 3px 0 0 0;">
+                или ${planData.calculations?.dailyCostInsurance || '0'} лв/ден
+              </p>
+            </div>
+          </div>
+          <div style="margin-top: 15px;">
+            <span style="background: #d1fae5; color: #047857; padding: 8px 16px; border-radius: 20px; font-size: 13px; border: 1px solid #6ee7b7;">
+              Периодичност: ${
+                planData.payment_frequency === 'annual' ? 'Годишна' :
+                planData.payment_frequency === 'semiannual' ? 'Полугодишна' :
+                planData.payment_frequency === 'quarterly' ? 'Тримесечна' : 'Месечна'
+              }
+            </span>
+          </div>
+        </div>
+        
+        <!-- Products List -->
+        <div style="margin: 0 40px;">
+          <h3 style="font-size: 18px; font-weight: bold; color: #0f172a; margin-bottom: 15px;">
+            Включени продукти:
+          </h3>
+          ${(planData.products || []).map(product => `
+            <div style="background: #f8fafc; padding: 18px; border-radius: 12px; margin-bottom: 12px; display: flex; align-items: start; border: 1px solid #e2e8f0;">
+              <div style="width: 24px; height: 24px; background: #22c55e; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; font-size: 14px; flex-shrink: 0;">✓</div>
+              <div style="flex: 1; margin-left: 15px;">
+                <p style="font-size: 14px; font-weight: bold; color: #0f172a; margin: 0;">
+                  ${product.name}
+                </p>
+                <p style="font-size: 12px; color: #64748b; margin: 3px 0 0 0;">
+                  ${product.benefit}
+                </p>
+                ${product.coverage ? `<p style="font-size: 11px; color: #94a3b8; margin: 3px 0 0 0;">Покритие: ${product.coverage.toLocaleString()} лв</p>` : ''}
+              </div>
+              <div style="text-align: right; margin-left: 15px;">
+                <p style="font-size: 16px; font-weight: bold; color: #2563eb; margin: 0;">
+                  ${product.monthlyPremium === 0 ? 'БЕЗПЛАТНО' : `${product.monthlyPremium.toFixed(0)} лв/мес`}
+                </p>
+              </div>
+            </div>
+          `).join('')}
+        </div>
+      </div>
 
-  // Page 1 - Cover
-  addGradientHeader();
-  
-  // Logo/Icon placeholder
-  doc.setFillColor(255, 255, 255);
-  doc.circle(30, 30, 8, 'F');
-  
-  // Title
-  doc.setTextColor(255, 255, 255);
-  doc.setFontSize(28);
-  doc.setFont(undefined, 'bold');
-  doc.text('Персонализиран', pageWidth / 2, 85, { align: 'center' });
-  doc.text('Финансов план', pageWidth / 2, 100, { align: 'center' });
-  
-  doc.setFontSize(12);
-  doc.setFont(undefined, 'normal');
-  doc.text('Вашият път към финансова свобода', pageWidth / 2, 115, { align: 'center' });
-  
-  // Client info
-  doc.setTextColor(...textDark);
-  doc.setFontSize(14);
-  doc.setFont(undefined, 'bold');
-  yPos = 140;
-  doc.text('Подготвен за:', pageWidth / 2, yPos, { align: 'center' });
-  
-  doc.setFontSize(18);
-  yPos += 10;
-  doc.text(`${clientData.name || 'Клиент'}`, pageWidth / 2, yPos, { align: 'center' });
-  
-  doc.setFontSize(10);
-  doc.setFont(undefined, 'normal');
-  doc.setTextColor(...textGray);
-  yPos += 8;
-  if (clientData.age) {
-    doc.text(`${clientData.age} години`, pageWidth / 2, yPos, { align: 'center' });
-  }
-  
-  // Date
-  yPos = 170;
-  doc.setFontSize(10);
-  doc.text(`Дата: ${new Date().toLocaleDateString('bg-BG')}`, pageWidth / 2, yPos, { align: 'center' });
-  doc.text(`Валидност: 30 дни`, pageWidth / 2, yPos + 6, { align: 'center' });
-  
-  // Guarantees box
-  yPos = 200;
-  doc.setFillColor(245, 247, 250);
-  doc.roundedRect(15, yPos, pageWidth - 30, 60, 3, 3, 'F');
-  
-  doc.setTextColor(...primaryBlue);
-  doc.setFontSize(11);
-  doc.setFont(undefined, 'bold');
-  doc.text('🛡️ Вашите гаранции', 20, yPos + 10);
-  
-  doc.setTextColor(...textDark);
-  doc.setFontSize(9);
-  doc.setFont(undefined, 'normal');
-  const guarantees = [
-    '✓ 20 дни за канселиране с пълно възстановяване',
-    '✓ Данъчно облекчение до 10% годишно',
-    '✓ 24/7 Customer Support винаги на линия',
-    '✓ Личен консултант - среща в рамките на 3 работни дни'
-  ];
-  
-  guarantees.forEach((g, idx) => {
-    doc.text(g, 25, yPos + 20 + (idx * 7));
-  });
+      <!-- Page 3 - Financial Impact -->
+      <div style="height: 297mm; display: flex; flex-direction: column; page-break-before: always;">
+        <!-- Header -->
+        <div style="background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%); padding: 20px 40px; color: white;">
+          <h2 style="font-size: 26px; margin: 0; font-weight: bold;">Финансов ефект</h2>
+        </div>
+        
+        <!-- Metrics Grid -->
+        <div style="margin: 30px 40px; display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+          <!-- Metric 1 -->
+          <div style="background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%); padding: 20px; border-radius: 12px; border: 1px solid #93c5fd;">
+            <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
+              <span style="font-size: 20px;">🛡️</span>
+              <p style="font-size: 12px; color: #475569; margin: 0;">Защитен трудов капитал</p>
+            </div>
+            <p style="font-size: 28px; font-weight: bold; color: #2563eb; margin: 5px 0;">
+              ${((planData.calculations?.laborCapital || 0) / 1000000).toFixed(1)}M лв
+            </p>
+            <p style="font-size: 10px; color: #64748b; margin: 0;">Вашият бъдещ доход защитен</p>
+          </div>
+          
+          <!-- Metric 2 -->
+          <div style="background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%); padding: 20px; border-radius: 12px; border: 1px solid #6ee7b7;">
+            <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
+              <span style="font-size: 20px;">📈</span>
+              <p style="font-size: 12px; color: #475569; margin: 0;">Данъчно облекчение</p>
+            </div>
+            <p style="font-size: 28px; font-weight: bold; color: #16a34a; margin: 5px 0;">
+              ${(planData.calculations?.totalTaxRelief || 0).toLocaleString()} лв
+            </p>
+            <p style="font-size: 10px; color: #64748b; margin: 0;">
+              Спестени данъци за ${clientData.yearsToRetirement || 0} години
+            </p>
+          </div>
+          
+          <!-- Metric 3 -->
+          <div style="background: linear-gradient(135deg, #e9d5ff 0%, #d8b4fe 100%); padding: 20px; border-radius: 12px; border: 1px solid #c084fc;">
+            <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
+              <span style="font-size: 20px;">✨</span>
+              <p style="font-size: 12px; color: #475569; margin: 0;">Прогнозна стойност</p>
+            </div>
+            <p style="font-size: 28px; font-weight: bold; color: #9333ea; margin: 5px 0;">
+              ${((planData.calculations?.projectedValue || 0) / 1000000).toFixed(1)}M лв
+            </p>
+            <p style="font-size: 10px; color: #64748b; margin: 0;">
+              При пенсиониране (${clientData.retirementAge || 65} години)
+            </p>
+          </div>
+          
+          <!-- Metric 4 -->
+          <div style="background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%); padding: 20px; border-radius: 12px; border: 1px solid #fcd34d;">
+            <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
+              <span style="font-size: 20px;">💰</span>
+              <p style="font-size: 12px; color: #475569; margin: 0;">Резерв след план</p>
+            </div>
+            <p style="font-size: 28px; font-weight: bold; color: #d97706; margin: 5px 0;">
+              ${(planData.calculations?.reserveMonths || 0).toFixed(1)} мес
+            </p>
+            <p style="font-size: 10px; color: #64748b; margin: 0;">
+              ${(planData.calculations?.reserveAfterPlan || 0).toLocaleString()} лв наличност
+            </p>
+          </div>
+        </div>
+        
+        <!-- Important Notice -->
+        <div style="margin: 20px 40px; padding: 20px; background: #fef3c7; border-left: 4px solid #f59e0b; border-radius: 8px;">
+          <div style="display: flex; align-items: start; gap: 12px;">
+            <span style="font-size: 20px;">⚠️</span>
+            <div>
+              <p style="font-weight: bold; color: #92400e; margin: 0 0 5px 0; font-size: 14px;">
+                Този план важи 30 дни
+              </p>
+              <p style="color: #b45309; font-size: 12px; margin: 0;">
+                Пазарните условия се променят. Запазете вашите условия днес.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
 
-  // Footer
-  doc.setFontSize(8);
-  doc.setTextColor(...textGray);
-  doc.text('APEX Financial - Независими финансови консултанти', pageWidth / 2, pageHeight - 10, { align: 'center' });
-
-  // Page 2 - Investment Summary
-  doc.addPage();
-  yPos = 20;
-  
-  // Header
-  doc.setFillColor(...primaryBlue);
-  doc.rect(0, 0, pageWidth, 40, 'F');
-  doc.setTextColor(255, 255, 255);
-  doc.setFontSize(18);
-  doc.setFont(undefined, 'bold');
-  doc.text('Инвестиционен план', 20, 25);
-  
-  yPos = 55;
-  
-  // Main price box
-  doc.setFillColor(239, 246, 255);
-  doc.roundedRect(15, yPos, pageWidth - 30, 35, 3, 3, 'F');
-  
-  doc.setTextColor(...textGray);
-  doc.setFontSize(9);
-  doc.text('Инвестиция от само', pageWidth / 2, yPos + 8, { align: 'center' });
-  
-  doc.setTextColor(...primaryBlue);
-  doc.setFontSize(24);
-  doc.setFont(undefined, 'bold');
-  doc.text(`${planData.total_monthly_premium?.toFixed(0) || '0'} лв/месец`, pageWidth / 2, yPos + 20, { align: 'center' });
-  
-  doc.setFontSize(9);
-  doc.setFont(undefined, 'normal');
-  doc.setTextColor(...textGray);
-  doc.text(`или ${planData.calculations?.dailyCostInsurance || '0'} лв/ден`, pageWidth / 2, yPos + 28, { align: 'center' });
-  
-  yPos += 45;
-  
-  // Products list
-  doc.setTextColor(...textDark);
-  doc.setFontSize(14);
-  doc.setFont(undefined, 'bold');
-  doc.text('Включени продукти:', 20, yPos);
-  yPos += 10;
-  
-  if (planData.products && planData.products.length > 0) {
-    planData.products.forEach((product, idx) => {
-      // Product box
-      doc.setFillColor(248, 250, 252);
-      doc.roundedRect(15, yPos, pageWidth - 30, 20, 2, 2, 'F');
-      
-      // Check icon
-      doc.setFillColor(...accentGreen);
-      doc.circle(22, yPos + 10, 3, 'F');
-      doc.setTextColor(255, 255, 255);
-      doc.setFontSize(8);
-      doc.text('✓', 22, yPos + 11, { align: 'center' });
-      
-      // Product name
-      doc.setTextColor(...textDark);
-      doc.setFontSize(10);
-      doc.setFont(undefined, 'bold');
-      doc.text(product.name, 30, yPos + 8);
-      
-      // Benefit
-      doc.setFontSize(8);
-      doc.setFont(undefined, 'normal');
-      doc.setTextColor(...textGray);
-      doc.text(product.benefit, 30, yPos + 14);
-      
-      // Price
-      doc.setTextColor(...primaryBlue);
-      doc.setFontSize(10);
-      doc.setFont(undefined, 'bold');
-      const priceText = product.monthlyPremium === 0 ? 'БЕЗПЛАТНО' : `${product.monthlyPremium.toFixed(0)} лв/мес`;
-      doc.text(priceText, pageWidth - 20, yPos + 10, { align: 'right' });
-      
-      yPos += 25;
-      
-      // Add new page if needed
-      if (yPos > 250 && idx < planData.products.length - 1) {
-        doc.addPage();
-        yPos = 20;
-      }
-    });
-  }
-  
-  // Page 3 - Financial Impact
-  doc.addPage();
-  yPos = 20;
-  
-  // Header
-  doc.setFillColor(...secondaryIndigo);
-  doc.rect(0, 0, pageWidth, 40, 'F');
-  doc.setTextColor(255, 255, 255);
-  doc.setFontSize(18);
-  doc.setFont(undefined, 'bold');
-  doc.text('Финансов ефект', 20, 25);
-  
-  yPos = 55;
-  
-  // Key metrics in grid
-  const metrics = [
-    {
-      icon: '🛡️',
-      label: 'Защитен трудов капитал',
-      value: `${((planData.calculations?.laborCapital || 0) / 1000000).toFixed(1)}M лв`,
-      subtitle: 'Вашият бъдещ доход защитен',
-      color: [59, 130, 246] // blue
-    },
-    {
-      icon: '📈',
-      label: 'Данъчно облекчение',
-      value: `${(planData.calculations?.totalTaxRelief || 0).toLocaleString()} лв`,
-      subtitle: `Спестени данъци за ${clientData.yearsToRetirement || 0} години`,
-      color: [34, 197, 94] // green
-    },
-    {
-      icon: '✨',
-      label: 'Прогнозна стойност',
-      value: `${((planData.calculations?.projectedValue || 0) / 1000000).toFixed(1)}M лв`,
-      subtitle: `При пенсиониране (${clientData.retirementAge || 65} години)`,
-      color: [168, 85, 247] // purple
-    },
-    {
-      icon: '💰',
-      label: 'Резерв след план',
-      value: `${(planData.calculations?.reserveMonths || 0).toFixed(1)} мес`,
-      subtitle: `${(planData.calculations?.reserveAfterPlan || 0).toLocaleString()} лв наличност`,
-      color: [245, 158, 11] // amber
-    }
-  ];
-  
-  metrics.forEach((metric, idx) => {
-    const col = idx % 2;
-    const row = Math.floor(idx / 2);
-    const x = 15 + col * (pageWidth / 2 - 5);
-    const y = yPos + row * 45;
-    
-    // Box
-    doc.setFillColor(245, 247, 250);
-    doc.roundedRect(x, y, (pageWidth / 2 - 20), 40, 3, 3, 'F');
-    
-    // Icon & Label
-    doc.setFontSize(16);
-    doc.text(metric.icon, x + 5, y + 12);
-    
-    doc.setTextColor(...textGray);
-    doc.setFontSize(9);
-    doc.setFont(undefined, 'normal');
-    doc.text(metric.label, x + 15, y + 10);
-    
-    // Value
-    doc.setTextColor(...metric.color);
-    doc.setFontSize(16);
-    doc.setFont(undefined, 'bold');
-    doc.text(metric.value, x + 15, y + 22);
-    
-    // Subtitle
-    doc.setTextColor(...textGray);
-    doc.setFontSize(7);
-    doc.setFont(undefined, 'normal');
-    doc.text(metric.subtitle, x + 15, y + 30);
-  });
-  
-  yPos += 100;
-  
-  // Payment frequency info
-  doc.setFillColor(239, 246, 255);
-  doc.roundedRect(15, yPos, pageWidth - 30, 25, 3, 3, 'F');
-  
-  doc.setTextColor(...textDark);
-  doc.setFontSize(11);
-  doc.setFont(undefined, 'bold');
-  doc.text('Препоръчителна периодичност на плащане:', 20, yPos + 10);
-  
-  doc.setTextColor(...accentGreen);
-  doc.setFontSize(12);
-  const frequencyText = 
-    planData.payment_frequency === 'annual' ? 'Годишна' :
-    planData.payment_frequency === 'semiannual' ? 'Полугодишна' :
-    planData.payment_frequency === 'quarterly' ? 'Тримесечна' : 'Месечна';
-  doc.text(frequencyText, 20, yPos + 20);
-  
-  yPos += 35;
-  
-  // Important notes
-  doc.setFillColor(254, 243, 199);
-  doc.roundedRect(15, yPos, pageWidth - 30, 30, 3, 3, 'F');
-  
-  doc.setFontSize(10);
-  doc.setTextColor(180, 83, 9);
-  doc.setFont(undefined, 'bold');
-  doc.text('⚠️ Важно:', 20, yPos + 10);
-  
-  doc.setFontSize(8);
-  doc.setFont(undefined, 'normal');
-  doc.text('Този план важи 30 дни. Пазарните условия се променят.', 20, yPos + 18);
-  doc.text('Запазете вашите условия днес.', 20, yPos + 24);
-  
-  // Page 4 - Guarantees & Next Steps
-  doc.addPage();
-  yPos = 20;
-  
-  // Dark header for guarantees
-  doc.setFillColor(15, 23, 42);
-  doc.rect(0, 0, pageWidth, 50, 'F');
-  
-  doc.setTextColor(255, 255, 255);
-  doc.setFontSize(18);
-  doc.setFont(undefined, 'bold');
-  doc.text('🛡️ Вашите гаранции', 20, 30);
-  
-  yPos = 65;
-  
-  const guaranteesList = [
-    {
-      title: '20 дни за канселиране',
-      desc: 'Пълно възстановяване без въпроси'
-    },
-    {
-      title: 'Данъчно облекчение',
-      desc: 'До 10% годишно спестяване'
-    },
-    {
-      title: '24/7 Customer Support',
-      desc: 'Винаги на линия за вас'
-    },
-    {
-      title: 'Личен консултант',
-      desc: 'Среща в рамките на 3 работни дни'
-    }
-  ];
-  
-  guaranteesList.forEach((guarantee, idx) => {
-    const col = idx % 2;
-    const row = Math.floor(idx / 2);
-    const x = 15 + col * (pageWidth / 2 - 5);
-    const y = yPos + row * 25;
-    
-    doc.setFillColor(248, 250, 252);
-    doc.roundedRect(x, y, (pageWidth / 2 - 20), 20, 2, 2, 'F');
-    
-    doc.setTextColor(...accentGreen);
-    doc.setFontSize(8);
-    doc.text('✓', x + 5, y + 10);
-    
-    doc.setTextColor(...textDark);
-    doc.setFontSize(10);
-    doc.setFont(undefined, 'bold');
-    doc.text(guarantee.title, x + 10, y + 8);
-    
-    doc.setFontSize(7);
-    doc.setFont(undefined, 'normal');
-    doc.setTextColor(...textGray);
-    doc.text(guarantee.desc, x + 10, y + 14);
-  });
-  
-  yPos += 60;
-  
-  // Social proof
-  doc.setFillColor(239, 246, 255);
-  doc.roundedRect(15, yPos, pageWidth - 30, 40, 3, 3, 'F');
-  
-  doc.setTextColor(...textDark);
-  doc.setFontSize(12);
-  doc.setFont(undefined, 'bold');
-  doc.text('Защо клиентите ни избират:', 20, yPos + 12);
-  
-  const stats = [
-    { value: '500+', label: 'Доволни клиенти' },
-    { value: '15+ год', label: 'Опит в бранша' },
-    { value: '98%', label: 'Препоръки' },
-    { value: '50M+ лв', label: 'Защитен капитал' }
-  ];
-  
-  doc.setFontSize(8);
-  doc.setFont(undefined, 'normal');
-  const statsY = yPos + 22;
-  stats.forEach((stat, idx) => {
-    const statX = 20 + idx * 42;
-    doc.setTextColor(...primaryBlue);
-    doc.setFontSize(11);
-    doc.setFont(undefined, 'bold');
-    doc.text(stat.value, statX, statsY);
-    
-    doc.setTextColor(...textGray);
-    doc.setFontSize(7);
-    doc.setFont(undefined, 'normal');
-    doc.text(stat.label, statX, statsY + 6);
-  });
-  
-  yPos += 50;
-  
-  // Next steps
-  doc.setTextColor(...textDark);
-  doc.setFontSize(14);
-  doc.setFont(undefined, 'bold');
-  doc.text('Следващи стъпки:', 20, yPos);
-  yPos += 10;
-  
-  const steps = [
-    'Свържете се с вашия личен консултант',
-    'Насрочете среща на удобно за вас време',
-    'Получете детайлна презентация на плана',
-    'Започнете инвестициите и защитете бъдещето си'
-  ];
-  
-  doc.setFontSize(9);
-  doc.setFont(undefined, 'normal');
-  doc.setTextColor(...textDark);
-  steps.forEach((step, idx) => {
-    doc.setFillColor(...primaryBlue);
-    doc.circle(22, yPos + 5 + idx * 10, 2, 'F');
-    doc.text(`${idx + 1}. ${step}`, 28, yPos + 7 + idx * 10);
-  });
-  
-  yPos += 50;
-  
-  // Contact CTA
-  doc.setFillColor(...primaryBlue);
-  doc.roundedRect(15, yPos, pageWidth - 30, 30, 5, 5, 'F');
-  
-  doc.setTextColor(255, 255, 255);
-  doc.setFontSize(14);
-  doc.setFont(undefined, 'bold');
-  doc.text('📞 Запазете среща с консултант', pageWidth / 2, yPos + 12, { align: 'center' });
-  
-  doc.setFontSize(9);
-  doc.setFont(undefined, 'normal');
-  doc.text('Телефон: +359 2 123 4567 | Email: info@apex-financial.bg', pageWidth / 2, yPos + 22, { align: 'center' });
-  
-  // Footer on all pages
-  for (let i = 1; i <= doc.getNumberOfPages(); i++) {
-    doc.setPage(i);
-    doc.setFontSize(8);
-    doc.setTextColor(...textGray);
-    doc.text(`Страница ${i} от ${doc.getNumberOfPages()}`, pageWidth - 20, pageHeight - 10, { align: 'right' });
-  }
-  
-  return doc;
+      <!-- Page 4 - Guarantees & Next Steps -->
+      <div style="height: 297mm; display: flex; flex-direction: column; page-break-before: always;">
+        <!-- Dark Header -->
+        <div style="background: #0f172a; padding: 30px 40px; color: white;">
+          <h2 style="font-size: 28px; margin: 0; font-weight: bold;">🛡️ Вашите гаранции</h2>
+        </div>
+        
+        <!-- Guarantees Grid -->
+        <div style="margin: 30px 40px; display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+          ${[
+            { title: '20 дни за канселиране', desc: 'Пълно възстановяване без въпроси' },
+            { title: 'Данъчно облекчение', desc: 'До 10% годишно спестяване' },
+            { title: '24/7 Customer Support', desc: 'Винаги на линия за вас' },
+            { title: 'Личен консултант', desc: 'Среща в рамките на 3 работни дни' }
+          ].map(g => `
+            <div style="background: #f8fafc; padding: 15px; border-radius: 8px; border: 1px solid #e2e8f0;">
+              <div style="display: flex; align-items: start; gap: 10px;">
+                <span style="color: #22c55e; font-weight: bold; font-size: 16px;">✓</span>
+                <div>
+                  <p style="font-weight: bold; color: #0f172a; margin: 0; font-size: 13px;">${g.title}</p>
+                  <p style="color: #64748b; font-size: 11px; margin: 3px 0 0 0;">${g.desc}</p>
+                </div>
+              </div>
+            </div>
+          `).join('')}
+        </div>
+        
+        <!-- Social Proof -->
+        <div style="margin: 20px 40px; padding: 25px; background: linear-gradient(135deg, #f1f5f9 0%, #e0f2fe 100%); border-radius: 12px; border: 1px solid #bae6fd;">
+          <h3 style="font-size: 16px; font-weight: bold; color: #0f172a; margin-bottom: 20px; text-align: center;">
+            Защо клиентите ни избират:
+          </h3>
+          <div style="display: flex; justify-content: space-around; text-align: center;">
+            ${[
+              { value: '500+', label: 'Доволни клиенти' },
+              { value: '15+ год', label: 'Опит в бранша' },
+              { value: '98%', label: 'Препоръки' },
+              { value: '50M+ лв', label: 'Защитен капитал' }
+            ].map(stat => `
+              <div>
+                <p style="font-size: 24px; font-weight: bold; color: #2563eb; margin: 0;">${stat.value}</p>
+                <p style="font-size: 11px; color: #64748b; margin: 5px 0 0 0;">${stat.label}</p>
+              </div>
+            `).join('')}
+          </div>
+        </div>
+        
+        <!-- Next Steps -->
+        <div style="margin: 20px 40px;">
+          <h3 style="font-size: 18px; font-weight: bold; color: #0f172a; margin-bottom: 15px;">
+            Следващи стъпки:
+          </h3>
+          ${[
+            'Свържете се с вашия личен консултант',
+            'Насрочете среща на удобно за вас време',
+            'Получете детайлна презентация на плана',
+            'Започнете инвестициите и защитете бъдещето си'
+          ].map((step, idx) => `
+            <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 10px;">
+              <div style="width: 28px; height: 28px; background: #2563eb; color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; flex-shrink: 0;">
+                ${idx + 1}
+              </div>
+              <p style="color: #0f172a; font-size: 13px; margin: 0;">${step}</p>
+            </div>
+          `).join('')}
+        </div>
+        
+        <!-- CTA -->
+        <div style="margin: 30px 40px; padding: 25px; background: #2563eb; border-radius: 16px; text-align: center;">
+          <p style="color: white; font-size: 20px; font-weight: bold; margin: 0 0 10px 0;">
+            📞 Запазете среща с консултант
+          </p>
+          <p style="color: #bfdbfe; font-size: 13px; margin: 0;">
+            Телефон: +359 2 123 4567 | Email: info@apex-financial.bg
+          </p>
+        </div>
+        
+        <!-- Footer -->
+        <div style="margin-top: auto; padding: 20px; text-align: center; color: #94a3b8; font-size: 11px;">
+          APEX Financial - Независими финансови консултанти
+        </div>
+      </div>
+    </div>
+  `;
 };
 
-export const downloadFinancialPlanPDF = (planData, clientData) => {
-  const doc = generateFinancialPlanPDF(planData, clientData);
-  const fileName = `Финансов_План_${clientData.name?.replace(/\s+/g, '_') || 'Клиент'}_${new Date().toISOString().split('T')[0]}.pdf`;
-  doc.save(fileName);
+export const downloadFinancialPlanPDF = async (planData, clientData) => {
+  // Create temporary container
+  const container = document.createElement('div');
+  container.style.position = 'fixed';
+  container.style.left = '-9999px';
+  container.style.top = '0';
+  container.innerHTML = createPDFTemplate(planData, clientData);
+  document.body.appendChild(container);
+
+  try {
+    const pdf = new jsPDF('p', 'mm', 'a4');
+    const pdfContent = container.querySelector('#pdf-content');
+    const pages = pdfContent.children;
+
+    for (let i = 0; i < pages.length; i++) {
+      if (i > 0) pdf.addPage();
+      
+      const canvas = await html2canvas(pages[i], {
+        scale: 2,
+        useCORS: true,
+        logging: false,
+        backgroundColor: '#ffffff'
+      });
+
+      const imgData = canvas.toDataURL('image/png');
+      const imgWidth = 210; // A4 width in mm
+      const imgHeight = (canvas.height * imgWidth) / canvas.width;
+      
+      pdf.addImage(imgData, 'PNG', 0, 0, imgWidth, imgHeight);
+    }
+
+    const fileName = `Финансов_План_${clientData.name?.replace(/\s+/g, '_') || 'Клиент'}_${new Date().toISOString().split('T')[0]}.pdf`;
+    pdf.save(fileName);
+    
+  } finally {
+    // Cleanup
+    document.body.removeChild(container);
+  }
 };

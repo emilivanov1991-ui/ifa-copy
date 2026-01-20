@@ -22,6 +22,7 @@ import { base44 } from '@/api/base44Client';
 import { toast } from 'sonner';
 import { motion } from 'framer-motion';
 import { downloadFinancialPlanPDF } from './FinancialPlanPDFGenerator';
+import FinancialPlanPresentation from './FinancialPlanPresentation';
 
 export default function FinancialPlanGeneratorV2({ analysisId, analysisData }) {
   const [isGenerating, setIsGenerating] = useState(false);

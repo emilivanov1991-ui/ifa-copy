@@ -1,0 +1,561 @@
+import React, { useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend, Area, AreaChart, Cell, Treemap } from 'recharts';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent } from '@/components/ui/card';
+import { ChevronLeft, ChevronRight, Download, X, CheckCircle, TrendingUp, Shield, Home, Wallet, DollarSign } from 'lucide-react';
+import { downloadFinancialPlanPDF } from './FinancialPlanPDFGenerator';
+import { toast } from 'sonner';
+
+export default function FinancialPlanPresentation({ planData, clientData, analysisData, onClose }) {
+  const [currentSlide, setCurrentSlide] = useState(0);
+
+  // Calculate data
+  const age = clientData?.age || 24;
+  const retirementAge = clientData?.retirementAge || 65;
+  const yearsToRetirement = clientData?.yearsToRetirement || (retirementAge - age);
+  const monthsToRetirement = yearsToRetirement * 12;
+  
+  // Capital chart data
+  const capitalData = Array.from({ length: Math.min(yearsToRetirement + 1, 42) }, (_, i) => {
+    const currentAge = age + i;
+    const progress = i / yearsToRetirement;
+    
+    return {
+      age: currentAge,
+      laborCapital: Math.max(100 - (progress * 100), 0),
+      financialCapital: Math.min(progress * 100, 100),
+    };
+  });
+
+  // Wealth comparison
+  const monthlyBalance = planData.calculations?.monthlyBalance || 0;
+  const withoutPlan = monthlyBalance * monthsToRetirement;
+  
+  const upfValue = planData.calculations?.upfAccumulated || 0;
+  const mortgageInterestSavings = (planData.calculations?.mortgageInterestSaved || 0) * 0.3;
+  const propertyValue = planData.calculations?.futurePropertyValue || 0;
+  const ulInvestments = planData.calculations?.ulInvestmentValue || 0;
+  const ulJuniorInvestments = planData.calculations?.ulJuniorValue || 0;
+  const reserveGrowth = (planData.calculations?.reserveAfterPlan || 0) * monthsToRetirement * 0.05;
+  
+  const withPlan = upfValue + mortgageInterestSavings + propertyValue + ulInvestments + ulJuniorInvestments + reserveGrowth;
+
+  const wealthComparisonData = [
+    {
+      name: 'БЕЗ план',
+      value: withoutPlan,
+      fill: '#94a3b8'
+    },
+    {
+      name: 'С НАШИЯ план',
+      value: withPlan,
+      fill: '#22c55e'
+    }
+  ];
+
+  // Allocation data
+  const products = planData.products || [];
+  let investments = 0, incomeProtection = 0, propertyProtection = 0, loans = 0;
+  
+  products.forEach(p => {
+    const premium = p.monthlyPremium || 0;
+    if (p.name.includes('Unit Linked') || p.name.includes('УПФ')) {
+      investments += premium;
+    } else if (p.name.includes('Uniqa') || p.name.includes('Generali') || p.name.includes('Срочен живот') || p.name.includes('Care')) {
+      incomeProtection += premium;
+    } else if (p.name.includes('Дом') || p.name.includes('Каско')) {
+      propertyProtection += premium;
+    } else if (p.name.includes('кредит') || p.name.includes('Ипотека')) {
+      loans += premium;
+    }
+  });
+
+  const allocationData = [
+    { name: 'Инвестиции', value: investments, color: '#3b82f6', icon: '📈' },
+    { name: 'Защита на дохода', value: incomeProtection, color: '#10b981', icon: '🛡️' },
+    { name: 'Защита на имущество', value: propertyProtection, color: '#f59e0b', icon: '🏠' },
+    { name: 'Кредити', value: loans, color: '#8b5cf6', icon: '💳' }
+  ].filter(item => item.value > 0);
+
+  const totalTaxRelief = planData.calculations?.totalTaxRelief || 0;
+  const dailyCost = ((planData.total_monthly_premium || 0) / 30).toFixed(2);
+
+  const slides = [
+    {
+      title: 'Трудов vs Финансов капитал',
+      content: (
+        <div className="space-y-6">
+          <div className="text-center">
+            <h2 className="text-3xl font-bold text-slate-900 mb-2">Вашата финансова стратегия</h2>
+            <p className="text-slate-600">Как изграждаме вашата финансова независимост</p>
+          </div>
+          
+          <ResponsiveContainer width="100%" height={400}>
+            <AreaChart data={capitalData}>
+              <defs>
+                <linearGradient id="laborGradient" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="5%" stopColor="#dc2626" stopOpacity={0.3}/>
+                  <stop offset="95%" stopColor="#dc2626" stopOpacity={0}/>
+                </linearGradient>
+                <linearGradient id="financialGradient" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="5%" stopColor="#2563eb" stopOpacity={0.3}/>
+                  <stop offset="95%" stopColor="#2563eb" stopOpacity={0}/>
+                </linearGradient>
+              </defs>
+              <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
+              <XAxis 
+                dataKey="age" 
+                label={{ value: 'Възраст', position: 'insideBottom', offset: -5 }}
+                stroke="#64748b"
+              />
+              <YAxis 
+                label={{ value: 'Капитал (%)', angle: -90, position: 'insideLeft' }}
+                stroke="#64748b"
+              />
+              <Tooltip 
+                contentStyle={{ backgroundColor: '#fff', border: '1px solid #e2e8f0', borderRadius: '8px' }}
+                labelFormatter={(value) => `Възраст: ${value}`}
+                formatter={(value, name) => [
+                  `${value.toFixed(0)}%`, 
+                  name === 'laborCapital' ? 'Трудов капитал' : 'Финансов капитал'
+                ]}
+              />
+              <Legend 
+                wrapperStyle={{ paddingTop: '20px' }}
+                formatter={(value) => value === 'laborCapital' ? 'Трудов капитал' : 'Финансов капитал'}
+              />
+              <Area 
+                type="monotone" 
+                dataKey="laborCapital" 
+                stroke="#dc2626" 
+                strokeWidth={3}
+                fill="url(#laborGradient)" 
+                name="laborCapital"
+              />
+              <Area 
+                type="monotone" 
+                dataKey="financialCapital" 
+                stroke="#2563eb" 
+                strokeWidth={3}
+                fill="url(#financialGradient)" 
+                name="financialCapital"
+              />
+            </AreaChart>
+          </ResponsiveContainer>
+
+          <Card className="bg-gradient-to-r from-blue-50 to-indigo-50 border-blue-200">
+            <CardContent className="p-6">
+              <div className="flex items-start gap-4">
+                <Shield className="w-8 h-8 text-blue-600 flex-shrink-0 mt-1" />
+                <div>
+                  <h4 className="font-bold text-slate-900 mb-2">Стратегия за успех</h4>
+                  <p className="text-sm text-slate-700 leading-relaxed">
+                    Докато вашият <strong className="text-red-600">трудов капитал</strong> постепенно намалява с приближаването на пенсионната възраст, 
+                    ние изграждаме вашия <strong className="text-blue-600">финансов капитал</strong> чрез инвестиции. 
+                    През целия период осигуряваме <strong className="text-red-600">защита</strong> на дохода ви, 
+                    за да гарантираме плавния преход към финансова независимост.
+                  </p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      )
+    },
+    {
+      title: 'Вашата инвестиция',
+      content: (
+        <div className="space-y-6">
+          <motion.div 
+            initial={{ scale: 0.9, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            transition={{ duration: 0.5 }}
+            className="text-center"
+          >
+            <h2 className="text-2xl font-bold text-slate-900 mb-4">Месечна инвестиция</h2>
+            <div className="bg-gradient-to-br from-blue-600 to-indigo-600 text-white rounded-2xl p-8 shadow-2xl">
+              <motion.div
+                initial={{ y: 20, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                transition={{ delay: 0.2 }}
+                className="flex items-center justify-center gap-4"
+              >
+                <span className="text-7xl font-bold">{planData.total_monthly_premium?.toFixed(0) || '0'}</span>
+                <div className="text-left">
+                  <p className="text-2xl font-semibold">лв/месец</p>
+                  <p className="text-lg text-blue-200">само {dailyCost} лв/ден</p>
+                </div>
+              </motion.div>
+            </div>
+          </motion.div>
+
+          <div className="bg-white rounded-xl p-6 shadow-lg border border-slate-200">
+            <h3 className="text-xl font-bold text-slate-900 mb-4 text-center">
+              Растеж на имуществото до пенсиониране
+            </h3>
+            <ResponsiveContainer width="100%" height={350}>
+              <BarChart data={wealthComparisonData}>
+                <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
+                <XAxis dataKey="name" stroke="#64748b" />
+                <YAxis 
+                  stroke="#64748b"
+                  tickFormatter={(value) => `${(value / 1000).toFixed(0)}K`}
+                />
+                <Tooltip 
+                  contentStyle={{ backgroundColor: '#fff', border: '1px solid #e2e8f0', borderRadius: '8px' }}
+                  formatter={(value) => [`${(value / 1000).toFixed(0)}K лв`, 'Стойност']}
+                />
+                <Bar dataKey="value" radius={[8, 8, 0, 0]}>
+                  {wealthComparisonData.map((entry, index) => (
+                    <Cell key={`cell-${index}`} fill={entry.fill} />
+                  ))}
+                </Bar>
+              </BarChart>
+            </ResponsiveContainer>
+            
+            <div className="mt-4 bg-amber-50 border-l-4 border-amber-400 p-4 rounded">
+              <div className="flex items-center gap-2">
+                <TrendingUp className="w-5 h-5 text-amber-600" />
+                <p className="text-sm font-semibold text-amber-900">
+                  +{(((withPlan - withoutPlan) / withoutPlan) * 100).toFixed(0)}% ръст с нашия план! 🚀
+                </p>
+              </div>
+              <p className="text-xs text-amber-700 mt-1">
+                *Проекция при {yearsToRetirement} години инвестиции до {retirementAge} г. възраст
+              </p>
+            </div>
+          </div>
+        </div>
+      )
+    },
+    {
+      title: 'Предимства',
+      content: (
+        <div className="space-y-6">
+          <h2 className="text-3xl font-bold text-slate-900 text-center mb-6">Предимства на плана</h2>
+          
+          <div className="grid md:grid-cols-2 gap-4">
+            {[
+              { title: 'Гъвкавост', desc: 'възможност да се променят сумите, определени за отделните цели', color: 'blue', icon: '🔄' },
+              { title: 'Променливост', desc: 'възможност да се добавят и променят финансовите решения', color: 'purple', icon: '⚡' },
+              { title: 'Качество', desc: 'финансови решения от качествени институции', color: 'pink', icon: '⭐' },
+              { title: 'Надежност', desc: 'във всяка ситуация ще има финансов съветник, който ще се грижи за Вас', color: 'amber', icon: '🤝' },
+              { title: 'Обслужване', desc: 'актуализиране при промяна на финансовото състояние или на пазара', color: 'cyan', icon: '🔧' },
+              { title: 'Данъчно облекчение', desc: 'спестяване от данъци за целия период', color: 'green', icon: '💰' }
+            ].map((adv, idx) => (
+              <motion.div
+                key={idx}
+                initial={{ x: -20, opacity: 0 }}
+                animate={{ x: 0, opacity: 1 }}
+                transition={{ delay: idx * 0.1 }}
+              >
+                <Card className={`border-l-4 border-${adv.color}-500 hover:shadow-lg transition-shadow`}>
+                  <CardContent className="p-4">
+                    <div className="flex items-start gap-3">
+                      <span className="text-2xl">{adv.icon}</span>
+                      <div>
+                        <h4 className={`font-bold text-${adv.color}-700 mb-1`}>{adv.title}</h4>
+                        <p className="text-sm text-slate-600">{adv.desc}</p>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              </motion.div>
+            ))}
+          </div>
+
+          <motion.div
+            initial={{ scale: 0.95, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            transition={{ delay: 0.6 }}
+            className="bg-gradient-to-r from-green-500 to-emerald-500 text-white rounded-xl p-6 shadow-xl"
+          >
+            <div className="flex items-center justify-between">
+              <div>
+                <h4 className="text-lg font-bold mb-1 flex items-center gap-2">
+                  <DollarSign className="w-6 h-6" />
+                  Данъчно облекчение
+                </h4>
+                <p className="text-green-100 text-sm">Спестени данъци за {yearsToRetirement} години</p>
+              </div>
+              <div className="text-right">
+                <p className="text-5xl font-bold">{totalTaxRelief.toLocaleString()}</p>
+                <p className="text-xl text-green-100">лв</p>
+              </div>
+            </div>
+          </motion.div>
+        </div>
+      )
+    },
+    {
+      title: 'Разпределение',
+      content: (
+        <div className="space-y-6">
+          <h2 className="text-3xl font-bold text-slate-900 text-center mb-4">
+            Разпределение на вашите спестявания
+          </h2>
+
+          <div className="bg-white rounded-xl p-6 shadow-lg border border-slate-200">
+            <ResponsiveContainer width="100%" height={400}>
+              <Treemap
+                data={allocationData}
+                dataKey="value"
+                aspectRatio={4/3}
+                stroke="#fff"
+                fill="#8884d8"
+                content={({ x, y, width, height, index, name, value, color, icon }) => {
+                  const percent = ((value / (investments + incomeProtection + propertyProtection + loans)) * 100).toFixed(0);
+                  return (
+                    <g>
+                      <rect
+                        x={x}
+                        y={y}
+                        width={width}
+                        height={height}
+                        style={{
+                          fill: color,
+                          stroke: '#fff',
+                          strokeWidth: 2,
+                        }}
+                      />
+                      {width > 80 && height > 80 && (
+                        <>
+                          <text
+                            x={x + width / 2}
+                            y={y + height / 2 - 20}
+                            textAnchor="middle"
+                            fill="#fff"
+                            fontSize={32}
+                            fontWeight="bold"
+                          >
+                            {percent}%
+                          </text>
+                          <text
+                            x={x + width / 2}
+                            y={y + height / 2 + 10}
+                            textAnchor="middle"
+                            fill="#fff"
+                            fontSize={14}
+                          >
+                            {name}
+                          </text>
+                          <text
+                            x={x + width / 2}
+                            y={y + height / 2 + 30}
+                            textAnchor="middle"
+                            fill="#fff"
+                            fontSize={16}
+                            fontWeight="bold"
+                          >
+                            {value.toFixed(0)} лв
+                          </text>
+                        </>
+                      )}
+                    </g>
+                  );
+                }}
+              />
+            </ResponsiveContainer>
+          </div>
+
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+            {allocationData.map((item, idx) => (
+              <Card key={idx} className="border-2" style={{ borderColor: item.color }}>
+                <CardContent className="p-3 text-center">
+                  <div className="text-2xl mb-1">{item.icon}</div>
+                  <p className="text-xs font-semibold text-slate-700 mb-1">{item.name}</p>
+                  <p className="text-lg font-bold" style={{ color: item.color }}>
+                    {item.value.toFixed(0)} лв
+                  </p>
+                  <p className="text-xs text-slate-500">
+                    {((item.value / (investments + incomeProtection + propertyProtection + loans)) * 100).toFixed(0)}%
+                  </p>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </div>
+      )
+    },
+    {
+      title: 'Продукти',
+      content: (
+        <div className="space-y-4">
+          <h2 className="text-3xl font-bold text-slate-900 text-center mb-4">Вашите продукти</h2>
+          
+          <div className="grid gap-4 max-h-[500px] overflow-y-auto pr-2">
+            {products.map((product, idx) => (
+              <motion.div
+                key={idx}
+                initial={{ x: -20, opacity: 0 }}
+                animate={{ x: 0, opacity: 1 }}
+                transition={{ delay: idx * 0.05 }}
+              >
+                <Card className="hover:shadow-lg transition-all border-l-4 border-blue-500">
+                  <CardContent className="p-4">
+                    <div className="flex items-start justify-between gap-4">
+                      <div className="flex items-start gap-3 flex-1">
+                        <div className="w-10 h-10 rounded-full bg-green-500 flex items-center justify-center flex-shrink-0">
+                          <CheckCircle className="w-6 h-6 text-white" />
+                        </div>
+                        <div className="flex-1">
+                          <h4 className="font-bold text-slate-900 mb-1">{product.name}</h4>
+                          <p className="text-sm text-slate-600 mb-2">{product.benefit}</p>
+                          {product.coverage && (
+                            <p className="text-xs text-slate-500">
+                              Покритие: <span className="font-semibold">{product.coverage.toLocaleString()} лв</span>
+                            </p>
+                          )}
+                        </div>
+                      </div>
+                      <div className="text-right">
+                        <p className="text-2xl font-bold text-blue-600">
+                          {product.monthlyPremium === 0 ? 'БЕЗПЛАТНО' : `${product.monthlyPremium.toFixed(0)} лв`}
+                        </p>
+                        <p className="text-xs text-slate-500">месечно</p>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      )
+    }
+  ];
+
+  const handleDownloadPDF = () => {
+    const clientInfo = {
+      name: `${analysisData?.client_first_name || ''} ${analysisData?.client_last_name || ''}`.trim(),
+      age: clientData?.age,
+      retirementAge: clientData?.retirementAge,
+      yearsToRetirement: clientData?.yearsToRetirement
+    };
+    downloadFinancialPlanPDF(planData, clientInfo);
+    toast.success('✓ PDF файлът се изтегля');
+  };
+
+  return (
+    <div className="fixed inset-0 bg-slate-900/95 z-50 overflow-hidden">
+      <div className="h-full flex flex-col">
+        {/* Header */}
+        <div className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white p-6 shadow-xl">
+          <div className="max-w-7xl mx-auto flex items-center justify-between">
+            <div>
+              <h1 className="text-3xl font-bold mb-1">Персонализиран финансов план</h1>
+              <p className="text-blue-100">
+                {analysisData?.client_first_name} {analysisData?.client_last_name}
+              </p>
+            </div>
+            <div className="flex items-center gap-3">
+              <Button 
+                variant="outline" 
+                onClick={handleDownloadPDF}
+                className="bg-white/10 border-white/20 text-white hover:bg-white/20"
+              >
+                <Download className="w-4 h-4 mr-2" />
+                Изтегли PDF
+              </Button>
+              <Button 
+                variant="ghost" 
+                size="icon"
+                onClick={onClose}
+                className="text-white hover:bg-white/10"
+              >
+                <X className="w-6 h-6" />
+              </Button>
+            </div>
+          </div>
+        </div>
+
+        {/* Progress */}
+        <div className="bg-white border-b border-slate-200 px-6 py-3">
+          <div className="max-w-7xl mx-auto">
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-sm font-medium text-slate-700">
+                {slides[currentSlide].title}
+              </span>
+              <span className="text-sm text-slate-500">
+                {currentSlide + 1} / {slides.length}
+              </span>
+            </div>
+            <div className="w-full bg-slate-200 rounded-full h-2">
+              <div 
+                className="bg-blue-600 h-2 rounded-full transition-all duration-300"
+                style={{ width: `${((currentSlide + 1) / slides.length) * 100}%` }}
+              />
+            </div>
+          </div>
+        </div>
+
+        {/* Content */}
+        <div className="flex-1 overflow-y-auto bg-slate-50 p-6">
+          <div className="max-w-7xl mx-auto">
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={currentSlide}
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -20 }}
+                transition={{ duration: 0.3 }}
+              >
+                {slides[currentSlide].content}
+              </motion.div>
+            </AnimatePresence>
+          </div>
+        </div>
+
+        {/* Navigation */}
+        <div className="bg-white border-t border-slate-200 p-6 shadow-xl">
+          <div className="max-w-7xl mx-auto flex items-center justify-between">
+            <Button
+              variant="outline"
+              onClick={() => setCurrentSlide(Math.max(0, currentSlide - 1))}
+              disabled={currentSlide === 0}
+              className="min-w-[120px]"
+            >
+              <ChevronLeft className="w-4 h-4 mr-2" />
+              Назад
+            </Button>
+
+            <div className="flex gap-2">
+              {slides.map((_, idx) => (
+                <button
+                  key={idx}
+                  onClick={() => setCurrentSlide(idx)}
+                  className={`w-2 h-2 rounded-full transition-all ${
+                    idx === currentSlide 
+                      ? 'bg-blue-600 w-8' 
+                      : 'bg-slate-300 hover:bg-slate-400'
+                  }`}
+                />
+              ))}
+            </div>
+
+            <Button
+              onClick={() => {
+                if (currentSlide < slides.length - 1) {
+                  setCurrentSlide(currentSlide + 1);
+                } else {
+                  onClose();
+                }
+              }}
+              className="min-w-[120px] bg-blue-600 hover:bg-blue-700"
+            >
+              {currentSlide < slides.length - 1 ? (
+                <>
+                  Напред
+                  <ChevronRight className="w-4 h-4 ml-2" />
+                </>
+              ) : (
+                'Завърши'
+              )}
+            </Button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}

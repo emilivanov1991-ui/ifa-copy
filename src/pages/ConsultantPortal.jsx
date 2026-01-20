@@ -51,7 +51,7 @@ import AIAnalyticsDashboard from '@/components/consultant/AIAnalyticsDashboard';
 import RBACManager from '@/components/consultant/RBACManager';
 import CommissionsManager from '@/components/consultant/CommissionsManager';
 import ProductCatalogManager from '@/components/admin/ProductCatalogManager';
-import ClientDossierView from '@/components/consultant/ClientDossierView';
+import DossiersManager from '@/components/consultant/DossiersManager';
 import { Package, FolderOpen } from 'lucide-react';
 
 const menuItems = [

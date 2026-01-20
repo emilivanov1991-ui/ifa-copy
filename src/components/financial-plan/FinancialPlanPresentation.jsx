@@ -16,6 +16,10 @@ export default function FinancialPlanPresentation({ planData, clientData, analys
   const yearsToRetirement = clientData?.yearsToRetirement || (retirementAge - age);
   const monthsToRetirement = yearsToRetirement * 12;
   
+  // Wealth projection with correct formulas
+  const wealth = calculateWealthProjection(planData, clientData, analysisData);
+  const allocation = calculateAllocation(planData, wealth.monthlyReserve);
+  
   // Capital chart data
   const capitalData = Array.from({ length: Math.min(yearsToRetirement + 1, 42) }, (_, i) => {
     const currentAge = age + i;
@@ -28,55 +32,28 @@ export default function FinancialPlanPresentation({ planData, clientData, analys
     };
   });
 
-  // Wealth comparison
-  const monthlyBalance = planData.calculations?.monthlyBalance || 0;
-  const withoutPlan = monthlyBalance * monthsToRetirement;
-  
-  const upfValue = planData.calculations?.upfAccumulated || 0;
-  const mortgageInterestSavings = (planData.calculations?.mortgageInterestSaved || 0) * 0.3;
-  const propertyValue = planData.calculations?.futurePropertyValue || 0;
-  const ulInvestments = planData.calculations?.ulInvestmentValue || 0;
-  const ulJuniorInvestments = planData.calculations?.ulJuniorValue || 0;
-  const reserveGrowth = (planData.calculations?.reserveAfterPlan || 0) * monthsToRetirement * 0.05;
-  
-  const withPlan = upfValue + mortgageInterestSavings + propertyValue + ulInvestments + ulJuniorInvestments + reserveGrowth;
-
   const wealthComparisonData = [
     {
       name: 'БЕЗ план',
-      value: withoutPlan,
+      value: wealth.withoutPlan,
       fill: '#94a3b8'
     },
     {
       name: 'С НАШИЯ план',
-      value: withPlan,
+      value: wealth.withPlan,
       fill: '#22c55e'
     }
   ];
 
-  // Allocation data
-  const products = planData.products || [];
-  let investments = 0, incomeProtection = 0, propertyProtection = 0, loans = 0;
-  
-  products.forEach(p => {
-    const premium = p.monthlyPremium || 0;
-    if (p.name.includes('Unit Linked') || p.name.includes('УПФ')) {
-      investments += premium;
-    } else if (p.name.includes('Uniqa') || p.name.includes('Generali') || p.name.includes('Срочен живот') || p.name.includes('Care')) {
-      incomeProtection += premium;
-    } else if (p.name.includes('Дом') || p.name.includes('Каско')) {
-      propertyProtection += premium;
-    } else if (p.name.includes('кредит') || p.name.includes('Ипотека')) {
-      loans += premium;
-    }
-  });
-
   const allocationData = [
-    { name: 'Инвестиции', value: investments, color: '#3b82f6', icon: '📈' },
-    { name: 'Защита на дохода', value: incomeProtection, color: '#10b981', icon: '🛡️' },
-    { name: 'Защита на имущество', value: propertyProtection, color: '#f59e0b', icon: '🏠' },
-    { name: 'Кредити', value: loans, color: '#8b5cf6', icon: '💳' }
+    { name: 'Инвестиции', value: allocation.investments.amount, color: '#3b82f6', icon: '📈' },
+    { name: 'Защита на дохода', value: allocation.incomeProtection.amount, color: '#10b981', icon: '🛡️' },
+    { name: 'Защита на имущество', value: allocation.propertyProtection.amount, color: '#f59e0b', icon: '🏠' },
+    { name: 'Кредити', value: allocation.loans.amount, color: '#8b5cf6', icon: '💳' },
+    { name: 'Резерв', value: allocation.reserve.amount, color: '#06b6d4', icon: '💰' }
   ].filter(item => item.value > 0);
+  
+  const products = planData.products || [];
 
   const totalTaxRelief = planData.calculations?.totalTaxRelief || 0;
   const dailyCost = ((planData.total_monthly_premium || 0) / 30).toFixed(2);
@@ -218,11 +195,14 @@ export default function FinancialPlanPresentation({ planData, clientData, analys
               <div className="flex items-center gap-2">
                 <TrendingUp className="w-5 h-5 text-amber-600" />
                 <p className="text-sm font-semibold text-amber-900">
-                  +{(((withPlan - withoutPlan) / withoutPlan) * 100).toFixed(0)}% ръст с нашия план! 🚀
+                  +{(((wealth.withPlan - wealth.withoutPlan) / wealth.withoutPlan) * 100).toFixed(0)}% ръст с нашия план! 🚀
                 </p>
               </div>
               <p className="text-xs text-amber-700 mt-1">
                 *Проекция при {yearsToRetirement} години инвестиции до {retirementAge} г. възраст
+              </p>
+              <p className="text-xs text-amber-600 mt-2 font-semibold">
+                Месечен резерв: {wealth.monthlyReserve.toFixed(0)} лв (спестявания извън плана)
               </p>
             </div>
           </div>
@@ -305,7 +285,9 @@ export default function FinancialPlanPresentation({ planData, clientData, analys
                 stroke="#fff"
                 fill="#8884d8"
                 content={({ x, y, width, height, index, name, value, color, icon }) => {
-                  const percent = ((value / (investments + incomeProtection + propertyProtection + loans)) * 100).toFixed(0);
+                  const totalAllocation = allocation.investments.amount + allocation.incomeProtection.amount + 
+                                          allocation.propertyProtection.amount + allocation.loans.amount + allocation.reserve.amount;
+                  const percent = ((value / totalAllocation) * 100).toFixed(0);
                   return (
                     <g>
                       <rect
@@ -369,7 +351,8 @@ export default function FinancialPlanPresentation({ planData, clientData, analys
                     {item.value.toFixed(0)} лв
                   </p>
                   <p className="text-xs text-slate-500">
-                    {((item.value / (investments + incomeProtection + propertyProtection + loans)) * 100).toFixed(0)}%
+                    {((item.value / (allocation.investments.amount + allocation.incomeProtection.amount + 
+                      allocation.propertyProtection.amount + allocation.loans.amount + allocation.reserve.amount)) * 100).toFixed(0)}%
                   </p>
                 </CardContent>
               </Card>

@@ -420,7 +420,10 @@ export default function FinancialPlanPresentation({ planData, clientData, analys
                 content={({ x, y, width, height, index, name, value, color, icon }) => {
                   const totalAllocation = allocation.investments.amount + allocation.incomeProtection.amount + 
                                           allocation.propertyProtection.amount + allocation.loans.amount + allocation.reserve.amount;
-                  const percent = ((value / totalAllocation) * 100).toFixed(0);
+                  const monthlyIncome = (analysisData?.client_net_income || 0) + (analysisData?.partner_net_income || 0);
+                  const percent = ((value / totalAllocation) * 100).toFixed(1);
+                  const percentOfIncome = monthlyIncome > 0 ? ((value / monthlyIncome) * 100).toFixed(1) : 0;
+                  
                   return (
                     <g>
                       <rect
@@ -438,7 +441,7 @@ export default function FinancialPlanPresentation({ planData, clientData, analys
                         <>
                           <text
                             x={x + width / 2}
-                            y={y + height / 2 - 20}
+                            y={y + height / 2 - 35}
                             textAnchor="middle"
                             fill="#fff"
                             fontSize={32}
@@ -448,7 +451,7 @@ export default function FinancialPlanPresentation({ planData, clientData, analys
                           </text>
                           <text
                             x={x + width / 2}
-                            y={y + height / 2 + 10}
+                            y={y + height / 2 - 5}
                             textAnchor="middle"
                             fill="#fff"
                             fontSize={14}
@@ -457,13 +460,63 @@ export default function FinancialPlanPresentation({ planData, clientData, analys
                           </text>
                           <text
                             x={x + width / 2}
-                            y={y + height / 2 + 30}
+                            y={y + height / 2 + 18}
                             textAnchor="middle"
                             fill="#fff"
                             fontSize={16}
                             fontWeight="bold"
                           >
                             {value.toFixed(0)} лв
+                          </text>
+                          <text
+                            x={x + width / 2}
+                            y={y + height / 2 + 38}
+                            textAnchor="middle"
+                            fill="rgba(255,255,255,0.9)"
+                            fontSize={11}
+                          >
+                            {percent}% от спестявания
+                          </text>
+                          <text
+                            x={x + width / 2}
+                            y={y + height / 2 + 53}
+                            textAnchor="middle"
+                            fill="rgba(255,255,255,0.8)"
+                            fontSize={11}
+                          >
+                            {percentOfIncome}% от доход
+                          </text>
+                        </>
+                      )}
+                      {width > 40 && width <= 80 && height > 40 && (
+                        <>
+                          <text
+                            x={x + width / 2}
+                            y={y + height / 2 - 8}
+                            textAnchor="middle"
+                            fill="#fff"
+                            fontSize={18}
+                            fontWeight="bold"
+                          >
+                            {percent}%
+                          </text>
+                          <text
+                            x={x + width / 2}
+                            y={y + height / 2 + 8}
+                            textAnchor="middle"
+                            fill="#fff"
+                            fontSize={10}
+                          >
+                            {value.toFixed(0)} лв
+                          </text>
+                          <text
+                            x={x + width / 2}
+                            y={y + height / 2 + 22}
+                            textAnchor="middle"
+                            fill="rgba(255,255,255,0.8)"
+                            fontSize={8}
+                          >
+                            {percentOfIncome}% от доход
                           </text>
                         </>
                       )}

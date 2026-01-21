@@ -475,21 +475,31 @@ export default function FinancialPlanPresentation({ planData, clientData, analys
           </div>
 
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-            {allocationData.map((item, idx) => (
-              <Card key={idx} className="border-2" style={{ borderColor: item.color }}>
-                <CardContent className="p-3 text-center">
-                  <div className="text-2xl mb-1">{item.icon}</div>
-                  <p className="text-xs font-semibold text-slate-700 mb-1">{item.name}</p>
-                  <p className="text-lg font-bold" style={{ color: item.color }}>
-                    {item.value.toFixed(0)} лв
-                  </p>
-                  <p className="text-xs text-slate-500">
-                    {((item.value / (allocation.investments.amount + allocation.incomeProtection.amount + 
-                      allocation.propertyProtection.amount + allocation.loans.amount + allocation.reserve.amount)) * 100).toFixed(0)}%
-                  </p>
-                </CardContent>
-              </Card>
-            ))}
+            {allocationData.map((item, idx) => {
+              const totalSavings = allocation.investments.amount + allocation.incomeProtection.amount + 
+                allocation.propertyProtection.amount + allocation.loans.amount + allocation.reserve.amount;
+              const monthlyIncome = (analysisData?.client_net_income || 0) + (analysisData?.partner_net_income || 0);
+              const percentOfSavings = ((item.value / totalSavings) * 100).toFixed(1);
+              const percentOfIncome = monthlyIncome > 0 ? ((item.value / monthlyIncome) * 100).toFixed(1) : 0;
+              
+              return (
+                <Card key={idx} className="border-2" style={{ borderColor: item.color }}>
+                  <CardContent className="p-3 text-center">
+                    <div className="text-2xl mb-1">{item.icon}</div>
+                    <p className="text-xs font-semibold text-slate-700 mb-1">{item.name}</p>
+                    <p className="text-lg font-bold" style={{ color: item.color }}>
+                      {item.value.toFixed(0)} лв
+                    </p>
+                    <p className="text-xs text-slate-600 font-medium">
+                      {percentOfSavings}% от спестявания
+                    </p>
+                    <p className="text-xs text-slate-500">
+                      {percentOfIncome}% от доход
+                    </p>
+                  </CardContent>
+                </Card>
+              );
+            })}
           </div>
         </div>
       )

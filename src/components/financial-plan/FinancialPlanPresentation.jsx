@@ -437,7 +437,7 @@ export default function FinancialPlanPresentation({ planData, clientData, analys
                           strokeWidth: 2,
                         }}
                       />
-                      {width > 80 && height > 80 && (
+                      {width > 60 && height > 60 && (
                         <>
                           <text
                             x={x + width / 2}
@@ -488,43 +488,62 @@ export default function FinancialPlanPresentation({ planData, clientData, analys
                           </text>
                         </>
                       )}
-                      {width > 40 && width <= 80 && height > 40 && (
+                      {width > 30 && width <= 60 && height > 30 && (
                         <>
                           <text
                             x={x + width / 2}
-                            y={y + height / 2 - 8}
+                            y={y + height / 2 - 20}
                             textAnchor="middle"
                             fill="#fff"
-                            fontSize={18}
+                            fontSize={20}
                             fontWeight="bold"
                           >
                             {percent}%
                           </text>
                           <text
                             x={x + width / 2}
-                            y={y + height / 2 + 8}
+                            y={y + height / 2}
                             textAnchor="middle"
                             fill="#fff"
-                            fontSize={10}
+                            fontSize={11}
+                          >
+                            {name}
+                          </text>
+                          <text
+                            x={x + width / 2}
+                            y={y + height / 2 + 16}
+                            textAnchor="middle"
+                            fill="#fff"
+                            fontSize={12}
+                            fontWeight="bold"
                           >
                             {value.toFixed(0)} лв
                           </text>
                           <text
                             x={x + width / 2}
-                            y={y + height / 2 + 22}
+                            y={y + height / 2 + 30}
+                            textAnchor="middle"
+                            fill="rgba(255,255,255,0.9)"
+                            fontSize={9}
+                          >
+                            {percent}% от спестявания
+                          </text>
+                          <text
+                            x={x + width / 2}
+                            y={y + height / 2 + 42}
                             textAnchor="middle"
                             fill="rgba(255,255,255,0.8)"
-                            fontSize={8}
+                            fontSize={9}
                           >
                             {percentOfIncome}% от доход
                           </text>
                         </>
                       )}
-                      {width > 20 && width <= 40 && height > 30 && (
+                      {width > 15 && width <= 30 && height > 20 && (
                         <>
                           <text
                             x={x + width / 2}
-                            y={y + height / 2 - 5}
+                            y={y + height / 2 - 12}
                             textAnchor="middle"
                             fill="#fff"
                             fontSize={14}
@@ -534,16 +553,26 @@ export default function FinancialPlanPresentation({ planData, clientData, analys
                           </text>
                           <text
                             x={x + width / 2}
-                            y={y + height / 2 + 8}
+                            y={y + height / 2 + 2}
                             textAnchor="middle"
                             fill="#fff"
-                            fontSize={8}
+                            fontSize={9}
+                          >
+                            {name}
+                          </text>
+                          <text
+                            x={x + width / 2}
+                            y={y + height / 2 + 14}
+                            textAnchor="middle"
+                            fill="#fff"
+                            fontSize={10}
+                            fontWeight="bold"
                           >
                             {value.toFixed(0)} лв
                           </text>
                           <text
                             x={x + width / 2}
-                            y={y + height / 2 + 18}
+                            y={y + height / 2 + 25}
                             textAnchor="middle"
                             fill="rgba(255,255,255,0.9)"
                             fontSize={7}
@@ -552,7 +581,7 @@ export default function FinancialPlanPresentation({ planData, clientData, analys
                           </text>
                           <text
                             x={x + width / 2}
-                            y={y + height / 2 + 27}
+                            y={y + height / 2 + 34}
                             textAnchor="middle"
                             fill="rgba(255,255,255,0.8)"
                             fontSize={7}
@@ -561,26 +590,58 @@ export default function FinancialPlanPresentation({ planData, clientData, analys
                           </text>
                         </>
                       )}
-                      {width > 10 && width <= 20 && height > 20 && (
+                      {width > 8 && width <= 15 && height > 15 && (
                         <>
                           <text
                             x={x + width / 2}
-                            y={y + height / 2}
+                            y={y + height / 2 - 5}
                             textAnchor="middle"
                             fill="#fff"
-                            fontSize={10}
+                            fontSize={11}
                             fontWeight="bold"
                           >
                             {percent}%
                           </text>
                           <text
                             x={x + width / 2}
-                            y={y + height / 2 + 12}
+                            y={y + height / 2 + 6}
+                            textAnchor="middle"
+                            fill="#fff"
+                            fontSize={7}
+                          >
+                            {value.toFixed(0)} лв
+                          </text>
+                          <text
+                            x={x + width / 2}
+                            y={y + height / 2 + 15}
                             textAnchor="middle"
                             fill="rgba(255,255,255,0.9)"
                             fontSize={6}
                           >
-                            {value.toFixed(0)} лв
+                            {percentOfIncome}% доход
+                          </text>
+                        </>
+                      )}
+                      {width > 5 && width <= 8 && height > 10 && (
+                        <>
+                          <text
+                            x={x + width / 2}
+                            y={y + height / 2}
+                            textAnchor="middle"
+                            fill="#fff"
+                            fontSize={9}
+                            fontWeight="bold"
+                          >
+                            {percent}%
+                          </text>
+                          <text
+                            x={x + width / 2}
+                            y={y + height / 2 + 10}
+                            textAnchor="middle"
+                            fill="rgba(255,255,255,0.9)"
+                            fontSize={6}
+                          >
+                            {value.toFixed(0)}
                           </text>
                         </>
                       )}

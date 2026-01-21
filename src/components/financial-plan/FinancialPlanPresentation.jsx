@@ -520,6 +520,70 @@ export default function FinancialPlanPresentation({ planData, clientData, analys
                           </text>
                         </>
                       )}
+                      {width > 20 && width <= 40 && height > 30 && (
+                        <>
+                          <text
+                            x={x + width / 2}
+                            y={y + height / 2 - 5}
+                            textAnchor="middle"
+                            fill="#fff"
+                            fontSize={14}
+                            fontWeight="bold"
+                          >
+                            {percent}%
+                          </text>
+                          <text
+                            x={x + width / 2}
+                            y={y + height / 2 + 8}
+                            textAnchor="middle"
+                            fill="#fff"
+                            fontSize={8}
+                          >
+                            {value.toFixed(0)} лв
+                          </text>
+                          <text
+                            x={x + width / 2}
+                            y={y + height / 2 + 18}
+                            textAnchor="middle"
+                            fill="rgba(255,255,255,0.9)"
+                            fontSize={7}
+                          >
+                            {percent}% от спестявания
+                          </text>
+                          <text
+                            x={x + width / 2}
+                            y={y + height / 2 + 27}
+                            textAnchor="middle"
+                            fill="rgba(255,255,255,0.8)"
+                            fontSize={7}
+                          >
+                            {percentOfIncome}% от доход
+                          </text>
+                        </>
+                      )}
+                      {width > 10 && width <= 20 && height > 20 && (
+                        <>
+                          <text
+                            x={x + width / 2}
+                            y={y + height / 2}
+                            textAnchor="middle"
+                            fill="#fff"
+                            fontSize={10}
+                            fontWeight="bold"
+                          >
+                            {percent}%
+                          </text>
+                          <text
+                            x={x + width / 2}
+                            y={y + height / 2 + 12}
+                            textAnchor="middle"
+                            fill="rgba(255,255,255,0.9)"
+                            fontSize={6}
+                          >
+                            {value.toFixed(0)} лв
+                          </text>
+                        </>
+                      )}
                     </g>
                   );
                 }}

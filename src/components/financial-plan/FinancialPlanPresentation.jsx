@@ -423,7 +423,9 @@ export default function FinancialPlanPresentation({ planData, clientData, analys
                   const monthlyIncome = (analysisData?.client_net_income || 0) + (analysisData?.partner_net_income || 0);
                   const percent = ((value / totalAllocation) * 100).toFixed(1);
                   const percentOfIncome = monthlyIncome > 0 ? ((value / monthlyIncome) * 100).toFixed(1) : 0;
-                  
+
+                  const isSmall = width < 30 || height < 30;
+
                   return (
                     <g>
                       <rect
@@ -539,116 +541,76 @@ export default function FinancialPlanPresentation({ planData, clientData, analys
                           </text>
                         </>
                       )}
-                      {width > 15 && width <= 30 && height > 20 && (
+                      {isSmall && (
                         <>
-                          <text
-                            x={x + width / 2}
-                            y={y + height / 2 - 12}
-                            textAnchor="middle"
+                          {/* Малка точка в центъра на полето */}
+                          <circle
+                            cx={x + width / 2}
+                            cy={y + height / 2}
+                            r={3}
                             fill="#fff"
-                            fontSize={14}
-                            fontWeight="bold"
-                          >
-                            {percent}%
-                          </text>
-                          <text
-                            x={x + width / 2}
-                            y={y + height / 2 + 2}
-                            textAnchor="middle"
-                            fill="#fff"
-                            fontSize={9}
-                          >
-                            {name}
-                          </text>
-                          <text
-                            x={x + width / 2}
-                            y={y + height / 2 + 14}
-                            textAnchor="middle"
-                            fill="#fff"
-                            fontSize={10}
-                            fontWeight="bold"
-                          >
-                            {value.toFixed(0)} лв
-                          </text>
-                          <text
-                            x={x + width / 2}
-                            y={y + height / 2 + 25}
-                            textAnchor="middle"
-                            fill="rgba(255,255,255,0.9)"
-                            fontSize={7}
-                          >
-                            {percent}% от спестявания
-                          </text>
-                          <text
-                            x={x + width / 2}
-                            y={y + height / 2 + 34}
-                            textAnchor="middle"
-                            fill="rgba(255,255,255,0.8)"
-                            fontSize={7}
-                          >
-                            {percentOfIncome}% от доход
-                          </text>
-                        </>
-                      )}
-                      {width > 8 && width <= 15 && height > 15 && (
-                        <>
-                          <text
-                            x={x + width / 2}
-                            y={y + height / 2 - 5}
-                            textAnchor="middle"
-                            fill="#fff"
-                            fontSize={11}
-                            fontWeight="bold"
-                          >
-                            {percent}%
-                          </text>
-                          <text
-                            x={x + width / 2}
-                            y={y + height / 2 + 6}
-                            textAnchor="middle"
-                            fill="#fff"
-                            fontSize={7}
-                          >
-                            {value.toFixed(0)} лв
-                          </text>
-                          <text
-                            x={x + width / 2}
-                            y={y + height / 2 + 15}
-                            textAnchor="middle"
-                            fill="rgba(255,255,255,0.9)"
-                            fontSize={6}
-                          >
-                            {percentOfIncome}% доход
-                          </text>
-                        </>
-                      )}
-                      {width > 5 && width <= 8 && height > 10 && (
-                        <>
-                          <text
-                            x={x + width / 2}
-                            y={y + height / 2}
-                            textAnchor="middle"
-                            fill="#fff"
-                            fontSize={9}
-                            fontWeight="bold"
-                          >
-                            {percent}%
-                          </text>
-                          <text
-                            x={x + width / 2}
-                            y={y + height / 2 + 10}
-                            textAnchor="middle"
-                            fill="rgba(255,255,255,0.9)"
-                            fontSize={6}
-                          >
-                            {value.toFixed(0)}
-                          </text>
+                          />
+                          {/* Линия към текста */}
+                          <line
+                            x1={x + width / 2}
+                            y1={y + height / 2}
+                            x2={x + width + 15}
+                            y2={y - 30 - (index * 35)}
+                            stroke="#333"
+                            strokeWidth={1.5}
+                            markerEnd="url(#arrowhead)"
+                          />
+                          {/* Текст извън полето */}
+                          <g transform={`translate(${x + width + 20}, ${y - 35 - (index * 35)})`}>
+                            <rect
+                              x={0}
+                              y={0}
+                              width={120}
+                              height={30}
+                              fill="white"
+                              stroke={color}
+                              strokeWidth={2}
+                              rx={4}
+                            />
+                            <text
+                              x={60}
+                              y={12}
+                              textAnchor="middle"
+                              fill="#333"
+                              fontSize={10}
+                              fontWeight="bold"
+                            >
+                              {name}
+                            </text>
+                            <text
+                              x={60}
+                              y={24}
+                              textAnchor="middle"
+                              fill="#333"
+                              fontSize={9}
+                            >
+                              {percent}% • {value.toFixed(0)} лв
+                            </text>
+                          </g>
                         </>
                       )}
                     </g>
                   );
                 }}
-              />
+              >
+                <defs>
+                  <marker
+                    id="arrowhead"
+                    markerWidth="10"
+                    markerHeight="10"
+                    refX="5"
+                    refY="3"
+                    orient="auto"
+                  >
+                    <polygon points="0 0, 10 3, 0 6" fill="#333" />
+                  </marker>
+                </defs>
+              </Treemap>
             </ResponsiveContainer>
           </div>
 

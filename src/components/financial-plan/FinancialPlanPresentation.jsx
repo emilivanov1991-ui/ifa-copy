@@ -309,6 +309,45 @@ export default function FinancialPlanPresentation({ planData, clientData, analys
         <div className="space-y-6">
           <h2 className="text-3xl font-bold text-slate-900 text-center mb-6">Предимства на плана</h2>
           
+          {/* Priorities Section */}
+          {(() => {
+            const priorityLabels = {
+              priority_income_protection: 'Защита на дохода',
+              priority_reserve: 'Увеличаване на резервите',
+              priority_housing: 'Ново жилище',
+              priority_pension: 'Достойна пенсия',
+              priority_children: 'Подсигуряване на децата',
+              priority_property_protection: 'Защита на собствеността',
+              priority_other: 'Други'
+            };
+            
+            const priorities = Object.keys(priorityLabels)
+              .map(key => ({
+                label: priorityLabels[key],
+                value: analysisData?.[key] || 0
+              }))
+              .filter(p => p.value > 0)
+              .sort((a, b) => a.value - b.value);
+            
+            return priorities.length > 0 && (
+              <Card className="bg-gradient-to-r from-red-50 to-pink-50 border-red-200">
+                <CardContent className="p-6">
+                  <h3 className="text-2xl font-bold text-red-900 mb-4 text-center">ПРИОРИТЕТИ</h3>
+                  <div className="grid grid-cols-2 gap-3">
+                    {priorities.map((priority, idx) => (
+                      <div key={idx} className="flex items-center gap-3 bg-white rounded-lg p-3 shadow-sm">
+                        <div className="w-8 h-8 rounded-full bg-red-600 text-white flex items-center justify-center font-bold">
+                          {idx + 1}
+                        </div>
+                        <p className="text-slate-700 font-medium">{priority.label}</p>
+                      </div>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+            );
+          })()}
+          
           <div className="grid md:grid-cols-2 gap-4">
             {[
               { title: 'Гъвкавост', desc: 'възможност да се променят сумите, определени за отделните цели', color: 'blue', icon: '🔄' },

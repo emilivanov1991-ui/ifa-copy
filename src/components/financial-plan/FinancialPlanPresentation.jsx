@@ -424,8 +424,6 @@ export default function FinancialPlanPresentation({ planData, clientData, analys
                   const percent = ((value / totalAllocation) * 100).toFixed(1);
                   const percentOfIncome = monthlyIncome > 0 ? ((value / monthlyIncome) * 100).toFixed(1) : 0;
 
-                  const isSmall = width < 30 || height < 30;
-
                   return (
                     <g>
                       <rect
@@ -541,77 +539,43 @@ export default function FinancialPlanPresentation({ planData, clientData, analys
                           </text>
                         </>
                       )}
-                      {isSmall && (
-                        <>
-                          {/* Малка точка в центъра на полето */}
-                          <circle
-                            cx={x + width / 2}
-                            cy={y + height / 2}
-                            r={3}
-                            fill="#fff"
-                          />
-                          {/* Линия към текста */}
-                          <line
-                            x1={x + width / 2}
-                            y1={y + height / 2}
-                            x2={x + width + 15}
-                            y2={y - 30 - (index * 35)}
-                            stroke="#333"
-                            strokeWidth={1.5}
-                            markerEnd="url(#arrowhead)"
-                          />
-                          {/* Текст извън полето */}
-                          <g transform={`translate(${x + width + 20}, ${y - 35 - (index * 35)})`}>
-                            <rect
-                              x={0}
-                              y={0}
-                              width={120}
-                              height={30}
-                              fill="white"
-                              stroke={color}
-                              strokeWidth={2}
-                              rx={4}
-                            />
-                            <text
-                              x={60}
-                              y={12}
-                              textAnchor="middle"
-                              fill="#333"
-                              fontSize={10}
-                              fontWeight="bold"
-                            >
-                              {name}
-                            </text>
-                            <text
-                              x={60}
-                              y={24}
-                              textAnchor="middle"
-                              fill="#333"
-                              fontSize={9}
-                            >
-                              {percent}% • {value.toFixed(0)} лв
-                            </text>
-                          </g>
-                        </>
-                      )}
                     </g>
                   );
                 }}
-              >
-                <defs>
-                  <marker
-                    id="arrowhead"
-                    markerWidth="10"
-                    markerHeight="10"
-                    refX="5"
-                    refY="3"
-                    orient="auto"
-                  >
-                    <polygon points="0 0, 10 3, 0 6" fill="#333" />
-                  </marker>
-                </defs>
-              </Treemap>
+              />
             </ResponsiveContainer>
+
+            {/* Легенда за всички категории */}
+            <div className="mt-4 pt-4 border-t border-slate-200">
+              <p className="text-xs text-slate-500 mb-2 font-medium">Пълна разбивка:</p>
+              <div className="grid grid-cols-2 md:grid-cols-5 gap-2">
+                {[
+                  { name: 'Инвестиции', ...allocation.investments, color: '#3b82f6', icon: '📈' },
+                  { name: 'Защита на дохода', ...allocation.incomeProtection, color: '#10b981', icon: '🛡️' },
+                  { name: 'Защита на имущество', ...allocation.propertyProtection, color: '#f59e0b', icon: '🏠' },
+                  { name: 'Кредити', ...allocation.loans, color: '#8b5cf6', icon: '💳' },
+                  { name: 'Резерв', ...allocation.reserve, color: '#06b6d4', icon: '💰' }
+                ].filter(item => item.amount > 0).map((item, idx) => {
+                  const monthlyIncome = (analysisData?.client_net_income || 0) + (analysisData?.partner_net_income || 0);
+                  const percentOfIncome = monthlyIncome > 0 ? ((item.amount / monthlyIncome) * 100).toFixed(1) : 0;
+                  return (
+                    <div key={idx} className="flex items-center gap-2 bg-slate-50 rounded-lg p-2">
+                      <div 
+                        className="w-3 h-3 rounded-sm flex-shrink-0" 
+                        style={{ backgroundColor: item.color }}
+                      />
+                      <div className="flex-1 min-w-0">
+                        <p className="text-xs font-semibold text-slate-700 truncate">{item.name}</p>
+                        <p className="text-xs text-slate-900 font-bold">{item.amount.toFixed(0)} лв</p>
+                        <p className="text-[10px] text-slate-500">
+                          {item.percent.toFixed(1)}% от спестявания • {percentOfIncome}% от доход
+                        </p>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
           </div>
 
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3">

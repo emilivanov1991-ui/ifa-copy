@@ -283,10 +283,13 @@ export default function FinancialPlanPresentation({ planData, clientData, analys
                 <Tooltip 
                   contentStyle={{ backgroundColor: '#fff', border: '1px solid #e2e8f0', borderRadius: '8px' }}
                   labelFormatter={(value) => `Възраст: ${value}`}
-                  formatter={(value, name) => [
-                    `${value.toFixed(0)} хил. EUR`, 
-                    name === 'laborCapital' ? 'Трудов капитал' : 'Финансов капитал'
-                  ]}
+                  formatter={(value, name) => {
+                    if (name === 'protectionArea') return null;
+                    return [
+                      `${value.toFixed(0)} хил. EUR`, 
+                      name === 'laborCapital' ? 'Трудов капитал' : 'Финансов капитал'
+                    ];
+                  }}
                 />
                 <Legend 
                   wrapperStyle={{ paddingTop: '20px' }}

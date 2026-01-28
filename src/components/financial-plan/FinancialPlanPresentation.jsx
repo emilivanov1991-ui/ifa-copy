@@ -725,15 +725,27 @@ export default function FinancialPlanPresentation({ planData, clientData, analys
                     });
                     
                     if (neighbors.length > 0) {
-                      // Find closest neighbor by edge distance
+                      // Find closest neighbor by minimum distance between boundaries
                       let closestNeighbor = neighbors[0];
                       let minDistance = Infinity;
                       
                       neighbors.forEach(neighbor => {
-                        // Calculate closest edge distance (not center distance)
-                        const dx = Math.max(neighbor.x0 - (x + width), 0, x - (neighbor.x0 + neighbor.width));
-                        const dy = Math.max(neighbor.y0 - (y + height), 0, y - (neighbor.y0 + neighbor.height));
-                        const distance = Math.sqrt(dx * dx + dy * dy);
+                        // Calculate minimum distance between the rectangles
+                        const left = Math.max(x, neighbor.x0);
+                        const right = Math.min(x + width, neighbor.x0 + neighbor.width);
+                        const top = Math.max(y, neighbor.y0);
+                        const bottom = Math.min(y + height, neighbor.y0 + neighbor.height);
+                        
+                        let distance;
+                        if (left < right && top < bottom) {
+                          // Rectangles overlap - they are touching
+                          distance = 0;
+                        } else {
+                          // Calculate actual distance between non-overlapping rectangles
+                          const dx = left > right ? left - right : 0;
+                          const dy = top > bottom ? top - bottom : 0;
+                          distance = Math.sqrt(dx * dx + dy * dy);
+                        }
                         
                         if (distance < minDistance) {
                           minDistance = distance;

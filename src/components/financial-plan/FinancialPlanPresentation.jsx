@@ -355,12 +355,12 @@ export default function FinancialPlanPresentation({ planData, clientData, analys
                   (capitalData[Math.floor(intersectionIndex / 2)].laborCapital + 
                    capitalData[Math.floor(intersectionIndex / 2)].financialCapital) / 2;
                 
-                // Calculate position as percentage
-                const xPercent = (centerIndex / (capitalData.length - 1)) * 100;
+                // Calculate position as percentage with visual adjustments
+                const xPercent = (centerIndex / (capitalData.length - 1)) * 100 + 5;
                 const maxY = Math.max(...capitalData.map(d => Math.max(d.laborCapital, d.financialCapital)));
                 const minY = Math.min(...capitalData.map(d => Math.min(d.laborCapital, d.financialCapital)));
                 const yRange = maxY - minY;
-                const yPercent = ((maxY - centerY) / yRange) * 100;
+                const yPercent = ((maxY - centerY) / yRange) * 100 - 10;
                 
                 return (
                   <div 

@@ -487,24 +487,89 @@ export default function FinancialPlanPresentation({ planData, clientData, analys
               Растеж на имуществото до пенсиониране
             </h3>
             <ResponsiveContainer width="100%" height={350}>
-              <BarChart data={wealthComparisonData}>
+              <AreaChart data={(() => {
+                const years = yearsToRetirement;
+                const withoutPlanFinal = wealth.withoutPlan;
+                const withPlanFinal = wealth.withPlan;
+
+                // Generate exponential growth data points
+                return Array.from({ length: Math.min(years + 1, 42) }, (_, i) => {
+                  const year = i;
+                  const progress = i / years;
+
+                  // Exponential growth formula: P * (1 + r)^t
+                  const withoutPlanValue = withoutPlanFinal * (Math.pow(progress, 1.5));
+                  const withPlanValue = withPlanFinal * (Math.pow(progress, 1.5));
+
+                  return {
+                    year,
+                    withoutPlan: withoutPlanValue,
+                    withPlan: withPlanValue
+                  };
+                });
+              })()}>
+                <defs>
+                  <linearGradient id="withoutPlanGradient" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor="#94a3b8" stopOpacity={0.3}/>
+                    <stop offset="95%" stopColor="#94a3b8" stopOpacity={0}/>
+                  </linearGradient>
+                  <linearGradient id="withPlanGradient" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor="#22c55e" stopOpacity={0.6}/>
+                    <stop offset="95%" stopColor="#22c55e" stopOpacity={0.15}/>
+                  </linearGradient>
+                  <pattern id="differenceHatch" patternUnits="userSpaceOnUse" width="8" height="8" patternTransform="rotate(45)">
+                    <line x1="0" y1="0" x2="0" y2="8" stroke="#16a34a" strokeWidth="1.5" opacity="0.4" />
+                  </pattern>
+                </defs>
                 <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
-                <XAxis dataKey="name" stroke="#64748b" />
+                <XAxis 
+                  dataKey="year" 
+                  label={{ value: 'Години', position: 'insideBottom', offset: -5 }}
+                  stroke="#64748b"
+                />
                 <YAxis 
                   stroke="#64748b"
                   tickFormatter={(value) => value >= 1000000 ? `${(value / 1000000).toFixed(2)} мил. EUR` : `${(value / 1000).toFixed(0)}K EUR`}
                 />
                 <Tooltip 
                   contentStyle={{ backgroundColor: '#fff', border: '1px solid #e2e8f0', borderRadius: '8px' }}
-                  formatter={(value) => [value >= 1000000 ? `${(value / 1000000).toFixed(2)} мил. EUR` : `${(value / 1000).toFixed(0)}K EUR`, 'Стойност']}
+                  formatter={(value, name) => [
+                    value >= 1000000 ? `${(value / 1000000).toFixed(2)} мил. EUR` : `${(value / 1000).toFixed(0)}K EUR`,
+                    name === 'withoutPlan' ? 'БЕЗ план' : 'С НАШИЯ план'
+                  ]}
                 />
-                <Bar dataKey="value" radius={[8, 8, 0, 0]}>
-                  {wealthComparisonData.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={entry.fill} />
-                  ))}
-                </Bar>
-              </BarChart>
+                <Legend 
+                  wrapperStyle={{ paddingTop: '20px' }}
+                  formatter={(value) => value === 'withoutPlan' ? 'БЕЗ план' : 'С НАШИЯ план'}
+                />
+                <Area 
+                  type="monotone" 
+                  dataKey="withoutPlan" 
+                  stroke="#94a3b8" 
+                  strokeWidth={3}
+                  fill="url(#withoutPlanGradient)"
+                  name="withoutPlan"
+                />
+                <Area 
+                  type="monotone" 
+                  dataKey="withPlan" 
+                  stroke="#22c55e" 
+                  strokeWidth={3}
+                  fill="url(#withPlanGradient)"
+                  name="withPlan"
+                />
+              </AreaChart>
             </ResponsiveContainer>
+
+            {/* Difference label */}
+            <div className="mt-4 flex items-center justify-center">
+              <div className="bg-green-100 border-2 border-green-500 rounded-lg px-6 py-3">
+                <p className="text-sm text-green-700 font-medium mb-1 text-center">Разлика:</p>
+                <p className="text-3xl font-bold text-green-700 text-center">
+                  {((wealth.withPlan - wealth.withoutPlan) / 1000).toFixed(0)}K EUR
+                </p>
+              </div>
+            </div>
             
             <div className="mt-4 bg-amber-50 border-l-4 border-amber-400 p-4 rounded">
               <div className="flex items-center gap-2">

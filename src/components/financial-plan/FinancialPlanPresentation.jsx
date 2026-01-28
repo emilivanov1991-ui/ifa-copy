@@ -711,71 +711,56 @@ export default function FinancialPlanPresentation({ planData, clientData, analys
 
                   const isSmall = width < 120 || height < 100;
 
-                  // Label positions
+                  // Label positions - default in bottom third of own field
                   let labelX = x + width / 2;
-                  let labelY = y + height * 2/3; // Bottom 1/3 for large fields
+                  let labelY = y + height * 2/3;
 
                   if (isSmall && root && root.children) {
-                    // Build array of all large fields with their actual rendered coordinates
-                    const largeFields = root.children
-                      .map(child => {
-                        const childData = child.data || child;
-                        // Find matching element in allocationData to get actual rendering coords
-                        const renderData = allocationData.find(d => d.name === childData.name);
-                        if (!renderData) return null;
+                    // Get current small box center
+                    const smallCenterX = x + width / 2;
+                    const smallCenterY = y + height / 2;
+                    const smallArea = width * height;
 
-                        // The child in root.children after treemap layout has been calculated
-                        return {
-                          name: childData.name,
-                          value: childData.value,
-                          x: child.x0,
-                          y: child.y0,
-                          width: child.x1 - child.x0,
-                          height: child.y1 - child.y0
-                        };
-                      })
-                      .filter(field => 
-                        field && 
-                        field.name !== name && 
-                        field.value > value * 2 // At least 2x larger by value
+                    // Find all neighbors that are significantly larger (by area)
+                    let closestNeighbor = null;
+                    let minDistance = Infinity;
+
+                    root.children.forEach(child => {
+                      const neighborData = child.data || child;
+                      const neighborX = child.x0;
+                      const neighborY = child.y0;
+                      const neighborWidth = child.x1 - child.x0;
+                      const neighborHeight = child.y1 - child.y0;
+                      const neighborArea = neighborWidth * neighborHeight;
+
+                      // Skip self and small neighbors
+                      if (neighborData.name === name || neighborArea <= smallArea * 2) {
+                        return;
+                      }
+
+                      // Calculate center-to-center distance
+                      const neighborCenterX = neighborX + neighborWidth / 2;
+                      const neighborCenterY = neighborY + neighborHeight / 2;
+                      const distance = Math.sqrt(
+                        Math.pow(neighborCenterX - smallCenterX, 2) + 
+                        Math.pow(neighborCenterY - smallCenterY, 2)
                       );
 
-                    if (largeFields.length > 0) {
-                      // Find closest by edge distance
-                      let closestField = largeFields[0];
-                      let minDistance = Infinity;
+                      if (distance < minDistance) {
+                        minDistance = distance;
+                        closestNeighbor = {
+                          x: neighborX,
+                          y: neighborY,
+                          width: neighborWidth,
+                          height: neighborHeight
+                        };
+                      }
+                    });
 
-                      largeFields.forEach(field => {
-                        // Calculate minimum edge distance between current small box and this large field
-                        let dx = 0, dy = 0;
-
-                        // Horizontal distance
-                        if (x + width < field.x) {
-                          dx = field.x - (x + width); // Small box is to the left
-                        } else if (x > field.x + field.width) {
-                          dx = x - (field.x + field.width); // Small box is to the right
-                        }
-                        // else they overlap horizontally, dx = 0
-
-                        // Vertical distance
-                        if (y + height < field.y) {
-                          dy = field.y - (y + height); // Small box is above
-                        } else if (y > field.y + field.height) {
-                          dy = y - (field.y + field.height); // Small box is below
-                        }
-                        // else they overlap vertically, dy = 0
-
-                        const distance = Math.sqrt(dx * dx + dy * dy);
-
-                        if (distance < minDistance) {
-                          minDistance = distance;
-                          closestField = field;
-                        }
-                      });
-
-                      // Position label in top 1/3 of closest large field
-                      labelX = closestField.x + closestField.width / 2;
-                      labelY = closestField.y + closestField.height / 3;
+                    // Position label in top 1/3 of closest neighbor
+                    if (closestNeighbor) {
+                      labelX = closestNeighbor.x + closestNeighbor.width / 2;
+                      labelY = closestNeighbor.y + closestNeighbor.height / 3;
                     }
                   }
 

@@ -263,8 +263,8 @@ export default function FinancialPlanPresentation({ planData, clientData, analys
                     <stop offset="95%" stopColor="#dc2626" stopOpacity={0}/>
                   </linearGradient>
                   <linearGradient id="financialGradient" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#2563eb" stopOpacity={0.3}/>
-                    <stop offset="95%" stopColor="#2563eb" stopOpacity={0}/>
+                    <stop offset="5%" stopColor="#2563eb" stopOpacity={0.6}/>
+                    <stop offset="95%" stopColor="#2563eb" stopOpacity={0.15}/>
                   </linearGradient>
                   <pattern id="diagonalHatch" patternUnits="userSpaceOnUse" width="8" height="8" patternTransform="rotate(45)">
                     <line x1="0" y1="0" x2="0" y2="8" stroke="#dc2626" strokeWidth="1.5" opacity="0.5" />
@@ -383,10 +383,28 @@ export default function FinancialPlanPresentation({ planData, clientData, analys
                 );
               }
               return null;
-            })()}
+              })()}
+
+              {/* Investment wealth label */}
+              <div 
+              className="absolute bg-green-600 text-white px-3 py-2 rounded-lg shadow-xl pointer-events-none"
+              style={{
+                right: '8%',
+                bottom: '25%',
+                fontSize: '11px',
+                fontWeight: 'bold',
+                lineHeight: '1.3',
+                whiteSpace: 'nowrap'
+              }}
+              >
+              <div className="flex items-center gap-1.5">
+                <CheckCircle className="w-4 h-4" />
+                <span>Имущество генерирано чрез инвестиции</span>
+              </div>
+              </div>
 
 
-          </div>
+              </div>
 
           <Card className="bg-gradient-to-r from-blue-50 to-indigo-50 border-blue-200">
             <CardContent className="p-6">

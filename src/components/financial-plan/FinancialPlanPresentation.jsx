@@ -402,10 +402,10 @@ export default function FinancialPlanPresentation({ planData, clientData, analys
 
                   // Check if there's enough space above the red line for the label
                   if (targetPoint.financialCapital > targetPoint.laborCapital + (2 * buffer)) {
-                    // Center in the blue area, but ensure it's above the red line
-                    const idealMidValue = (targetPoint.financialCapital + targetPoint.laborCapital) / 2;
-                    const constrainedMidValue = Math.max(idealMidValue, targetPoint.laborCapital + buffer);
-                    const finalMidValue = Math.min(constrainedMidValue, targetPoint.financialCapital - buffer);
+                    // Position at 75% height in the blue area (closer to the top blue line)
+                    const idealMidValue = targetPoint.laborCapital + 0.75 * (targetPoint.financialCapital - targetPoint.laborCapital);
+                    const constrainedMidValue = Math.max(idealMidValue, targetPoint.laborCapital + 2 * buffer);
+                    const finalMidValue = Math.min(constrainedMidValue, targetPoint.financialCapital - 2 * buffer);
 
                     const yPercent = (1 - (finalMidValue / maxChartYValue)) * 100;
 

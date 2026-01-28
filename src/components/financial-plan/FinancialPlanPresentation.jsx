@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend, Area, AreaChart, Cell, Treemap } from 'recharts';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { ChevronLeft, ChevronRight, Download, X, CheckCircle, TrendingUp, Shield, Home, Wallet, DollarSign } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Download, X, CheckCircle, TrendingUp, Shield, Home, Wallet, DollarSign, AlertTriangle } from 'lucide-react';
 import { downloadFinancialPlanPDF } from './FinancialPlanPDFGenerator';
 import { toast } from 'sonner';
 
@@ -250,58 +250,82 @@ export default function FinancialPlanPresentation({ planData, clientData, analys
             <p className="text-slate-600">Как изграждаме вашата финансова независимост</p>
           </div>
           
-          <ResponsiveContainer width="100%" height={400}>
-            <AreaChart data={capitalData}>
-              <defs>
-                <linearGradient id="laborGradient" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor="#dc2626" stopOpacity={0.3}/>
-                  <stop offset="95%" stopColor="#dc2626" stopOpacity={0}/>
-                </linearGradient>
-                <linearGradient id="financialGradient" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor="#2563eb" stopOpacity={0.3}/>
-                  <stop offset="95%" stopColor="#2563eb" stopOpacity={0}/>
-                </linearGradient>
-              </defs>
-              <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
-              <XAxis 
-                dataKey="age" 
-                label={{ value: 'Възраст', position: 'insideBottom', offset: -5 }}
-                stroke="#64748b"
-              />
-              <YAxis 
-                label={{ value: 'Капитал (хил. EUR)', angle: -90, position: 'insideLeft' }}
-                stroke="#64748b"
-              />
-              <Tooltip 
-                contentStyle={{ backgroundColor: '#fff', border: '1px solid #e2e8f0', borderRadius: '8px' }}
-                labelFormatter={(value) => `Възраст: ${value}`}
-                formatter={(value, name) => [
-                  `${value.toFixed(0)} хил. EUR`, 
-                  name === 'laborCapital' ? 'Трудов капитал' : 'Финансов капитал'
-                ]}
-              />
-              <Legend 
-                wrapperStyle={{ paddingTop: '20px' }}
-                formatter={(value) => value === 'laborCapital' ? 'Трудов капитал' : 'Финансов капитал'}
-              />
-              <Area 
-                type="monotone" 
-                dataKey="laborCapital" 
-                stroke="#dc2626" 
-                strokeWidth={3}
-                fill="url(#laborGradient)" 
-                name="laborCapital"
-              />
-              <Area 
-                type="monotone" 
-                dataKey="financialCapital" 
-                stroke="#2563eb" 
-                strokeWidth={3}
-                fill="url(#financialGradient)" 
-                name="financialCapital"
-              />
-            </AreaChart>
-          </ResponsiveContainer>
+          <div className="relative">
+            <ResponsiveContainer width="100%" height={400}>
+              <AreaChart data={capitalData}>
+                <defs>
+                  <linearGradient id="laborGradient" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor="#dc2626" stopOpacity={0.3}/>
+                    <stop offset="95%" stopColor="#dc2626" stopOpacity={0}/>
+                  </linearGradient>
+                  <linearGradient id="financialGradient" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor="#2563eb" stopOpacity={0.3}/>
+                    <stop offset="95%" stopColor="#2563eb" stopOpacity={0}/>
+                  </linearGradient>
+                </defs>
+                <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
+                <XAxis 
+                  dataKey="age" 
+                  label={{ value: 'Възраст', position: 'insideBottom', offset: -5 }}
+                  stroke="#64748b"
+                />
+                <YAxis 
+                  label={{ value: 'Капитал (хил. EUR)', angle: -90, position: 'insideLeft' }}
+                  stroke="#64748b"
+                />
+                <Tooltip 
+                  contentStyle={{ backgroundColor: '#fff', border: '1px solid #e2e8f0', borderRadius: '8px' }}
+                  labelFormatter={(value) => `Възраст: ${value}`}
+                  formatter={(value, name) => [
+                    `${value.toFixed(0)} хил. EUR`, 
+                    name === 'laborCapital' ? 'Трудов капитал' : 'Финансов капитал'
+                  ]}
+                />
+                <Legend 
+                  wrapperStyle={{ paddingTop: '20px' }}
+                  formatter={(value) => value === 'laborCapital' ? 'Трудов капитал' : 'Финансов капитал'}
+                />
+                <Area 
+                  type="monotone" 
+                  dataKey="laborCapital" 
+                  stroke="#dc2626" 
+                  strokeWidth={3}
+                  fill="url(#laborGradient)" 
+                  name="laborCapital"
+                />
+                <Area 
+                  type="monotone" 
+                  dataKey="financialCapital" 
+                  stroke="#2563eb" 
+                  strokeWidth={3}
+                  fill="url(#financialGradient)" 
+                  name="financialCapital"
+                />
+              </AreaChart>
+            </ResponsiveContainer>
+
+            {/* Warning badge for labor capital protection */}
+            {(() => {
+              // Find the intersection point where financial capital overtakes labor capital
+              const intersectionIndex = capitalData.findIndex((point, i) => 
+                i > 0 && point.financialCapital >= point.laborCapital
+              );
+              
+              // Show warning only if there's a period where labor capital is higher
+              if (intersectionIndex > 0) {
+                return (
+                  <div className="absolute top-4 right-4 bg-red-600 text-white px-4 py-3 rounded-lg shadow-xl flex items-center gap-3 max-w-xs animate-pulse">
+                    <AlertTriangle className="w-8 h-8 flex-shrink-0" />
+                    <div>
+                      <p className="font-bold text-sm leading-tight">Нужда от защита на трудовия капитал!</p>
+                      <p className="text-xs text-red-100 mt-1">до {capitalData[intersectionIndex]?.age} години</p>
+                    </div>
+                  </div>
+                );
+              }
+              return null;
+            })()}
+          </div>
 
           <Card className="bg-gradient-to-r from-blue-50 to-indigo-50 border-blue-200">
             <CardContent className="p-6">

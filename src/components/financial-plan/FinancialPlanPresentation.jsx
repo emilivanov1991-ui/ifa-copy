@@ -262,9 +262,6 @@ export default function FinancialPlanPresentation({ planData, clientData, analys
                     <stop offset="5%" stopColor="#2563eb" stopOpacity={0.3}/>
                     <stop offset="95%" stopColor="#2563eb" stopOpacity={0}/>
                   </linearGradient>
-                  <pattern id="protectionPattern" patternUnits="userSpaceOnUse" width="10" height="10" patternTransform="rotate(-45)">
-                    <line x1="0" y1="0" x2="0" y2="10" stroke="#dc2626" strokeWidth="1.5" opacity="0.4" />
-                  </pattern>
                 </defs>
                 <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
                 <XAxis 
@@ -288,32 +285,6 @@ export default function FinancialPlanPresentation({ planData, clientData, analys
                   wrapperStyle={{ paddingTop: '20px' }}
                   formatter={(value) => value === 'laborCapital' ? 'Трудов капитал' : 'Финансов капитал'}
                 />
-                
-                {/* Hatched area between lines - only before intersection */}
-                {(() => {
-                  const intersectionIndex = capitalData.findIndex((point, i) => 
-                    i > 0 && point.financialCapital >= point.laborCapital
-                  );
-                  if (intersectionIndex > 0) {
-                    const protectionData = capitalData.slice(0, intersectionIndex + 1).map(point => ({
-                      ...point,
-                      protectionZone: point.laborCapital - point.financialCapital
-                    }));
-                    return (
-                      <Area 
-                        type="monotone" 
-                        dataKey="protectionZone"
-                        stackId="protection"
-                        stroke="none"
-                        fill="url(#protectionPattern)"
-                        data={protectionData}
-                        baseValue="dataMin"
-                      />
-                    );
-                  }
-                  return null;
-                })()}
-                
                 <Area 
                   type="monotone" 
                   dataKey="laborCapital" 
@@ -330,38 +301,6 @@ export default function FinancialPlanPresentation({ planData, clientData, analys
                   fill="url(#financialGradient)" 
                   name="financialCapital"
                 />
-                
-                {/* Text labels */}
-                {(() => {
-                  const intersectionIndex = capitalData.findIndex((point, i) => 
-                    i > 0 && point.financialCapital >= point.laborCapital
-                  );
-                  if (intersectionIndex > 0) {
-                    return (
-                      <text
-                        x="20%"
-                        y="30%"
-                        fill="#dc2626"
-                        fontSize="24"
-                        fontWeight="bold"
-                        textAnchor="middle"
-                      >
-                        ЗАЩИТА
-                      </text>
-                    );
-                  }
-                  return null;
-                })()}
-                <text
-                  x="75%"
-                  y="20%"
-                  fill="#2563eb"
-                  fontSize="20"
-                  fontWeight="bold"
-                  textAnchor="middle"
-                >
-                  ИНВЕСТИЦИИ
-                </text>
               </AreaChart>
             </ResponsiveContainer>
 

@@ -68,14 +68,14 @@ const calculateWealthProjection = (planData, clientData, analysisData) => {
   return { withoutPlan, withPlan, monthlyReserve };
 };
 
-// Calculate allocation breakdown including reserve
-const calculateAllocation = (planData, monthlyReserve) => {
-  const products = planData.products || [];
+// Calculate allocation breakdown including reserve (in EUR)
+const calculateAllocation = (planData, monthlyReserve, productsEUR, eurRate) => {
+  const products = productsEUR;
   let investments = 0;
   let incomeProtection = 0;
   let propertyProtection = 0;
   let loans = 0;
-  
+
   products.forEach(p => {
     const premium = p.monthlyPremium || 0;
     if (p.name.includes('Unit Linked') || p.name.includes('УПФ')) {
@@ -88,10 +88,10 @@ const calculateAllocation = (planData, monthlyReserve) => {
       loans += premium;
     }
   });
-  
-  const reserve = Math.max(monthlyReserve, 0);
+
+  const reserve = Math.max(monthlyReserve / eurRate, 0); // конвертираме резерва в EUR
   const total = investments + incomeProtection + propertyProtection + loans + reserve || 1;
-  
+
   return {
     investments: { amount: investments, percent: (investments / total) * 100 },
     incomeProtection: { amount: incomeProtection, percent: (incomeProtection / total) * 100 },

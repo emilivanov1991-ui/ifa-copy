@@ -210,7 +210,7 @@ export default function FinancialPlanPresentation({ planData, clientData, analys
                 contentStyle={{ backgroundColor: '#fff', border: '1px solid #e2e8f0', borderRadius: '8px' }}
                 labelFormatter={(value) => `Възраст: ${value}`}
                 formatter={(value, name) => [
-                  `${value.toFixed(0)}%`, 
+                  `${value.toFixed(0)} хил. лв`, 
                   name === 'laborCapital' ? 'Трудов капитал' : 'Финансов капитал'
                 ]}
               />

@@ -343,10 +343,10 @@ export default function FinancialPlanPresentation({ planData, clientData, analys
                 transition={{ delay: 0.2 }}
                 className="flex items-center justify-center gap-4"
               >
-                <span className="text-7xl font-bold">{planData.total_monthly_premium?.toFixed(0) || '0'}</span>
+                <span className="text-7xl font-bold">{totalMonthlyPremiumEUR.toFixed(0)}</span>
                 <div className="text-left">
-                  <p className="text-2xl font-semibold">лв/месец</p>
-                  <p className="text-lg text-blue-200">само {dailyCost} лв/ден</p>
+                  <p className="text-2xl font-semibold">EUR/месец</p>
+                  <p className="text-lg text-blue-200">само {dailyCost} EUR/ден</p>
                 </div>
               </motion.div>
             </div>

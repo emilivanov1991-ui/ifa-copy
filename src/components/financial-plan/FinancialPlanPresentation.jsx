@@ -395,31 +395,40 @@ export default function FinancialPlanPresentation({ planData, clientData, analys
                 const targetAge = Math.round(minAge + 0.8 * (maxAge - minAge));
                 const targetPoint = capitalData.find(d => d.age === targetAge);
 
-                if (targetPoint && targetPoint.financialCapital > 0) {
+if (targetPoint && targetPoint.financialCapital > 0) {
                   const xPercent = ((targetAge - minAge) / (maxAge - minAge)) * 100;
-                  // Position in the middle between blue line (financial) and red line (labor)
-                  const midValue = (targetPoint.financialCapital + targetPoint.laborCapital) / 2;
-                  const yPercent = (1 - (midValue / maxChartYValue)) * 100;
+                  
+                  const buffer = 0.015 * maxChartYValue;
+                  
+                  // Check if there's enough space above the red line
+                  if (targetPoint.financialCapital > targetPoint.laborCapital + (2 * buffer)) {
+                    // Center in the blue area, but ensure it's above the red line
+                    const idealMidValue = (targetPoint.financialCapital + targetPoint.laborCapital) / 2;
+                    const constrainedMidValue = Math.max(idealMidValue, targetPoint.laborCapital + buffer);
+                    const finalMidValue = Math.min(constrainedMidValue, targetPoint.financialCapital - buffer);
 
-                  return (
-                    <div
-                      className="absolute bg-green-600 text-white px-3 py-2 rounded-lg shadow-xl pointer-events-none"
-                      style={{
-                        left: `${xPercent}%`,
-                        top: `${yPercent}%`,
-                        transform: 'translate(-50%, -50%)',
-                        fontSize: '11px',
-                        fontWeight: 'bold',
-                        lineHeight: '1.3',
-                        whiteSpace: 'nowrap'
-                      }}
-                    >
-                      <div className="flex items-center gap-1.5">
-                        <CheckCircle className="w-4 h-4" />
-                        <span>Имущество генерирано чрез инвестиции</span>
+                    const yPercent = (1 - (finalMidValue / maxChartYValue)) * 100;
+
+                    return (
+                      <div
+                        className="absolute bg-green-600 text-white px-3 py-2 rounded-lg shadow-xl pointer-events-none"
+                        style={{
+                          left: `${xPercent}%`,
+                          top: `${yPercent}%`,
+                          transform: 'translate(-50%, -50%)',
+                          fontSize: '11px',
+                          fontWeight: 'bold',
+                          lineHeight: '1.3',
+                          whiteSpace: 'nowrap'
+                        }}
+                      >
+                        <div className="flex items-center gap-1.5">
+                          <CheckCircle className="w-4 h-4" />
+                          <span>Имущество генерирано чрез инвестиции</span>
+                        </div>
                       </div>
-                    </div>
-                  );
+                    );
+                  }
                 }
                 return null;
               })()}

@@ -206,11 +206,15 @@ export default function FinancialPlanPresentation({ planData, clientData, analys
     const grownInitialWealth = initialNetWorth * Math.pow(1 + wealthGrowthRate, i);
 
     const financialCapital = grownInitialWealth + investmentGrowth;
+    
+    const laborCapitalK = laborCapital / 1000;
+    const financialCapitalK = financialCapital / 1000;
 
     return {
       age: currentAge,
-      laborCapital: laborCapital / 1000, // в хиляди евро
-      financialCapital: financialCapital / 1000, // в хиляди евро
+      laborCapital: laborCapitalK,
+      financialCapital: financialCapitalK,
+      protectionArea: laborCapitalK > financialCapitalK ? [financialCapitalK, laborCapitalK] : null
     };
   });
 
@@ -262,6 +266,9 @@ export default function FinancialPlanPresentation({ planData, clientData, analys
                     <stop offset="5%" stopColor="#2563eb" stopOpacity={0.3}/>
                     <stop offset="95%" stopColor="#2563eb" stopOpacity={0}/>
                   </linearGradient>
+                  <pattern id="diagonalHatch" patternUnits="userSpaceOnUse" width="8" height="8" patternTransform="rotate(45)">
+                    <line x1="0" y1="0" x2="0" y2="8" stroke="#dc2626" strokeWidth="1.5" opacity="0.5" />
+                  </pattern>
                 </defs>
                 <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
                 <XAxis 
@@ -284,6 +291,13 @@ export default function FinancialPlanPresentation({ planData, clientData, analys
                 <Legend 
                   wrapperStyle={{ paddingTop: '20px' }}
                   formatter={(value) => value === 'laborCapital' ? 'Трудов капитал' : 'Финансов капитал'}
+                />
+                <Area 
+                  type="monotone" 
+                  dataKey="protectionArea" 
+                  stroke="none"
+                  fill="url(#diagonalHatch)" 
+                  connectNulls
                 />
                 <Area 
                   type="monotone" 

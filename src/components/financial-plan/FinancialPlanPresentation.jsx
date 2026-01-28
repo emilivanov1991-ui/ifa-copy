@@ -657,7 +657,7 @@ export default function FinancialPlanPresentation({ planData, clientData, analys
                       />
                       <div className="flex-1 min-w-0">
                         <p className="text-xs font-semibold text-slate-700 truncate">{item.name}</p>
-                        <p className="text-xs text-slate-900 font-bold">{item.amount.toFixed(0)} лв</p>
+                        <p className="text-xs text-slate-900 font-bold">{item.amount.toFixed(0)} EUR</p>
                         <p className="text-[10px] text-slate-500">
                           {item.percent.toFixed(1)}% от спестявания • {percentOfIncome}% от доход
                         </p>

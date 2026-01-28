@@ -3,7 +3,8 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend, Area, AreaChart, Cell, Treemap, Sankey, Rectangle } from 'recharts';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { ChevronLeft, ChevronRight, Download, X, CheckCircle, TrendingUp, Shield, Home, Wallet, Euro, AlertTriangle } from 'lucide-react';
+import { Slider } from '@/components/ui/slider';
+import { ChevronLeft, ChevronRight, Download, X, CheckCircle, TrendingUp, Shield, Home, Wallet, Euro, AlertTriangle, Edit, Check } from 'lucide-react';
 import { downloadFinancialPlanPDF } from './FinancialPlanPDFGenerator';
 import { toast } from 'sonner';
 
@@ -103,6 +104,8 @@ const calculateAllocation = (planData, monthlyReserve, productsEUR, eurRate) => 
 
 export default function FinancialPlanPresentation({ planData, clientData, analysisData, onClose }) {
   const [currentSlide, setCurrentSlide] = useState(0);
+  const [editingProductIndex, setEditingProductIndex] = useState(null);
+  const [modifiedProducts, setModifiedProducts] = useState([]);
 
   // Курс BGN към EUR
   const EUR_BGN_RATE = 1.95583;
@@ -1405,41 +1408,155 @@ export default function FinancialPlanPresentation({ planData, clientData, analys
           <h2 className="text-3xl font-bold text-slate-900 text-center mb-4">Вашите продукти</h2>
           
           <div className="grid gap-4 max-h-[500px] overflow-y-auto pr-2">
-            {products.map((product, idx) => (
-              <motion.div
-                key={idx}
-                initial={{ x: -20, opacity: 0 }}
-                animate={{ x: 0, opacity: 1 }}
-                transition={{ delay: idx * 0.05 }}
-              >
-                <Card className="hover:shadow-lg transition-all border-l-4 border-blue-500">
-                  <CardContent className="p-4">
-                    <div className="flex items-start justify-between gap-4">
-                      <div className="flex items-start gap-3 flex-1">
-                        <div className="w-10 h-10 rounded-full bg-green-500 flex items-center justify-center flex-shrink-0">
-                          <CheckCircle className="w-6 h-6 text-white" />
+            {products.map((product, idx) => {
+              const isEditing = editingProductIndex === idx;
+              const currentProduct = modifiedProducts[idx] || product;
+              
+              return (
+                <motion.div
+                  key={idx}
+                  initial={{ x: -20, opacity: 0 }}
+                  animate={{ x: 0, opacity: 1 }}
+                  transition={{ delay: idx * 0.05 }}
+                >
+                  <Card className="hover:shadow-lg transition-all border-l-4 border-blue-500">
+                    <CardContent className="p-4">
+                      <div className="flex items-start justify-between gap-4">
+                        <div className="flex items-start gap-3 flex-1">
+                          <div className="w-10 h-10 rounded-full bg-green-500 flex items-center justify-center flex-shrink-0">
+                            <CheckCircle className="w-6 h-6 text-white" />
+                          </div>
+                          <div className="flex-1">
+                            <h4 className="font-bold text-slate-900 mb-1">{product.name}</h4>
+                            <p className="text-sm text-slate-600 mb-2">{product.benefit}</p>
+                            {currentProduct.coverage && (
+                              <p className="text-xs text-slate-500">
+                                Покритие: <span className="font-semibold">{currentProduct.coverage.toLocaleString()} EUR</span>
+                              </p>
+                            )}
+                          </div>
                         </div>
-                        <div className="flex-1">
-                          <h4 className="font-bold text-slate-900 mb-1">{product.name}</h4>
-                          <p className="text-sm text-slate-600 mb-2">{product.benefit}</p>
-                          {product.coverage && (
-                            <p className="text-xs text-slate-500">
-                              Покритие: <span className="font-semibold">{product.coverage.toLocaleString()} EUR</span>
-                            </p>
-                          )}
+                        <div className="text-right">
+                          <p className="text-2xl font-bold text-blue-600">
+                            {currentProduct.monthlyPremium === 0 ? 'БЕЗПЛАТНО' : `${currentProduct.monthlyPremium.toFixed(0)} EUR`}
+                          </p>
+                          <p className="text-xs text-slate-500">месечно</p>
                         </div>
                       </div>
-                      <div className="text-right">
-                        <p className="text-2xl font-bold text-blue-600">
-                          {product.monthlyPremium === 0 ? 'БЕЗПЛАТНО' : `${product.monthlyPremium.toFixed(0)} EUR`}
-                        </p>
-                        <p className="text-xs text-slate-500">месечно</p>
+
+                      {/* Action Buttons */}
+                      <div className="mt-4 flex gap-2">
+                        <Button 
+                          size="sm" 
+                          className="flex-1 bg-green-600 hover:bg-green-700"
+                          onClick={() => toast.success('Функционалността за активиране ще бъде добавена скоро')}
+                        >
+                          <Check className="w-4 h-4 mr-2" />
+                          Активирай
+                        </Button>
+                        <Button 
+                          size="sm" 
+                          variant="outline"
+                          className="flex-1"
+                          onClick={() => {
+                            if (isEditing) {
+                              setEditingProductIndex(null);
+                            } else {
+                              setEditingProductIndex(idx);
+                              if (!modifiedProducts[idx]) {
+                                const newModified = [...modifiedProducts];
+                                newModified[idx] = { ...product };
+                                setModifiedProducts(newModified);
+                              }
+                            }
+                          }}
+                        >
+                          <Edit className="w-4 h-4 mr-2" />
+                          {isEditing ? 'Затвори' : 'Промени'}
+                        </Button>
                       </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              </motion.div>
-            ))}
+
+                      {/* Edit Panel */}
+                      <AnimatePresence>
+                        {isEditing && (
+                          <motion.div
+                            initial={{ height: 0, opacity: 0 }}
+                            animate={{ height: 'auto', opacity: 1 }}
+                            exit={{ height: 0, opacity: 0 }}
+                            className="overflow-hidden"
+                          >
+                            <div className="mt-4 pt-4 border-t border-slate-200 space-y-4">
+                              {/* Monthly Premium */}
+                              {currentProduct.monthlyPremium > 0 && (
+                                <div>
+                                  <label className="text-sm font-medium text-slate-700 mb-2 block">
+                                    Месечна премия: {currentProduct.monthlyPremium.toFixed(0)} EUR
+                                  </label>
+                                  <Slider
+                                    value={[currentProduct.monthlyPremium]}
+                                    onValueChange={([value]) => {
+                                      const newModified = [...modifiedProducts];
+                                      newModified[idx] = { ...currentProduct, monthlyPremium: value };
+                                      setModifiedProducts(newModified);
+                                    }}
+                                    min={Math.max(10, product.monthlyPremium * 0.5)}
+                                    max={product.monthlyPremium * 2}
+                                    step={5}
+                                    className="w-full"
+                                  />
+                                </div>
+                              )}
+
+                              {/* Coverage */}
+                              {currentProduct.coverage && currentProduct.coverage > 0 && (
+                                <div>
+                                  <label className="text-sm font-medium text-slate-700 mb-2 block">
+                                    Покритие: {currentProduct.coverage.toLocaleString()} EUR
+                                  </label>
+                                  <Slider
+                                    value={[currentProduct.coverage]}
+                                    onValueChange={([value]) => {
+                                      const newModified = [...modifiedProducts];
+                                      newModified[idx] = { ...currentProduct, coverage: value };
+                                      setModifiedProducts(newModified);
+                                    }}
+                                    min={Math.max(1000, product.coverage * 0.5)}
+                                    max={product.coverage * 2}
+                                    step={1000}
+                                    className="w-full"
+                                  />
+                                </div>
+                              )}
+
+                              {/* Term Years (if applicable) */}
+                              {product.termYears && (
+                                <div>
+                                  <label className="text-sm font-medium text-slate-700 mb-2 block">
+                                    Период: {currentProduct.termYears || product.termYears} години
+                                  </label>
+                                  <Slider
+                                    value={[currentProduct.termYears || product.termYears]}
+                                    onValueChange={([value]) => {
+                                      const newModified = [...modifiedProducts];
+                                      newModified[idx] = { ...currentProduct, termYears: value };
+                                      setModifiedProducts(newModified);
+                                    }}
+                                    min={5}
+                                    max={40}
+                                    step={1}
+                                    className="w-full"
+                                  />
+                                </div>
+                              )}
+                            </div>
+                          </motion.div>
+                        )}
+                      </AnimatePresence>
+                    </CardContent>
+                  </Card>
+                </motion.div>
+              );
+            })}
           </div>
         </div>
       )

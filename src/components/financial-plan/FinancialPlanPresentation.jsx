@@ -397,8 +397,9 @@ export default function FinancialPlanPresentation({ planData, clientData, analys
 
                 if (targetPoint && targetPoint.financialCapital > 0) {
                   const xPercent = ((targetAge - minAge) / (maxAge - minAge)) * 100;
-                  // Center vertically in the blue area - at 50% of financial capital height
-                  const yPercent = (1 - ((targetPoint.financialCapital / 2) / maxChartYValue)) * 100;
+                  // Position in the middle between blue line (financial) and red line (labor)
+                  const midValue = (targetPoint.financialCapital + targetPoint.laborCapital) / 2;
+                  const yPercent = (1 - (midValue / maxChartYValue)) * 100;
 
                   return (
                     <div

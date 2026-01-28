@@ -22,6 +22,12 @@ import MortgageCalculator from '../components/calculators/MortgageCalculator';
 import ConsumerLoanCalculator from '../components/calculators/ConsumerLoanCalculator';
 import OBBPillar2Calculator from '../components/calculators/OBBPillar2Calculator';
 import OBBPillar3Calculator from '../components/calculators/OBBPillar3Calculator';
+import UniCreditMortgageCalculator from '../components/calculators/UniCreditMortgageCalculator';
+import DSKMortgageCalculator from '../components/calculators/DSKMortgageCalculator';
+import PostBankMortgageCalculator from '../components/calculators/PostBankMortgageCalculator';
+import UBBMortgageCalculator from '../components/calculators/UBBMortgageCalculator';
+import UniCreditConsumerLoanCalculator from '../components/calculators/UniCreditConsumerLoanCalculator';
+import UBBConsumerLoanCalculator from '../components/calculators/UBBConsumerLoanCalculator';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -396,56 +402,44 @@ export default function ProductConfigDemo() {
               </TabsList>
 
               <TabsContent value="unicredit-mortgage">
-                <PlaceholderCalculator 
-                  productName="Ипотечен кредит"
-                  provider="UniCredit"
-                  description="Ипотечно кредитиране. Моля предоставете лихвени проценти, такси и условия."
-                  logoUrl="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6925a960748714fa4828395a/d2215799e_image.png"
+                <UniCreditMortgageCalculator 
+                  analysisId={demoAnalysisId}
+                  clientId={demoClientId}
                 />
               </TabsContent>
 
               <TabsContent value="dsk-mortgage">
-                <PlaceholderCalculator 
-                  productName="Ипотечен кредит"
-                  provider="ДСК Банка"
-                  description="Ипотечно кредитиране. Моля предоставете лихвени проценти, такси и условия."
-                  logoUrl="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6925a960748714fa4828395a/4edc7ab0b_image.png"
+                <DSKMortgageCalculator 
+                  analysisId={demoAnalysisId}
+                  clientId={demoClientId}
                 />
               </TabsContent>
 
               <TabsContent value="ubb-mortgage">
-                <PlaceholderCalculator 
-                  productName="Ипотечен кредит"
-                  provider="ОББ"
-                  description="Ипотечно кредитиране. Моля предоставете лихвени проценти, такси и условия."
-                  logoUrl="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6925a960748714fa4828395a/8a6c6726e_image.png"
+                <UBBMortgageCalculator 
+                  analysisId={demoAnalysisId}
+                  clientId={demoClientId}
                 />
               </TabsContent>
 
               <TabsContent value="postbank-mortgage">
-                <PlaceholderCalculator 
-                  productName="Ипотечен кредит"
-                  provider="Пощенска Банка"
-                  description="Ипотечно кредитиране. Моля предоставете лихвени проценти, такси и условия."
-                  logoUrl="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6925a960748714fa4828395a/97f069381_image.png"
+                <PostBankMortgageCalculator 
+                  analysisId={demoAnalysisId}
+                  clientId={demoClientId}
                 />
               </TabsContent>
 
               <TabsContent value="unicredit-consumer">
-                <PlaceholderCalculator 
-                  productName="Потребителски кредит"
-                  provider="UniCredit"
-                  description="Потребителско кредитиране. Моля предоставете лихвени проценти, такси и условия."
-                  logoUrl="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6925a960748714fa4828395a/d2215799e_image.png"
+                <UniCreditConsumerLoanCalculator 
+                  analysisId={demoAnalysisId}
+                  clientId={demoClientId}
                 />
               </TabsContent>
 
               <TabsContent value="ubb-consumer">
-                <PlaceholderCalculator 
-                  productName="Потребителски кредит"
-                  provider="ОББ"
-                  description="Потребителско кредитиране. Моля предоставете лихвени проценти, такси и условия."
-                  logoUrl="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6925a960748714fa4828395a/8a6c6726e_image.png"
+                <UBBConsumerLoanCalculator 
+                  analysisId={demoAnalysisId}
+                  clientId={demoClientId}
                 />
               </TabsContent>
             </Tabs>

@@ -960,6 +960,346 @@ export default function FinancialPlanPresentation({ planData, clientData, analys
       )
     },
     {
+      title: 'Покрития и инвестиции',
+      content: (
+        <div className="space-y-6">
+          <h2 className="text-3xl font-bold text-slate-900 text-center mb-4">Застрахователни покрития и развитие на инвестициите</h2>
+          
+          <div className="grid md:grid-cols-2 gap-6">
+            {/* Left column - Labor Capital & Coverages */}
+            <div className="space-y-4">
+              {/* Labor Capital */}
+              <Card className="bg-gradient-to-r from-red-50 to-pink-50 border-red-200">
+                <CardContent className="p-4">
+                  <h3 className="text-xl font-bold text-red-900 mb-2">Трудов капитал</h3>
+                  <div className="flex items-baseline gap-2">
+                    <p className="text-3xl font-bold text-red-700">
+                      {(() => {
+                        const monthlyNetIncome = clientData.monthlyNetIncome || 0;
+                        const yearsToRet = yearsToRetirement || 30;
+                        const laborCapital = monthlyNetIncome * 12 * yearsToRet * Math.pow(1.03, yearsToRet / 2);
+                        return `${(laborCapital / EUR_BGN_RATE).toLocaleString('bg-BG', { maximumFractionDigits: 0 })} EUR`;
+                      })()}
+                    </p>
+                  </div>
+                  <p className="text-xs text-slate-600 mt-1">
+                    При прогнозен ръст на възнагражденията от 3% годишно
+                  </p>
+                </CardContent>
+              </Card>
+
+              {/* Insurance Coverages */}
+              <Card className="border-green-200">
+                <CardContent className="p-4">
+                  <h3 className="text-lg font-bold text-green-900 mb-3">Защита на дохода</h3>
+                  <div className="space-y-2 text-sm">
+                    {(() => {
+                      const coverages = {};
+                      
+                      products.forEach(product => {
+                        if (product.coverages) {
+                          Object.entries(product.coverages).forEach(([key, value]) => {
+                            if (value && value !== 'Включено') {
+                              coverages[key] = (coverages[key] || 0) + parseFloat(value);
+                            } else if (value === 'Включено') {
+                              coverages[key] = 'Включено';
+                            }
+                          });
+                        }
+                      });
+
+                      const coverageLabels = {
+                        'death': 'Смърт',
+                        'accident_death': 'Смърт вследствие на злополука',
+                        'disability': 'Тежки заболявания',
+                        'permanent_disability': 'Трайна загуба на работоспособност от злополука',
+                        'fractures': 'Фрактури и изгаряния',
+                        'critical_illness': 'Лечение на критични заболявания',
+                        'telemedicine': 'Телемедицина',
+                        'health_insurance': 'Допълнително здравно осигуряване',
+                        'premium_waiver': 'Споразумение за защита на детето'
+                      };
+
+                      return Object.entries(coverages).map(([key, value], idx) => (
+                        <div key={idx} className="flex justify-between items-center py-1 border-b border-slate-100 last:border-0">
+                          <span className="text-slate-700">{coverageLabels[key] || key}</span>
+                          <span className="font-bold text-green-700">
+                            {value === 'Включено' ? (
+                              <CheckCircle className="w-4 h-4 text-green-600" />
+                            ) : (
+                              `${(value / EUR_BGN_RATE).toLocaleString('bg-BG', { maximumFractionDigits: 0 })} EUR`
+                            )}
+                          </span>
+                        </div>
+                      ));
+                    })()}
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+
+            {/* Right column - Allocation Distribution */}
+            <div className="space-y-4">
+              <Card className="border-blue-200">
+                <CardContent className="p-4">
+                  <h3 className="text-lg font-bold text-blue-900 mb-3">Разпределение на средствата</h3>
+                  <div className="space-y-2 text-sm">
+                    {/* Reserve */}
+                    {wealth.monthlyReserve > 0 && (
+                      <div className="flex justify-between items-center py-2 border-b border-slate-100">
+                        <span className="text-slate-700 font-medium">Резерв</span>
+                        <div className="text-right">
+                          <p className="font-bold text-cyan-700">{(wealth.monthlyReserve / EUR_BGN_RATE).toFixed(0)} EUR</p>
+                          <p className="text-xs text-slate-500">месечно</p>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Investments breakdown */}
+                    {(() => {
+                      const investmentProducts = products.filter(p => 
+                        p.name.includes('Unit Linked') || p.name.includes('УПФ')
+                      );
+                      
+                      if (investmentProducts.length === 0) return null;
+
+                      const totalMonthlyInvestment = investmentProducts.reduce((sum, p) => sum + (p.monthlyPremium || 0), 0);
+                      const periods = [];
+                      
+                      // Determine periods
+                      if (yearsToRetirement > 20) {
+                        periods.push({ years: 10, label: '10 години' });
+                        periods.push({ years: 20, label: '20 години' });
+                        periods.push({ years: yearsToRetirement, label: 'До пенсия' });
+                      } else if (yearsToRetirement > 10) {
+                        periods.push({ years: 10, label: '10 години' });
+                        const midYears = Math.round((10 + yearsToRetirement) / 2);
+                        periods.push({ years: midYears, label: `${midYears} години` });
+                        periods.push({ years: yearsToRetirement, label: 'До пенсия' });
+                      } else {
+                        periods.push({ years: Math.min(10, yearsToRetirement), label: yearsToRetirement < 10 ? `${yearsToRetirement} години` : '10 години' });
+                      }
+
+                      return periods.map((period, idx) => {
+                        const months = period.years * 12;
+                        const returnRate = 0.08 / 12;
+                        const futureValue = totalMonthlyInvestment * (((Math.pow(1 + returnRate, months) - 1) / returnRate) * (1 + returnRate));
+                        
+                        return (
+                          <div key={idx} className="flex justify-between items-center py-2 border-b border-slate-100">
+                            <span className="text-slate-700">Инвестиции</span>
+                            <div className="text-right">
+                              <p className="font-bold text-blue-700">{futureValue.toFixed(0)} EUR</p>
+                              <p className="text-xs text-slate-500">{period.label}</p>
+                            </div>
+                          </div>
+                        );
+                      });
+                    })()}
+
+                    {/* Other goals */}
+                    {(() => {
+                      const otherGoals = (analysisData?.other_goals_car || 0) + 
+                                        (analysisData?.other_goals_vacation || 0) + 
+                                        (analysisData?.other_goals_other || 0);
+                      
+                      if (otherGoals > 0 && analysisData?.include_other_goals_in_plan) {
+                        return (
+                          <div className="flex justify-between items-center py-2 border-b border-slate-100">
+                            <span className="text-slate-700">Други цели</span>
+                            <div className="text-right">
+                              <p className="font-bold text-purple-700">{(otherGoals / EUR_BGN_RATE).toFixed(0)} EUR</p>
+                            </div>
+                          </div>
+                        );
+                      }
+                    })()}
+
+                    {/* Down payment */}
+                    {(() => {
+                      if (analysisData?.planning_housing_change && 
+                          analysisData?.financing_method === 'cash_and_loan' && 
+                          analysisData?.available_cash) {
+                        return (
+                          <div className="flex justify-between items-center py-2 border-b border-slate-100">
+                            <span className="text-slate-700">Самоучастие</span>
+                            <div className="text-right">
+                              <p className="font-bold text-orange-700">{(analysisData.available_cash / EUR_BGN_RATE).toFixed(0)} EUR</p>
+                            </div>
+                          </div>
+                        );
+                      }
+                    })()}
+
+                    {/* Children education */}
+                    {(() => {
+                      const childrenCount = analysisData?.children_count || 0;
+                      const childrenProducts = products.filter(p => p.name.includes('Junior'));
+                      
+                      if (childrenCount > 0 && childrenProducts.length > 0) {
+                        return Array.from({ length: childrenCount }, (_, i) => {
+                          const childProduct = childrenProducts.find(p => p.name.includes(`Дете ${i + 1}`));
+                          if (!childProduct) return null;
+
+                          const childBirthdate = analysisData?.[`child_${i + 1}_birthdate`];
+                          if (!childBirthdate) return null;
+
+                          const childAge = new Date().getFullYear() - new Date(childBirthdate).getFullYear();
+                          const yearsTo19 = Math.max(19 - childAge, 0);
+                          const months = yearsTo19 * 12;
+                          const returnRate = 0.08 / 12;
+                          const monthlyPremium = childProduct.monthlyPremium || 0;
+                          const futureValue = monthlyPremium * (((Math.pow(1 + returnRate, months) - 1) / returnRate) * (1 + returnRate));
+
+                          return (
+                            <div key={i} className="flex justify-between items-center py-2 border-b border-slate-100">
+                              <span className="text-slate-700">Образование на Дете {i + 1}</span>
+                              <div className="text-right">
+                                <p className="font-bold text-indigo-700">{futureValue.toFixed(0)} EUR</p>
+                                <p className="text-xs text-slate-500">до 19 години</p>
+                              </div>
+                            </div>
+                          );
+                        });
+                      }
+                    })()}
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          </div>
+
+          {/* Bottom chart - Invested vs Accumulated */}
+          <Card className="border-slate-200">
+            <CardContent className="p-6">
+              <h3 className="text-xl font-bold text-slate-900 mb-4 text-center">
+                Времева алокация на средствата
+              </h3>
+              <ResponsiveContainer width="100%" height={300}>
+                <BarChart data={(() => {
+                  const investmentProducts = products.filter(p => 
+                    p.name.includes('Unit Linked') || p.name.includes('УПФ')
+                  );
+                  
+                  if (investmentProducts.length === 0) return [];
+
+                  const totalMonthlyInvestment = investmentProducts.reduce((sum, p) => sum + (p.monthlyPremium || 0), 0);
+                  const categories = [];
+
+                  // Reserve
+                  if (wealth.monthlyReserve > 0) {
+                    const reserveMonthly = wealth.monthlyReserve / EUR_BGN_RATE;
+                    categories.push({
+                      name: 'Резерв',
+                      invested: reserveMonthly,
+                      accumulated: reserveMonthly,
+                      years: 1
+                    });
+                  }
+
+                  // Other goals
+                  const otherGoals = (analysisData?.other_goals_car || 0) + 
+                                    (analysisData?.other_goals_vacation || 0) + 
+                                    (analysisData?.other_goals_other || 0);
+                  if (otherGoals > 0 && analysisData?.include_other_goals_in_plan) {
+                    categories.push({
+                      name: 'Други цели',
+                      invested: (otherGoals / EUR_BGN_RATE) / 12,
+                      accumulated: otherGoals / EUR_BGN_RATE,
+                      years: 1
+                    });
+                  }
+
+                  // Down payment
+                  if (analysisData?.planning_housing_change && 
+                      analysisData?.financing_method === 'cash_and_loan' && 
+                      analysisData?.available_cash) {
+                    const yearsToProperty = analysisData?.planned_housing_timeline_years || 3;
+                    const downPayment = analysisData.available_cash / EUR_BGN_RATE;
+                    categories.push({
+                      name: 'Самоучастие',
+                      invested: downPayment / (yearsToProperty * 12),
+                      accumulated: downPayment,
+                      years: yearsToProperty
+                    });
+                  }
+
+                  // Investments
+                  const periods = [];
+                  if (yearsToRetirement > 20) {
+                    periods.push({ years: 10, label: 'Инвестиции' });
+                    periods.push({ years: 20, label: 'Инвестиции' });
+                    periods.push({ years: yearsToRetirement, label: 'Инвестиции' });
+                  } else if (yearsToRetirement > 10) {
+                    periods.push({ years: 10, label: 'Инвестиции' });
+                    const midYears = Math.round((10 + yearsToRetirement) / 2);
+                    periods.push({ years: midYears, label: 'Инвестиции' });
+                    periods.push({ years: yearsToRetirement, label: 'Инвестиции' });
+                  } else {
+                    periods.push({ years: Math.min(10, yearsToRetirement), label: 'Инвестиции' });
+                  }
+
+                  periods.forEach((period, idx) => {
+                    const months = period.years * 12;
+                    const returnRate = 0.08 / 12;
+                    const futureValue = totalMonthlyInvestment * (((Math.pow(1 + returnRate, months) - 1) / returnRate) * (1 + returnRate));
+                    
+                    categories.push({
+                      name: `${period.label}`,
+                      invested: totalMonthlyInvestment * months,
+                      accumulated: futureValue,
+                      years: period.years
+                    });
+                  });
+
+                  // Children education
+                  const childrenCount = analysisData?.children_count || 0;
+                  const childrenProducts = products.filter(p => p.name.includes('Junior'));
+                  
+                  if (childrenCount > 0 && childrenProducts.length > 0) {
+                    Array.from({ length: childrenCount }, (_, i) => {
+                      const childProduct = childrenProducts.find(p => p.name.includes(`Дете ${i + 1}`));
+                      if (!childProduct) return;
+
+                      const childBirthdate = analysisData?.[`child_${i + 1}_birthdate`];
+                      if (!childBirthdate) return;
+
+                      const childAge = new Date().getFullYear() - new Date(childBirthdate).getFullYear();
+                      const yearsTo19 = Math.max(19 - childAge, 0);
+                      const months = yearsTo19 * 12;
+                      const returnRate = 0.08 / 12;
+                      const monthlyPremium = childProduct.monthlyPremium || 0;
+                      const futureValue = monthlyPremium * (((Math.pow(1 + returnRate, months) - 1) / returnRate) * (1 + returnRate));
+
+                      categories.push({
+                        name: `Образование Дете ${i + 1}`,
+                        invested: monthlyPremium * months,
+                        accumulated: futureValue,
+                        years: yearsTo19
+                      });
+                    });
+                  }
+
+                  return categories;
+                })()}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
+                  <XAxis dataKey="name" stroke="#64748b" />
+                  <YAxis stroke="#64748b" tickFormatter={(value) => `${(value / 1000).toFixed(0)}K`} />
+                  <Tooltip 
+                    contentStyle={{ backgroundColor: '#fff', border: '1px solid #e2e8f0', borderRadius: '8px' }}
+                    formatter={(value) => `${value.toFixed(0)} EUR`}
+                  />
+                  <Legend />
+                  <Bar dataKey="invested" fill="#94a3b8" name="Инвестирани" />
+                  <Bar dataKey="accumulated" fill="#dc2626" name="Натрупани" />
+                </BarChart>
+              </ResponsiveContainer>
+            </CardContent>
+          </Card>
+        </div>
+      )
+    },
+    {
       title: 'Продукти',
       content: (
         <div className="space-y-4">

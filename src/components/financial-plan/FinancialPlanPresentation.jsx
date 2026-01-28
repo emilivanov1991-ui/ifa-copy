@@ -1300,6 +1300,105 @@ export default function FinancialPlanPresentation({ planData, clientData, analys
       )
     },
     {
+      title: 'Структура на портфейла',
+      content: (
+        <div className="space-y-6">
+          <h2 className="text-3xl font-bold text-slate-900 text-center mb-6">Структура на портфейла</h2>
+          
+          <Card className="border-slate-200">
+            <CardContent className="p-6">
+              <ResponsiveContainer width="100%" height={500}>
+                <Sankey
+                  data={(() => {
+                    const monthlyBalance = planData.calculations?.monthlyBalance || 0;
+                    const monthlyBalanceEUR = monthlyBalance / EUR_BGN_RATE;
+                    
+                    // Calculate optimization savings (from pension fund change, refinancing, etc)
+                    let optimizationSavings = 0;
+                    
+                    // Example: УПФ optimization could save around 20-30 EUR/month
+                    if (analysisData?.partner_pillar_2 || analysisData?.client_pillar_2) {
+                      optimizationSavings += 25; // Average savings from fund optimization
+                    }
+                    
+                    const totalForPlan = monthlyBalanceEUR + optimizationSavings;
+                    
+                    // Calculate categories from allocation
+                    const investmentsAmount = allocation.investments.amount;
+                    const reserveAmount = allocation.reserve.amount;
+                    const protectionAmount = allocation.incomeProtection.amount + allocation.propertyProtection.amount;
+                    const loansAmount = allocation.loans.amount;
+                    
+                    const nodes = [
+                      { name: 'Месечен баланс' },
+                      { name: 'След оптимизация' },
+                      { name: 'Общо за план' },
+                      { name: 'Инвестиции' },
+                      { name: 'Резерв' },
+                      { name: 'Защита' },
+                      { name: 'Заеми и кредити' }
+                    ];
+                    
+                    const links = [
+                      { source: 0, target: 2, value: monthlyBalanceEUR },
+                      { source: 1, target: 2, value: optimizationSavings },
+                      { source: 2, target: 3, value: investmentsAmount },
+                      { source: 2, target: 4, value: reserveAmount },
+                      { source: 2, target: 5, value: protectionAmount },
+                      { source: 2, target: 6, value: loansAmount }
+                    ].filter(link => link.value > 0);
+                    
+                    return { nodes, links };
+                  })()}
+                  node={<Rectangle fill="#3b82f6" fillOpacity="0.8" />}
+                  link={{ stroke: '#94a3b8', strokeOpacity: 0.5 }}
+                  nodePadding={50}
+                  margin={{ top: 20, right: 150, bottom: 20, left: 150 }}
+                >
+                  <Tooltip 
+                    contentStyle={{ backgroundColor: '#fff', border: '1px solid #e2e8f0', borderRadius: '8px' }}
+                    formatter={(value) => `${value.toFixed(0)} EUR`}
+                  />
+                </Sankey>
+              </ResponsiveContainer>
+              
+              <div className="mt-6 grid grid-cols-2 md:grid-cols-4 gap-4">
+                <Card className="bg-gradient-to-br from-blue-50 to-blue-100 border-blue-200">
+                  <CardContent className="p-4 text-center">
+                    <p className="text-sm text-blue-700 font-medium mb-1">Инвестиции</p>
+                    <p className="text-2xl font-bold text-blue-900">{allocation.investments.amount.toFixed(0)} EUR</p>
+                  </CardContent>
+                </Card>
+                
+                <Card className="bg-gradient-to-br from-cyan-50 to-cyan-100 border-cyan-200">
+                  <CardContent className="p-4 text-center">
+                    <p className="text-sm text-cyan-700 font-medium mb-1">Резерв</p>
+                    <p className="text-2xl font-bold text-cyan-900">{allocation.reserve.amount.toFixed(0)} EUR</p>
+                  </CardContent>
+                </Card>
+                
+                <Card className="bg-gradient-to-br from-green-50 to-green-100 border-green-200">
+                  <CardContent className="p-4 text-center">
+                    <p className="text-sm text-green-700 font-medium mb-1">Защита</p>
+                    <p className="text-2xl font-bold text-green-900">
+                      {(allocation.incomeProtection.amount + allocation.propertyProtection.amount).toFixed(0)} EUR
+                    </p>
+                  </CardContent>
+                </Card>
+                
+                <Card className="bg-gradient-to-br from-purple-50 to-purple-100 border-purple-200">
+                  <CardContent className="p-4 text-center">
+                    <p className="text-sm text-purple-700 font-medium mb-1">Заеми и кредити</p>
+                    <p className="text-2xl font-bold text-purple-900">{allocation.loans.amount.toFixed(0)} EUR</p>
+                  </CardContent>
+                </Card>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      )
+    },
+    {
       title: 'Продукти',
       content: (
         <div className="space-y-4">

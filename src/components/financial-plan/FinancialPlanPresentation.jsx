@@ -485,7 +485,7 @@ export default function FinancialPlanPresentation({ planData, clientData, analys
               </div>
               <div className="text-right">
                 <p className="text-5xl font-bold">{totalTaxRelief.toLocaleString()}</p>
-                <p className="text-xl text-green-100">лв</p>
+                <p className="text-xl text-green-100">EUR</p>
               </div>
             </div>
           </motion.div>

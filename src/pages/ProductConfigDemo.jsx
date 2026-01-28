@@ -394,7 +394,7 @@ export default function ProductConfigDemo() {
           {/* Credits */}
           <TabsContent value="credits" className="space-y-4">
             <Tabs defaultValue="comparison-mortgage" className="w-full">
-              <TabsList className="grid w-full grid-cols-2 lg:grid-cols-8 mb-4 bg-green-50 p-1 rounded-lg text-xs">
+              <TabsList className="grid w-full grid-cols-2 lg:grid-cols-4 mb-4 bg-green-50 p-2 rounded-lg text-xs gap-1">
                 <TabsTrigger value="comparison-mortgage">📊 Сравни ипотеки</TabsTrigger>
                 <TabsTrigger value="comparison-consumer">📊 Сравни потребителски</TabsTrigger>
                 <TabsTrigger value="unicredit-mortgage">UniCredit Ипотека</TabsTrigger>

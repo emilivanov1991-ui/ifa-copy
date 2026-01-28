@@ -362,7 +362,7 @@ export default function FinancialPlanPresentation({ planData, clientData, analys
                 <XAxis dataKey="name" stroke="#64748b" />
                 <YAxis 
                   stroke="#64748b"
-                  tickFormatter={(value) => `${(value / 1000).toFixed(0)}K`}
+                  tickFormatter={(value) => `${(value / 1000).toFixed(0)}K EUR`}
                 />
                 <Tooltip 
                   contentStyle={{ backgroundColor: '#fff', border: '1px solid #e2e8f0', borderRadius: '8px' }}

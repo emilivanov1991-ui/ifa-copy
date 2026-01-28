@@ -277,16 +277,20 @@ export default function FinancialPlanPresentation({ planData, clientData, analys
                   stroke="#64748b"
                 />
                 <YAxis 
-                  label={{ value: 'Капитал (хил. EUR)', angle: -90, position: 'insideLeft' }}
+                  label={{ value: 'Капитал', angle: -90, position: 'insideLeft' }}
                   stroke="#64748b"
+                  tickFormatter={(value) => value >= 1000 ? `${(value / 1000).toFixed(2)} мил.` : `${value} хил.`}
                 />
                 <Tooltip 
                   contentStyle={{ backgroundColor: '#fff', border: '1px solid #e2e8f0', borderRadius: '8px' }}
                   labelFormatter={(value) => `Възраст: ${value}`}
                   formatter={(value, name) => {
                     if (name === 'protectionArea') return null;
+                    const formattedValue = value >= 1000 
+                      ? `${(value / 1000).toFixed(2)} мил. EUR` 
+                      : `${value.toFixed(0)} хил. EUR`;
                     return [
-                      `${value.toFixed(0)} хил. EUR`, 
+                      formattedValue, 
                       name === 'laborCapital' ? 'Трудов капитал' : 'Финансов капитал'
                     ];
                   }}
@@ -301,6 +305,52 @@ export default function FinancialPlanPresentation({ planData, clientData, analys
                   stroke="none"
                   fill="url(#diagonalHatch)" 
                   connectNulls
+                  label={({ viewBox, index }) => {
+                    const intersectionIndex = capitalData.findIndex((point, i) => 
+                      i > 0 && point.financialCapital >= point.laborCapital
+                    );
+                    const midPoint = Math.floor(intersectionIndex / 2);
+                    
+                    if (index === midPoint && intersectionIndex > 0) {
+                      const midAge = capitalData[midPoint].age;
+                      const midY = (capitalData[midPoint].laborCapital + capitalData[midPoint].financialCapital) / 2;
+                      
+                      return (
+                        <g>
+                          <rect
+                            x={viewBox.x - 80}
+                            y={viewBox.y - 25}
+                            width={160}
+                            height={50}
+                            fill="#dc2626"
+                            opacity="0.95"
+                            rx={8}
+                          />
+                          <text
+                            x={viewBox.x}
+                            y={viewBox.y - 5}
+                            textAnchor="middle"
+                            fill="white"
+                            fontSize={13}
+                            fontWeight="bold"
+                          >
+                            ⚠ Нужда от защита на
+                          </text>
+                          <text
+                            x={viewBox.x}
+                            y={viewBox.y + 10}
+                            textAnchor="middle"
+                            fill="white"
+                            fontSize={13}
+                            fontWeight="bold"
+                          >
+                            трудовия капитал!
+                          </text>
+                        </g>
+                      );
+                    }
+                    return null;
+                  }}
                 />
                 <Area 
                   type="monotone" 
@@ -321,27 +371,7 @@ export default function FinancialPlanPresentation({ planData, clientData, analys
               </AreaChart>
             </ResponsiveContainer>
 
-            {/* Warning badge for labor capital protection */}
-            {(() => {
-              // Find the intersection point where financial capital overtakes labor capital
-              const intersectionIndex = capitalData.findIndex((point, i) => 
-                i > 0 && point.financialCapital >= point.laborCapital
-              );
-              
-              // Show warning only if there's a period where labor capital is higher
-              if (intersectionIndex > 0) {
-                return (
-                  <div className="absolute top-4 right-4 bg-red-600 text-white px-4 py-3 rounded-lg shadow-xl flex items-center gap-3 max-w-xs animate-pulse">
-                    <AlertTriangle className="w-8 h-8 flex-shrink-0" />
-                    <div>
-                      <p className="font-bold text-sm leading-tight">Нужда от защита на трудовия капитал!</p>
-                      <p className="text-xs text-red-100 mt-1">до {capitalData[intersectionIndex]?.age} години</p>
-                    </div>
-                  </div>
-                );
-              }
-              return null;
-            })()}
+
           </div>
 
           <Card className="bg-gradient-to-r from-blue-50 to-indigo-50 border-blue-200">

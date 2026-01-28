@@ -238,10 +238,10 @@ export default function FinancialPlanPresentation({ planData, clientData, analys
     { name: 'Резерв', value: allocation.reserve.amount, color: '#06b6d4', icon: '💰' }
   ].filter(item => item.value > 0);
   
-  const products = planData.products || [];
+  const products = productsEUR;
 
-  const totalTaxRelief = planData.calculations?.totalTaxRelief || 0;
-  const dailyCost = ((planData.total_monthly_premium || 0) / 30).toFixed(2);
+  const totalTaxRelief = (planData.calculations?.totalTaxRelief || 0) / EUR_BGN_RATE;
+  const dailyCost = (totalMonthlyPremiumEUR / 30).toFixed(2);
 
   const slides = [
     {

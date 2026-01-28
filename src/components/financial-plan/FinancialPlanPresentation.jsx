@@ -391,8 +391,8 @@ export default function FinancialPlanPresentation({ planData, clientData, analys
                 const maxAge = capitalData[capitalData.length - 1].age;
                 const maxChartYValue = Math.max(...capitalData.flatMap(d => [d.laborCapital, d.financialCapital]));
 
-                // Position at 85% through the age span
-                const targetAge = Math.round(minAge + 0.85 * (maxAge - minAge));
+                // Position at 88% through the age span
+                const targetAge = Math.round(minAge + 0.88 * (maxAge - minAge));
                 const targetPoint = capitalData.find(d => d.age === targetAge);
 
                 if (targetPoint && targetPoint.financialCapital > 0) {

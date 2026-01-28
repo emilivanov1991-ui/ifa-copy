@@ -732,7 +732,7 @@ export default function FinancialPlanPresentation({ planData, clientData, analys
                       </div>
                       <div className="text-right">
                         <p className="text-2xl font-bold text-blue-600">
-                          {product.monthlyPremium === 0 ? 'БЕЗПЛАТНО' : `${product.monthlyPremium.toFixed(0)} лв`}
+                          {product.monthlyPremium === 0 ? 'БЕЗПЛАТНО' : `${product.monthlyPremium.toFixed(0)} EUR`}
                         </p>
                         <p className="text-xs text-slate-500">месечно</p>
                       </div>

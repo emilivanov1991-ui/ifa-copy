@@ -262,8 +262,8 @@ export default function FinancialPlanPresentation({ planData, clientData, analys
                     <stop offset="5%" stopColor="#2563eb" stopOpacity={0.3}/>
                     <stop offset="95%" stopColor="#2563eb" stopOpacity={0}/>
                   </linearGradient>
-                  <pattern id="protectionPattern" patternUnits="userSpaceOnUse" width="8" height="8" patternTransform="rotate(45)">
-                    <line x1="0" y1="0" x2="0" y2="8" stroke="#dc2626" strokeWidth="2" />
+                  <pattern id="protectionPattern" patternUnits="userSpaceOnUse" width="10" height="10" patternTransform="rotate(-45)">
+                    <line x1="0" y1="0" x2="0" y2="10" stroke="#dc2626" strokeWidth="1.5" opacity="0.4" />
                   </pattern>
                 </defs>
                 <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
@@ -289,33 +289,26 @@ export default function FinancialPlanPresentation({ planData, clientData, analys
                   formatter={(value) => value === 'laborCapital' ? 'Трудов капитал' : 'Финансов капитал'}
                 />
                 
-                {/* Hatched area for protection zone */}
+                {/* Hatched area between lines - only before intersection */}
                 {(() => {
                   const intersectionIndex = capitalData.findIndex((point, i) => 
                     i > 0 && point.financialCapital >= point.laborCapital
                   );
                   if (intersectionIndex > 0) {
+                    const protectionData = capitalData.slice(0, intersectionIndex + 1).map(point => ({
+                      ...point,
+                      protectionZone: point.laborCapital - point.financialCapital
+                    }));
                     return (
-                      <>
-                        <Area 
-                          type="monotone" 
-                          dataKey="laborCapital" 
-                          stroke="none"
-                          fill="url(#protectionPattern)"
-                          data={capitalData.slice(0, intersectionIndex + 1)}
-                        />
-                        {/* Text label in the middle of protection zone */}
-                        <text
-                          x="20%"
-                          y="35%"
-                          fill="#dc2626"
-                          fontSize="22"
-                          fontWeight="bold"
-                          textAnchor="middle"
-                        >
-                          ЗАЩИТА
-                        </text>
-                      </>
+                      <Area 
+                        type="monotone" 
+                        dataKey="protectionZone"
+                        stackId="protection"
+                        stroke="none"
+                        fill="url(#protectionPattern)"
+                        data={protectionData}
+                        baseValue="dataMin"
+                      />
                     );
                   }
                   return null;
@@ -338,12 +331,32 @@ export default function FinancialPlanPresentation({ planData, clientData, analys
                   name="financialCapital"
                 />
                 
-                {/* Investment label on financial capital line */}
+                {/* Text labels */}
+                {(() => {
+                  const intersectionIndex = capitalData.findIndex((point, i) => 
+                    i > 0 && point.financialCapital >= point.laborCapital
+                  );
+                  if (intersectionIndex > 0) {
+                    return (
+                      <text
+                        x="20%"
+                        y="30%"
+                        fill="#dc2626"
+                        fontSize="24"
+                        fontWeight="bold"
+                        textAnchor="middle"
+                      >
+                        ЗАЩИТА
+                      </text>
+                    );
+                  }
+                  return null;
+                })()}
                 <text
-                  x="70%"
-                  y="25%"
+                  x="75%"
+                  y="20%"
                   fill="#2563eb"
-                  fontSize="18"
+                  fontSize="20"
                   fontWeight="bold"
                   textAnchor="middle"
                 >

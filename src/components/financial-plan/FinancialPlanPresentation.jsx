@@ -366,7 +366,7 @@ export default function FinancialPlanPresentation({ planData, clientData, analys
                 />
                 <Tooltip 
                   contentStyle={{ backgroundColor: '#fff', border: '1px solid #e2e8f0', borderRadius: '8px' }}
-                  formatter={(value) => [`${(value / 1000).toFixed(0)}K лв`, 'Стойност']}
+                  formatter={(value) => [`${(value / 1000).toFixed(0)}K EUR`, 'Стойност']}
                 />
                 <Bar dataKey="value" radius={[8, 8, 0, 0]}>
                   {wealthComparisonData.map((entry, index) => (

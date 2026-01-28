@@ -104,6 +104,41 @@ const calculateAllocation = (planData, monthlyReserve) => {
 export default function FinancialPlanPresentation({ planData, clientData, analysisData, onClose }) {
   const [currentSlide, setCurrentSlide] = useState(0);
 
+  // Курс BGN към EUR
+  const EUR_BGN_RATE = 1.95583;
+
+  // Продукти в лева, които трябва да се конвертират
+  const productsInBGN = [
+    'ДЗИ Закрила',
+    'ДЗИ Каско',
+    'ДЗИ ГО',
+    'Uniqa У дома',
+    'Generali Health Line',
+    'Инстинкт',
+    'ОББ'
+  ];
+
+  // Функция за конвертиране на премия към EUR ако е нужно
+  const convertToEUR = (product) => {
+    const needsConversion = productsInBGN.some(name => product.name.includes(name));
+    return {
+      ...product,
+      monthlyPremium: needsConversion && product.monthlyPremium 
+        ? product.monthlyPremium / EUR_BGN_RATE 
+        : product.monthlyPremium,
+      annualPremium: needsConversion && product.annualPremium
+        ? product.annualPremium / EUR_BGN_RATE
+        : product.annualPremium,
+      coverage: needsConversion && product.coverage
+        ? product.coverage / EUR_BGN_RATE
+        : product.coverage
+    };
+  };
+
+  // Конвертираме продуктите
+  const productsEUR = (planData.products || []).map(convertToEUR);
+  const totalMonthlyPremiumEUR = productsEUR.reduce((sum, p) => sum + (p.monthlyPremium || 0), 0);
+
   // Calculate data
   const age = clientData?.age || 24;
   const retirementAge = clientData?.retirementAge || 65;

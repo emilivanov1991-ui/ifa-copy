@@ -114,15 +114,37 @@ export default function FinancialPlanPresentation({ planData, clientData, analys
   const wealth = calculateWealthProjection(planData, clientData, analysisData);
   const allocation = calculateAllocation(planData, wealth.monthlyReserve);
   
-  // Capital chart data
+  // Capital chart data - real values in BGN
+  const monthlyInvestment = (planData.products || [])
+    .filter(p => p.name.includes('Unit Linked') || p.name.includes('УПФ'))
+    .reduce((sum, p) => sum + (p.monthlyPremium || 0), 0);
+
+  const annualSalaryGrowth = 0.03; // 3% годишен растеж на заплатата
+  const investmentReturn = 0.08; // 8% годишна доходност на инвестициите
+
   const capitalData = Array.from({ length: Math.min(yearsToRetirement + 1, 42) }, (_, i) => {
     const currentAge = age + i;
-    const progress = i / yearsToRetirement;
-    
+    const yearsLeft = yearsToRetirement - i;
+
+    // Трудов капитал = бъдещи доходи до пенсия (намалява с времето)
+    // Формула: месечен доход * 12 месеца * години до пенсия * (1 + растеж)^средни години
+    const avgYearsLeft = yearsLeft / 2;
+    const laborCapital = yearsLeft > 0 
+      ? (clientData.monthlyNetIncome * 12 * yearsLeft * Math.pow(1 + annualSalaryGrowth, avgYearsLeft))
+      : 0;
+
+    // Финансов капитал = натрупани инвестиции до момента
+    // Формула: месечна премия * ((1 + r)^n - 1) / r * (1 + r) където r = месечна доходност, n = месеци
+    const monthlyReturn = investmentReturn / 12;
+    const monthsInvested = i * 12;
+    const financialCapital = monthsInvested > 0 && monthlyInvestment > 0
+      ? monthlyInvestment * (((Math.pow(1 + monthlyReturn, monthsInvested) - 1) / monthlyReturn) * (1 + monthlyReturn))
+      : 0;
+
     return {
       age: currentAge,
-      laborCapital: Math.max(100 - (progress * 100), 0),
-      financialCapital: Math.min(progress * 100, 100),
+      laborCapital: laborCapital / 1000, // в хиляди лева за по-добра визуализация
+      financialCapital: financialCapital / 1000,
     };
   });
 

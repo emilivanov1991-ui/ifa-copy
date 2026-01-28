@@ -237,7 +237,7 @@ export default function FinancialPlanPresentation({ planData, clientData, analys
     { name: 'Защита на имущество', value: allocation.propertyProtection.amount, color: '#f59e0b', icon: '🏠' },
     { name: 'Кредити', value: allocation.loans.amount, color: '#8b5cf6', icon: '💳' },
     { name: 'Резерв', value: allocation.reserve.amount, color: '#06b6d4', icon: '💰' }
-  ].filter(item => item.value > 0);
+  ].filter(item => item.value > 0).sort((a, b) => b.value - a.value);
   
   const products = productsEUR;
 

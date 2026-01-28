@@ -248,14 +248,14 @@ export default function FinancialPlanPresentation({ planData, clientData, analys
     {
       title: 'Трудов vs Финансов капитал',
       content: (
-        <div className="space-y-2 md:space-y-4">
+        <div className="space-y-6">
           <div className="text-center">
-            <h2 className="text-lg md:text-2xl font-bold text-slate-900 mb-1">Вашата финансова стратегия</h2>
-            <p className="text-xs md:text-sm text-slate-600">Как изграждаме вашата финансова независимост</p>
+            <h2 className="text-3xl font-bold text-slate-900 mb-2">Вашата финансова стратегия</h2>
+            <p className="text-slate-600">Как изграждаме вашата финансова независимост</p>
           </div>
-
+          
           <div className="relative">
-            <ResponsiveContainer width="100%" height={240} className="md:!h-[320px]">
+            <ResponsiveContainer width="100%" height={400}>
               <AreaChart data={capitalData}>
                 <defs>
                   <linearGradient id="laborGradient" x1="0" y1="0" x2="0" y2="1">
@@ -437,12 +437,12 @@ export default function FinancialPlanPresentation({ planData, clientData, analys
               </div>
 
           <Card className="bg-gradient-to-r from-blue-50 to-indigo-50 border-blue-200">
-            <CardContent className="p-2 md:p-4">
-              <div className="flex items-start gap-2">
-                <Shield className="w-5 h-5 md:w-6 md:h-6 text-blue-600 flex-shrink-0 mt-0.5" />
+            <CardContent className="p-6">
+              <div className="flex items-start gap-4">
+                <Shield className="w-8 h-8 text-blue-600 flex-shrink-0 mt-1" />
                 <div>
-                  <h4 className="font-bold text-slate-900 mb-1 text-xs md:text-sm">Стратегия за успех</h4>
-                  <p className="text-[10px] md:text-xs text-slate-700 leading-snug">
+                  <h4 className="font-bold text-slate-900 mb-2">Стратегия за успех</h4>
+                  <p className="text-sm text-slate-700 leading-relaxed">
                     Докато вашият <strong className="text-red-600">трудов капитал</strong> постепенно намалява с приближаването на пенсионната възраст, 
                     ние изграждаме вашия <strong className="text-blue-600">финансов капитал</strong> чрез инвестиции. 
                     През целия период осигуряваме <strong className="text-red-600">защита</strong> на дохода ви, 
@@ -458,35 +458,35 @@ export default function FinancialPlanPresentation({ planData, clientData, analys
     {
       title: 'Вашата инвестиция',
       content: (
-        <div className="space-y-2 md:space-y-4">
+        <div className="space-y-6">
           <motion.div 
             initial={{ scale: 0.9, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             transition={{ duration: 0.5 }}
             className="text-center"
           >
-            <h2 className="text-lg md:text-2xl font-bold text-slate-900 mb-1 md:mb-2">Месечна инвестиция</h2>
-            <div className="bg-gradient-to-br from-blue-600 to-indigo-600 text-white rounded-lg md:rounded-xl p-3 md:p-6 shadow-2xl">
+            <h2 className="text-2xl font-bold text-slate-900 mb-4">Месечна инвестиция</h2>
+            <div className="bg-gradient-to-br from-blue-600 to-indigo-600 text-white rounded-2xl p-8 shadow-2xl">
               <motion.div
                 initial={{ y: 20, opacity: 0 }}
                 animate={{ y: 0, opacity: 1 }}
                 transition={{ delay: 0.2 }}
-                className="flex flex-col md:flex-row items-center justify-center gap-1 md:gap-3"
+                className="flex items-center justify-center gap-4"
               >
-                <span className="text-3xl md:text-5xl font-bold">{totalMonthlyPremiumEUR.toFixed(0)}</span>
-                <div className="text-center md:text-left">
-                  <p className="text-base md:text-xl font-semibold">EUR/месец</p>
-                  <p className="text-xs md:text-base text-blue-200">само {dailyCost} EUR/ден</p>
+                <span className="text-7xl font-bold">{totalMonthlyPremiumEUR.toFixed(0)}</span>
+                <div className="text-left">
+                  <p className="text-2xl font-semibold">EUR/месец</p>
+                  <p className="text-lg text-blue-200">само {dailyCost} EUR/ден</p>
                 </div>
               </motion.div>
             </div>
           </motion.div>
 
-          <div className="bg-white rounded-lg md:rounded-xl p-2 md:p-4 shadow-lg border border-slate-200">
-            <h3 className="text-sm md:text-lg font-bold text-slate-900 mb-1 md:mb-2 text-center">
+          <div className="bg-white rounded-xl p-6 shadow-lg border border-slate-200">
+            <h3 className="text-xl font-bold text-slate-900 mb-4 text-center">
               Растеж на имуществото до пенсиониране
             </h3>
-            <ResponsiveContainer width="100%" height={200} className="md:!h-[280px]">
+            <ResponsiveContainer width="100%" height={350}>
               <BarChart data={wealthComparisonData}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
                 <XAxis dataKey="name" stroke="#64748b" />
@@ -506,17 +506,17 @@ export default function FinancialPlanPresentation({ planData, clientData, analys
               </BarChart>
             </ResponsiveContainer>
             
-            <div className="mt-1 md:mt-2 bg-amber-50 border-l-2 md:border-l-4 border-amber-400 p-1.5 md:p-3 rounded">
-              <div className="flex items-center gap-1.5">
-                <TrendingUp className="w-3 h-3 md:w-4 md:h-4 text-amber-600" />
-                <p className="text-[10px] md:text-xs font-semibold text-amber-900">
+            <div className="mt-4 bg-amber-50 border-l-4 border-amber-400 p-4 rounded">
+              <div className="flex items-center gap-2">
+                <TrendingUp className="w-5 h-5 text-amber-600" />
+                <p className="text-sm font-semibold text-amber-900">
                   +{(((wealth.withPlan - wealth.withoutPlan) / wealth.withoutPlan) * 100).toFixed(0)}% ръст с нашия план! 🚀
                 </p>
               </div>
-              <p className="text-[9px] md:text-[10px] text-amber-700 mt-0.5">
+              <p className="text-xs text-amber-700 mt-1">
                 *Проекция при {yearsToRetirement} години инвестиции до {retirementAge} г. възраст
               </p>
-              <p className="text-[9px] md:text-[10px] text-amber-600 mt-1 font-semibold">
+              <p className="text-xs text-amber-600 mt-2 font-semibold">
                 Месечен резерв: {wealth.monthlyReserve.toFixed(0)} лв (спестявания извън плана)
               </p>
             </div>
@@ -527,8 +527,8 @@ export default function FinancialPlanPresentation({ planData, clientData, analys
     {
       title: 'Предимства',
       content: (
-        <div className="space-y-2 md:space-y-4">
-          <h2 className="text-lg md:text-2xl font-bold text-slate-900 text-center mb-2 md:mb-3">Предимства на плана</h2>
+        <div className="space-y-6">
+          <h2 className="text-3xl font-bold text-slate-900 text-center mb-6">Предимства на плана</h2>
           
           {/* Priorities Section */}
           {(() => {
@@ -552,15 +552,15 @@ export default function FinancialPlanPresentation({ planData, clientData, analys
             
             return priorities.length > 0 && (
               <Card className="bg-gradient-to-r from-red-50 to-pink-50 border-red-200">
-                <CardContent className="p-2 md:p-4">
-                  <h3 className="text-base md:text-xl font-bold text-red-900 mb-1.5 md:mb-3 text-center">ПРИОРИТЕТИ</h3>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-1.5 md:gap-2">
+                <CardContent className="p-6">
+                  <h3 className="text-2xl font-bold text-red-900 mb-4 text-center">ПРИОРИТЕТИ</h3>
+                  <div className="grid grid-cols-2 gap-3">
                     {priorities.map((priority, idx) => (
-                      <div key={idx} className="flex items-center gap-1.5 md:gap-2 bg-white rounded p-1.5 md:p-2 shadow-sm">
-                        <div className="w-5 h-5 md:w-6 md:h-6 rounded-full bg-red-600 text-white flex items-center justify-center font-bold text-xs md:text-sm flex-shrink-0">
+                      <div key={idx} className="flex items-center gap-3 bg-white rounded-lg p-3 shadow-sm">
+                        <div className="w-8 h-8 rounded-full bg-red-600 text-white flex items-center justify-center font-bold">
                           {idx + 1}
                         </div>
-                        <p className="text-[10px] md:text-xs text-slate-700 font-medium">{priority.label}</p>
+                        <p className="text-slate-700 font-medium">{priority.label}</p>
                       </div>
                     ))}
                   </div>
@@ -569,7 +569,7 @@ export default function FinancialPlanPresentation({ planData, clientData, analys
             );
           })()}
           
-          <div className="grid grid-cols-2 md:grid-cols-3 gap-1.5 md:gap-3">
+          <div className="grid md:grid-cols-2 gap-4">
             {[
               { title: 'Гъвкавост', desc: 'възможност да се променят сумите, определени за отделните цели', color: 'blue', icon: '🔄' },
               { title: 'Променливост', desc: 'възможност да се добавят и променят финансовите решения', color: 'purple', icon: '⚡' },
@@ -584,13 +584,13 @@ export default function FinancialPlanPresentation({ planData, clientData, analys
                 animate={{ x: 0, opacity: 1 }}
                 transition={{ delay: idx * 0.1 }}
               >
-                <Card className={`border-l-2 md:border-l-4 border-${adv.color}-500 hover:shadow-lg transition-shadow`}>
-                  <CardContent className="p-1.5 md:p-3">
-                    <div className="flex items-start gap-1.5 md:gap-2">
-                      <span className="text-base md:text-xl">{adv.icon}</span>
+                <Card className={`border-l-4 border-${adv.color}-500 hover:shadow-lg transition-shadow`}>
+                  <CardContent className="p-4">
+                    <div className="flex items-start gap-3">
+                      <span className="text-2xl">{adv.icon}</span>
                       <div>
-                        <h4 className={`font-bold text-${adv.color}-700 mb-0.5 text-xs md:text-sm`}>{adv.title}</h4>
-                        <p className="text-[10px] md:text-xs text-slate-600 leading-snug">{adv.desc}</p>
+                        <h4 className={`font-bold text-${adv.color}-700 mb-1`}>{adv.title}</h4>
+                        <p className="text-sm text-slate-600">{adv.desc}</p>
                       </div>
                     </div>
                   </CardContent>
@@ -603,19 +603,19 @@ export default function FinancialPlanPresentation({ planData, clientData, analys
             initial={{ scale: 0.95, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             transition={{ delay: 0.6 }}
-            className="bg-gradient-to-r from-green-500 to-emerald-500 text-white rounded-lg md:rounded-xl p-2 md:p-4 shadow-xl"
+            className="bg-gradient-to-r from-green-500 to-emerald-500 text-white rounded-xl p-6 shadow-xl"
           >
-            <div className="flex flex-col md:flex-row items-center md:justify-between gap-2">
-              <div className="text-center md:text-left">
-                <h4 className="text-sm md:text-base font-bold mb-0.5 flex items-center justify-center md:justify-start gap-1.5">
-                  <DollarSign className="w-4 h-4 md:w-5 md:h-5" />
+            <div className="flex items-center justify-between">
+              <div>
+                <h4 className="text-lg font-bold mb-1 flex items-center gap-2">
+                  <DollarSign className="w-6 h-6" />
                   Данъчно облекчение
                 </h4>
-                <p className="text-green-100 text-[10px] md:text-xs">Спестени данъци за {yearsToRetirement} години</p>
+                <p className="text-green-100 text-sm">Спестени данъци за {yearsToRetirement} години</p>
               </div>
-              <div className="text-center md:text-right">
-                <p className="text-2xl md:text-4xl font-bold">{totalTaxRelief.toLocaleString()}</p>
-                <p className="text-base md:text-lg text-green-100">EUR</p>
+              <div className="text-right">
+                <p className="text-5xl font-bold">{totalTaxRelief.toLocaleString()}</p>
+                <p className="text-xl text-green-100">EUR</p>
               </div>
             </div>
           </motion.div>
@@ -625,13 +625,13 @@ export default function FinancialPlanPresentation({ planData, clientData, analys
     {
       title: 'Разпределение',
       content: (
-        <div className="space-y-2 md:space-y-4">
-          <h2 className="text-lg md:text-2xl font-bold text-slate-900 text-center mb-1 md:mb-2">
+        <div className="space-y-6">
+          <h2 className="text-3xl font-bold text-slate-900 text-center mb-4">
             Разпределение на вашите спестявания
           </h2>
 
-          <div className="bg-white rounded-lg md:rounded-xl p-2 md:p-4 shadow-lg border border-slate-200">
-            <ResponsiveContainer width="100%" height={240} className="md:!h-[320px]">
+          <div className="bg-white rounded-xl p-6 shadow-lg border border-slate-200">
+            <ResponsiveContainer width="100%" height={400}>
               <Treemap
                 data={allocationData}
                 dataKey="value"
@@ -767,9 +767,9 @@ export default function FinancialPlanPresentation({ planData, clientData, analys
             </ResponsiveContainer>
 
             {/* Легенда за всички категории */}
-            <div className="mt-1.5 md:mt-3 pt-1.5 md:pt-3 border-t border-slate-200">
-              <p className="text-[9px] md:text-[10px] text-slate-500 mb-1 font-medium">Пълна разбивка:</p>
-              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-1 md:gap-1.5">
+            <div className="mt-4 pt-4 border-t border-slate-200">
+              <p className="text-xs text-slate-500 mb-2 font-medium">Пълна разбивка:</p>
+              <div className="grid grid-cols-2 md:grid-cols-5 gap-2">
                 {[
                   { name: 'Инвестиции', ...allocation.investments, color: '#3b82f6', icon: '📈' },
                   { name: 'Защита на дохода', ...allocation.incomeProtection, color: '#10b981', icon: '🛡️' },
@@ -780,16 +780,16 @@ export default function FinancialPlanPresentation({ planData, clientData, analys
                   const monthlyIncome = (analysisData?.client_net_income || 0) + (analysisData?.partner_net_income || 0);
                   const percentOfIncome = monthlyIncome > 0 ? ((item.amount / monthlyIncome) * 100).toFixed(1) : 0;
                   return (
-                    <div key={idx} className="flex items-center gap-1 md:gap-1.5 bg-slate-50 rounded p-1 md:p-1.5">
+                    <div key={idx} className="flex items-center gap-2 bg-slate-50 rounded-lg p-2">
                       <div 
-                        className="w-2 h-2 md:w-2.5 md:h-2.5 rounded-sm flex-shrink-0" 
+                        className="w-3 h-3 rounded-sm flex-shrink-0" 
                         style={{ backgroundColor: item.color }}
                       />
                       <div className="flex-1 min-w-0">
-                        <p className="text-[9px] md:text-[10px] font-semibold text-slate-700 truncate">{item.name}</p>
-                        <p className="text-[10px] md:text-xs text-slate-900 font-bold">{item.amount.toFixed(0)} EUR</p>
-                        <p className="text-[8px] md:text-[9px] text-slate-500">
-                          {item.percent.toFixed(1)}% • {percentOfIncome}% дох.
+                        <p className="text-xs font-semibold text-slate-700 truncate">{item.name}</p>
+                        <p className="text-xs text-slate-900 font-bold">{item.amount.toFixed(0)} EUR</p>
+                        <p className="text-[10px] text-slate-500">
+                          {item.percent.toFixed(1)}% от спестявания • {percentOfIncome}% от доход
                         </p>
                       </div>
                     </div>
@@ -799,24 +799,27 @@ export default function FinancialPlanPresentation({ planData, clientData, analys
             </div>
           </div>
 
-          <div className="grid grid-cols-2 md:grid-cols-5 gap-1.5 md:gap-2">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
             {allocationData.map((item, idx) => {
               const totalSavings = allocation.investments.amount + allocation.incomeProtection.amount + 
                 allocation.propertyProtection.amount + allocation.loans.amount + allocation.reserve.amount;
               const monthlyIncome = (analysisData?.client_net_income || 0) + (analysisData?.partner_net_income || 0);
               const percentOfSavings = ((item.value / totalSavings) * 100).toFixed(1);
               const percentOfIncome = monthlyIncome > 0 ? ((item.value / monthlyIncome) * 100).toFixed(1) : 0;
-
+              
               return (
-                <Card key={idx} className="border" style={{ borderColor: item.color }}>
-                  <CardContent className="p-1.5 md:p-2 text-center">
-                    <div className="text-base md:text-xl mb-0.5">{item.icon}</div>
-                    <p className="text-[9px] md:text-[10px] font-semibold text-slate-700 mb-0.5 truncate">{item.name}</p>
-                    <p className="text-sm md:text-base font-bold" style={{ color: item.color }}>
-                      {item.value.toFixed(0)}
+                <Card key={idx} className="border-2" style={{ borderColor: item.color }}>
+                  <CardContent className="p-3 text-center">
+                    <div className="text-2xl mb-1">{item.icon}</div>
+                    <p className="text-xs font-semibold text-slate-700 mb-1">{item.name}</p>
+                    <p className="text-lg font-bold" style={{ color: item.color }}>
+                      {item.value.toFixed(0)} EUR
                     </p>
-                    <p className="text-[8px] md:text-[9px] text-slate-600 font-medium">
-                      {percentOfSavings}%
+                    <p className="text-xs text-slate-600 font-medium">
+                      {percentOfSavings}% от спестявания
+                    </p>
+                    <p className="text-xs text-slate-500">
+                      {percentOfIncome}% от доход
                     </p>
                   </CardContent>
                 </Card>
@@ -829,10 +832,10 @@ export default function FinancialPlanPresentation({ planData, clientData, analys
     {
       title: 'Продукти',
       content: (
-        <div className="space-y-1.5 md:space-y-3">
-          <h2 className="text-lg md:text-2xl font-bold text-slate-900 text-center mb-1.5 md:mb-3">Вашите продукти</h2>
-
-          <div className="grid gap-1.5 md:gap-3 max-h-[calc(100vh-280px)] overflow-y-auto pr-1 md:pr-2">
+        <div className="space-y-4">
+          <h2 className="text-3xl font-bold text-slate-900 text-center mb-4">Вашите продукти</h2>
+          
+          <div className="grid gap-4 max-h-[500px] overflow-y-auto pr-2">
             {products.map((product, idx) => (
               <motion.div
                 key={idx}
@@ -840,28 +843,28 @@ export default function FinancialPlanPresentation({ planData, clientData, analys
                 animate={{ x: 0, opacity: 1 }}
                 transition={{ delay: idx * 0.05 }}
               >
-                <Card className="hover:shadow-lg transition-all border-l-2 md:border-l-4 border-blue-500">
-                  <CardContent className="p-1.5 md:p-3">
-                    <div className="flex items-start justify-between gap-2">
-                      <div className="flex items-start gap-1.5 md:gap-2 flex-1 min-w-0">
-                        <div className="w-6 h-6 md:w-8 md:h-8 rounded-full bg-green-500 flex items-center justify-center flex-shrink-0">
-                          <CheckCircle className="w-4 h-4 md:w-5 md:h-5 text-white" />
+                <Card className="hover:shadow-lg transition-all border-l-4 border-blue-500">
+                  <CardContent className="p-4">
+                    <div className="flex items-start justify-between gap-4">
+                      <div className="flex items-start gap-3 flex-1">
+                        <div className="w-10 h-10 rounded-full bg-green-500 flex items-center justify-center flex-shrink-0">
+                          <CheckCircle className="w-6 h-6 text-white" />
                         </div>
-                        <div className="flex-1 min-w-0">
-                          <h4 className="font-bold text-slate-900 mb-0.5 text-xs md:text-sm leading-tight">{product.name}</h4>
-                          <p className="text-[10px] md:text-xs text-slate-600 mb-0.5 leading-snug">{product.benefit}</p>
+                        <div className="flex-1">
+                          <h4 className="font-bold text-slate-900 mb-1">{product.name}</h4>
+                          <p className="text-sm text-slate-600 mb-2">{product.benefit}</p>
                           {product.coverage && (
-                            <p className="text-[9px] md:text-[10px] text-slate-500">
+                            <p className="text-xs text-slate-500">
                               Покритие: <span className="font-semibold">{product.coverage.toLocaleString()} EUR</span>
                             </p>
                           )}
                         </div>
                       </div>
-                      <div className="text-right flex-shrink-0">
-                        <p className="text-base md:text-lg font-bold text-blue-600 whitespace-nowrap">
-                          {product.monthlyPremium === 0 ? 'БЕЗПЛ.' : `${product.monthlyPremium.toFixed(0)} EUR`}
+                      <div className="text-right">
+                        <p className="text-2xl font-bold text-blue-600">
+                          {product.monthlyPremium === 0 ? 'БЕЗПЛАТНО' : `${product.monthlyPremium.toFixed(0)} EUR`}
                         </p>
-                        <p className="text-[9px] md:text-[10px] text-slate-500">мес.</p>
+                        <p className="text-xs text-slate-500">месечно</p>
                       </div>
                     </div>
                   </CardContent>
@@ -887,51 +890,51 @@ export default function FinancialPlanPresentation({ planData, clientData, analys
 
   return (
     <div className="fixed inset-0 bg-slate-900/95 z-50 overflow-hidden">
-      <div className="h-screen flex flex-col">
+      <div className="h-full flex flex-col">
         {/* Header */}
-        <div className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white p-3 md:p-6 shadow-xl flex-shrink-0">
+        <div className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white p-6 shadow-xl">
           <div className="max-w-7xl mx-auto flex items-center justify-between">
             <div>
-              <h1 className="text-xl md:text-3xl font-bold mb-1">Персонализиран финансов план</h1>
-              <p className="text-sm md:text-base text-blue-100">
+              <h1 className="text-3xl font-bold mb-1">Персонализиран финансов план</h1>
+              <p className="text-blue-100">
                 {analysisData?.client_first_name} {analysisData?.client_last_name}
               </p>
             </div>
-            <div className="flex items-center gap-2 md:gap-3">
+            <div className="flex items-center gap-3">
               <Button 
                 variant="outline" 
                 onClick={handleDownloadPDF}
-                className="bg-white/10 border-white/20 text-white hover:bg-white/20 text-xs md:text-sm px-2 md:px-4"
+                className="bg-white/10 border-white/20 text-white hover:bg-white/20"
               >
-                <Download className="w-3 h-3 md:w-4 md:h-4 md:mr-2" />
-                <span className="hidden md:inline">Изтегли PDF</span>
+                <Download className="w-4 h-4 mr-2" />
+                Изтегли PDF
               </Button>
               <Button 
                 variant="ghost" 
                 size="icon"
                 onClick={onClose}
-                className="text-white hover:bg-white/10 w-8 h-8 md:w-10 md:h-10"
+                className="text-white hover:bg-white/10"
               >
-                <X className="w-5 h-5 md:w-6 md:h-6" />
+                <X className="w-6 h-6" />
               </Button>
             </div>
           </div>
         </div>
 
         {/* Progress */}
-        <div className="bg-white border-b border-slate-200 px-3 md:px-6 py-2 md:py-3 flex-shrink-0">
+        <div className="bg-white border-b border-slate-200 px-6 py-3">
           <div className="max-w-7xl mx-auto">
             <div className="flex items-center justify-between mb-2">
-              <span className="text-xs md:text-sm font-medium text-slate-700 truncate mr-2">
+              <span className="text-sm font-medium text-slate-700">
                 {slides[currentSlide].title}
               </span>
-              <span className="text-xs md:text-sm text-slate-500 whitespace-nowrap">
+              <span className="text-sm text-slate-500">
                 {currentSlide + 1} / {slides.length}
               </span>
             </div>
-            <div className="w-full bg-slate-200 rounded-full h-1.5 md:h-2">
+            <div className="w-full bg-slate-200 rounded-full h-2">
               <div 
-                className="bg-blue-600 h-1.5 md:h-2 rounded-full transition-all duration-300"
+                className="bg-blue-600 h-2 rounded-full transition-all duration-300"
                 style={{ width: `${((currentSlide + 1) / slides.length) * 100}%` }}
               />
             </div>
@@ -939,8 +942,8 @@ export default function FinancialPlanPresentation({ planData, clientData, analys
         </div>
 
         {/* Content */}
-        <div className="flex-1 overflow-hidden bg-slate-50 p-2 md:p-4">
-          <div className="max-w-7xl mx-auto h-full flex items-center justify-center">
+        <div className="flex-1 overflow-y-auto bg-slate-50 p-6">
+          <div className="max-w-7xl mx-auto">
             <AnimatePresence mode="wait">
               <motion.div
                 key={currentSlide}
@@ -948,37 +951,34 @@ export default function FinancialPlanPresentation({ planData, clientData, analys
                 animate={{ opacity: 1, x: 0 }}
                 exit={{ opacity: 0, x: -20 }}
                 transition={{ duration: 0.3 }}
-                className="w-full h-full flex items-center"
               >
-                <div className="w-full max-h-full overflow-y-auto">
-                  {slides[currentSlide].content}
-                </div>
+                {slides[currentSlide].content}
               </motion.div>
             </AnimatePresence>
           </div>
         </div>
 
         {/* Navigation */}
-        <div className="bg-white border-t border-slate-200 p-3 md:p-6 shadow-xl flex-shrink-0">
+        <div className="bg-white border-t border-slate-200 p-6 shadow-xl">
           <div className="max-w-7xl mx-auto flex items-center justify-between">
             <Button
               variant="outline"
               onClick={() => setCurrentSlide(Math.max(0, currentSlide - 1))}
               disabled={currentSlide === 0}
-              className="min-w-[80px] md:min-w-[120px] text-xs md:text-sm px-2 md:px-4"
+              className="min-w-[120px]"
             >
-              <ChevronLeft className="w-3 h-3 md:w-4 md:h-4 md:mr-2" />
-              <span className="hidden sm:inline">Назад</span>
+              <ChevronLeft className="w-4 h-4 mr-2" />
+              Назад
             </Button>
 
-            <div className="flex gap-1 md:gap-2">
+            <div className="flex gap-2">
               {slides.map((_, idx) => (
                 <button
                   key={idx}
                   onClick={() => setCurrentSlide(idx)}
-                  className={`w-1.5 h-1.5 md:w-2 md:h-2 rounded-full transition-all ${
+                  className={`w-2 h-2 rounded-full transition-all ${
                     idx === currentSlide 
-                      ? 'bg-blue-600 w-6 md:w-8' 
+                      ? 'bg-blue-600 w-8' 
                       : 'bg-slate-300 hover:bg-slate-400'
                   }`}
                 />
@@ -993,13 +993,12 @@ export default function FinancialPlanPresentation({ planData, clientData, analys
                   onClose();
                 }
               }}
-              className="min-w-[80px] md:min-w-[120px] bg-blue-600 hover:bg-blue-700 text-xs md:text-sm px-2 md:px-4"
+              className="min-w-[120px] bg-blue-600 hover:bg-blue-700"
             >
               {currentSlide < slides.length - 1 ? (
                 <>
-                  <span className="hidden sm:inline">Напред</span>
-                  <span className="sm:hidden">→</span>
-                  <ChevronRight className="w-3 h-3 md:w-4 md:h-4 md:ml-2 hidden sm:inline" />
+                  Напред
+                  <ChevronRight className="w-4 h-4 ml-2" />
                 </>
               ) : (
                 'Завърши'

@@ -709,6 +709,8 @@ export default function FinancialPlanPresentation({ planData, clientData, analys
                   const percent = ((value / totalAllocation) * 100).toFixed(1);
                   const percentOfIncome = monthlyIncome > 0 ? ((value / monthlyIncome) * 100).toFixed(1) : 0;
 
+                  const isSmall = width < 80 || height < 80;
+
                   return (
                     <g>
                       <rect
@@ -722,112 +724,109 @@ export default function FinancialPlanPresentation({ planData, clientData, analys
                           strokeWidth: 2,
                         }}
                       />
-                      {width > 60 && height > 60 && (
+                      {!isSmall && width > 60 && height > 60 && (
                         <>
                           <text
                             x={x + width / 2}
-                            y={y + height / 2 - 35}
+                            y={y + height / 2 - 30}
                             textAnchor="middle"
                             fill="#fff"
-                            fontSize={32}
+                            fontSize={18}
                             fontWeight="bold"
-                          >
-                            {percent}%
-                          </text>
-                          <text
-                            x={x + width / 2}
-                            y={y + height / 2 - 5}
-                            textAnchor="middle"
-                            fill="#fff"
-                            fontSize={14}
                           >
                             {name}
-                          </text>
-                          <text
-                            x={x + width / 2}
-                            y={y + height / 2 + 18}
-                            textAnchor="middle"
-                            fill="#fff"
-                            fontSize={16}
-                            fontWeight="bold"
-                          >
-                            {value.toFixed(0)} EUR
-                          </text>
-                          <text
-                            x={x + width / 2}
-                            y={y + height / 2 + 38}
-                            textAnchor="middle"
-                            fill="rgba(255,255,255,0.9)"
-                            fontSize={11}
-                          >
-                            {percent}% от спестявания
-                          </text>
-                          <text
-                            x={x + width / 2}
-                            y={y + height / 2 + 53}
-                            textAnchor="middle"
-                            fill="rgba(255,255,255,0.8)"
-                            fontSize={11}
-                          >
-                            {percentOfIncome}% от доход
-                          </text>
-                        </>
-                      )}
-                      {width > 30 && width <= 60 && height > 30 && (
-                        <>
-                          <text
-                            x={x + width / 2}
-                            y={y + height / 2 - 20}
-                            textAnchor="middle"
-                            fill="#fff"
-                            fontSize={20}
-                            fontWeight="bold"
-                          >
-                            {percent}%
                           </text>
                           <text
                             x={x + width / 2}
                             y={y + height / 2}
                             textAnchor="middle"
                             fill="#fff"
-                            fontSize={11}
-                          >
-                            {name}
-                          </text>
-                          <text
-                            x={x + width / 2}
-                            y={y + height / 2 + 16}
-                            textAnchor="middle"
-                            fill="#fff"
-                            fontSize={12}
+                            fontSize={20}
                             fontWeight="bold"
                           >
                             {value.toFixed(0)} EUR
                           </text>
                           <text
                             x={x + width / 2}
-                            y={y + height / 2 + 30}
+                            y={y + height / 2 + 22}
                             textAnchor="middle"
-                            fill="rgba(255,255,255,0.9)"
-                            fontSize={9}
+                            fill="rgba(255,255,255,0.95)"
+                            fontSize={13}
                           >
                             {percent}% от спестявания
                           </text>
                           <text
                             x={x + width / 2}
-                            y={y + height / 2 + 42}
+                            y={y + height / 2 + 40}
                             textAnchor="middle"
-                            fill="rgba(255,255,255,0.8)"
-                            fontSize={9}
+                            fill="rgba(255,255,255,0.9)"
+                            fontSize={13}
                           >
                             {percentOfIncome}% от доход
+                          </text>
+                        </>
+                      )}
+                      {isSmall && (
+                        <>
+                          {/* Arrow pointing to small box */}
+                          <line
+                            x1={x + width / 2}
+                            y1={y - 30}
+                            x2={x + width / 2}
+                            y2={y}
+                            stroke="#fff"
+                            strokeWidth={2}
+                            markerEnd="url(#arrowhead)"
+                          />
+                          {/* Label above the small box */}
+                          <text
+                            x={x + width / 2}
+                            y={y - 75}
+                            textAnchor="middle"
+                            fill="#1e293b"
+                            fontSize={14}
+                            fontWeight="bold"
+                          >
+                            {name}
+                          </text>
+                          <text
+                            x={x + width / 2}
+                            y={y - 58}
+                            textAnchor="middle"
+                            fill="#1e293b"
+                            fontSize={14}
+                            fontWeight="bold"
+                          >
+                            {value.toFixed(0)} EUR
+                          </text>
+                          <text
+                            x={x + width / 2}
+                            y={y - 43}
+                            textAnchor="middle"
+                            fill="#475569"
+                            fontSize={11}
+                          >
+                            {percent}% от спестявания • {percentOfIncome}% от доход
                           </text>
                         </>
                       )}
                     </g>
                   );
                 }}
-              />
+              >
+                <defs>
+                  <marker
+                    id="arrowhead"
+                    markerWidth="10"
+                    markerHeight="10"
+                    refX="5"
+                    refY="5"
+                    orient="auto"
+                  >
+                    <polygon points="0 0, 10 5, 0 10" fill="#fff" />
+                  </marker>
+                </defs>
+              </Treemap>
             </ResponsiveContainer>
 
             {/* Легенда за всички категории */}

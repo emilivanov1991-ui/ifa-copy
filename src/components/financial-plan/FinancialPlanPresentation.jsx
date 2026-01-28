@@ -725,7 +725,7 @@ export default function FinancialPlanPresentation({ planData, clientData, analys
                           <p className="text-sm text-slate-600 mb-2">{product.benefit}</p>
                           {product.coverage && (
                             <p className="text-xs text-slate-500">
-                              Покритие: <span className="font-semibold">{product.coverage.toLocaleString()} лв</span>
+                              Покритие: <span className="font-semibold">{product.coverage.toLocaleString()} EUR</span>
                             </p>
                           )}
                         </div>

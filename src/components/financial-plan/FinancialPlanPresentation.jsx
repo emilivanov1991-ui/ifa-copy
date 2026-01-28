@@ -492,11 +492,11 @@ export default function FinancialPlanPresentation({ planData, clientData, analys
                 <XAxis dataKey="name" stroke="#64748b" />
                 <YAxis 
                   stroke="#64748b"
-                  tickFormatter={(value) => `${(value / 1000).toFixed(0)}K EUR`}
+                  tickFormatter={(value) => value >= 1000000 ? `${(value / 1000000).toFixed(2)} мил. EUR` : `${(value / 1000).toFixed(0)}K EUR`}
                 />
                 <Tooltip 
                   contentStyle={{ backgroundColor: '#fff', border: '1px solid #e2e8f0', borderRadius: '8px' }}
-                  formatter={(value) => [`${(value / 1000).toFixed(0)}K EUR`, 'Стойност']}
+                  formatter={(value) => [value >= 1000000 ? `${(value / 1000000).toFixed(2)} мил. EUR` : `${(value / 1000).toFixed(0)}K EUR`, 'Стойност']}
                 />
                 <Bar dataKey="value" radius={[8, 8, 0, 0]}>
                   {wealthComparisonData.map((entry, index) => (

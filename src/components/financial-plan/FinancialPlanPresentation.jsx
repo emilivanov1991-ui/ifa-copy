@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend, Area, AreaChart, Cell, Treemap } from 'recharts';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { ChevronLeft, ChevronRight, Download, X, CheckCircle, TrendingUp, Shield, Home, Wallet, DollarSign, AlertTriangle } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Download, X, CheckCircle, TrendingUp, Shield, Home, Wallet, Euro, AlertTriangle } from 'lucide-react';
 import { downloadFinancialPlanPDF } from './FinancialPlanPDFGenerator';
 import { toast } from 'sonner';
 
@@ -672,7 +672,7 @@ export default function FinancialPlanPresentation({ planData, clientData, analys
             <div className="flex items-center justify-between">
               <div>
                 <h4 className="text-lg font-bold mb-1 flex items-center gap-2">
-                  <DollarSign className="w-6 h-6" />
+                  <Euro className="w-6 h-6" />
                   Данъчно облекчение
                 </h4>
                 <p className="text-green-100 text-sm">Спестени данъци за {yearsToRetirement} години</p>

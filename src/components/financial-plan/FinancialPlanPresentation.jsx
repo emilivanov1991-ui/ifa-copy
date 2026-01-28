@@ -325,21 +325,42 @@ export default function FinancialPlanPresentation({ planData, clientData, analys
               </AreaChart>
             </ResponsiveContainer>
             
-            {/* Warning label in the middle of protection zone */}
+            {/* Warning label in the absolute center of protection zone */}
             {(() => {
               const intersectionIndex = capitalData.findIndex((point, i) => 
                 i > 0 && point.financialCapital >= point.laborCapital
               );
               
               if (intersectionIndex > 0) {
-                const midPoint = Math.floor(intersectionIndex / 2);
-                const midData = capitalData[midPoint];
-                const midY = (midData.laborCapital + midData.financialCapital) / 2;
+                // Calculate the geometric center of the hatched zone
+                const protectionZone = capitalData.slice(0, intersectionIndex);
+                
+                // Sum all areas for weighted center calculation
+                let totalArea = 0;
+                let weightedX = 0;
+                let weightedY = 0;
+                
+                protectionZone.forEach((point, i) => {
+                  if (i < protectionZone.length - 1 && point.protectionArea) {
+                    const [bottom, top] = point.protectionArea;
+                    const area = top - bottom;
+                    totalArea += area;
+                    weightedX += i * area;
+                    weightedY += ((top + bottom) / 2) * area;
+                  }
+                });
+                
+                const centerIndex = totalArea > 0 ? weightedX / totalArea : Math.floor(intersectionIndex / 2);
+                const centerY = totalArea > 0 ? weightedY / totalArea : 
+                  (capitalData[Math.floor(intersectionIndex / 2)].laborCapital + 
+                   capitalData[Math.floor(intersectionIndex / 2)].financialCapital) / 2;
                 
                 // Calculate position as percentage
-                const xPercent = (midPoint / (capitalData.length - 1)) * 100;
+                const xPercent = (centerIndex / (capitalData.length - 1)) * 100;
                 const maxY = Math.max(...capitalData.map(d => Math.max(d.laborCapital, d.financialCapital)));
-                const yPercent = 100 - (midY / maxY) * 100;
+                const minY = Math.min(...capitalData.map(d => Math.min(d.laborCapital, d.financialCapital)));
+                const yRange = maxY - minY;
+                const yPercent = ((maxY - centerY) / yRange) * 100;
                 
                 return (
                   <div 

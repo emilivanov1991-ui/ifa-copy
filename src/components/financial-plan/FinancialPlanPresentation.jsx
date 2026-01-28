@@ -149,9 +149,6 @@ export default function FinancialPlanPresentation({ planData, clientData, analys
   const wealth = calculateWealthProjection(planData, clientData, analysisData);
   const allocation = calculateAllocation(planData, wealth.monthlyReserve, productsEUR, EUR_BGN_RATE);
   
-  // Курс BGN към EUR
-  const EUR_BGN_RATE = 1.95583;
-
   // Нетно имущество от анализа (в лева, конвертираме към евро)
   const assets = (
     (analysisData?.client_checking_account || 0) +
@@ -179,7 +176,7 @@ export default function FinancialPlanPresentation({ planData, clientData, analys
   const initialNetWorth = assets - liabilities;
 
   // Capital chart data - real values in EUR
-  const monthlyInvestment = (planData.products || [])
+  const monthlyInvestment = (productsEUR || [])
     .filter(p => p.name.includes('Unit Linked') || p.name.includes('УПФ'))
     .reduce((sum, p) => sum + (p.monthlyPremium || 0), 0);
 

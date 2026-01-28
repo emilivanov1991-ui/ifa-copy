@@ -484,7 +484,7 @@ export default function FinancialPlanPresentation({ planData, clientData, analys
 
           <div className="bg-white rounded-xl p-6 shadow-lg border border-slate-200">
             <h3 className="text-xl font-bold text-slate-900 mb-4 text-center">
-              Растеж на имуществото до пенсиониране
+              Размер на имуществото
             </h3>
             <ResponsiveContainer width="100%" height={350}>
               <AreaChart data={(() => {
@@ -510,15 +510,11 @@ export default function FinancialPlanPresentation({ planData, clientData, analys
               })()}>
                 <defs>
                   <linearGradient id="withoutPlanGradient" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#94a3b8" stopOpacity={0.3}/>
-                    <stop offset="95%" stopColor="#94a3b8" stopOpacity={0}/>
+                    <stop offset="5%" stopColor="#dc2626" stopOpacity={0.3}/>
+                    <stop offset="95%" stopColor="#dc2626" stopOpacity={0}/>
                   </linearGradient>
-                  <linearGradient id="withPlanGradient" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#22c55e" stopOpacity={0.6}/>
-                    <stop offset="95%" stopColor="#22c55e" stopOpacity={0.15}/>
-                  </linearGradient>
-                  <pattern id="differenceHatch" patternUnits="userSpaceOnUse" width="8" height="8" patternTransform="rotate(45)">
-                    <line x1="0" y1="0" x2="0" y2="8" stroke="#16a34a" strokeWidth="1.5" opacity="0.4" />
+                  <pattern id="greenHatch" patternUnits="userSpaceOnUse" width="8" height="8" patternTransform="rotate(45)">
+                    <line x1="0" y1="0" x2="0" y2="8" stroke="#22c55e" strokeWidth="1.5" opacity="0.5" />
                   </pattern>
                 </defs>
                 <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
@@ -535,17 +531,17 @@ export default function FinancialPlanPresentation({ planData, clientData, analys
                   contentStyle={{ backgroundColor: '#fff', border: '1px solid #e2e8f0', borderRadius: '8px' }}
                   formatter={(value, name) => [
                     value >= 1000000 ? `${(value / 1000000).toFixed(2)} мил. EUR` : `${(value / 1000).toFixed(0)}K EUR`,
-                    name === 'withoutPlan' ? 'БЕЗ план' : 'С НАШИЯ план'
+                    name === 'withoutPlan' ? 'Без Финансов План' : 'С Финансов план'
                   ]}
                 />
                 <Legend 
                   wrapperStyle={{ paddingTop: '20px' }}
-                  formatter={(value) => value === 'withoutPlan' ? 'БЕЗ план' : 'С НАШИЯ план'}
+                  formatter={(value) => value === 'withoutPlan' ? 'Без Финансов План' : 'С Финансов план'}
                 />
                 <Area 
                   type="monotone" 
                   dataKey="withoutPlan" 
-                  stroke="#94a3b8" 
+                  stroke="#dc2626" 
                   strokeWidth={3}
                   fill="url(#withoutPlanGradient)"
                   name="withoutPlan"
@@ -555,7 +551,7 @@ export default function FinancialPlanPresentation({ planData, clientData, analys
                   dataKey="withPlan" 
                   stroke="#22c55e" 
                   strokeWidth={3}
-                  fill="url(#withPlanGradient)"
+                  fill="url(#greenHatch)"
                   name="withPlan"
                 />
               </AreaChart>
@@ -566,7 +562,10 @@ export default function FinancialPlanPresentation({ planData, clientData, analys
               <div className="bg-green-100 border-2 border-green-500 rounded-lg px-6 py-3">
                 <p className="text-sm text-green-700 font-medium mb-1 text-center">Разлика:</p>
                 <p className="text-3xl font-bold text-green-700 text-center">
-                  {((wealth.withPlan - wealth.withoutPlan) / 1000).toFixed(0)}K EUR
+                  {((wealth.withPlan - wealth.withoutPlan) >= 1000000 
+                    ? `${((wealth.withPlan - wealth.withoutPlan) / 1000000).toFixed(2)} мил. EUR`
+                    : `${((wealth.withPlan - wealth.withoutPlan) / 1000).toFixed(0)}K EUR`
+                  )}
                 </p>
               </div>
             </div>

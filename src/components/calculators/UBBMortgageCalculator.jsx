@@ -2,12 +2,18 @@ import React, { useState, useMemo } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
-import { Home, TrendingDown } from 'lucide-react';
+import { Home, TrendingDown, Save, AlertCircle } from 'lucide-react';
+import { base44 } from '@/api/base44Client';
+import { toast } from 'sonner';
+import AmortizationExport from './AmortizationExport';
 
 export default function UBBMortgageCalculator({ analysisId, clientId }) {
   const EUR_BGN_RATE = 1.95583;
+  const [isSaving, setIsSaving] = useState(false);
+  const [showFullSchedule, setShowFullSchedule] = useState(false);
   
   const [inputs, setInputs] = useState({
     propertyValue: 100000,
@@ -16,6 +22,20 @@ export default function UBBMortgageCalculator({ analysisId, clientId }) {
     propertyType: 'apartment',
     salaryPackage: false
   });
+  
+  const validation = useMemo(() => {
+    const errors = [];
+    const loanAmount = inputs.propertyValue * (1 - inputs.downPayment / 100);
+    const loanAmountBGN = loanAmount * EUR_BGN_RATE;
+    
+    if (loanAmountBGN < 15000) errors.push('Минимална сума: 15,000 BGN');
+    if (loanAmount > 500000) errors.push('Максимална сума: 500,000 EUR');
+    if (inputs.loanTerm < 5) errors.push('Минимален срок: 5 години');
+    if (inputs.loanTerm > 30) errors.push('Максимален срок: 30 години');
+    if (inputs.downPayment < 15) errors.push('Минимален собствен принос: 15%');
+    
+    return { isValid: errors.length === 0, errors };
+  }, [inputs]);
 
   const calculations = useMemo(() => {
     const loanAmount = inputs.propertyValue * (1 - inputs.downPayment / 100);
@@ -50,7 +70,7 @@ export default function UBBMortgageCalculator({ analysisId, clientId }) {
     let balance = loanAmount;
     const schedule = [];
     
-    for (let i = 1; i <= Math.min(numPayments, 360); i++) {
+    for (let i = 1; i <= numPayments; i++) {
       const interestPayment = balance * monthlyRate;
       const principalPayment = monthlyPayment - interestPayment;
       balance -= principalPayment;
@@ -88,9 +108,40 @@ export default function UBBMortgageCalculator({ analysisId, clientId }) {
       insurance: {
         propertyAnnual: propertyInsuranceAnnual
       },
-      schedule: schedule.slice(0, 12)
+      schedulePreview: schedule.slice(0, 12),
+      scheduleFull: schedule
     };
   }, [inputs]);
+  
+  const handleSaveOffer = async () => {
+    if (!analysisId) {
+      toast.error('Моля въведете Analysis ID');
+      return;
+    }
+    
+    setIsSaving(true);
+    try {
+      await base44.entities.ProductOffer.create({
+        analysis_id: analysisId,
+        client_id: clientId,
+        provider: 'ОББ',
+        product_name: 'Ипотечен кредит за недвижим имот',
+        product_type: 'mortgage',
+        monthly_premium: calculations.totalMonthlyPayment,
+        annual_premium: calculations.totalMonthlyPayment * 12,
+        coverage_amount: calculations.loanAmount,
+        term_years: inputs.loanTerm,
+        offer_status: 'generated',
+        ai_recommendation_reason: `Най-ниска лихва ${calculations.interestRate.toFixed(2)}%, ГПР ${calculations.apr.toFixed(2)}%`,
+        notes: JSON.stringify({ inputs, calculations, schedule: calculations.scheduleFull })
+      });
+      toast.success('✓ Офертата е запазена');
+    } catch (error) {
+      toast.error('Грешка: ' + error.message);
+    } finally {
+      setIsSaving(false);
+    }
+  };
 
   return (
     <Card>
@@ -101,6 +152,20 @@ export default function UBBMortgageCalculator({ analysisId, clientId }) {
         </CardTitle>
       </CardHeader>
       <CardContent className="p-6 space-y-6">
+        {!validation.isValid && (
+          <div className="bg-red-50 border-l-4 border-red-500 p-4 rounded">
+            <div className="flex items-start gap-2">
+              <AlertCircle className="w-5 h-5 text-red-600 mt-0.5" />
+              <div>
+                <p className="font-semibold text-red-900 text-sm">Грешки:</p>
+                <ul className="text-xs text-red-800 mt-1 space-y-1">
+                  {validation.errors.map((err, idx) => <li key={idx}>• {err}</li>)}
+                </ul>
+              </div>
+            </div>
+          </div>
+        )}
+        
         <div className="grid md:grid-cols-2 gap-4">
           <div>
             <Label>Стойност на имота (EUR)</Label>
@@ -217,10 +282,33 @@ export default function UBBMortgageCalculator({ analysisId, clientId }) {
         </div>
 
         <div>
-          <h4 className="font-semibold mb-2">Амортизационна таблица (първи 12 месеца)</h4>
-          <div className="overflow-x-auto">
+          <div className="flex items-center justify-between mb-2">
+            <h4 className="font-semibold">
+              Амортизационна таблица {showFullSchedule ? `(всички ${calculations.scheduleFull.length} месеца)` : '(първи 12 месеца)'}
+            </h4>
+            <div className="flex items-center gap-2">
+              <AmortizationExport 
+                schedule={calculations.scheduleFull}
+                loanDetails={{
+                  amount: calculations.loanAmount,
+                  interestRate: calculations.interestRate,
+                  term: inputs.loanTerm * 12,
+                  monthlyPayment: calculations.monthlyPayment
+                }}
+              />
+              <Button 
+                variant="outline" 
+                size="sm"
+                onClick={() => setShowFullSchedule(!showFullSchedule)}
+                className="text-xs"
+              >
+                {showFullSchedule ? 'Скрий' : 'Покажи всички'}
+              </Button>
+            </div>
+          </div>
+          <div className="overflow-x-auto max-h-96 overflow-y-auto">
             <table className="w-full text-sm">
-              <thead className="bg-slate-100">
+              <thead className="bg-slate-100 sticky top-0">
                 <tr>
                   <th className="p-2 text-left">Месец</th>
                   <th className="p-2 text-right">Вноска (EUR)</th>
@@ -230,7 +318,7 @@ export default function UBBMortgageCalculator({ analysisId, clientId }) {
                 </tr>
               </thead>
               <tbody>
-                {calculations.schedule.map((row) => (
+                {(showFullSchedule ? calculations.scheduleFull : calculations.schedulePreview).map((row) => (
                   <tr key={row.month} className="border-b">
                     <td className="p-2">{row.month}</td>
                     <td className="p-2 text-right">{row.payment.toFixed(2)}</td>
@@ -243,6 +331,15 @@ export default function UBBMortgageCalculator({ analysisId, clientId }) {
             </table>
           </div>
         </div>
+        
+        <Button 
+          onClick={handleSaveOffer}
+          disabled={isSaving || !validation.isValid}
+          className="w-full bg-orange-600 hover:bg-orange-700"
+        >
+          <Save className="w-4 h-4 mr-2" />
+          {isSaving ? 'Запазва се...' : 'Запази оферта'}
+        </Button>
 
         <div className="bg-green-50 border-l-4 border-green-400 p-4 rounded text-sm">
           <p className="font-semibold text-green-900 mb-1">Предимства:</p>

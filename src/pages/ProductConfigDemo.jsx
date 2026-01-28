@@ -28,6 +28,8 @@ import PostBankMortgageCalculator from '../components/calculators/PostBankMortga
 import UBBMortgageCalculator from '../components/calculators/UBBMortgageCalculator';
 import UniCreditConsumerLoanCalculator from '../components/calculators/UniCreditConsumerLoanCalculator';
 import UBBConsumerLoanCalculator from '../components/calculators/UBBConsumerLoanCalculator';
+import MortgageComparison from '../components/calculators/MortgageComparison';
+import ConsumerLoanComparison from '../components/calculators/ConsumerLoanComparison';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -391,8 +393,10 @@ export default function ProductConfigDemo() {
 
           {/* Credits */}
           <TabsContent value="credits" className="space-y-4">
-            <Tabs defaultValue="unicredit-mortgage" className="w-full">
-              <TabsList className="grid w-full grid-cols-2 lg:grid-cols-6 mb-4 bg-green-50 p-1 rounded-lg text-xs">
+            <Tabs defaultValue="comparison-mortgage" className="w-full">
+              <TabsList className="grid w-full grid-cols-2 lg:grid-cols-8 mb-4 bg-green-50 p-1 rounded-lg text-xs">
+                <TabsTrigger value="comparison-mortgage">📊 Сравни ипотеки</TabsTrigger>
+                <TabsTrigger value="comparison-consumer">📊 Сравни потребителски</TabsTrigger>
                 <TabsTrigger value="unicredit-mortgage">UniCredit Ипотека</TabsTrigger>
                 <TabsTrigger value="dsk-mortgage">ДСК Ипотека</TabsTrigger>
                 <TabsTrigger value="ubb-mortgage">ОББ Ипотека</TabsTrigger>
@@ -400,6 +404,14 @@ export default function ProductConfigDemo() {
                 <TabsTrigger value="unicredit-consumer">UniCredit Потребителски</TabsTrigger>
                 <TabsTrigger value="ubb-consumer">ОББ Потребителски</TabsTrigger>
               </TabsList>
+              
+              <TabsContent value="comparison-mortgage">
+                <MortgageComparison />
+              </TabsContent>
+              
+              <TabsContent value="comparison-consumer">
+                <ConsumerLoanComparison />
+              </TabsContent>
 
               <TabsContent value="unicredit-mortgage">
                 <UniCreditMortgageCalculator 

@@ -203,7 +203,7 @@ export default function FinancialPlanPresentation({ planData, clientData, analys
                 stroke="#64748b"
               />
               <YAxis 
-                label={{ value: 'Капитал (%)', angle: -90, position: 'insideLeft' }}
+                label={{ value: 'Капитал (хил. лв)', angle: -90, position: 'insideLeft' }}
                 stroke="#64748b"
               />
               <Tooltip 

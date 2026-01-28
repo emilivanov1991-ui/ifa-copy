@@ -394,9 +394,9 @@ export default function ProductConfigDemo() {
           {/* Credits */}
           <TabsContent value="credits" className="space-y-4">
             <Tabs defaultValue="comparison-mortgage" className="w-full">
-              <div className="space-y-2 mb-4">
+              <TabsList className="flex flex-col gap-2 h-auto bg-transparent p-0 mb-4">
                 {/* Ред 1: Ипотечни */}
-                <div className="bg-white p-2 rounded-lg shadow-sm border border-slate-200">
+                <div className="bg-white p-2 rounded-lg shadow-sm border border-slate-200 w-full">
                   <p className="text-xs font-semibold text-slate-600 mb-2 px-2">Ипотечни кредити</p>
                   <div className="grid grid-cols-2 lg:grid-cols-4 gap-2">
                     <TabsTrigger value="unicredit-mortgage" className="data-[state=active]:bg-red-600 data-[state=active]:text-white bg-red-50 text-red-700 border border-red-200 hover:bg-red-100">UniCredit Ипотека</TabsTrigger>
@@ -407,7 +407,7 @@ export default function ProductConfigDemo() {
                 </div>
                 
                 {/* Ред 2: Потребителски */}
-                <div className="bg-white p-2 rounded-lg shadow-sm border border-slate-200">
+                <div className="bg-white p-2 rounded-lg shadow-sm border border-slate-200 w-full">
                   <p className="text-xs font-semibold text-slate-600 mb-2 px-2">Потребителски кредити</p>
                   <div className="grid grid-cols-2 gap-2">
                     <TabsTrigger value="unicredit-consumer" className="data-[state=active]:bg-red-600 data-[state=active]:text-white bg-red-50 text-red-700 border border-red-200 hover:bg-red-100">UniCredit Потребителски</TabsTrigger>
@@ -416,14 +416,14 @@ export default function ProductConfigDemo() {
                 </div>
                 
                 {/* Ред 3: Сравнение */}
-                <div className="bg-white p-2 rounded-lg shadow-sm border border-slate-200">
+                <div className="bg-white p-2 rounded-lg shadow-sm border border-slate-200 w-full">
                   <p className="text-xs font-semibold text-slate-600 mb-2 px-2">Сравнение</p>
                   <div className="grid grid-cols-2 gap-2">
                     <TabsTrigger value="comparison-mortgage" className="data-[state=active]:bg-blue-600 data-[state=active]:text-white bg-blue-50 text-blue-700 border border-blue-200 hover:bg-blue-100">📊 Сравни ипотеки</TabsTrigger>
                     <TabsTrigger value="comparison-consumer" className="data-[state=active]:bg-indigo-600 data-[state=active]:text-white bg-indigo-50 text-indigo-700 border border-indigo-200 hover:bg-indigo-100">📊 Сравни потребителски</TabsTrigger>
                   </div>
                 </div>
-              </div>
+              </TabsList>
               
               <TabsContent value="comparison-mortgage">
                 <MortgageComparison />

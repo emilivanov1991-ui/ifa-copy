@@ -385,23 +385,42 @@ export default function FinancialPlanPresentation({ planData, clientData, analys
               return null;
               })()}
 
-              {/* Investment wealth label */}
-              <div 
-              className="absolute bg-green-600 text-white px-3 py-2 rounded-lg shadow-xl pointer-events-none"
-              style={{
-                right: '8%',
-                bottom: '25%',
-                fontSize: '11px',
-                fontWeight: 'bold',
-                lineHeight: '1.3',
-                whiteSpace: 'nowrap'
-              }}
-              >
-              <div className="flex items-center gap-1.5">
-                <CheckCircle className="w-4 h-4" />
-                <span>Имущество генерирано чрез инвестиции</span>
-              </div>
-              </div>
+              {/* Investment wealth label - dynamically positioned */}
+              {(() => {
+                const minAge = capitalData[0].age;
+                const maxAge = capitalData[capitalData.length - 1].age;
+                const maxChartYValue = Math.max(...capitalData.flatMap(d => [d.laborCapital, d.financialCapital]));
+
+                // Position at 80% through the age span
+                const targetAge = Math.round(minAge + 0.8 * (maxAge - minAge));
+                const targetPoint = capitalData.find(d => d.age === targetAge);
+
+                if (targetPoint && targetPoint.financialCapital > 0) {
+                  const xPercent = ((targetAge - minAge) / (maxAge - minAge)) * 100;
+                  const yPercent = (1 - (targetPoint.financialCapital / maxChartYValue)) * 100 + 5;
+
+                  return (
+                    <div
+                      className="absolute bg-green-600 text-white px-3 py-2 rounded-lg shadow-xl pointer-events-none"
+                      style={{
+                        left: `${xPercent}%`,
+                        top: `${yPercent}%`,
+                        transform: 'translate(-50%, -50%)',
+                        fontSize: '11px',
+                        fontWeight: 'bold',
+                        lineHeight: '1.3',
+                        whiteSpace: 'nowrap'
+                      }}
+                    >
+                      <div className="flex items-center gap-1.5">
+                        <CheckCircle className="w-4 h-4" />
+                        <span>Имущество генерирано чрез инвестиции</span>
+                      </div>
+                    </div>
+                  );
+                }
+                return null;
+              })()}
 
 
               </div>

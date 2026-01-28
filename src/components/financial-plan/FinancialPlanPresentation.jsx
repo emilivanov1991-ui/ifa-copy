@@ -711,9 +711,9 @@ export default function FinancialPlanPresentation({ planData, clientData, analys
 
                   const isSmall = width < 120 || height < 100;
                   
-                  // Find largest neighbor for label placement
-                  let targetX = x + width / 2;
-                  let targetY = y + height / 2;
+                  // Label positions
+                  let labelX = x + width / 2;
+                  let labelY = y + height * 2/3; // Bottom 1/3 for large fields
                   
                   if (isSmall && root && root.children) {
                     // Find the largest neighbor (closest large rectangle)
@@ -738,9 +738,9 @@ export default function FinancialPlanPresentation({ planData, clientData, analys
                         }
                       });
                       
-                      // Position label on closest large neighbor
-                      targetX = closestNeighbor.x0 + (closestNeighbor.x1 - closestNeighbor.x0) * 0.3;
-                      targetY = closestNeighbor.y0 + (closestNeighbor.y1 - closestNeighbor.y0) * 0.7;
+                      // Position label in top 1/3 of closest large neighbor
+                      labelX = closestNeighbor.x0 + (closestNeighbor.x1 - closestNeighbor.x0) / 2;
+                      labelY = closestNeighbor.y0 + (closestNeighbor.y1 - closestNeighbor.y0) / 3;
                     }
                   }
 
@@ -760,8 +760,8 @@ export default function FinancialPlanPresentation({ planData, clientData, analys
                       {!isSmall && (
                         <>
                           <text
-                            x={x + width / 2}
-                            y={y + height / 2 - 30}
+                            x={labelX}
+                            y={labelY - 30}
                             textAnchor="middle"
                             fill="#fff"
                             fontSize={18}
@@ -770,8 +770,8 @@ export default function FinancialPlanPresentation({ planData, clientData, analys
                             {name}
                           </text>
                           <text
-                            x={x + width / 2}
-                            y={y + height / 2}
+                            x={labelX}
+                            y={labelY}
                             textAnchor="middle"
                             fill="#fff"
                             fontSize={20}
@@ -780,8 +780,8 @@ export default function FinancialPlanPresentation({ planData, clientData, analys
                             {value.toFixed(0)} EUR
                           </text>
                           <text
-                            x={x + width / 2}
-                            y={y + height / 2 + 22}
+                            x={labelX}
+                            y={labelY + 22}
                             textAnchor="middle"
                             fill="rgba(255,255,255,0.95)"
                             fontSize={13}
@@ -789,8 +789,8 @@ export default function FinancialPlanPresentation({ planData, clientData, analys
                             {percent}% от спестявания
                           </text>
                           <text
-                            x={x + width / 2}
-                            y={y + height / 2 + 40}
+                            x={labelX}
+                            y={labelY + 40}
                             textAnchor="middle"
                             fill="rgba(255,255,255,0.9)"
                             fontSize={13}
@@ -803,8 +803,8 @@ export default function FinancialPlanPresentation({ planData, clientData, analys
                         <>
                           {/* Arrow from label to small box */}
                           <line
-                            x1={targetX}
-                            y1={targetY}
+                            x1={labelX}
+                            y1={labelY + 50}
                             x2={x + width / 2}
                             y2={y + height / 2}
                             stroke="#fff"
@@ -813,8 +813,8 @@ export default function FinancialPlanPresentation({ planData, clientData, analys
                           />
                           {/* Label with same styling as other fields */}
                           <text
-                            x={targetX}
-                            y={targetY - 30}
+                            x={labelX}
+                            y={labelY - 30}
                             textAnchor="middle"
                             fill="#fff"
                             fontSize={18}
@@ -823,8 +823,8 @@ export default function FinancialPlanPresentation({ planData, clientData, analys
                             {name}
                           </text>
                           <text
-                            x={targetX}
-                            y={targetY}
+                            x={labelX}
+                            y={labelY}
                             textAnchor="middle"
                             fill="#fff"
                             fontSize={20}
@@ -833,8 +833,8 @@ export default function FinancialPlanPresentation({ planData, clientData, analys
                             {value.toFixed(0)} EUR
                           </text>
                           <text
-                            x={targetX}
-                            y={targetY + 22}
+                            x={labelX}
+                            y={labelY + 22}
                             textAnchor="middle"
                             fill="rgba(255,255,255,0.95)"
                             fontSize={13}
@@ -842,8 +842,8 @@ export default function FinancialPlanPresentation({ planData, clientData, analys
                             {percent}% от спестявания
                           </text>
                           <text
-                            x={targetX}
-                            y={targetY + 40}
+                            x={labelX}
+                            y={labelY + 40}
                             textAnchor="middle"
                             fill="rgba(255,255,255,0.9)"
                             fontSize={13}

@@ -147,7 +147,7 @@ export default function FinancialPlanPresentation({ planData, clientData, analys
   
   // Wealth projection with correct formulas
   const wealth = calculateWealthProjection(planData, clientData, analysisData);
-  const allocation = calculateAllocation(planData, wealth.monthlyReserve);
+  const allocation = calculateAllocation(planData, wealth.monthlyReserve, productsEUR, EUR_BGN_RATE);
   
   // Курс BGN към EUR
   const EUR_BGN_RATE = 1.95583;

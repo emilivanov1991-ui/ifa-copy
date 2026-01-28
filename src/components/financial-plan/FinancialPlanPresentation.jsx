@@ -305,52 +305,6 @@ export default function FinancialPlanPresentation({ planData, clientData, analys
                   stroke="none"
                   fill="url(#diagonalHatch)" 
                   connectNulls
-                  label={({ viewBox, index }) => {
-                    const intersectionIndex = capitalData.findIndex((point, i) => 
-                      i > 0 && point.financialCapital >= point.laborCapital
-                    );
-                    const midPoint = Math.floor(intersectionIndex / 2);
-                    
-                    if (index === midPoint && intersectionIndex > 0) {
-                      const midAge = capitalData[midPoint].age;
-                      const midY = (capitalData[midPoint].laborCapital + capitalData[midPoint].financialCapital) / 2;
-                      
-                      return (
-                        <g>
-                          <rect
-                            x={viewBox.x - 80}
-                            y={viewBox.y - 25}
-                            width={160}
-                            height={50}
-                            fill="#dc2626"
-                            opacity="0.95"
-                            rx={8}
-                          />
-                          <text
-                            x={viewBox.x}
-                            y={viewBox.y - 5}
-                            textAnchor="middle"
-                            fill="white"
-                            fontSize={13}
-                            fontWeight="bold"
-                          >
-                            ⚠ Нужда от защита на
-                          </text>
-                          <text
-                            x={viewBox.x}
-                            y={viewBox.y + 10}
-                            textAnchor="middle"
-                            fill="white"
-                            fontSize={13}
-                            fontWeight="bold"
-                          >
-                            трудовия капитал!
-                          </text>
-                        </g>
-                      );
-                    }
-                    return null;
-                  }}
                 />
                 <Area 
                   type="monotone" 
@@ -370,6 +324,45 @@ export default function FinancialPlanPresentation({ planData, clientData, analys
                 />
               </AreaChart>
             </ResponsiveContainer>
+            
+            {/* Warning label in the middle of protection zone */}
+            {(() => {
+              const intersectionIndex = capitalData.findIndex((point, i) => 
+                i > 0 && point.financialCapital >= point.laborCapital
+              );
+              
+              if (intersectionIndex > 0) {
+                const midPoint = Math.floor(intersectionIndex / 2);
+                const midData = capitalData[midPoint];
+                const midY = (midData.laborCapital + midData.financialCapital) / 2;
+                
+                // Calculate position as percentage
+                const xPercent = (midPoint / (capitalData.length - 1)) * 100;
+                const maxY = Math.max(...capitalData.map(d => Math.max(d.laborCapital, d.financialCapital)));
+                const yPercent = 100 - (midY / maxY) * 100;
+                
+                return (
+                  <div 
+                    className="absolute bg-red-600 text-white px-3 py-2 rounded-lg shadow-xl pointer-events-none"
+                    style={{
+                      left: `${xPercent}%`,
+                      top: `${yPercent}%`,
+                      transform: 'translate(-50%, -50%)',
+                      fontSize: '11px',
+                      fontWeight: 'bold',
+                      lineHeight: '1.3',
+                      whiteSpace: 'nowrap'
+                    }}
+                  >
+                    <div className="flex items-center gap-1">
+                      <AlertTriangle className="w-3 h-3" />
+                      <span>Нужда от защита на трудовия капитал!</span>
+                    </div>
+                  </div>
+                );
+              }
+              return null;
+            })()}
 
 
           </div>

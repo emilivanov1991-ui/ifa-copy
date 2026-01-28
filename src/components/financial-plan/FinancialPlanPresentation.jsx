@@ -683,7 +683,7 @@ export default function FinancialPlanPresentation({ planData, clientData, analys
                     <div className="text-2xl mb-1">{item.icon}</div>
                     <p className="text-xs font-semibold text-slate-700 mb-1">{item.name}</p>
                     <p className="text-lg font-bold" style={{ color: item.color }}>
-                      {item.value.toFixed(0)} лв
+                      {item.value.toFixed(0)} EUR
                     </p>
                     <p className="text-xs text-slate-600 font-medium">
                       {percentOfSavings}% от спестявания

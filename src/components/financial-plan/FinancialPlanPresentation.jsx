@@ -716,29 +716,29 @@ export default function FinancialPlanPresentation({ planData, clientData, analys
                   let labelY = y + height * 2/3;
 
                   if (isSmall && root && root.children) {
-                    // Get current small box center
+                    // Get current small box info
                     const smallCenterX = x + width / 2;
                     const smallCenterY = y + height / 2;
                     const smallArea = width * height;
 
-                    // Find all neighbors that are significantly larger (by area)
-                    let closestNeighbor = null;
-                    let minDistance = Infinity;
+                    // Find the largest neighbor that's close
+                    let bestNeighbor = null;
+                    let bestScore = -Infinity;
 
                     root.children.forEach(child => {
                       const neighborData = child.data || child;
+                      if (neighborData.name === name) return; // Skip self
+
                       const neighborX = child.x0;
                       const neighborY = child.y0;
                       const neighborWidth = child.x1 - child.x0;
                       const neighborHeight = child.y1 - child.y0;
                       const neighborArea = neighborWidth * neighborHeight;
 
-                      // Skip self and small neighbors
-                      if (neighborData.name === name || neighborArea <= smallArea * 2) {
-                        return;
-                      }
+                      // Must be significantly larger
+                      if (neighborArea <= smallArea * 2) return;
 
-                      // Calculate center-to-center distance
+                      // Calculate distance between centers
                       const neighborCenterX = neighborX + neighborWidth / 2;
                       const neighborCenterY = neighborY + neighborHeight / 2;
                       const distance = Math.sqrt(
@@ -746,9 +746,14 @@ export default function FinancialPlanPresentation({ planData, clientData, analys
                         Math.pow(neighborCenterY - smallCenterY, 2)
                       );
 
-                      if (distance < minDistance) {
-                        minDistance = distance;
-                        closestNeighbor = {
+                      // Score: prioritize larger areas and closer distance
+                      // Higher area = better, lower distance = better
+                      const score = (neighborArea / 10000) - (distance / 100);
+
+                      if (score > bestScore) {
+                        bestScore = score;
+                        bestNeighbor = {
+                          name: neighborData.name,
                           x: neighborX,
                           y: neighborY,
                           width: neighborWidth,
@@ -757,10 +762,10 @@ export default function FinancialPlanPresentation({ planData, clientData, analys
                       }
                     });
 
-                    // Position label in top 1/3 of closest neighbor
-                    if (closestNeighbor) {
-                      labelX = closestNeighbor.x + closestNeighbor.width / 2;
-                      labelY = closestNeighbor.y + closestNeighbor.height / 3;
+                    // Position label in top 1/3 of best neighbor
+                    if (bestNeighbor) {
+                      labelX = bestNeighbor.x + bestNeighbor.width / 2;
+                      labelY = bestNeighbor.y + bestNeighbor.height / 3;
                     }
                   }
 

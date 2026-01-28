@@ -716,21 +716,24 @@ export default function FinancialPlanPresentation({ planData, clientData, analys
                   let labelY = y + height * 2/3; // Bottom 1/3 for large fields
                   
                   if (isSmall && root && root.children) {
-                    // Find the largest neighbor (closest large rectangle)
+                    // Find all larger neighbors
                     const neighbors = root.children.filter(child => {
                       const childData = child.data || child;
-                      return childData.name !== name && childData.value > value * 3; // At least 3x larger
+                      const childArea = child.width * child.height;
+                      const currentArea = width * height;
+                      return childData.name !== name && childArea > currentArea * 2; // At least 2x larger by area
                     });
                     
                     if (neighbors.length > 0) {
-                      // Find closest neighbor
+                      // Find closest neighbor by edge distance
                       let closestNeighbor = neighbors[0];
                       let minDistance = Infinity;
                       
                       neighbors.forEach(neighbor => {
-                        const nx = neighbor.x0 + (neighbor.x1 - neighbor.x0) / 2;
-                        const ny = neighbor.y0 + (neighbor.y1 - neighbor.y0) / 2;
-                        const distance = Math.sqrt(Math.pow(nx - (x + width/2), 2) + Math.pow(ny - (y + height/2), 2));
+                        // Calculate closest edge distance (not center distance)
+                        const dx = Math.max(neighbor.x0 - (x + width), 0, x - (neighbor.x0 + neighbor.width));
+                        const dy = Math.max(neighbor.y0 - (y + height), 0, y - (neighbor.y0 + neighbor.height));
+                        const distance = Math.sqrt(dx * dx + dy * dy);
                         
                         if (distance < minDistance) {
                           minDistance = distance;
@@ -739,8 +742,8 @@ export default function FinancialPlanPresentation({ planData, clientData, analys
                       });
                       
                       // Position label in top 1/3 of closest large neighbor
-                      labelX = closestNeighbor.x0 + (closestNeighbor.x1 - closestNeighbor.x0) / 2;
-                      labelY = closestNeighbor.y0 + (closestNeighbor.y1 - closestNeighbor.y0) / 3;
+                      labelX = closestNeighbor.x0 + closestNeighbor.width / 2;
+                      labelY = closestNeighbor.y0 + closestNeighbor.height / 3;
                     }
                   }
 

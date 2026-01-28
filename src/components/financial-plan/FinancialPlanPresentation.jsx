@@ -262,6 +262,9 @@ export default function FinancialPlanPresentation({ planData, clientData, analys
                     <stop offset="5%" stopColor="#2563eb" stopOpacity={0.3}/>
                     <stop offset="95%" stopColor="#2563eb" stopOpacity={0}/>
                   </linearGradient>
+                  <pattern id="protectionPattern" patternUnits="userSpaceOnUse" width="8" height="8" patternTransform="rotate(45)">
+                    <line x1="0" y1="0" x2="0" y2="8" stroke="#dc2626" strokeWidth="2" />
+                  </pattern>
                 </defs>
                 <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
                 <XAxis 
@@ -285,6 +288,39 @@ export default function FinancialPlanPresentation({ planData, clientData, analys
                   wrapperStyle={{ paddingTop: '20px' }}
                   formatter={(value) => value === 'laborCapital' ? 'Трудов капитал' : 'Финансов капитал'}
                 />
+                
+                {/* Hatched area for protection zone */}
+                {(() => {
+                  const intersectionIndex = capitalData.findIndex((point, i) => 
+                    i > 0 && point.financialCapital >= point.laborCapital
+                  );
+                  if (intersectionIndex > 0) {
+                    return (
+                      <>
+                        <Area 
+                          type="monotone" 
+                          dataKey="laborCapital" 
+                          stroke="none"
+                          fill="url(#protectionPattern)"
+                          data={capitalData.slice(0, intersectionIndex + 1)}
+                        />
+                        {/* Text label in the middle of protection zone */}
+                        <text
+                          x="20%"
+                          y="35%"
+                          fill="#dc2626"
+                          fontSize="22"
+                          fontWeight="bold"
+                          textAnchor="middle"
+                        >
+                          ЗАЩИТА
+                        </text>
+                      </>
+                    );
+                  }
+                  return null;
+                })()}
+                
                 <Area 
                   type="monotone" 
                   dataKey="laborCapital" 
@@ -301,6 +337,18 @@ export default function FinancialPlanPresentation({ planData, clientData, analys
                   fill="url(#financialGradient)" 
                   name="financialCapital"
                 />
+                
+                {/* Investment label on financial capital line */}
+                <text
+                  x="70%"
+                  y="25%"
+                  fill="#2563eb"
+                  fontSize="18"
+                  fontWeight="bold"
+                  textAnchor="middle"
+                >
+                  ИНВЕСТИЦИИ
+                </text>
               </AreaChart>
             </ResponsiveContainer>
 

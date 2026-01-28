@@ -394,16 +394,36 @@ export default function ProductConfigDemo() {
           {/* Credits */}
           <TabsContent value="credits" className="space-y-4">
             <Tabs defaultValue="comparison-mortgage" className="w-full">
-              <TabsList className="grid w-full grid-cols-2 lg:grid-cols-4 mb-4 bg-green-50 p-2 rounded-lg text-xs gap-1">
-                <TabsTrigger value="comparison-mortgage">📊 Сравни ипотеки</TabsTrigger>
-                <TabsTrigger value="comparison-consumer">📊 Сравни потребителски</TabsTrigger>
-                <TabsTrigger value="unicredit-mortgage">UniCredit Ипотека</TabsTrigger>
-                <TabsTrigger value="dsk-mortgage">ДСК Ипотека</TabsTrigger>
-                <TabsTrigger value="ubb-mortgage">ОББ Ипотека</TabsTrigger>
-                <TabsTrigger value="postbank-mortgage">Пощенска Ипотека</TabsTrigger>
-                <TabsTrigger value="unicredit-consumer">UniCredit Потребителски</TabsTrigger>
-                <TabsTrigger value="ubb-consumer">ОББ Потребителски</TabsTrigger>
-              </TabsList>
+              <div className="space-y-2 mb-4">
+                {/* Ред 1: Ипотечни */}
+                <div className="bg-white p-2 rounded-lg shadow-sm border border-slate-200">
+                  <p className="text-xs font-semibold text-slate-600 mb-2 px-2">Ипотечни кредити</p>
+                  <div className="grid grid-cols-2 lg:grid-cols-4 gap-2">
+                    <TabsTrigger value="unicredit-mortgage" className="data-[state=active]:bg-red-600 data-[state=active]:text-white bg-red-50 text-red-700 border border-red-200 hover:bg-red-100">UniCredit Ипотека</TabsTrigger>
+                    <TabsTrigger value="dsk-mortgage" className="data-[state=active]:bg-green-600 data-[state=active]:text-white bg-green-50 text-green-700 border border-green-200 hover:bg-green-100">ДСК Ипотека</TabsTrigger>
+                    <TabsTrigger value="ubb-mortgage" className="data-[state=active]:bg-orange-600 data-[state=active]:text-white bg-orange-50 text-orange-700 border border-orange-200 hover:bg-orange-100">ОББ Ипотека</TabsTrigger>
+                    <TabsTrigger value="postbank-mortgage" className="data-[state=active]:bg-purple-600 data-[state=active]:text-white bg-purple-50 text-purple-700 border border-purple-200 hover:bg-purple-100">Пощенска Ипотека</TabsTrigger>
+                  </div>
+                </div>
+                
+                {/* Ред 2: Потребителски */}
+                <div className="bg-white p-2 rounded-lg shadow-sm border border-slate-200">
+                  <p className="text-xs font-semibold text-slate-600 mb-2 px-2">Потребителски кредити</p>
+                  <div className="grid grid-cols-2 gap-2">
+                    <TabsTrigger value="unicredit-consumer" className="data-[state=active]:bg-red-600 data-[state=active]:text-white bg-red-50 text-red-700 border border-red-200 hover:bg-red-100">UniCredit Потребителски</TabsTrigger>
+                    <TabsTrigger value="ubb-consumer" className="data-[state=active]:bg-orange-600 data-[state=active]:text-white bg-orange-50 text-orange-700 border border-orange-200 hover:bg-orange-100">ОББ Потребителски</TabsTrigger>
+                  </div>
+                </div>
+                
+                {/* Ред 3: Сравнение */}
+                <div className="bg-white p-2 rounded-lg shadow-sm border border-slate-200">
+                  <p className="text-xs font-semibold text-slate-600 mb-2 px-2">Сравнение</p>
+                  <div className="grid grid-cols-2 gap-2">
+                    <TabsTrigger value="comparison-mortgage" className="data-[state=active]:bg-blue-600 data-[state=active]:text-white bg-blue-50 text-blue-700 border border-blue-200 hover:bg-blue-100">📊 Сравни ипотеки</TabsTrigger>
+                    <TabsTrigger value="comparison-consumer" className="data-[state=active]:bg-indigo-600 data-[state=active]:text-white bg-indigo-50 text-indigo-700 border border-indigo-200 hover:bg-indigo-100">📊 Сравни потребителски</TabsTrigger>
+                  </div>
+                </div>
+              </div>
               
               <TabsContent value="comparison-mortgage">
                 <MortgageComparison />

@@ -702,14 +702,29 @@ export default function FinancialPlanPresentation({ planData, clientData, analys
                 aspectRatio={4/3}
                 stroke="#fff"
                 fill="#8884d8"
-                content={({ x, y, width, height, index, name, value, color, icon }) => {
+                content={({ x, y, width, height, index, name, value, color, icon, ...props }) => {
                   const totalAllocation = allocation.investments.amount + allocation.incomeProtection.amount + 
                                           allocation.propertyProtection.amount + allocation.loans.amount + allocation.reserve.amount;
                   const monthlyIncome = (analysisData?.client_net_income || 0) + (analysisData?.partner_net_income || 0);
                   const percent = ((value / totalAllocation) * 100).toFixed(1);
                   const percentOfIncome = monthlyIncome > 0 ? ((value / monthlyIncome) * 100).toFixed(1) : 0;
 
-                  const isSmall = width < 80 || height < 80;
+                  const isSmall = width < 120 || height < 100;
+                  
+                  // Find the largest neighbor to place the label on
+                  let targetX = x + width / 2;
+                  let targetY = y + height / 2;
+                  
+                  if (isSmall && allocationData.length > 1) {
+                    // Find the largest item (first one since sorted)
+                    const largestItem = allocationData[0];
+                    if (largestItem.name !== name) {
+                      // Position on the largest field - we'll calculate it from the treemap layout
+                      // Since treemap positions from left to right, largest is typically on the left
+                      targetX = 100; // Position text in the left area (largest field)
+                      targetY = 200; // Middle height
+                    }
+                  }
 
                   return (
                     <g>
@@ -724,7 +739,7 @@ export default function FinancialPlanPresentation({ planData, clientData, analys
                           strokeWidth: 2,
                         }}
                       />
-                      {!isSmall && width > 60 && height > 60 && (
+                      {!isSmall && (
                         <>
                           <text
                             x={x + width / 2}
@@ -768,20 +783,20 @@ export default function FinancialPlanPresentation({ planData, clientData, analys
                       )}
                       {isSmall && (
                         <>
-                          {/* Arrow pointing to small box */}
+                          {/* Arrow from label to small box */}
                           <line
-                            x1={x + width / 2}
-                            y1={y - 30}
+                            x1={targetX}
+                            y1={targetY}
                             x2={x + width / 2}
-                            y2={y}
-                            stroke="#fff"
+                            y2={y + height / 2}
+                            stroke="#1e293b"
                             strokeWidth={2}
                             markerEnd="url(#arrowhead)"
                           />
-                          {/* Label above the small box */}
+                          {/* Label positioned on largest field */}
                           <text
-                            x={x + width / 2}
-                            y={y - 75}
+                            x={targetX}
+                            y={targetY - 35}
                             textAnchor="middle"
                             fill="#1e293b"
                             fontSize={14}
@@ -790,8 +805,8 @@ export default function FinancialPlanPresentation({ planData, clientData, analys
                             {name}
                           </text>
                           <text
-                            x={x + width / 2}
-                            y={y - 58}
+                            x={targetX}
+                            y={targetY - 18}
                             textAnchor="middle"
                             fill="#1e293b"
                             fontSize={14}
@@ -800,8 +815,8 @@ export default function FinancialPlanPresentation({ planData, clientData, analys
                             {value.toFixed(0)} EUR
                           </text>
                           <text
-                            x={x + width / 2}
-                            y={y - 43}
+                            x={targetX}
+                            y={targetY - 3}
                             textAnchor="middle"
                             fill="#475569"
                             fontSize={11}
@@ -823,7 +838,7 @@ export default function FinancialPlanPresentation({ planData, clientData, analys
                     refY="5"
                     orient="auto"
                   >
-                    <polygon points="0 0, 10 5, 0 10" fill="#fff" />
+                    <polygon points="0 0, 10 5, 0 10" fill="#1e293b" />
                   </marker>
                 </defs>
               </Treemap>

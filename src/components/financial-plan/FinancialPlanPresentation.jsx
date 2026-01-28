@@ -114,7 +114,36 @@ export default function FinancialPlanPresentation({ planData, clientData, analys
   const wealth = calculateWealthProjection(planData, clientData, analysisData);
   const allocation = calculateAllocation(planData, wealth.monthlyReserve);
   
-  // Capital chart data - real values in BGN
+  // Курс BGN към EUR
+  const EUR_BGN_RATE = 1.95583;
+
+  // Нетно имущество от анализа (в лева, конвертираме към евро)
+  const assets = (
+    (analysisData?.client_checking_account || 0) +
+    (analysisData?.client_savings_book || 0) +
+    (analysisData?.client_term_deposit || 0) +
+    (analysisData?.client_mutual_funds || 0) +
+    (analysisData?.client_savings_account || 0) +
+    (analysisData?.client_cash || 0) +
+    (analysisData?.partner_checking_account || 0) +
+    (analysisData?.partner_savings_book || 0) +
+    (analysisData?.partner_term_deposit || 0) +
+    (analysisData?.partner_mutual_funds || 0) +
+    (analysisData?.partner_savings_account || 0) +
+    (analysisData?.partner_cash || 0)
+  ) / EUR_BGN_RATE;
+
+  const liabilities = (
+    (analysisData?.liability_mortgage || 0) +
+    (analysisData?.liability_consumer_loans || 0) +
+    (analysisData?.liability_credit_cards || 0) +
+    (analysisData?.liability_leasing || 0) +
+    (analysisData?.liability_overdraft || 0)
+  ) / EUR_BGN_RATE;
+
+  const initialNetWorth = assets - liabilities;
+
+  // Capital chart data - real values in EUR
   const monthlyInvestment = (planData.products || [])
     .filter(p => p.name.includes('Unit Linked') || p.name.includes('УПФ'))
     .reduce((sum, p) => sum + (p.monthlyPremium || 0), 0);
@@ -126,25 +155,30 @@ export default function FinancialPlanPresentation({ planData, clientData, analys
     const currentAge = age + i;
     const yearsLeft = yearsToRetirement - i;
 
-    // Трудов капитал = бъдещи доходи до пенсия (намалява с времето)
-    // Формула: месечен доход * 12 месеца * години до пенсия * (1 + растеж)^средни години
+    // Трудов капитал = бъдещи доходи до пенсия (намалява с времето) - в евро
     const avgYearsLeft = yearsLeft / 2;
+    const monthlyNetIncomeEUR = clientData.monthlyNetIncome / EUR_BGN_RATE;
     const laborCapital = yearsLeft > 0 
-      ? (clientData.monthlyNetIncome * 12 * yearsLeft * Math.pow(1 + annualSalaryGrowth, avgYearsLeft))
+      ? (monthlyNetIncomeEUR * 12 * yearsLeft * Math.pow(1 + annualSalaryGrowth, avgYearsLeft))
       : 0;
 
-    // Финансов капитал = натрупани инвестиции до момента
-    // Формула: месечна премия * ((1 + r)^n - 1) / r * (1 + r) където r = месечна доходност, n = месеци
+    // Финансов капитал = начално имущество + натрупани инвестиции до момента (в евро)
     const monthlyReturn = investmentReturn / 12;
     const monthsInvested = i * 12;
-    const financialCapital = monthsInvested > 0 && monthlyInvestment > 0
+    const investmentGrowth = monthsInvested > 0 && monthlyInvestment > 0
       ? monthlyInvestment * (((Math.pow(1 + monthlyReturn, monthsInvested) - 1) / monthlyReturn) * (1 + monthlyReturn))
       : 0;
 
+    // Начално имущество също расте с времето (предполагаме 4% доходност)
+    const wealthGrowthRate = 0.04;
+    const grownInitialWealth = initialNetWorth * Math.pow(1 + wealthGrowthRate, i);
+
+    const financialCapital = grownInitialWealth + investmentGrowth;
+
     return {
       age: currentAge,
-      laborCapital: laborCapital / 1000, // в хиляди лева за по-добра визуализация
-      financialCapital: financialCapital / 1000,
+      laborCapital: laborCapital / 1000, // в хиляди евро
+      financialCapital: financialCapital / 1000, // в хиляди евро
     };
   });
 

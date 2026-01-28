@@ -554,7 +554,7 @@ export default function FinancialPlanPresentation({ planData, clientData, analys
                             fontSize={16}
                             fontWeight="bold"
                           >
-                            {value.toFixed(0)} лв
+                            {value.toFixed(0)} EUR
                           </text>
                           <text
                             x={x + width / 2}
@@ -605,7 +605,7 @@ export default function FinancialPlanPresentation({ planData, clientData, analys
                             fontSize={12}
                             fontWeight="bold"
                           >
-                            {value.toFixed(0)} лв
+                            {value.toFixed(0)} EUR
                           </text>
                           <text
                             x={x + width / 2}

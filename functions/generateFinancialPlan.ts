@@ -421,6 +421,9 @@ Deno.serve(async (req) => {
     totalMonthlyPremium += ulMonthlyPremiumRounded;
     totalMonthlyInvestments += ulAnnualSavings / 12;
     totalMonthlyInsurance += coveragesPremium / 12;
+    
+    // Инициализираме бюджета за допълнителни продукти
+    let currentBudget = maxMonthlyPlan - totalMonthlyPremium;
 
     // 4.2 Задължителна смяна на пенсионен фонд
     planProducts.push({
@@ -541,9 +544,6 @@ Deno.serve(async (req) => {
         }
       }
     }
-
-    // Допълнителни продукти при наличие на бюджет
-    let currentBudget = maxMonthlyPlan - totalMonthlyPremium;
 
     // Приоритет 1: Uniqa Здраве и ценност - План Европа (ВИНАГИ)
     {

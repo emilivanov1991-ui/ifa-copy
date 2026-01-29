@@ -591,141 +591,30 @@ Deno.serve(async (req) => {
       }
     }
 
-    // Приоритет 4: Нов ипотечен/потребителски кредит (ако ще закупува жилище)
-    if (analysis.planning_housing_change && analysis.financing_method === 'cash_and_loan') {
-      const plannedValue = analysis.planned_housing_value || 0;
-      const extraCosts = analysis.planned_housing_extra_costs || 0;
-      const availableCash = analysis.available_cash || 0;
-      const loanAmount = Math.max(0, plannedValue + extraCosts - availableCash);
-      const loanYears = analysis.loan_term_years || 20;
-      const interestRate = analysis.loan_interest_rate || 3;
+    // Fallback продукти ако няма достатъчно бюджет за MetLife UL
+    if (maxMonthlyPlan < 100 && planProducts.filter(p => p.product_type === 'ul_investment' && p.beneficiary === 'partner1').length === 0) {
+      // MetLife Срочен живот или ДЗИ Закрила 15 лв/месечно
+      const fallbackMonthly = 15;
       
-      if (loanAmount > 0) {
-        const monthlyPayment = calculateMonthlyLoanPayment(loanAmount, interestRate, loanYears);
-        
-        // Проверка на лимити
-        const maxPaymentFromBalance = monthlyBalance * 0.9; // 90% от баланс
-        const maxPaymentBNB = (clientNetIncome + partnerNetIncome) * 0.5; // 50% БНБ лимит
-        
-        let recommendedMonthly = monthlyPayment;
-        let needsInsurance = false;
-        
-        if (monthlyPayment > maxPaymentFromBalance || monthlyPayment > maxPaymentBNB) {
-          // Намаляване до 86% и 4% за застраховане
-          recommendedMonthly = monthlyBalance * 0.86;
-          needsInsurance = true;
-          const insuranceAllocation = monthlyBalance * 0.04;
-          
-          planProducts.push({
-            product_type: 'mortgage_loan',
-            provider: 'Препоръчана банка',
-            product_name: 'Ипотечен кредит',
-            beneficiary: 'family',
-            monthly_premium: recommendedMonthly,
-            total_premium: recommendedMonthly * loanYears * 12,
-            coverage_amount: loanAmount,
-            term_years: loanYears,
-            is_active: true,
-            details: {
-              interest_rate: interestRate,
-              insurance_allocation: insuranceAllocation,
-              note: 'Месечната вноска е намалена за спазване на лимитите',
-              recommended_metlife_credit_guard: true
-            }
-          });
-        } else {
-          planProducts.push({
-            product_type: 'mortgage_loan',
-            provider: 'Препоръчана банка',
-            product_name: 'Ипотечен кредит',
-            beneficiary: 'family',
-            monthly_premium: monthlyPayment,
-            total_premium: monthlyPayment * loanYears * 12,
-            coverage_amount: loanAmount,
-            term_years: loanYears,
-            is_active: true,
-            details: {
-              interest_rate: interestRate,
-              recommended_metlife_credit_guard: true
-            }
-          });
+      planProducts.push({
+        product_type: 'term_life',
+        provider: 'ДЗИ',
+        product_name: 'ДЗИ Закрила Gold',
+        beneficiary: 'partner1',
+        beneficiary_name: `${analysis.client_first_name || ''} ${analysis.client_last_name || ''}`.trim(),
+        beneficiary_age: clientAge,
+        monthly_premium: fallbackMonthly,
+        total_premium: fallbackMonthly * 12,
+        coverage_amount: 10000,
+        is_active: true,
+        details: {
+          note: 'Минимален застрахователен план при ограничен бюджет',
+          coverages: 'Смърт, Трайна нетрудоспособност'
         }
-      }
-    }
-
-    // Приоритет 5: Застраховка за дома (ако има жилище без застраховка)
-    if (hasProperty && !analysis.property_1_has_insurance && currentBudget > 0) {
-      const propertyValue = analysis.property_1_value || 0;
-      const propertyValueBGN = propertyValue * EUR_BGN_RATE;
+      });
       
-      // Определяне на доставчик
-      let provider, productName, monthlyPremiumEUR;
-      
-      if (propertyValueBGN <= 500000) {
-        // Инстинкт - използваме Пакет 2 (100,000 EUR ~ 195,583 BGN)
-        provider = 'Инстинкт';
-        productName = 'Закрила на дома - Пакет 2';
-        monthlyPremiumEUR = 126.66 / EUR_BGN_RATE / 12; // ~5.4 EUR/месец
-      } else {
-        // ДЗИ Защита за дома
-        provider = 'ДЗИ';
-        productName = 'Защита за дома';
-        monthlyPremiumEUR = 8; // Примерна цена
-      }
-      
-      if (currentBudget >= monthlyPremiumEUR) {
-        planProducts.push({
-          product_type: 'property_insurance',
-          provider: provider,
-          product_name: productName,
-          beneficiary: 'family',
-          monthly_premium: monthlyPremiumEUR,
-          total_premium: monthlyPremiumEUR * 12,
-          coverage_amount: propertyValue,
-          is_active: true,
-          details: {
-            property_address: analysis.property_1_address || 'Н/П',
-            all_risks_coverage: true
-          }
-        });
-        
-        totalMonthlyPremium += monthlyPremiumEUR;
-        totalMonthlyInsurance += monthlyPremiumEUR;
-        currentBudget -= monthlyPremiumEUR;
-      }
-    }
-
-    // Приоритет 6: Каско/ГО (ако има кола над 8000 лв без Каско)
-    const car1Value = analysis.car_1_value || 0;
-    const car1ValueBGN = car1Value * EUR_BGN_RATE;
-    const hasCar = analysis.has_car_1 || false;
-    const hasCasco = analysis.car_1_has_casco || false;
-    
-    if (hasCar && !hasCasco && car1ValueBGN > 8000 && currentBudget > 0) {
-      // Примерна премия за Каско (зависи от стойността на колата)
-      const cascoMonthlyPremium = Math.max(30, car1Value * 0.003); // ~0.3% от стойността месечно
-      
-      if (currentBudget >= cascoMonthlyPremium) {
-        planProducts.push({
-          product_type: 'car_insurance',
-          provider: 'ДЗИ',
-          product_name: 'Каско+',
-          beneficiary: 'family',
-          monthly_premium: cascoMonthlyPremium,
-          total_premium: cascoMonthlyPremium * 12,
-          coverage_amount: car1Value,
-          is_active: true,
-          details: {
-            car_brand: analysis.car_1_brand || 'Н/П',
-            car_model: analysis.car_1_model || 'Н/П',
-            car_year: analysis.car_1_year || 0
-          }
-        });
-        
-        totalMonthlyPremium += cascoMonthlyPremium;
-        totalMonthlyInsurance += cascoMonthlyPremium;
-        currentBudget -= cascoMonthlyPremium;
-      }
+      totalMonthlyPremium += fallbackMonthly;
+      totalMonthlyInsurance += fallbackMonthly;
     }
 
     // ============================================================

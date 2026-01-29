@@ -759,6 +759,41 @@ Deno.serve(async (req) => {
       childULProduct.details.total_invested = Math.round(annualSavings * termYears);
       extraGeneratedWealth.child_ul_at_19 = Math.round(childValue);
     }
+    
+    // 6.3 Проекция за УПФ (Универсален Пенсионен Фонд - Втори стълб)
+    const upfProducts = planProducts.filter(p => p.product_type === 'pension_plan');
+    if (upfProducts.length > 0) {
+      // Изчисление на натрупана сума в УПФ към пенсия
+      // 5% от БОД (брутен осигурителен доход) отиват в УПФ
+      const contributionRate = 0.05;
+      const expectedReturn = 0.0601; // 6.01% годишна доходност
+      
+      // За клиента
+      const clientGrossAnnual = clientGrossIncome * 12;
+      let clientUPFValue = 0;
+      let currentGross = clientGrossAnnual;
+      
+      for (let year = 1; year <= clientYearsToRetirement; year++) {
+        const annualContribution = currentGross * contributionRate;
+        clientUPFValue = (clientUPFValue + annualContribution) * (1 + expectedReturn);
+        currentGross *= 1.03; // 3% годишен ръст на дохода
+      }
+      
+      // За партньора (ако има)
+      let partnerUPFValue = 0;
+      if (includePartner && partnerGrossIncome > 0) {
+        const partnerGrossAnnual = partnerGrossIncome * 12;
+        let currentPartnerGross = partnerGrossAnnual;
+        
+        for (let year = 1; year <= partnerYearsToRetirement; year++) {
+          const annualContribution = currentPartnerGross * contributionRate;
+          partnerUPFValue = (partnerUPFValue + annualContribution) * (1 + expectedReturn);
+          currentPartnerGross *= 1.03;
+        }
+      }
+      
+      extraGeneratedWealth.pension_fund_at_65 = Math.round(clientUPFValue + partnerUPFValue);
+    }
 
     // ============================================================
     // СТЪПКА 7: СЪЗДАВАНЕ НА ФИНАНСОВ ПЛАН

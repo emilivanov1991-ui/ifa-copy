@@ -325,20 +325,22 @@ Deno.serve(async (req) => {
     const partnerSocialSupport = includePartner ? calculateSocialSupport(partnerGrossIncome, 'disability') : 0;
 
     // Изчисляване на нужда от покритие нетрудоспособност
+    // Формула: 80% × (променливи разходи - социална издръжка) × (80 - възраст) × 12
     const clientDisabilityCoverage = variableExpenses > clientSocialSupport ?
-      Math.round(0.80 * (variableExpenses - clientSocialSupport) * (80 - clientAge) * 12 / 100) * 100 : // Закръгли до 100
+      roundCoverageUp(0.80 * (variableExpenses - clientSocialSupport) * (80 - clientAge) * 12) :
       0;
     
     const partnerDisabilityCoverage = includePartner && variableExpenses > partnerSocialSupport ?
-      Math.round(0.80 * (variableExpenses - partnerSocialSupport) * (80 - partnerAge) * 12 / 100) * 100 :
+      roundCoverageUp(0.80 * (variableExpenses - partnerSocialSupport) * (80 - partnerAge) * 12) :
       0;
 
     // Фрактури и изгаряния - стандартно 1500 EUR
     const fracturesCoverage = 1500;
 
     // Тежки заболявания (40)
+    // Формула: (променливи разходи - социална издръжка) × 3 × 12
     const criticalIllnessCoverage = variableExpenses > clientSocialSupport ?
-      Math.round((variableExpenses - clientSocialSupport) * 3 * 12 / 100) * 100 :
+      roundCoverageUp((variableExpenses - clientSocialSupport) * 3 * 12) :
       0;
 
     // Изчисляване на покрития за UL

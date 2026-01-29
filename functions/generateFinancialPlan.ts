@@ -356,13 +356,13 @@ Deno.serve(async (req) => {
     // Изчисляване на премия за покритията
     let coveragesPremium = 0;
     
-    // PTD
+    // PTD (Пълна/Частична Трайна Нетрудоспособност)
     if (ulCoverages.ptdCoverage > 0) {
       const riskData = METLIFE_PA_RISK_CLASSES[1]; // Приемаме рисков клас 1
-      coveragesPremium += (ulCoverages.ptdCoverage / 1000) * riskData.pi / 2; // /2 за частична
+      coveragesPremium += (ulCoverages.ptdCoverage / 1000) * riskData.pi;
     }
     
-    // Fractures
+    // Fractures and Burns
     if (ulCoverages.fracturesCoverage > 0) {
       const riskData = METLIFE_PA_RISK_CLASSES[1];
       coveragesPremium += (ulCoverages.fracturesCoverage / 1000) * riskData.fracturesAndBurns;
@@ -374,12 +374,12 @@ Deno.serve(async (req) => {
       coveragesPremium += ulCoverages.criticalIllness40Coverage / coefficient;
     }
     
-    // Telemedicine
+    // Telemedicine / Second Medical Opinion
     if (ulCoverages.telemedicine) {
       coveragesPremium += 15;
     }
     
-    // Premium Waiver
+    // Premium Waiver (Отказ от премия)
     if (ulCoverages.premiumWaiver) {
       const waiverRate = 0.0438; // Рисков клас 1
       const basePremium = ulAnnualSavings + coveragesPremium;
@@ -388,6 +388,10 @@ Deno.serve(async (req) => {
     
     const totalULAnnualPremium = ulAnnualSavings + coveragesPremium + 15; // +15 admin fee
     const ulMonthlyPremium = totalULAnnualPremium / 12;
+    
+    // Прилагаме ценова психология - закръгляме премията надолу
+    const ulMonthlyPremiumRounded = roundPremiumDown(ulMonthlyPremium);
+    const ulAnnualPremiumRounded = ulMonthlyPremiumRounded * 12;
     
     planProducts.push({
       product_type: 'ul_investment',

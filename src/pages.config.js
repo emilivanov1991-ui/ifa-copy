@@ -63,6 +63,7 @@ import ProductCatalogAdmin from './pages/ProductCatalogAdmin';
 import ProductConfigDemo from './pages/ProductConfigDemo';
 import Services from './pages/Services';
 import app from './pages/_app';
+import FinancialPlanView from './pages/FinancialPlanView';
 import __Layout from './Layout.jsx';
 
 
@@ -83,6 +84,7 @@ export const PAGES = {
     "ProductConfigDemo": ProductConfigDemo,
     "Services": Services,
     "_app": app,
+    "FinancialPlanView": FinancialPlanView,
 }
 
 export const pagesConfig = {

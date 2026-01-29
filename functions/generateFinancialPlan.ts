@@ -304,20 +304,22 @@ Deno.serve(async (req) => {
 
     // 4.1 Основен продукт: MetLife Unit Linked
     const hasPartnerOrChildren = includePartner || (analysis.children_count || 0) > 0;
-    let integratedLifeCoverage = hasPartnerOrChildren ? 
-      getLifeCoverageMultiplier(clientAge) * 1000 : // Умножи по годишна премия (ще се коригира)
-      2500; // По подразбиране 2500 EUR
-
-    // Калкулиране на налични средства за UL
-    let availableForUL = maxMonthlyPlan;
     
-    // Резервираме минимум за инвестиции
-    const ulAnnualSavings = Math.max(300, Math.min(availableForUL * 12 * 0.5, maxAnnualPlan * 0.5));
+    // Определяме колко можем да инвестираме месечно
+    // Започваме с максималния план минус минимум за инвестиции
+    const targetULMonthly = Math.max(25, maxMonthlyPlan * 0.55); // 55% от плана за UL
+    const ulAnnualSavings = Math.max(300, Math.min(targetULMonthly * 12, maxAnnualPlan * 0.5));
     
-    // Коригираме интегрираното покритие според премията
+    // Определяме интегрирано покритие живот
+    let integratedLifeCoverage;
     if (hasPartnerOrChildren) {
       const multiplier = getLifeCoverageMultiplier(clientAge);
       integratedLifeCoverage = Math.min(ulAnnualSavings * multiplier, 14999); // Макс 14999 за избягване на здравен въпросник
+      // Закръгляне визуално
+      integratedLifeCoverage = roundCoverageUp(integratedLifeCoverage);
+    } else {
+      // По подразбиране 2500 EUR без партньор/деца
+      integratedLifeCoverage = 2500;
     }
 
     // Социална издръжка за disability (за изчисляване на покритията)

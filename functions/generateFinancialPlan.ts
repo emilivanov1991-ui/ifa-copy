@@ -507,7 +507,7 @@ Deno.serve(async (req) => {
         childCoveragesPremium += (childFractures / 1000) * 33; // Fractures
         
         // Child Protection Agreement
-        const childProtectionCoef = formData.policyholderAge >= 18 && formData.policyholderAge <= 55 ? 0.0438 : 0;
+        const childProtectionCoef = clientAge >= 18 && clientAge <= 55 ? 0.0438 : 0;
         const childBasePremium = targetChildULAnnual + childCoveragesPremium;
         childCoveragesPremium += childBasePremium * childProtectionCoef;
         

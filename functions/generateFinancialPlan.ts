@@ -847,7 +847,77 @@ Deno.serve(async (req) => {
       }
     }
 
-    // Приоритет 6: Каско/ГО
+    // Приоритет 6: Трети пенсионен стълб (ОББ ДПФ)
+    if (currentBudget > 50 && clientAge < 60) {
+      // Максимална данъчно-облекчена сума: 60 лв/месечно (1200 BGN годишно)
+      const maxMonthlyContribution = 60 / EUR_BGN_RATE; // ~30.67 EUR
+      const targetContribution = Math.min(currentBudget * 0.3, maxMonthlyContribution);
+      
+      if (targetContribution >= 10) {
+        planProducts.push({
+          product_type: 'pension_plan',
+          provider: 'ОББ ДПФ',
+          product_name: 'Доброволен Пенсионен Фонд (Трети стълб)',
+          beneficiary: 'partner1',
+          beneficiary_name: `${analysis.client_first_name || ''} ${analysis.client_last_name || ''}`.trim(),
+          beneficiary_age: clientAge,
+          monthly_premium: roundPremiumDown(targetContribution),
+          total_premium: targetContribution * 12,
+          is_active: true,
+          details: {
+            note: 'Допълнително пенсионно спестяване с данъчно облекчение',
+            tax_benefit: 'До 10% данъчно облекчение на внесените суми (макс 1200 BGN годишно)',
+            expected_return: 'Базирана на балансирана стратегия',
+            contribution_limit: 'Максимално 60 лв месечно за пълно данъчно облекчение'
+          }
+        });
+        
+        totalMonthlyPremium += targetContribution;
+        totalMonthlyInvestments += targetContribution;
+        currentBudget -= targetContribution;
+      }
+    }
+
+    // Приоритет 7: Partners Investments Regular (при наличие на бюджет)
+    if (currentBudget > 100 && clientAge < 60) {
+      const targetMonthly = Math.min(currentBudget * 0.4, 200);
+      const annualContribution = targetMonthly * 12;
+      
+      // Проекция на 20 години при 7% доходност
+      const termYears = Math.min(20, 65 - clientAge);
+      let projectedValue = 0;
+      for (let year = 1; year <= termYears; year++) {
+        projectedValue = (projectedValue + annualContribution) * 1.07;
+      }
+      
+      planProducts.push({
+        product_type: 'investment',
+        provider: 'Partners',
+        product_name: 'Regular Investment Plan',
+        beneficiary: 'partner1',
+        beneficiary_name: `${analysis.client_first_name || ''} ${analysis.client_last_name || ''}`.trim(),
+        beneficiary_age: clientAge,
+        term_years: termYears,
+        strategy: 'balanced',
+        monthly_premium: roundPremiumDown(targetMonthly),
+        total_premium: targetMonthly * 12,
+        expected_value: Math.round(projectedValue),
+        is_active: true,
+        details: {
+          annual_savings: annualContribution,
+          expected_return: 0.07,
+          management_fee: 0.01,
+          total_invested: Math.round(annualContribution * termYears),
+          note: 'Дългосрочна инвестиция с балансирана стратегия'
+        }
+      });
+      
+      totalMonthlyPremium += targetMonthly;
+      totalMonthlyInvestments += targetMonthly;
+      currentBudget -= targetMonthly;
+    }
+
+    // Приоритет 8: Каско/ГО
     const carValue = (analysis.property_car_value || 0); // Вече е в EUR
     const carValueBGN = carValue * EUR_BGN_RATE;
     const hasCasco = analysis.has_casco_insurance || false;

@@ -430,11 +430,10 @@ Deno.serve(async (req) => {
     });
 
     // 4.3 Допълнителни продукти при наличие на бюджет
-    const remainingBudget = maxMonthlyPlan - totalMonthlyPremium;
-    const additions = rules.standard_plan_structure?.additions_if_extra_budget || [];
+    let currentBudget = maxMonthlyPlan - totalMonthlyPremium;
 
-    // Приоритет 1: Uniqa Здраве и ценност - План Европа (винаги)
-    if (remainingBudget > 0) {
+    // Приоритет 1: Uniqa Здраве и ценност - План Европа (ВИНАГИ)
+    {
       // Определяне на възрастова група
       let ageGroup = '31-40';
       if (clientAge <= 17) ageGroup = '0-17';
@@ -446,15 +445,15 @@ Deno.serve(async (req) => {
       else if (clientAge <= 60) ageGroup = '56-60';
       else ageGroup = '61-65';
       
-      // Тарифи за Уника Здраве и ценност План Европа
+      // Тарифи за Уника Здраве и ценност План Европа (месечни)
       const uniqaTariffs = {
-        '0-17': 6.61, '18-30': 12.79, '31-40': 13.98, '41-45': 16.81,
-        '46-50': 20.20, '51-55': 25.20, '56-60': 31.11, '61-65': 38.15
+        '0-17': 6.48, '18-30': 12.54, '31-40': 13.71, '41-45': 16.48,
+        '46-50': 20.02, '51-55': 24.71, '56-60': 30.50, '61-65': 37.40
       };
       
-      const uniqaMonthlyPremium = uniqaTariffs[ageGroup] || 13.98;
+      const uniqaMonthlyPremium = uniqaTariffs[ageGroup] || 13.71;
       
-      if (remainingBudget >= uniqaMonthlyPremium) {
+      if (currentBudget >= uniqaMonthlyPremium) {
         planProducts.push({
           product_type: 'health_insurance',
           provider: 'УНИКА',
@@ -475,36 +474,74 @@ Deno.serve(async (req) => {
         
         totalMonthlyPremium += uniqaMonthlyPremium;
         totalMonthlyInsurance += uniqaMonthlyPremium;
+        currentBudget -= uniqaMonthlyPremium;
       }
     }
 
     // Приоритет 2: Generali базов пакет (ако няма от фирма)
+    // TODO: Трябва да проверим дали клиентът има здравно от фирма
+    // Засега пропускаме
+    
     // Приоритет 3: Детски Unit Linked (ако има деца)
     const childrenCount = analysis.children_count || 0;
-    if (childrenCount > 0 && remainingBudget - (totalMonthlyPremium - ulMonthlyPremium) > 100) {
-      // Детски UL с минимум 100 EUR/месец (1200 EUR годишно)
-      const childULAnnual = Math.min(1200, (remainingBudget - totalMonthlyPremium) * 12);
+    if (childrenCount > 0 && currentBudget > 100) {
+      // Детски UL с минимум 1200 EUR годишно
+      const targetChildULAnnual = 1200;
+      const childULMonthly = targetChildULAnnual / 12;
       
-      if (childULAnnual >= 300) {
-        planProducts.push({
-          product_type: 'ul_investment',
-          provider: 'MetLife',
-          product_name: 'MetLife Детство',
-          beneficiary: 'child1',
-          beneficiary_name: analysis.child_1_name || 'Дете',
-          beneficiary_age: analysis.child_1_birthdate ? 
-            Math.floor((new Date() - new Date(analysis.child_1_birthdate)) / (365.25 * 24 * 60 * 60 * 1000)) : 5,
-          monthly_premium: childULAnnual / 12,
-          total_premium: childULAnnual,
-          is_active: true,
-          details: {
-            annual_savings: childULAnnual,
-            child_protection: true
-          }
-        });
+      if (currentBudget >= childULMonthly && targetChildULAnnual >= 300) {
+        const child1Age = analysis.child_1_birthdate ? 
+          Math.floor((new Date() - new Date(analysis.child_1_birthdate)) / (365.25 * 24 * 60 * 60 * 1000)) : 5;
         
-        totalMonthlyPremium += childULAnnual / 12;
-        totalMonthlyInvestments += childULAnnual / 12;
+        // Детски покрития
+        const childPTD = 5000; // Минимум
+        const childHospitalDaily = 50; // EUR/ден
+        const childSurgical = 1500; // EUR
+        const childFractures = 500; // EUR
+        
+        // Изчисляване на покрития премия
+        let childCoveragesPremium = 0;
+        childCoveragesPremium += (childPTD / 1000) * 1.5; // PTD
+        childCoveragesPremium += childHospitalDaily * 4.25; // Hospital Daily
+        childCoveragesPremium += (childSurgical / 100) * 8.32; // Surgical
+        childCoveragesPremium += (childFractures / 1000) * 33; // Fractures
+        
+        // Child Protection Agreement
+        const childProtectionCoef = formData.policyholderAge >= 18 && formData.policyholderAge <= 55 ? 0.0438 : 0;
+        const childBasePremium = targetChildULAnnual + childCoveragesPremium;
+        childCoveragesPremium += childBasePremium * childProtectionCoef;
+        
+        const totalChildULAnnual = targetChildULAnnual + childCoveragesPremium + 15;
+        const childULMonthlyTotal = totalChildULAnnual / 12;
+        
+        if (currentBudget >= childULMonthlyTotal) {
+          planProducts.push({
+            product_type: 'ul_investment',
+            provider: 'MetLife',
+            product_name: 'MetLife Детство',
+            beneficiary: 'child1',
+            beneficiary_name: analysis.child_1_name || 'Дете',
+            beneficiary_age: child1Age,
+            monthly_premium: childULMonthlyTotal,
+            total_premium: totalChildULAnnual,
+            is_active: true,
+            details: {
+              annual_savings: targetChildULAnnual,
+              child_protection: true,
+              coverages: {
+                ptd: childPTD,
+                hospital_daily: childHospitalDaily,
+                surgical: childSurgical,
+                fractures: childFractures
+              }
+            }
+          });
+          
+          totalMonthlyPremium += childULMonthlyTotal;
+          totalMonthlyInvestments += targetChildULAnnual / 12;
+          totalMonthlyInsurance += childCoveragesPremium / 12;
+          currentBudget -= childULMonthlyTotal;
+        }
       }
     }
 

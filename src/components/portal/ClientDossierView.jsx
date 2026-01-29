@@ -199,29 +199,24 @@ export default function ClientDossierView({ clientId }) {
                       </div>
 
                       {/* Create Plan Button */}
-                      {!hasPlan && (
-                        <div className="mt-4 pt-4 border-t border-slate-100">
-                          <Button 
-                            onClick={() => {
-                              setSelectedAnalysis(analysis);
-                              setShowPlanGenerator(true);
-                            }}
-                            className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white shadow-lg"
-                          >
-                            <Sparkles className="w-4 h-4 mr-2" />
-                            Създай финансов план
-                            <ArrowRight className="w-4 h-4 ml-2" />
-                          </Button>
-                        </div>
-                      )}
-
-                      {hasPlan && (
-                        <div className="mt-4 pt-4 border-t border-slate-100">
-                          <Badge className="bg-green-100 text-green-700 border-green-300">
+                      <div className="mt-4 pt-4 border-t border-slate-100">
+                        {hasPlan && (
+                          <Badge className="bg-green-100 text-green-700 border-green-300 mb-3">
                             ✓ Финансовият план е създаден
                           </Badge>
-                        </div>
-                      )}
+                        )}
+                        <Button 
+                          onClick={() => {
+                            setSelectedAnalysis(analysis);
+                            setShowPlanGenerator(true);
+                          }}
+                          className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white shadow-lg"
+                        >
+                          <Sparkles className="w-4 h-4 mr-2" />
+                          Създай финансов план
+                          <ArrowRight className="w-4 h-4 ml-2" />
+                        </Button>
+                      </div>
                     </CardContent>
                   </Card>
                 );

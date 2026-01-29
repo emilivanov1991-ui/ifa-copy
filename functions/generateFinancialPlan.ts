@@ -460,6 +460,86 @@ Deno.serve(async (req) => {
           tax_benefit: 'Данъчно облекчение приложимо'
         }
       });
+      
+      // Ако партньорът има доход, добавяме и партньор UL
+      if (partnerNetIncome > 0 && currentBudget > 100) {
+        const partnerTargetULMonthly = Math.max(25, currentBudget * 0.4);
+        const partnerULAnnualSavings = Math.max(300, Math.min(partnerTargetULMonthly * 12, currentBudget * 12 * 0.3));
+        
+        // Определяме интегрирано покритие за партньора
+        const partnerMultiplier = getLifeCoverageMultiplier(partnerAge);
+        const partnerIntegratedLife = Math.min(partnerULAnnualSavings * partnerMultiplier, 14999);
+        
+        const partnerSocialSupport2 = calculateSocialSupport(partnerGrossIncome, 'disability');
+        const partnerDisability = variableExpenses > partnerSocialSupport2 ?
+          roundCoverageUp(0.80 * (variableExpenses - partnerSocialSupport2) * (80 - partnerAge) * 12) : 0;
+        
+        const partnerCriticalIllness = variableExpenses > partnerSocialSupport2 ?
+          roundCoverageUp((variableExpenses - partnerSocialSupport2) * 3 * 12) : 0;
+        
+        const partnerULCoverages = {
+          integratedLifeCoverage: roundCoverageUp(partnerIntegratedLife),
+          ptdCoverage: roundCoverageUp(partnerDisability),
+          fracturesCoverage: 1500,
+          criticalIllness40Coverage: roundCoverageUp(partnerCriticalIllness),
+          telemedicine: partnerAge < 65,
+          premiumWaiver: partnerAge <= 55
+        };
+        
+        // Изчисляване на премия за партньор
+        let partnerCoveragesPremium = 0;
+        if (partnerULCoverages.ptdCoverage > 0) {
+          partnerCoveragesPremium += (partnerULCoverages.ptdCoverage / 1000) * 1.5;
+        }
+        if (partnerULCoverages.fracturesCoverage > 0) {
+          partnerCoveragesPremium += (partnerULCoverages.fracturesCoverage / 1000) * 16;
+        }
+        if (partnerULCoverages.criticalIllness40Coverage > 0) {
+          const coefficient = METLIFE_PA_SECURITY_PLUS_COEFFICIENTS[partnerAge] || 50;
+          partnerCoveragesPremium += partnerULCoverages.criticalIllness40Coverage / coefficient;
+        }
+        if (partnerULCoverages.telemedicine) {
+          partnerCoveragesPremium += 15;
+        }
+        if (partnerULCoverages.premiumWaiver) {
+          const waiverRate = 0.0438;
+          const basePremium = partnerULAnnualSavings + partnerCoveragesPremium;
+          partnerCoveragesPremium += basePremium * waiverRate;
+        }
+        
+        const partnerTotalULAnnual = partnerULAnnualSavings + partnerCoveragesPremium + 15;
+        const partnerULMonthly = roundPremiumDown(partnerTotalULAnnual / 12);
+        
+        if (currentBudget >= partnerULMonthly) {
+          planProducts.push({
+            product_type: 'ul_investment',
+            provider: 'MetLife',
+            product_name: 'MetLife Предимство',
+            beneficiary: 'partner2',
+            beneficiary_name: `${analysis.partner_first_name || ''} ${analysis.partner_last_name || ''}`.trim(),
+            beneficiary_age: partnerAge,
+            term_years: Math.min(80 - partnerAge, 49),
+            strategy: 'balanced',
+            monthly_premium: partnerULMonthly,
+            total_premium: partnerULMonthly * 12,
+            coverage_amount: partnerULCoverages.integratedLifeCoverage,
+            expected_value: 0,
+            is_active: true,
+            details: {
+              annual_savings: partnerULAnnualSavings,
+              coverages: partnerULCoverages,
+              premium_bonus: getPremiumBonus(partnerULAnnualSavings),
+              management_fee: getAVCharge(partnerULAnnualSavings),
+              daily_cost: (partnerULMonthly / 30).toFixed(2)
+            }
+          });
+          
+          totalMonthlyPremium += partnerULMonthly;
+          totalMonthlyInvestments += partnerULAnnualSavings / 12;
+          totalMonthlyInsurance += partnerCoveragesPremium / 12;
+          currentBudget -= partnerULMonthly;
+        }
+      }
     }
 
     // 4.3 Допълнителни продукти при наличие на бюджет
@@ -561,66 +641,77 @@ Deno.serve(async (req) => {
     // Приоритет 3: Детски Unit Linked (ако има деца)
     const childrenCount = analysis.children_count || 0;
     if (childrenCount > 0 && currentBudget > 100) {
-      const child1Age = analysis.child_1_birthdate ? 
-        Math.floor((new Date() - new Date(analysis.child_1_birthdate)) / (365.25 * 24 * 60 * 60 * 1000)) : 5;
+      // Обработваме до 3 деца
+      const maxChildren = Math.min(childrenCount, 3);
       
-      // Целева годишна инвестиция за дете
-      const targetChildULAnnual = Math.max(1200, Math.min(currentBudget * 12, 3000));
-      
-      // Детски покрития
-      const childPTD = 5000;
-      const childHospitalDaily = 50;
-      const childSurgical = 1500;
-      const childFractures = 500;
-      
-      // Изчисляване на премия за покритията
-      let childCoveragesPremium = 0;
-      childCoveragesPremium += (childPTD / 1000) * 1.5;
-      childCoveragesPremium += childHospitalDaily * 4.25;
-      childCoveragesPremium += (childSurgical / 100) * 8.32;
-      childCoveragesPremium += (childFractures / 1000) * 33;
-      
-      // Child Protection Agreement
-      const childProtectionCoef = clientAge >= 18 && clientAge <= 55 ? 0.0438 : 0;
-      const childBasePremium = targetChildULAnnual + childCoveragesPremium;
-      const childProtectionPremium = childBasePremium * childProtectionCoef;
-      childCoveragesPremium += childProtectionPremium;
-      
-      const totalChildULAnnual = targetChildULAnnual + childCoveragesPremium + 15;
-      const childULMonthlyTotal = roundPremiumDown(totalChildULAnnual / 12);
-      
-      if (currentBudget >= childULMonthlyTotal) {
-        planProducts.push({
-          product_type: 'ul_investment',
-          provider: 'MetLife',
-          product_name: 'MetLife Детство (Junior UL)',
-          beneficiary: 'child1',
-          beneficiary_name: analysis.child_1_name || 'Дете',
-          beneficiary_age: child1Age,
-          term_years: Math.max(1, 19 - child1Age),
-          monthly_premium: childULMonthlyTotal,
-          total_premium: childULMonthlyTotal * 12,
-          expected_value: 0,
-          is_active: true,
-          details: {
-            annual_savings: targetChildULAnnual,
-            child_protection: true,
-            child_protection_premium: childProtectionPremium,
-            coverages: {
-              ptd: childPTD,
-              hospital_daily: childHospitalDaily,
-              surgical: childSurgical,
-              fractures: childFractures,
-              child_protection_agreement: true
-            },
-            daily_cost: (childULMonthlyTotal / 30).toFixed(2)
-          }
-        });
+      for (let i = 1; i <= maxChildren; i++) {
+        const childBirthdate = analysis[`child_${i}_birthdate`];
+        if (!childBirthdate) continue;
         
-        totalMonthlyPremium += childULMonthlyTotal;
-        totalMonthlyInvestments += targetChildULAnnual / 12;
-        totalMonthlyInsurance += childCoveragesPremium / 12;
-        currentBudget -= childULMonthlyTotal;
+        const childAge = Math.floor((new Date() - new Date(childBirthdate)) / (365.25 * 24 * 60 * 60 * 1000));
+        if (childAge >= 19) continue; // Прескачаме ако детето е над 19
+        
+        const childName = analysis[`child_${i}_name`] || `Дете ${i}`;
+        
+        // Целева годишна инвестиция за дете (намалява с всяко следващо дете)
+        const budgetPerChild = currentBudget / (maxChildren - i + 1);
+        const targetChildULAnnual = Math.max(1200, Math.min(budgetPerChild * 12, 3000));
+        
+        // Детски покрития
+        const childPTD = 5000;
+        const childHospitalDaily = 50;
+        const childSurgical = 1500;
+        const childFractures = 500;
+        
+        // Изчисляване на премия за покритията
+        let childCoveragesPremium = 0;
+        childCoveragesPremium += (childPTD / 1000) * 1.5;
+        childCoveragesPremium += childHospitalDaily * 4.25;
+        childCoveragesPremium += (childSurgical / 100) * 8.32;
+        childCoveragesPremium += (childFractures / 1000) * 33;
+        
+        // Child Protection Agreement
+        const childProtectionCoef = clientAge >= 18 && clientAge <= 55 ? 0.0438 : 0;
+        const childBasePremium = targetChildULAnnual + childCoveragesPremium;
+        const childProtectionPremium = childBasePremium * childProtectionCoef;
+        childCoveragesPremium += childProtectionPremium;
+        
+        const totalChildULAnnual = targetChildULAnnual + childCoveragesPremium + 15;
+        const childULMonthlyTotal = roundPremiumDown(totalChildULAnnual / 12);
+        
+        if (currentBudget >= childULMonthlyTotal) {
+          planProducts.push({
+            product_type: 'ul_investment',
+            provider: 'MetLife',
+            product_name: 'MetLife Детство (Junior UL)',
+            beneficiary: `child${i}`,
+            beneficiary_name: childName,
+            beneficiary_age: childAge,
+            term_years: Math.max(1, 19 - childAge),
+            monthly_premium: childULMonthlyTotal,
+            total_premium: childULMonthlyTotal * 12,
+            expected_value: 0,
+            is_active: true,
+            details: {
+              annual_savings: targetChildULAnnual,
+              child_protection: true,
+              child_protection_premium: childProtectionPremium,
+              coverages: {
+                ptd: childPTD,
+                hospital_daily: childHospitalDaily,
+                surgical: childSurgical,
+                fractures: childFractures,
+                child_protection_agreement: true
+              },
+              daily_cost: (childULMonthlyTotal / 30).toFixed(2)
+            }
+          });
+          
+          totalMonthlyPremium += childULMonthlyTotal;
+          totalMonthlyInvestments += targetChildULAnnual / 12;
+          totalMonthlyInsurance += childCoveragesPremium / 12;
+          currentBudget -= childULMonthlyTotal;
+        }
       }
     }
 
@@ -941,9 +1032,11 @@ Deno.serve(async (req) => {
       extraGeneratedWealth.ul_investments_at_65 = Math.round(balancedValue);
     }
     
-    // 6.2 Проекция за Детски UL
-    const childULProduct = planProducts.find(p => p.product_type === 'ul_investment' && p.beneficiary === 'child1');
-    if (childULProduct) {
+    // 6.2 Проекция за Детски UL (за всички деца)
+    const childULProducts = planProducts.filter(p => p.product_type === 'ul_investment' && p.beneficiary.startsWith('child'));
+    let totalChildULValue = 0;
+    
+    childULProducts.forEach(childULProduct => {
       const annualSavings = childULProduct.details.annual_savings || 0;
       const termYears = childULProduct.term_years || 0;
       const balancedReturn = 0.06;
@@ -956,7 +1049,29 @@ Deno.serve(async (req) => {
       
       childULProduct.expected_value = Math.round(childValue);
       childULProduct.details.total_invested = Math.round(annualSavings * termYears);
-      extraGeneratedWealth.child_ul_at_19 = Math.round(childValue);
+      totalChildULValue += childValue;
+    });
+    
+    extraGeneratedWealth.child_ul_at_19 = Math.round(totalChildULValue);
+    
+    // 6.2b Проекция за партньор UL
+    const partnerULProduct = planProducts.find(p => p.product_type === 'ul_investment' && p.beneficiary === 'partner2');
+    if (partnerULProduct) {
+      const annualSavings = partnerULProduct.details.annual_savings || 0;
+      const termYears = partnerULProduct.term_years || 0;
+      const premiumBonus = partnerULProduct.details.premium_bonus || 0;
+      const managementFee = partnerULProduct.details.management_fee || 0;
+      
+      const balancedReturn = 0.06;
+      let partnerValue = 0;
+      for (let year = 1; year <= termYears; year++) {
+        const annualContribution = annualSavings * (1 + premiumBonus);
+        partnerValue = (partnerValue + annualContribution) * (1 + balancedReturn - managementFee);
+      }
+      
+      partnerULProduct.expected_value = Math.round(partnerValue);
+      partnerULProduct.details.total_invested = Math.round(annualSavings * termYears);
+      extraGeneratedWealth.ul_investments_at_65 += Math.round(partnerValue);
     }
     
     // 6.3 Проекция за УПФ (Универсален Пенсионен Фонд - Втори стълб)

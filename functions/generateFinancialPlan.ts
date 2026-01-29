@@ -864,9 +864,17 @@ ${includePartner ? `• Партньор - Инвалидност: ${partnerSoci
 ══════════════════════════════════════
 ${extraGeneratedWealth.saved_mortgage_interest > 0 ? `• Спестени лихви по кредит (30%): ${(extraGeneratedWealth.saved_mortgage_interest * 0.3).toFixed(2)} EUR` : ''}
 ${extraGeneratedWealth.property_value_growth > 0 ? `• Стойност на имот при пенсия (5% ръст): ${Math.round(extraGeneratedWealth.property_value_growth).toLocaleString()} EUR` : ''}
-• УПФ натрупана сума към ${clientRetirementAge} г.: (ще се изчисли)
-• UL инвестиции към ${clientRetirementAge} г.: (ще се изчисли)
-${childrenCount > 0 ? `• Детски UL към 19 г.: (ще се изчисли)` : ''}
+${extraGeneratedWealth.pension_fund_at_65 > 0 ? `• УПФ натрупана сума към ${clientRetirementAge} г.: ${Math.round(extraGeneratedWealth.pension_fund_at_65).toLocaleString()} EUR` : ''}
+${extraGeneratedWealth.ul_investments_at_65 > 0 ? `• UL инвестиции към ${clientRetirementAge} г.: ${Math.round(extraGeneratedWealth.ul_investments_at_65).toLocaleString()} EUR` : ''}
+${extraGeneratedWealth.child_ul_at_19 > 0 ? `• Детски UL към 19 г.: ${Math.round(extraGeneratedWealth.child_ul_at_19).toLocaleString()} EUR` : ''}
+
+• Общо допълнително богатство: ${Math.round(
+  (extraGeneratedWealth.saved_mortgage_interest * 0.3) +
+  extraGeneratedWealth.property_value_growth +
+  extraGeneratedWealth.pension_fund_at_65 +
+  extraGeneratedWealth.ul_investments_at_65 +
+  extraGeneratedWealth.child_ul_at_19
+).toLocaleString()} EUR
       `.trim()
     };
 

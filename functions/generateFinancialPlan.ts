@@ -954,6 +954,49 @@ Deno.serve(async (req) => {
     }
 
     // ============================================================
+    // СТЪПКА 6: ИНВЕСТИЦИОННИ ПРОЕКЦИИ
+    // ============================================================
+    
+    // 6.1 Проекция за MetLife UL на клиента
+    const clientULProduct = planProducts.find(p => p.product_type === 'ul_investment' && p.beneficiary === 'partner1');
+    if (clientULProduct) {
+      const annualSavings = clientULProduct.details.annual_savings || 0;
+      const termYears = clientULProduct.term_years || 0;
+      const premiumBonus = clientULProduct.details.premium_bonus || 0;
+      const managementFee = clientULProduct.details.management_fee || 0;
+      
+      // Балансирана проекция (6%)
+      const balancedReturn = 0.06;
+      let balancedValue = 0;
+      for (let year = 1; year <= termYears; year++) {
+        const annualContribution = annualSavings * (1 + premiumBonus);
+        balancedValue = (balancedValue + annualContribution) * (1 + balancedReturn - managementFee);
+      }
+      
+      clientULProduct.expected_value = Math.round(balancedValue);
+      clientULProduct.details.total_invested = Math.round(annualSavings * termYears);
+      extraGeneratedWealth.ul_investments_at_65 = Math.round(balancedValue);
+    }
+    
+    // 6.2 Проекция за Детски UL
+    const childULProduct = planProducts.find(p => p.product_type === 'ul_investment' && p.beneficiary === 'child1');
+    if (childULProduct) {
+      const annualSavings = childULProduct.details.annual_savings || 0;
+      const termYears = childULProduct.term_years || 0;
+      const balancedReturn = 0.06;
+      const managementFee = 0.005;
+      
+      let childValue = 0;
+      for (let year = 1; year <= termYears; year++) {
+        childValue = (childValue + annualSavings) * (1 + balancedReturn - managementFee);
+      }
+      
+      childULProduct.expected_value = Math.round(childValue);
+      childULProduct.details.total_invested = Math.round(annualSavings * termYears);
+      extraGeneratedWealth.child_ul_at_19 = Math.round(childValue);
+    }
+
+    // ============================================================
     // СТЪПКА 7: СЪЗДАВАНЕ НА ФИНАНСОВ ПЛАН
     // ============================================================
 

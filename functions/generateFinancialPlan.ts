@@ -402,8 +402,8 @@ Deno.serve(async (req) => {
       beneficiary_age: clientAge,
       term_years: Math.min(80 - clientAge, 49),
       strategy: 'balanced',
-      monthly_premium: ulMonthlyPremium,
-      total_premium: totalULAnnualPremium,
+      monthly_premium: ulMonthlyPremiumRounded,
+      total_premium: ulAnnualPremiumRounded,
       coverage_amount: ulCoverages.integratedLifeCoverage,
       expected_value: 0, // Ще се изчисли по-късно с проекция
       is_active: true,
@@ -411,11 +411,12 @@ Deno.serve(async (req) => {
         annual_savings: ulAnnualSavings,
         coverages: ulCoverages,
         premium_bonus: getPremiumBonus(ulAnnualSavings),
-        management_fee: getAVCharge(ulAnnualSavings)
+        management_fee: getAVCharge(ulAnnualSavings),
+        daily_cost: (ulMonthlyPremiumRounded / 30).toFixed(2) // Дневна цена
       }
     });
     
-    totalMonthlyPremium += ulMonthlyPremium;
+    totalMonthlyPremium += ulMonthlyPremiumRounded;
     totalMonthlyInvestments += ulAnnualSavings / 12;
     totalMonthlyInsurance += coveragesPremium / 12;
 

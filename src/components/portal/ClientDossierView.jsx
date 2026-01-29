@@ -202,23 +202,9 @@ export default function ClientDossierView({ clientId }) {
                       {!hasPlan && (
                         <div className="mt-4 pt-4 border-t border-slate-100">
                           <Button 
-                            onClick={async () => {
-                              try {
-                                toast.loading('Генериране на финансов план...');
-                                const result = await base44.functions.invoke('generateFinancialPlan', {
-                                  analysis_id: analysis.id
-                                });
-                                
-                                if (result.data.success) {
-                                  toast.success('Финансовият план е създаден успешно!');
-                                  loadDossier(); // Reload to show updated plan
-                                } else {
-                                  toast.error(result.data.error || 'Грешка при генериране на плана');
-                                }
-                              } catch (error) {
-                                console.error('Error generating plan:', error);
-                                toast.error('Грешка при генериране на плана: ' + error.message);
-                              }
+                            onClick={() => {
+                              setSelectedAnalysis(analysis);
+                              setShowPlanGenerator(true);
                             }}
                             className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white shadow-lg"
                           >

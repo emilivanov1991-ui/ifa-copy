@@ -52,7 +52,6 @@ import RBACManager from '@/components/consultant/RBACManager';
 import CommissionsManager from '@/components/consultant/CommissionsManager';
 import ProductCatalogManager from '@/components/admin/ProductCatalogManager';
 import DossiersManager from '@/components/consultant/DossiersManager';
-import FinancialAnalysisTab from '@/components/consultant/FinancialAnalysisTab';
 import { Package, FolderOpen } from 'lucide-react';
 
 const menuItems = [
@@ -288,7 +287,45 @@ export default function ConsultantPortal() {
               {activeTab === 'dashboard' && <ConsultantDashboard onNavigate={setActiveTab} />}
               {activeTab === 'crm' && <ConsultantCRMAdvanced isAdmin={currentUser?.role === 'admin'} />}
               {activeTab === 'dossiers' && <DossiersManager />}
-              {activeTab === 'analysis' && <FinancialAnalysisTab />}
+              {activeTab === 'analysis' && (
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.95 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                >
+                  <Card className="bg-white/70 backdrop-blur-sm border-0 shadow-xl shadow-slate-200/50 overflow-hidden">
+                    <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/5 to-blue-500/5" />
+                    <CardHeader className="relative">
+                      <CardTitle className="flex items-center gap-3">
+                        <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-500 to-emerald-600 flex items-center justify-center shadow-lg shadow-emerald-500/30">
+                          <FileText className="h-5 w-5 text-white" />
+                        </div>
+                        <div>
+                          <span className="text-xl">Финансов анализ</span>
+                          <p className="text-sm font-normal text-slate-500">Създайте персонализирани финансови планове</p>
+                        </div>
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent className="relative">
+                      <div className="flex gap-3">
+                        <Link to={createPageUrl('FinancialAnalysis')}>
+                          <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+                            <Button className="bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 shadow-lg shadow-emerald-500/25 rounded-xl">
+                              <Plus className="h-4 w-4 mr-2" />
+                              Нов анализ
+                            </Button>
+                          </motion.div>
+                        </Link>
+                        <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+                          <Button variant="outline" className="rounded-xl hover:bg-slate-50">
+                            <Eye className="h-4 w-4 mr-2" />
+                            Преглед на анализи
+                          </Button>
+                        </motion.div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </motion.div>
+              )}
               {activeTab === 'commissions' && <CommissionsManager consultantEmail={currentUser?.email} />}
               {activeTab === 'ai-analytics' && <AIAnalyticsDashboard />}
               {activeTab === 'analytics' && <ConsultantAnalytics />}

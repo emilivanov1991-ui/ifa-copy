@@ -230,12 +230,10 @@ export default function ClientDossier({ clientId, analysisId = null, showAllClie
                               <Eye className="h-4 w-4 mr-2" />
                               Преглед
                             </Button>
-                            {!hasPlan && (
-                              <Button size="sm" className="bg-purple-600 hover:bg-purple-700">
-                                <TrendingUp className="h-4 w-4 mr-2" />
-                                Създай план
-                              </Button>
-                            )}
+                            <Button size="sm" className="bg-purple-600 hover:bg-purple-700">
+                              <TrendingUp className="h-4 w-4 mr-2" />
+                              Създай план
+                            </Button>
                           </div>
                         </div>
                       </motion.div>

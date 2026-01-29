@@ -11,10 +11,13 @@ import {
   TrendingUp,
   Shield,
   FileText,
-  ArrowRight
+  ArrowRight,
+  Euro,
+  Calendar
 } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
 import { toast } from 'sonner';
+import PlanPDFExport from './PlanPDFExport';
 
 export default function AutoPlanGenerator({ analysisId, analysisData, onComplete }) {
   const [generating, setGenerating] = useState(false);
@@ -255,42 +258,157 @@ export default function AutoPlanGenerator({ analysisId, analysisData, onComplete
             </Card>
           </div>
 
-          {/* Products List */}
+          {/* Products List - Grouped by Type */}
           <Card>
             <CardHeader className="bg-gradient-to-r from-indigo-50 to-purple-50 py-4">
-              <CardTitle className="text-base text-indigo-800">Продукти в плана</CardTitle>
+              <CardTitle className="text-base text-indigo-800">Продукти в плана ({result.products.length})</CardTitle>
             </CardHeader>
             <CardContent className="pt-4">
-              <div className="space-y-3">
-                {result.products.map((product, idx) => (
-                  <div 
-                    key={idx}
-                    className="flex items-start justify-between p-4 bg-white rounded-lg border border-slate-200 hover:shadow-md transition-shadow"
-                  >
-                    <div className="flex-1">
-                      <div className="flex items-center gap-2 mb-1">
-                        <h4 className="font-semibold text-slate-900">{product.product_name}</h4>
-                        <Badge variant="outline" className="text-xs">
-                          {product.provider}
-                        </Badge>
-                      </div>
-                      <p className="text-sm text-slate-600">
-                        {product.beneficiary_name} • {product.beneficiary_age} години
-                      </p>
-                      {product.coverage_amount > 0 && (
-                        <p className="text-xs text-slate-500 mt-1">
-                          Покритие: {product.coverage_amount.toLocaleString()} EUR
-                        </p>
-                      )}
-                    </div>
-                    <div className="text-right">
-                      <p className="text-sm text-slate-600">Месечно</p>
-                      <p className="text-lg font-bold text-blue-600">
-                        {product.monthly_premium.toFixed(2)} €
-                      </p>
+              <div className="space-y-6">
+                {/* Инвестиции */}
+                {result.products.filter(p => p.product_type === 'ul_investment').length > 0 && (
+                  <div>
+                    <h3 className="text-sm font-semibold text-slate-700 mb-3 flex items-center gap-2">
+                      <TrendingUp className="w-4 h-4" />
+                      Инвестиции и спестявания
+                    </h3>
+                    <div className="space-y-2">
+                      {result.products.filter(p => p.product_type === 'ul_investment').map((product, idx) => (
+                        <div 
+                          key={idx}
+                          className="flex items-start justify-between p-4 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg border border-blue-200"
+                        >
+                          <div className="flex-1">
+                            <div className="flex items-center gap-2 mb-1">
+                              <h4 className="font-semibold text-slate-900">{product.product_name}</h4>
+                              <Badge variant="outline" className="text-xs">{product.provider}</Badge>
+                            </div>
+                            <p className="text-sm text-slate-600">
+                              {product.beneficiary_name} • {product.beneficiary_age} г. • {product.term_years} години
+                            </p>
+                            {product.expected_value > 0 && (
+                              <p className="text-xs text-green-600 font-medium mt-1">
+                                Прогноза: {product.expected_value.toLocaleString()} EUR
+                              </p>
+                            )}
+                            {product.details?.daily_cost && (
+                              <p className="text-xs text-slate-500 mt-1">
+                                Дневна цена: {product.details.daily_cost} EUR
+                              </p>
+                            )}
+                          </div>
+                          <div className="text-right">
+                            <p className="text-xs text-slate-500">Месечно</p>
+                            <p className="text-xl font-bold text-blue-600">
+                              {product.monthly_premium.toFixed(0)} €
+                            </p>
+                          </div>
+                        </div>
+                      ))}
                     </div>
                   </div>
-                ))}
+                )}
+
+                {/* Здравни застраховки */}
+                {result.products.filter(p => p.product_type === 'health_insurance').length > 0 && (
+                  <div>
+                    <h3 className="text-sm font-semibold text-slate-700 mb-3 flex items-center gap-2">
+                      <Shield className="w-4 h-4" />
+                      Здравни застраховки
+                    </h3>
+                    <div className="space-y-2">
+                      {result.products.filter(p => p.product_type === 'health_insurance').map((product, idx) => (
+                        <div 
+                          key={idx}
+                          className="flex items-start justify-between p-4 bg-gradient-to-r from-green-50 to-emerald-50 rounded-lg border border-green-200"
+                        >
+                          <div className="flex-1">
+                            <div className="flex items-center gap-2 mb-1">
+                              <h4 className="font-semibold text-slate-900">{product.product_name}</h4>
+                              <Badge variant="outline" className="text-xs">{product.provider}</Badge>
+                            </div>
+                            <p className="text-sm text-slate-600">{product.beneficiary_name}</p>
+                            {product.coverage_amount > 0 && (
+                              <p className="text-xs text-slate-500 mt-1">
+                                Лимит: {product.coverage_amount.toLocaleString()} EUR
+                              </p>
+                            )}
+                          </div>
+                          <div className="text-right">
+                            <p className="text-xs text-slate-500">Месечно</p>
+                            <p className="text-xl font-bold text-green-600">
+                              {product.monthly_premium.toFixed(0)} €
+                            </p>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Пенсионни */}
+                {result.products.filter(p => p.product_type === 'pension_plan').length > 0 && (
+                  <div>
+                    <h3 className="text-sm font-semibold text-slate-700 mb-3 flex items-center gap-2">
+                      <TrendingUp className="w-4 h-4" />
+                      Пенсионно осигуряване
+                    </h3>
+                    <div className="space-y-2">
+                      {result.products.filter(p => p.product_type === 'pension_plan').map((product, idx) => (
+                        <div 
+                          key={idx}
+                          className="p-4 bg-gradient-to-r from-amber-50 to-yellow-50 rounded-lg border border-amber-200"
+                        >
+                          <div className="flex items-center gap-2 mb-1">
+                            <h4 className="font-semibold text-slate-900">{product.product_name}</h4>
+                            <Badge className="text-xs bg-green-600">БЕЗ РАЗХОДИ</Badge>
+                          </div>
+                          <p className="text-sm text-slate-600">{product.beneficiary_name}</p>
+                          <p className="text-xs text-slate-500 mt-1">{product.details?.note}</p>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Други застраховки */}
+                {result.products.filter(p => ['insurance', 'property_insurance', 'car_insurance', 'term_life'].includes(p.product_type)).length > 0 && (
+                  <div>
+                    <h3 className="text-sm font-semibold text-slate-700 mb-3 flex items-center gap-2">
+                      <Shield className="w-4 h-4" />
+                      Допълнителни застраховки
+                    </h3>
+                    <div className="space-y-2">
+                      {result.products.filter(p => ['insurance', 'property_insurance', 'car_insurance', 'term_life'].includes(p.product_type)).map((product, idx) => (
+                        <div 
+                          key={idx}
+                          className="flex items-start justify-between p-4 bg-white rounded-lg border border-slate-200"
+                        >
+                          <div className="flex-1">
+                            <div className="flex items-center gap-2 mb-1">
+                              <h4 className="font-semibold text-slate-900">{product.product_name}</h4>
+                              <Badge variant="outline" className="text-xs">{product.provider}</Badge>
+                            </div>
+                            {product.beneficiary_name && (
+                              <p className="text-sm text-slate-600">{product.beneficiary_name}</p>
+                            )}
+                            {product.coverage_amount > 0 && (
+                              <p className="text-xs text-slate-500 mt-1">
+                                Покритие: {product.coverage_amount.toLocaleString()} EUR
+                              </p>
+                            )}
+                          </div>
+                          <div className="text-right">
+                            <p className="text-xs text-slate-500">Месечно</p>
+                            <p className="text-lg font-bold text-slate-900">
+                              {product.monthly_premium.toFixed(0)} €
+                            </p>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
               </div>
             </CardContent>
           </Card>
@@ -322,37 +440,82 @@ export default function AutoPlanGenerator({ analysisId, analysisData, onComplete
           )}
 
           {/* Additional Info */}
-          <Card>
-            <CardHeader className="bg-gradient-to-r from-slate-50 to-slate-100 py-4">
-              <CardTitle className="text-base text-slate-800">Допълнителна информация</CardTitle>
-            </CardHeader>
-            <CardContent className="pt-4 space-y-2 text-sm">
-              <div className="flex justify-between">
-                <span className="text-slate-600">Трудов капитал (общо):</span>
-                <span className="font-semibold">{result.summary.labor_capital_total.toLocaleString()} EUR</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-slate-600">Данъчно облекчение (годишно):</span>
-                <span className="font-semibold text-green-600">
-                  {result.summary.tax_relief_annual.toFixed(2)} EUR
-                </span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-slate-600">Препоръчителна периодичност:</span>
-                <span className="font-semibold">
-                  {result.summary.recommended_frequency === 'annual' ? 'Годишно' :
-                   result.summary.recommended_frequency === 'semiannual' ? 'Полугодишно' :
-                   result.summary.recommended_frequency === 'quarterly' ? 'Тримесечно' : 'Месечно'}
-                </span>
-              </div>
-            </CardContent>
-          </Card>
+          <div className="grid md:grid-cols-2 gap-4">
+            <Card>
+              <CardHeader className="bg-gradient-to-r from-slate-50 to-slate-100 py-4">
+                <CardTitle className="text-base text-slate-800 flex items-center gap-2">
+                  <Euro className="w-4 h-4" />
+                  Финансови показатели
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="pt-4 space-y-3 text-sm">
+                <div className="flex justify-between items-center p-3 bg-blue-50 rounded-lg">
+                  <span className="text-slate-600">Трудов капитал (общо):</span>
+                  <span className="font-bold text-blue-600">
+                    {result.summary.labor_capital_total.toLocaleString()} €
+                  </span>
+                </div>
+                <div className="flex justify-between items-center p-3 bg-green-50 rounded-lg">
+                  <span className="text-slate-600">Данъчно облекчение (год.):</span>
+                  <span className="font-bold text-green-600">
+                    {result.summary.tax_relief_annual.toFixed(2)} €
+                  </span>
+                </div>
+                {result.products.find(p => p.expected_value > 0) && (
+                  <div className="flex justify-between items-center p-3 bg-purple-50 rounded-lg">
+                    <span className="text-slate-600">Прогнозна стойност при пенсия:</span>
+                    <span className="font-bold text-purple-600">
+                      {result.products
+                        .filter(p => p.expected_value > 0)
+                        .reduce((sum, p) => sum + p.expected_value, 0)
+                        .toLocaleString()} €
+                    </span>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader className="bg-gradient-to-r from-slate-50 to-slate-100 py-4">
+                <CardTitle className="text-base text-slate-800 flex items-center gap-2">
+                  <Calendar className="w-4 h-4" />
+                  Препоръки за плащане
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="pt-4 space-y-3 text-sm">
+                <div className="p-4 bg-indigo-50 rounded-lg border border-indigo-200">
+                  <p className="text-xs text-slate-600 mb-1">Препоръчителна периодичност</p>
+                  <p className="text-lg font-bold text-indigo-600">
+                    {result.summary.recommended_frequency === 'annual' ? 'Годишно' :
+                     result.summary.recommended_frequency === 'semiannual' ? 'Полугодишно' :
+                     result.summary.recommended_frequency === 'quarterly' ? 'Тримесечно' : 'Месечно'}
+                  </p>
+                  <p className="text-xs text-slate-500 mt-2">
+                    {result.summary.recommended_frequency === 'annual' && 'Най-изгодна цена с годишно плащане'}
+                    {result.summary.recommended_frequency === 'semiannual' && 'По-гъвкаво плащане на 6 месеца'}
+                    {result.summary.recommended_frequency === 'quarterly' && 'Тримесечни вноски за по-лесно управление'}
+                    {result.summary.recommended_frequency === 'monthly' && 'Месечни вноски при ограничен резерв'}
+                  </p>
+                </div>
+                
+                <div className="grid grid-cols-2 gap-2 text-xs">
+                  <div className="p-2 bg-slate-50 rounded">
+                    <p className="text-slate-500">Годишно</p>
+                    <p className="font-semibold">{(result.summary.total_monthly_premium * 12).toFixed(0)} €</p>
+                  </div>
+                  <div className="p-2 bg-slate-50 rounded">
+                    <p className="text-slate-500">Месечно</p>
+                    <p className="font-semibold">{result.summary.total_monthly_premium.toFixed(0)} €</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
 
           {/* Actions */}
           <div className="flex gap-3">
             <Button 
               variant="outline"
-              className="flex-1"
               onClick={() => {
                 setResult(null);
                 setProgress(0);
@@ -360,12 +523,15 @@ export default function AutoPlanGenerator({ analysisId, analysisData, onComplete
             >
               Генерирай отново
             </Button>
+            <PlanPDFExport planId={result.plan_id} planData={result} />
             <Button 
               className="flex-1 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700"
-              onClick={() => window.open(`/plans/${result.plan_id}`, '_blank')}
+              onClick={() => {
+                if (onComplete) onComplete(result);
+              }}
             >
-              <FileText className="w-4 h-4 mr-2" />
-              Прегледай плана
+              <CheckCircle2 className="w-4 h-4 mr-2" />
+              Завърши
             </Button>
           </div>
         </div>

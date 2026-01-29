@@ -583,7 +583,8 @@ Deno.serve(async (req) => {
             details: {
               interest_rate: interestRate,
               insurance_allocation: insuranceAllocation,
-              note: 'Месечната вноска е намалена за спазване на лимитите'
+              note: 'Месечната вноска е намалена за спазване на лимитите',
+              recommended_metlife_credit_guard: true
             }
           });
         } else {
@@ -598,7 +599,8 @@ Deno.serve(async (req) => {
             term_years: loanYears,
             is_active: true,
             details: {
-              interest_rate: interestRate
+              interest_rate: interestRate,
+              recommended_metlife_credit_guard: true
             }
           });
         }
@@ -606,7 +608,79 @@ Deno.serve(async (req) => {
     }
 
     // Приоритет 5: Застраховка за дома (ако има жилище без застраховка)
+    if (hasProperty && !analysis.property_1_has_insurance && currentBudget > 0) {
+      const propertyValue = analysis.property_1_value || 0;
+      const propertyValueBGN = propertyValue * EUR_BGN_RATE;
+      
+      // Определяне на доставчик
+      let provider, productName, monthlyPremiumEUR;
+      
+      if (propertyValueBGN <= 500000) {
+        // Инстинкт - използваме Пакет 2 (100,000 EUR ~ 195,583 BGN)
+        provider = 'Инстинкт';
+        productName = 'Закрила на дома - Пакет 2';
+        monthlyPremiumEUR = 126.66 / EUR_BGN_RATE / 12; // ~5.4 EUR/месец
+      } else {
+        // ДЗИ Защита за дома
+        provider = 'ДЗИ';
+        productName = 'Защита за дома';
+        monthlyPremiumEUR = 8; // Примерна цена
+      }
+      
+      if (currentBudget >= monthlyPremiumEUR) {
+        planProducts.push({
+          product_type: 'property_insurance',
+          provider: provider,
+          product_name: productName,
+          beneficiary: 'family',
+          monthly_premium: monthlyPremiumEUR,
+          total_premium: monthlyPremiumEUR * 12,
+          coverage_amount: propertyValue,
+          is_active: true,
+          details: {
+            property_address: analysis.property_1_address || 'Н/П',
+            all_risks_coverage: true
+          }
+        });
+        
+        totalMonthlyPremium += monthlyPremiumEUR;
+        totalMonthlyInsurance += monthlyPremiumEUR;
+        currentBudget -= monthlyPremiumEUR;
+      }
+    }
+
     // Приоритет 6: Каско/ГО (ако има кола над 8000 лв без Каско)
+    const car1Value = analysis.car_1_value || 0;
+    const car1ValueBGN = car1Value * EUR_BGN_RATE;
+    const hasCar = analysis.has_car_1 || false;
+    const hasCasco = analysis.car_1_has_casco || false;
+    
+    if (hasCar && !hasCasco && car1ValueBGN > 8000 && currentBudget > 0) {
+      // Примерна премия за Каско (зависи от стойността на колата)
+      const cascoMonthlyPremium = Math.max(30, car1Value * 0.003); // ~0.3% от стойността месечно
+      
+      if (currentBudget >= cascoMonthlyPremium) {
+        planProducts.push({
+          product_type: 'car_insurance',
+          provider: 'ДЗИ',
+          product_name: 'Каско+',
+          beneficiary: 'family',
+          monthly_premium: cascoMonthlyPremium,
+          total_premium: cascoMonthlyPremium * 12,
+          coverage_amount: car1Value,
+          is_active: true,
+          details: {
+            car_brand: analysis.car_1_brand || 'Н/П',
+            car_model: analysis.car_1_model || 'Н/П',
+            car_year: analysis.car_1_year || 0
+          }
+        });
+        
+        totalMonthlyPremium += cascoMonthlyPremium;
+        totalMonthlyInsurance += cascoMonthlyPremium;
+        currentBudget -= cascoMonthlyPremium;
+      }
+    }
 
     // ============================================================
     // СТЪПКА 5: ИЗЧИСЛЕНИЯ ЗА КЛИЕНТА

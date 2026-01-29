@@ -426,7 +426,7 @@ Deno.serve(async (req) => {
     planProducts.push({
       product_type: 'pension_plan',
       provider: 'ОББ УПФ',
-      product_name: 'Универсален Пенсионен Фонд',
+      product_name: 'Универсален Пенсионен Фонд (Втори стълб)',
       beneficiary: 'partner1',
       beneficiary_name: `${analysis.client_first_name || ''} ${analysis.client_last_name || ''}`.trim(),
       beneficiary_age: clientAge,
@@ -434,9 +434,33 @@ Deno.serve(async (req) => {
       total_premium: 0,
       is_active: true,
       details: {
-        note: 'Смяна на пенсионен фонд - без допълнителни разходи'
+        note: 'Смяна на пенсионен фонд към ОББ - без допълнителни разходи',
+        expected_return: 6.01, // % последни 24 месеца
+        contribution_rate: 5, // % от БОД
+        tax_benefit: 'Данъчно облекчение приложимо'
       }
     });
+    
+    // Ако има партньор, добавяме и за партньора
+    if (includePartner && partnerAge > 0) {
+      planProducts.push({
+        product_type: 'pension_plan',
+        provider: 'ОББ УПФ',
+        product_name: 'Универсален Пенсионен Фонд (Втори стълб)',
+        beneficiary: 'partner2',
+        beneficiary_name: `${analysis.partner_first_name || ''} ${analysis.partner_last_name || ''}`.trim(),
+        beneficiary_age: partnerAge,
+        monthly_premium: 0,
+        total_premium: 0,
+        is_active: true,
+        details: {
+          note: 'Смяна на пенсионен фонд към ОББ - без допълнителни разходи',
+          expected_return: 6.01,
+          contribution_rate: 5,
+          tax_benefit: 'Данъчно облекчение приложимо'
+        }
+      });
+    }
 
     // 4.3 Допълнителни продукти при наличие на бюджет
     let currentBudget = maxMonthlyPlan - totalMonthlyPremium;

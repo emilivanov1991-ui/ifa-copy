@@ -23,6 +23,7 @@ import { toast } from 'sonner';
 import { useNavigate } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
 import FinancialPlanGeneratorV2 from '../financial-plan/FinancialPlanGeneratorV2';
+import AutoPlanGenerator from '../financial-plan/AutoPlanGenerator';
 
 export default function ClientDossierView({ clientId }) {
   const [client, setClient] = useState(null);
@@ -243,9 +244,14 @@ export default function ClientDossierView({ clientId }) {
                   </Button>
                 </div>
                 <div className="p-6">
-                  <FinancialPlanGeneratorV2 
+                  <AutoPlanGenerator 
                     analysisId={selectedAnalysis.id}
                     analysisData={selectedAnalysis}
+                    onComplete={() => {
+                      setShowPlanGenerator(false);
+                      setSelectedAnalysis(null);
+                      loadDossier();
+                    }}
                   />
                 </div>
               </div>

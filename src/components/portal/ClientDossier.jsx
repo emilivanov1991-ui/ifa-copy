@@ -178,51 +178,69 @@ export default function ClientDossier({ clientId, analysisId = null, showAllClie
                 </div>
               ) : (
                 <div className="space-y-3">
-                  {analyses.map((analysis, idx) => (
-                    <motion.div
-                      key={analysis.id}
-                      initial={{ opacity: 0, x: -20 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      transition={{ delay: idx * 0.05 }}
-                      className="bg-gradient-to-r from-blue-50 to-slate-50 rounded-lg p-4 border border-blue-100 hover:shadow-md transition-shadow"
-                    >
-                      <div className="flex items-center justify-between">
-                        <div className="flex-1">
-                          <div className="flex items-center gap-3 mb-2">
-                            <h4 className="font-semibold text-slate-900">
-                              {analysis.client_first_name} {analysis.client_last_name}
-                            </h4>
-                            {analysis.status && (
-                              <Badge className={statusConfig[analysis.status]?.color || 'bg-slate-100'}>
-                                {statusConfig[analysis.status]?.label || analysis.status}
-                              </Badge>
+                  {analyses.map((analysis, idx) => {
+                    // Check if plan exists for this analysis
+                    const hasPlan = plans.some(p => p.analysis_id === analysis.id);
+                    
+                    return (
+                      <motion.div
+                        key={analysis.id}
+                        initial={{ opacity: 0, x: -20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ delay: idx * 0.05 }}
+                        className="bg-gradient-to-r from-blue-50 to-slate-50 rounded-lg p-4 border border-blue-100 hover:shadow-md transition-shadow"
+                      >
+                        <div className="flex items-center justify-between">
+                          <div className="flex-1">
+                            <div className="flex items-center gap-3 mb-2">
+                              <h4 className="font-semibold text-slate-900">
+                                {analysis.client_first_name} {analysis.client_last_name}
+                              </h4>
+                              {analysis.status && (
+                                <Badge className={statusConfig[analysis.status]?.color || 'bg-slate-100'}>
+                                  {statusConfig[analysis.status]?.label || analysis.status}
+                                </Badge>
+                              )}
+                              {hasPlan && (
+                                <Badge className="bg-green-100 text-green-700">
+                                  ✓ Финансовият план е създаден
+                                </Badge>
+                              )}
+                            </div>
+                            <div className="grid grid-cols-2 md:grid-cols-4 gap-3 text-xs text-slate-600">
+                              <div>
+                                <span className="font-medium">Email:</span> {analysis.client_email}
+                              </div>
+                              <div>
+                                <span className="font-medium">Телефон:</span> {analysis.client_phone}
+                              </div>
+                              <div>
+                                <span className="font-medium">Възраст:</span> {analysis.client_age}
+                              </div>
+                              <div>
+                                <span className="font-medium">Дата:</span> {new Date(analysis.created_date).toLocaleDateString('bg-BG')}
+                              </div>
+                            </div>
+                            <div className="mt-2 text-xs text-slate-500">
+                              <span className="font-medium">ID:</span> {analysis.id}
+                            </div>
+                          </div>
+                          <div className="flex gap-2 ml-4">
+                            <Button variant="outline" size="sm">
+                              <Eye className="h-4 w-4 mr-2" />
+                              Преглед
+                            </Button>
+                            {!hasPlan && (
+                              <Button size="sm" className="bg-purple-600 hover:bg-purple-700">
+                                <TrendingUp className="h-4 w-4 mr-2" />
+                                Създай план
+                              </Button>
                             )}
                           </div>
-                          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 text-xs text-slate-600">
-                            <div>
-                              <span className="font-medium">Email:</span> {analysis.client_email}
-                            </div>
-                            <div>
-                              <span className="font-medium">Телефон:</span> {analysis.client_phone}
-                            </div>
-                            <div>
-                              <span className="font-medium">Възраст:</span> {analysis.client_age}
-                            </div>
-                            <div>
-                              <span className="font-medium">Дата:</span> {new Date(analysis.created_date).toLocaleDateString('bg-BG')}
-                            </div>
-                          </div>
-                          <div className="mt-2 text-xs text-slate-500">
-                            <span className="font-medium">ID:</span> {analysis.id}
-                          </div>
                         </div>
-                        <Button variant="outline" size="sm" className="ml-4">
-                          <Eye className="h-4 w-4 mr-2" />
-                          Преглед
-                        </Button>
-                      </div>
-                    </motion.div>
-                  ))}
+                      </motion.div>
+                    );
+                  })}
                 </div>
               )}
             </CardContent>

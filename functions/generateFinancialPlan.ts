@@ -522,8 +522,41 @@ Deno.serve(async (req) => {
     }
 
     // Приоритет 2: Generali базов пакет (ако няма от фирма)
-    // TODO: Трябва да проверим дали клиентът има здравно от фирма
-    // Засега пропускаме
+    const hasEmployerHealth = analysis.has_employer_health_insurance || false;
+    if (!hasEmployerHealth && currentBudget > 30) {
+      // Generali Health Line Basic - примерни тарифи
+      const generaliMonthly = clientAge < 40 ? 25 : clientAge < 50 ? 35 : 45;
+      
+      if (currentBudget >= generaliMonthly) {
+        planProducts.push({
+          product_type: 'health_insurance',
+          provider: 'Generali',
+          product_name: 'Health Line Basic',
+          beneficiary: 'partner1',
+          beneficiary_name: `${analysis.client_first_name || ''} ${analysis.client_last_name || ''}`.trim(),
+          beneficiary_age: clientAge,
+          monthly_premium: generaliMonthly,
+          total_premium: generaliMonthly * 12,
+          coverage_amount: 50000,
+          is_active: true,
+          details: {
+            plan: 'Basic',
+            annual_limit: 50000,
+            daily_cost: (generaliMonthly / 30).toFixed(2),
+            coverages: [
+              'Амбулаторни прегледи',
+              'Лабораторни изследвания',
+              'Болнично лечение',
+              'Спешна помощ'
+            ]
+          }
+        });
+        
+        totalMonthlyPremium += generaliMonthly;
+        totalMonthlyInsurance += generaliMonthly;
+        currentBudget -= generaliMonthly;
+      }
+    }
     
     // Приоритет 3: Детски Unit Linked (ако има деца)
     const childrenCount = analysis.children_count || 0;
@@ -588,6 +621,172 @@ Deno.serve(async (req) => {
         totalMonthlyInvestments += targetChildULAnnual / 12;
         totalMonthlyInsurance += childCoveragesPremium / 12;
         currentBudget -= childULMonthlyTotal;
+      }
+    }
+
+    // Приоритет 4: Нов ипотечен/потребителски кредит с Credit Guard
+    const planningHousingChange = analysis.planning_housing_change || false;
+    const financingMethod = analysis.financing_method;
+    
+    if (planningHousingChange && (financingMethod === 'loan' || financingMethod === 'cash_and_loan') && currentBudget > 50) {
+      const plannedValue = analysis.planned_housing_value || 0;
+      const extraCosts = analysis.planned_housing_extra_costs || 0;
+      const availableCash = analysis.available_cash || 0;
+      const loanAmount = plannedValue + extraCosts - availableCash;
+      const loanYears = Math.min(30, analysis.loan_term_years || 20, 70 - clientAge);
+      
+      if (loanAmount > 0 && loanYears > 0) {
+        const estimatedRate = 4.5; // Средна лихва за нов кредит
+        const monthlyPayment = calculateMonthlyLoanPayment(loanAmount, estimatedRate, loanYears);
+        
+        // Проверка на лимити
+        const maxPaymentBNB = (clientNetIncome + partnerNetIncome) * 0.5;
+        const maxPaymentBalance = monthlyBalance * 0.9;
+        
+        if (monthlyPayment <= Math.min(maxPaymentBNB, maxPaymentBalance)) {
+          // Credit Guard застраховка - 4% от вноската
+          const creditGuardMonthly = monthlyPayment * 0.04;
+          
+          if (currentBudget >= creditGuardMonthly) {
+            planProducts.push({
+              product_type: 'insurance',
+              provider: 'MetLife',
+              product_name: 'Credit Guard',
+              beneficiary: 'partner1',
+              beneficiary_name: `${analysis.client_first_name || ''} ${analysis.client_last_name || ''}`.trim(),
+              beneficiary_age: clientAge,
+              term_years: loanYears,
+              monthly_premium: roundPremiumDown(creditGuardMonthly),
+              total_premium: creditGuardMonthly * 12,
+              coverage_amount: loanAmount,
+              is_active: true,
+              details: {
+                loan_amount: loanAmount,
+                loan_monthly_payment: monthlyPayment.toFixed(2),
+                loan_rate: estimatedRate,
+                coverage: 'Смърт, Трайна Нетрудоспособност, Критични Заболявания',
+                daily_cost: (creditGuardMonthly / 30).toFixed(2),
+                note: 'Защита на кредита при непредвидени обстоятелства'
+              }
+            });
+            
+            totalMonthlyPremium += creditGuardMonthly;
+            totalMonthlyInsurance += creditGuardMonthly;
+            currentBudget -= creditGuardMonthly;
+          }
+        } else {
+          // Намаляване на вноската до 86%
+          const reducedPayment = monthlyBalance * 0.86;
+          const creditGuardMonthly = reducedPayment * 0.04;
+          
+          if (currentBudget >= creditGuardMonthly) {
+            planProducts.push({
+              product_type: 'insurance',
+              provider: 'MetLife',
+              product_name: 'Credit Guard',
+              beneficiary: 'partner1',
+              beneficiary_name: `${analysis.client_first_name || ''} ${analysis.client_last_name || ''}`.trim(),
+              beneficiary_age: clientAge,
+              term_years: loanYears,
+              monthly_premium: roundPremiumDown(creditGuardMonthly),
+              total_premium: creditGuardMonthly * 12,
+              coverage_amount: loanAmount,
+              is_active: true,
+              details: {
+                loan_amount: loanAmount,
+                loan_monthly_payment: reducedPayment.toFixed(2),
+                loan_rate: estimatedRate,
+                coverage: 'Смърт, Трайна Нетрудоспособност, Критични Заболявания',
+                daily_cost: (creditGuardMonthly / 30).toFixed(2),
+                note: 'Вноската е намалена до 86% от баланса за спазване на БНБ лимити'
+              }
+            });
+            
+            totalMonthlyPremium += creditGuardMonthly;
+            totalMonthlyInsurance += creditGuardMonthly;
+            currentBudget -= creditGuardMonthly;
+          }
+        }
+      }
+    }
+
+    // Приоритет 5: Застраховка за дома
+    const ownsProperty = analysis.current_housing === 'owned' || planningHousingChange;
+    const hasHomeInsurance = analysis.has_property_insurance || false;
+    const propertyValue = analysis.current_housing_value || analysis.planned_housing_value || 0;
+    
+    if (ownsProperty && !hasHomeInsurance && propertyValue > 0 && currentBudget > 20) {
+      const propertyValueBGN = propertyValue * EUR_BGN_RATE;
+      let homeProvider, homeProductName, homeMonthly;
+      
+      if (propertyValueBGN <= 500000) {
+        // Инстинкт - до 500K BGN
+        homeProvider = 'Инстинкт';
+        homeProductName = 'Закрила на дома - Пакет 2';
+        homeMonthly = 126.66 / EUR_BGN_RATE / 12; // ~5.4 EUR/месец
+      } else {
+        // ДЗИ - над 500K BGN
+        homeProvider = 'ДЗИ';
+        homeProductName = 'Защита за дома';
+        homeMonthly = propertyValue * 0.0006 / 12; // 0.06% годишно
+      }
+      
+      if (currentBudget >= homeMonthly) {
+        planProducts.push({
+          product_type: 'property_insurance',
+          provider: homeProvider,
+          product_name: homeProductName,
+          beneficiary: 'family',
+          beneficiary_name: 'Семейство',
+          monthly_premium: roundPremiumDown(homeMonthly),
+          total_premium: homeMonthly * 12,
+          coverage_amount: propertyValue,
+          is_active: true,
+          details: {
+            property_value: propertyValue,
+            coverage: 'Имот, Домакинско обзавеждане, Гражданска отговорност',
+            all_risks: true,
+            daily_cost: (homeMonthly / 30).toFixed(2)
+          }
+        });
+        
+        totalMonthlyPremium += homeMonthly;
+        totalMonthlyInsurance += homeMonthly;
+        currentBudget -= homeMonthly;
+      }
+    }
+
+    // Приоритет 6: Каско/ГО
+    const carValue = (analysis.property_car_value || 0); // Вече е в EUR
+    const carValueBGN = carValue * EUR_BGN_RATE;
+    const hasCasco = analysis.has_casco_insurance || false;
+    
+    if (carValue > 0 && carValueBGN > 8000 && !hasCasco && currentBudget > 30) {
+      // ДЗИ Каско - примерно 4% от стойността годишно
+      const cascoAnnual = carValue * 0.04;
+      const cascoMonthly = cascoAnnual / 12;
+      
+      if (currentBudget >= cascoMonthly) {
+        planProducts.push({
+          product_type: 'car_insurance',
+          provider: 'ДЗИ',
+          product_name: 'Каско + ГО',
+          beneficiary: 'family',
+          beneficiary_name: 'Семейство',
+          monthly_premium: roundPremiumDown(cascoMonthly),
+          total_premium: cascoMonthly * 12,
+          coverage_amount: carValue,
+          is_active: true,
+          details: {
+            car_value: carValue,
+            coverage: 'Пълно Каско, Гражданска отговорност',
+            daily_cost: (cascoMonthly / 30).toFixed(2)
+          }
+        });
+        
+        totalMonthlyPremium += cascoMonthly;
+        totalMonthlyInsurance += cascoMonthly;
+        currentBudget -= cascoMonthly;
       }
     }
 

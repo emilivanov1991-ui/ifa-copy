@@ -459,8 +459,9 @@ Deno.serve(async (req) => {
       };
       
       const uniqaMonthlyPremium = uniqaTariffs[ageGroup] || 13.71;
+      const uniqaMonthlyRounded = roundPremiumDown(uniqaMonthlyPremium);
       
-      if (currentBudget >= uniqaMonthlyPremium) {
+      if (currentBudget >= uniqaMonthlyRounded) {
         planProducts.push({
           product_type: 'health_insurance',
           provider: 'УНИКА',
@@ -468,20 +469,29 @@ Deno.serve(async (req) => {
           beneficiary: 'partner1',
           beneficiary_name: `${analysis.client_first_name || ''} ${analysis.client_last_name || ''}`.trim(),
           beneficiary_age: clientAge,
-          monthly_premium: uniqaMonthlyPremium,
-          total_premium: uniqaMonthlyPremium * 12,
+          monthly_premium: uniqaMonthlyRounded,
+          total_premium: uniqaMonthlyRounded * 12,
           coverage_amount: 2242300, // EUR макс покритие
           is_active: true,
           details: {
             plan: 'План Европа',
             territory: 'Европа',
-            daily_benefit: 135
+            daily_benefit: 135,
+            daily_cost: (uniqaMonthlyRounded / 30).toFixed(2),
+            coverages: [
+              'Лечение злокачествени новообразувания',
+              'Операции за отстраняване на тумори',
+              'Лечение на доброкачествени тумори на главата',
+              'Операции на сънната артерия',
+              'Байпас операции на коронарни артерии',
+              'Трансплантация на органи'
+            ]
           }
         });
         
-        totalMonthlyPremium += uniqaMonthlyPremium;
-        totalMonthlyInsurance += uniqaMonthlyPremium;
-        currentBudget -= uniqaMonthlyPremium;
+        totalMonthlyPremium += uniqaMonthlyRounded;
+        totalMonthlyInsurance += uniqaMonthlyRounded;
+        currentBudget -= uniqaMonthlyRounded;
       }
     }
 

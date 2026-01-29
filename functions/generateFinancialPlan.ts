@@ -820,24 +820,55 @@ Deno.serve(async (req) => {
       total_monthly_premium: totalMonthlyPremium,
       total_coverage: planProducts.reduce((sum, p) => sum + (p.coverage_amount || 0), 0),
       notes: `
-Автоматично генериран финансов план.
+Автоматично генериран финансов план (v${rules.rule_version})
 
-ОПТИМИЗАЦИИ:
-${optimizations.map(o => `- ${o.description}: ${JSON.stringify(o, null, 2)}`).join('\n')}
+══════════════════════════════════════
+ОБОБЩЕНИЕ:
+══════════════════════════════════════
+• Месечна премия: ${totalMonthlyPremium.toFixed(2)} EUR
+• Месечни инвестиции: ${totalMonthlyInvestments.toFixed(2)} EUR
+• Месечни застраховки: ${totalMonthlyInsurance.toFixed(2)} EUR
+• Периодичност: ${recommendedFrequency} (${frequencyNote})
+• Резерв след план: ${reserveMonthsAfterPlan.toFixed(1)} месечни разхода
 
-ЛИМИТИ:
-- Макс годишен план: ${maxAnnualPlan.toFixed(2)} EUR (150% от годишен доход)
-- Макс месечен план: ${maxMonthlyPlan.toFixed(2)} EUR (40% от месечен баланс)
-- Макс застраховки: ${maxMonthlyInsurance.toFixed(2)} EUR
-- Мин инвестиции: ${minMonthlyInvestments.toFixed(2)} EUR
+══════════════════════════════════════
+ОПТИМИЗАЦИИ (${optimizations.length}):
+══════════════════════════════════════
+${optimizations.map((o, i) => `${i + 1}. ${o.description}
+   ${Object.entries(o).filter(([k]) => k !== 'description' && k !== 'type').map(([k, v]) => `   ${k}: ${typeof v === 'number' ? v.toFixed(2) : v}`).join('\n')}`).join('\n\n')}
 
-ИЗЧИСЛЕНИЯ:
-- Трудов капитал клиент: ${Math.round(clientLaborCapital).toLocaleString()} EUR
-${includePartner ? `- Трудов капитал партньор: ${Math.round(partnerLaborCapital).toLocaleString()} EUR` : ''}
-- Данъчно облекчение: ${taxRelief.toFixed(2)} EUR годишно
+══════════════════════════════════════
+ЛИМИТИ НА ПЛАНА:
+══════════════════════════════════════
+• Макс годишен план: ${maxAnnualPlan.toFixed(2)} EUR (${(maxAnnualPlanVsIncome * 100).toFixed(0)}% от годишен доход)
+• Макс месечен план: ${maxMonthlyPlan.toFixed(2)} EUR (${(maxMonthlyPlanVsBalance * 100).toFixed(0)}% от месечен баланс)
+• Макс застраховки живот: ${maxMonthlyInsurance.toFixed(2)} EUR (${(maxInsuranceVsPlan * 100).toFixed(0)}% от план ИЛИ ${(maxInsuranceVsNetIncome * 100).toFixed(0)}% от доход)
+• Мин инвестиции: ${minMonthlyInvestments.toFixed(2)} EUR (${(minInvestmentsVsPlan * 100).toFixed(0)}% от план)
+• Мин месечна инвестиция: ${minMonthlyInvestment.toFixed(2)} EUR
 
-ПРЕПОРЪЧИТЕЛНА ПЕРИОДИЧНОСТ: ${recommendedFrequency}
-Резерв след план: ${reserveMonthsAfterPlan.toFixed(1)} месечни дохода
+══════════════════════════════════════
+ИЗЧИСЛЕНИЯ ЗА КЛИЕНТА:
+══════════════════════════════════════
+• Трудов капитал клиент: ${Math.round(clientLaborCapital).toLocaleString()} EUR (до ${clientRetirementAge} г.)
+${includePartner ? `• Трудов капитал партньор: ${Math.round(partnerLaborCapital).toLocaleString()} EUR (до ${partnerRetirementAge} г.)` : ''}
+• Общ трудов капитал: ${Math.round(clientLaborCapital + partnerLaborCapital).toLocaleString()} EUR
+• Данъчно облекчение: ${taxRelief.toFixed(2)} EUR годишно (10%)
+• Променливи разходи: ${variableExpenses.toFixed(2)} EUR месечно
+
+══════════════════════════════════════
+СОЦИАЛНА ИЗДРЪЖКА (компенсации):
+══════════════════════════════════════
+• Клиент - Инвалидност: ${clientSocialSupport.toFixed(2)} EUR
+${includePartner ? `• Партньор - Инвалидност: ${partnerSocialSupport.toFixed(2)} EUR` : ''}
+
+══════════════════════════════════════
+ДОПЪЛНИТЕЛНО ГЕНЕРИРАНО БОГАТСТВО:
+══════════════════════════════════════
+${extraGeneratedWealth.saved_mortgage_interest > 0 ? `• Спестени лихви по кредит (30%): ${(extraGeneratedWealth.saved_mortgage_interest * 0.3).toFixed(2)} EUR` : ''}
+${extraGeneratedWealth.property_value_growth > 0 ? `• Стойност на имот при пенсия (5% ръст): ${Math.round(extraGeneratedWealth.property_value_growth).toLocaleString()} EUR` : ''}
+• УПФ натрупана сума към ${clientRetirementAge} г.: (ще се изчисли)
+• UL инвестиции към ${clientRetirementAge} г.: (ще се изчисли)
+${childrenCount > 0 ? `• Детски UL към 19 г.: (ще се изчисли)` : ''}
       `.trim()
     };
 

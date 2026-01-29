@@ -749,7 +749,7 @@ Deno.serve(async (req) => {
     // СТЪПКА 6: ОПРЕДЕЛЯНЕ НА ПЕРИОДИЧНОСТ НА ПЛАЩАНЕ
     // ============================================================
 
-    // Резерви след план
+    // Резерви след план (приспадаме годишна премия)
     const totalReserves = (analysis.client_checking_account || 0) +
       (analysis.client_savings_book || 0) +
       (analysis.client_term_deposit || 0) +
@@ -761,17 +761,40 @@ Deno.serve(async (req) => {
       (includePartner ? (analysis.partner_savings_account || 0) : 0) +
       (includePartner ? (analysis.partner_cash || 0) : 0);
     
-    const reserveMonthsAfterPlan = totalReserves / variableExpenses;
+    // Приспадаме годишна премия на плана
+    const annualPlanCost = totalMonthlyPremium * 12;
+    const reservesAfterPlan = Math.max(0, totalReserves - annualPlanCost);
+    const reserveMonthsAfterPlan = variableExpenses > 0 ? reservesAfterPlan / variableExpenses : 999;
     
     let recommendedFrequency = 'annual'; // Базова
+    let frequencyNote = 'Годишна периодика осигурява най-ниска цена';
+    
     if (reserveMonthsAfterPlan < 4) {
       recommendedFrequency = 'semiannual';
+      frequencyNote = 'Полугодишна периодика поради ограничен резерв';
     }
     if (reserveMonthsAfterPlan < 3) {
       recommendedFrequency = 'quarterly';
+      frequencyNote = 'Тримесечна периодика поради ограничен резерв';
     }
     if (reserveMonthsAfterPlan < 2) {
       recommendedFrequency = 'monthly';
+      frequencyNote = 'Месечна периодика поради много ограничен резерв';
+    }
+    
+    // Минимален резерв след план: 1 месечен доход
+    const minReserveNeeded = variableExpenses * 1;
+    const reserveDeficit = Math.max(0, minReserveNeeded - reservesAfterPlan);
+    
+    if (reserveDeficit > 0) {
+      optimizations.push({
+        type: 'reserve_warning',
+        description: 'Недостатъчен резерв след план',
+        current_reserve: reservesAfterPlan,
+        needed_reserve: minReserveNeeded,
+        deficit: reserveDeficit,
+        recommendation: 'Препоръчва се натрупване на резерв преди стартиране на плана'
+      });
     }
 
     // ============================================================

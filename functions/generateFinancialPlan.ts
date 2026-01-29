@@ -422,6 +422,9 @@ Deno.serve(async (req) => {
     totalMonthlyInvestments += ulAnnualSavings / 12;
     totalMonthlyInsurance += coveragesPremium / 12;
 
+    // 4.3 Допълнителни продукти при наличие на бюджет
+    let currentBudget = maxMonthlyPlan - totalMonthlyPremium;
+
     // 4.2 Задължителна смяна на пенсионен фонд
     planProducts.push({
       product_type: 'pension_plan',

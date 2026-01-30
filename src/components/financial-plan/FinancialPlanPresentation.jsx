@@ -20,13 +20,20 @@ const calculateAllocation = (planData, monthlyReserve, productsEUR, eurRate) => 
 
   products.forEach(p => {
     const premium = p.monthlyPremium || 0;
-    if (p.name.includes('Unit Linked') || p.name.includes('УПФ') || p.name.includes('Partners')) {
+    // Investments
+    if (p.product_type === 'ul_investment' || p.product_type === 'pension_plan' || (p.provider && p.provider.includes('Partners'))) {
       investments += premium;
-    } else if (p.name.includes('Uniqa') || p.name.includes('Generali') || p.name.includes('Срочен живот') || p.name.includes('Care') || p.name.includes('ДЗИ Закрила')) {
+    } 
+    // Income Protection
+    else if (p.product_type === 'term_life' || p.product_type === 'health_insurance' || p.product_type === 'critical_illness' || p.product_type === 'personal_accident' || (p.provider && (p.provider.includes('УНИКА') || p.provider.includes('Generali') || p.provider.includes('MetLife')))) {
       incomeProtection += premium;
-    } else if (p.name.includes('Дом') || p.name.includes('Каско') || p.name.includes('Инстинкт') || p.name.includes('ГО')) {
+    } 
+    // Property Protection
+    else if (p.product_type === 'property_insurance' || p.product_type === 'car_insurance' || p.product_type === 'home_insurance' || (p.provider && (p.provider.includes('Инстинкт') || p.provider.includes('ДЗИ')))) {
       propertyProtection += premium;
-    } else if (p.name.includes('кредит') || p.name.includes('Ипотека')) {
+    } 
+    // Loans
+    else if (p.product_type === 'mortgage_loan' || p.product_type === 'consumer_loan') {
       loans += premium;
     }
   });

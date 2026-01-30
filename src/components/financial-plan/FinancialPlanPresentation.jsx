@@ -807,24 +807,24 @@ export default function FinancialPlanPresentation({ planData, clientData, analys
             </motion.div>
 
             {/* Priorities Section */}
-          {(() => {
-            const priorityLabels = {
-              priority_income_protection: 'Защита на дохода',
-              priority_reserve: 'Увеличаване на резервите',
-              priority_housing: 'Ново жилище',
-              priority_pension: 'Достойна пенсия',
-              priority_children: 'Подсигуряване на децата',
-              priority_property_protection: 'Защита на собствеността',
-              priority_other: 'Други'
-            };
+            {(() => {
+              const priorityLabels = {
+                priority_income_protection: 'Подсигуряване на доходите',
+                priority_property_protection: 'Защита на собствеността',
+                priority_reserve: 'Създаване и увеличаване стойността на резерва',
+                priority_housing: 'Ново жилище',
+                priority_pension: 'По-добра пенсия',
+                priority_children: 'Финансово подсигуряване на децата',
+                priority_other: 'Други (кола, почивка...)'
+              };
 
-            const priorities = Object.keys(priorityLabels)
-              .map(key => ({
-                label: priorityLabels[key],
-                value: analysisData?.[key] || 0
-              }))
-              .filter(p => p.value > 0)
-              .sort((a, b) => a.value - b.value);
+              const priorities = Object.keys(priorityLabels)
+                .map(key => ({
+                  label: priorityLabels[key],
+                  value: analysisData?.[key] || 0
+                }))
+                .filter(p => p.value > 0)
+                .sort((a, b) => a.value - b.value);
 
             return priorities.length > 0 && (
               <Card className="bg-gradient-to-r from-red-50 to-pink-50 border-red-200">

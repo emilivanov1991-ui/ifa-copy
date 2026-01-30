@@ -296,6 +296,8 @@ export default function FinancialPlanPresentation({ planData, clientData, analys
     }
   ];
 
+  // Използваме директно продуктите от финансовия план
+  const planProducts = planData.products || [];
   const allocationData = [
     { name: 'Инвестиции', value: allocation.investments.amount, color: '#3b82f6', icon: '📈' },
     { name: 'Защита на дохода', value: allocation.incomeProtection.amount, color: '#10b981', icon: '🛡️' },

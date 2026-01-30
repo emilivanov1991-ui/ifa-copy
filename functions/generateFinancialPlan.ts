@@ -406,6 +406,8 @@ Deno.serve(async (req) => {
       strategy: 'balanced',
       monthly_premium: ulMonthlyPremiumRounded,
       total_premium: ulAnnualPremiumRounded,
+      investmentPremium: ulAnnualSavings / 12, // Месечна инвестиционна част
+      insurancePremium: (coveragesPremium + 15) / 12, // Месечна застрахователна част + admin fee
       coverage_amount: ulCoverages.integratedLifeCoverage,
       expected_value: 0, // Ще се изчисли по-късно с проекция
       is_active: true,
@@ -525,6 +527,8 @@ Deno.serve(async (req) => {
             strategy: 'balanced',
             monthly_premium: partnerULMonthly,
             total_premium: partnerULMonthly * 12,
+            investmentPremium: partnerULAnnualSavings / 12, // Месечна инвестиционна част
+            insurancePremium: (partnerCoveragesPremium + 15) / 12, // Месечна застрахователна част + admin fee
             coverage_amount: partnerULCoverages.integratedLifeCoverage,
             expected_value: 0,
             is_active: true,
@@ -690,6 +694,8 @@ Deno.serve(async (req) => {
             term_years: Math.max(1, 19 - childAge),
             monthly_premium: childULMonthlyTotal,
             total_premium: childULMonthlyTotal * 12,
+            investmentPremium: targetChildULAnnual / 12, // Месечна инвестиционна част
+            insurancePremium: (childCoveragesPremium + 15) / 12, // Месечна застрахователна част + admin fee
             expected_value: 0,
             is_active: true,
             details: {

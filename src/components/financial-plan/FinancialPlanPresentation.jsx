@@ -20,6 +20,8 @@ const calculateAllocation = (planData, monthlyReserve, productsEUR, eurRate) => 
 
   products.forEach(p => {
     const premium = p.monthlyPremium || 0;
+    const investmentPremium = p.investmentPremium || 0;
+    const insurancePremium = p.insurancePremium || 0;
 
     console.log('Categorizing product:', {
       name: p.name,
@@ -27,8 +29,8 @@ const calculateAllocation = (planData, monthlyReserve, productsEUR, eurRate) => 
       product_type: p.product_type,
       provider: p.provider,
       premium: premium,
-      investmentPremium: p.investmentPremium,
-      insurancePremium: p.insurancePremium
+      investmentPremium: investmentPremium,
+      insurancePremium: insurancePremium
     });
 
     // MetLife Unit Linked продукти - разделяме на компоненти
@@ -36,18 +38,18 @@ const calculateAllocation = (planData, monthlyReserve, productsEUR, eurRate) => 
       (p.product_type === 'ul_investment' || (p.name && p.name.includes('Unit Linked'))) &&
       (p.provider && p.provider.includes('MetLife'))
     ) {
-      // Ако има explicit разделение, използваме го
-      if (p.investmentPremium !== undefined && p.insurancePremium !== undefined) {
-        investments += p.investmentPremium || 0;
-        incomeProtection += p.insurancePremium || 0;
-        console.log('→ MetLife UL: Инвестиции:', p.investmentPremium, 'Застраховка:', p.insurancePremium);
+      // Винаги използваме explicit разделението ако съществува
+      if (investmentPremium > 0 || insurancePremium > 0) {
+        investments += investmentPremium;
+        incomeProtection += insurancePremium;
+        console.log('→ MetLife UL: Инвестиции:', investmentPremium, 'Застраховка:', insurancePremium);
       } else {
-        // Иначе приблизително 85% отива в инвестиции, 15% е застрахователна част + такси
+        // Fallback: приблизително 85% отива в инвестиции, 15% е застрахователна част + такси
         const investmentPart = premium * 0.85;
         const insurancePart = premium * 0.15;
         investments += investmentPart;
         incomeProtection += insurancePart;
-        console.log('→ MetLife UL (изчислено): Инвестиции:', investmentPart, 'Застраховка:', insurancePart);
+        console.log('→ MetLife UL (fallback): Инвестиции:', investmentPart, 'Застраховка:', insurancePart);
       }
     }
     // УПФ и Partners - чисти инвестиции

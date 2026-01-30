@@ -800,12 +800,7 @@ export default function FinancialPlanPresentation({ planData, clientData, analys
               <div className="bg-green-100 border-2 border-green-500 rounded-lg px-6 py-3">
                 <p className="text-sm text-green-700 font-medium mb-1 text-center">Разлика:</p>
                 <p className="text-3xl font-bold text-green-700 text-center">
-                  {(() => {
-                    const diff = wealth.withPlan - wealth.withoutPlan;
-                    return diff >= 1000000 
-                      ? `${(diff / 1000000).toFixed(2)} мил. EUR`
-                      : `${(diff / 1000).toFixed(0)}K EUR`;
-                  })()}
+                  {(wealth.withPlan - wealth.withoutPlan).toLocaleString('bg-BG', { maximumFractionDigits: 0 })} EUR
                 </p>
               </div>
             </div>

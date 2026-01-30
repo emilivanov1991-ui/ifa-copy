@@ -8,17 +8,17 @@ import { ChevronLeft, ChevronRight, Download, X, CheckCircle, TrendingUp, Shield
 import { downloadFinancialPlanPDF } from './FinancialPlanPDFGenerator';
 import { toast } from 'sonner';
 
-// Calculate wealth projection with correct formulas
+// Calculate wealth projection with correct formulas - ВСИЧКО В EUR
 const calculateWealthProjection = (planData, clientData, analysisData) => {
   const monthsToRetirement = (clientData.yearsToRetirement || 0) * 12;
   const yearsToRetirement = clientData.yearsToRetirement || 30;
-  const monthlyBalance = planData.calculations?.monthlyBalance || 0;
+  const monthlyBalanceEUR = (planData.calculations?.monthlyBalanceEUR || 0);
   const totalMonthlyPremium = planData.total_monthly_premium || 0;
-  const monthlyReserve = monthlyBalance - totalMonthlyPremium;
+  const monthlyReserveEUR = monthlyBalanceEUR - totalMonthlyPremium;
   const EUR_BGN_RATE = 1.95583;
   
-  // WITHOUT PLAN - just monthly savings with no growth
-  const withoutPlan = monthlyBalance * monthsToRetirement;
+  // WITHOUT PLAN - просто натрупване на месечния баланс БЕЗ инвестиции и растеж (в EUR)
+  const withoutPlan = monthlyBalanceEUR * monthsToRetirement;
   
   // WITH PLAN - detailed calculation with all components
   
@@ -115,15 +115,15 @@ const calculateWealthProjection = (planData, clientData, analysisData) => {
     ? juniorMonthlyPremium * (((Math.pow(1 + ulReturn, juniorMonths) - 1) / ulReturn) * (1 + ulReturn))
     : 0;
   
-  // 9. Резервен остатък * месеци (с 2% растеж)
+  // 9. Резервен остатък * месеци (с 2% растеж) - вече в EUR
   const reserveReturn = 0.02 / 12; // 2% annual на резерва
-  const reserveAccumulation = monthlyReserve * (((Math.pow(1 + reserveReturn, monthsToRetirement) - 1) / reserveReturn) * (1 + reserveReturn));
+  const reserveAccumulation = monthlyReserveEUR * (((Math.pow(1 + reserveReturn, monthsToRetirement) - 1) / reserveReturn) * (1 + reserveReturn));
   
-  // ОБЩО "С ПЛАН" = активи + имущество - задължения + натрупвания
+  // ОБЩО "С ПЛАН" = активи + имущество - задължения + натрупвания (всичко в EUR)
   const withPlan = currentAssetsFutureValue + currentPropertyFutureValue + newPropertyFutureValue - remainingLiabilities +
     upfValue + mortgageInterestSavings + ulValue + juniorValue + reserveAccumulation;
   
-  return { withoutPlan, withPlan, monthlyReserve };
+  return { withoutPlan, withPlan, monthlyReserveEUR };
 };
 
 // Calculate allocation breakdown including reserve (in EUR)
@@ -205,7 +205,7 @@ export default function FinancialPlanPresentation({ planData, clientData, analys
   const yearsToRetirement = clientData?.yearsToRetirement || (retirementAge - age);
   const monthsToRetirement = yearsToRetirement * 12;
   
-  // Изчисляване на месечния баланс (доходи - разходи)
+  // Изчисляване на месечния баланс (доходи - разходи) - ВСИЧКО В BGN
   const totalIncome = (analysisData?.client_net_income || 0) + (analysisData?.partner_net_income || 0);
   const totalExpenses = (analysisData?.expense_rent || 0) + (analysisData?.expense_utilities || 0) + 
     (analysisData?.expense_food || 0) + (analysisData?.expense_phone || 0) + (analysisData?.expense_internet || 0) +
@@ -215,19 +215,19 @@ export default function FinancialPlanPresentation({ planData, clientData, analys
     (analysisData?.expense_children || 0) + (analysisData?.expense_cigarettes || 0) + (analysisData?.expense_pets || 0) +
     (analysisData?.expense_vacation || 0) + (analysisData?.expense_business || 0) + (analysisData?.expense_other || 0);
   
-  const actualMonthlyBalance = totalIncome - totalExpenses;
+  const actualMonthlyBalanceBGN = totalIncome - totalExpenses;
   
-  // Използваме реалния месечен баланс вместо calculations.monthlyBalance
-  const monthlyBalance = actualMonthlyBalance;
-  const monthlyReserve = monthlyBalance - totalMonthlyPremiumEUR;
+  // КОНВЕРТИРАМЕ В EUR
+  const monthlyBalanceEUR = actualMonthlyBalanceBGN / EUR_BGN_RATE;
+  const monthlyReserveEUR = monthlyBalanceEUR - totalMonthlyPremiumEUR;
   
-  // Wealth projection with correct formulas
+  // Wealth projection with correct formulas - ВСИЧКО В EUR
   const wealth = calculateWealthProjection(
-    { ...planData, calculations: { ...planData.calculations, monthlyBalance } }, 
+    { ...planData, calculations: { ...planData.calculations, monthlyBalanceEUR } }, 
     clientData, 
     analysisData
   );
-  const allocation = calculateAllocation(planData, monthlyReserve, productsEUR, EUR_BGN_RATE);
+  const allocation = calculateAllocation(planData, monthlyReserveEUR * EUR_BGN_RATE, productsEUR, EUR_BGN_RATE);
   
   // Нетно имущество от анализа (в лева, конвертираме към евро)
   const assets = (
@@ -604,18 +604,55 @@ export default function FinancialPlanPresentation({ planData, clientData, analys
             </h3>
             <ResponsiveContainer width="100%" height={350}>
               <AreaChart data={(() => {
-                const years = yearsToRetirement;
-                const withoutPlanFinal = wealth.withoutPlan;
-                const withPlanFinal = wealth.withPlan;
-
-                // Generate exponential growth data points
-                return Array.from({ length: Math.min(years + 1, 42) }, (_, i) => {
+                const years = Math.min(yearsToRetirement, 41);
+                
+                // Реално изчисление на растежа по години
+                return Array.from({ length: years + 1 }, (_, i) => {
                   const year = i;
-                  const progress = i / years;
-
-                  // Exponential growth formula: P * (1 + r)^t
-                  const withoutPlanValue = withoutPlanFinal * (Math.pow(progress, 1.5));
-                  const withPlanValue = withPlanFinal * (Math.pow(progress, 1.5));
+                  const currentMonths = i * 12;
+                  
+                  // БЕЗ ПЛАН: просто натрупване без растеж
+                  const withoutPlanValue = monthlyBalanceEUR * currentMonths;
+                  
+                  // С ПЛАН: текущи активи растат + нови инвестиции натрупват
+                  // Настоящи активи с растеж
+                  const liquidAssets = (
+                    (analysisData?.client_checking_account || 0) +
+                    (analysisData?.client_savings_book || 0) +
+                    (analysisData?.client_term_deposit || 0) +
+                    (analysisData?.client_savings_account || 0) +
+                    (analysisData?.client_cash || 0) +
+                    (analysisData?.partner_checking_account || 0) +
+                    (analysisData?.partner_savings_book || 0) +
+                    (analysisData?.partner_term_deposit || 0) +
+                    (analysisData?.partner_savings_account || 0) +
+                    (analysisData?.partner_cash || 0)
+                  ) / EUR_BGN_RATE;
+                  
+                  const investmentAssets = (
+                    (analysisData?.client_mutual_funds || 0) +
+                    (analysisData?.partner_mutual_funds || 0)
+                  ) / EUR_BGN_RATE;
+                  
+                  const currentAssetsGrowth = liquidAssets * Math.pow(1.04, i) + investmentAssets * Math.pow(1.08, i);
+                  
+                  // Unit Linked инвестиции от плана
+                  const ulMonthlyPremium = (productsEUR || [])
+                    .filter(p => p.name.includes('Unit Linked') || p.name.includes('УПФ'))
+                    .reduce((sum, p) => sum + (p.monthlyPremium || 0), 0);
+                  
+                  const ulReturn = 0.08 / 12;
+                  const ulGrowth = currentMonths > 0 && ulMonthlyPremium > 0
+                    ? ulMonthlyPremium * (((Math.pow(1 + ulReturn, currentMonths) - 1) / ulReturn) * (1 + ulReturn))
+                    : 0;
+                  
+                  // Резерв с растеж
+                  const reserveReturn = 0.02 / 12;
+                  const reserveGrowth = currentMonths > 0 && monthlyReserveEUR > 0
+                    ? monthlyReserveEUR * (((Math.pow(1 + reserveReturn, currentMonths) - 1) / reserveReturn) * (1 + reserveReturn))
+                    : 0;
+                  
+                  const withPlanValue = currentAssetsGrowth + ulGrowth + reserveGrowth;
 
                   return {
                     year,
@@ -697,7 +734,7 @@ export default function FinancialPlanPresentation({ planData, clientData, analys
                 *Проекция при {yearsToRetirement} години инвестиции до {retirementAge} г. възраст
               </p>
               <p className="text-xs text-amber-600 mt-2 font-semibold">
-                Месечен резерв: {wealth.monthlyReserve.toFixed(0)} лв (спестявания извън плана)
+                Месечен резерв: {wealth.monthlyReserveEUR.toFixed(0)} EUR (спестявания извън плана)
               </p>
             </div>
           </div>
@@ -1161,11 +1198,11 @@ export default function FinancialPlanPresentation({ planData, clientData, analys
                   <h3 className="text-lg font-bold text-blue-900 mb-3">Разпределение на средствата</h3>
                   <div className="space-y-2 text-sm">
                     {/* Reserve */}
-                    {wealth.monthlyReserve > 0 && (
+                    {wealth.monthlyReserveEUR > 0 && (
                       <div className="flex justify-between items-center py-2 border-b border-slate-100">
                         <span className="text-slate-700 font-medium">Резерв</span>
                         <div className="text-right">
-                          <p className="font-bold text-cyan-700">{(wealth.monthlyReserve / EUR_BGN_RATE).toFixed(0)} EUR</p>
+                          <p className="font-bold text-cyan-700">{wealth.monthlyReserveEUR.toFixed(0)} EUR</p>
                           <p className="text-xs text-slate-500">месечно</p>
                         </div>
                       </div>
@@ -1303,12 +1340,11 @@ export default function FinancialPlanPresentation({ planData, clientData, analys
                   const categories = [];
 
                   // Reserve
-                  if (wealth.monthlyReserve > 0) {
-                    const reserveMonthly = wealth.monthlyReserve / EUR_BGN_RATE;
+                  if (wealth.monthlyReserveEUR > 0) {
                     categories.push({
                       name: 'Резерв',
-                      invested: reserveMonthly,
-                      accumulated: reserveMonthly,
+                      invested: wealth.monthlyReserveEUR,
+                      accumulated: wealth.monthlyReserveEUR,
                       years: 1
                     });
                   }

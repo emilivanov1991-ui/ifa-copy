@@ -864,46 +864,115 @@ export default function FinancialPlanPresentation({ planData, clientData, analys
             Разпределение на вашите спестявания
           </h2>
 
-          <div className="bg-white rounded-xl p-6 shadow-lg border border-slate-200">
-            <ResponsiveContainer width="100%" height={400}>
-              <PieChart>
-                <Pie
-                  data={allocationData}
-                  cx="50%"
-                  cy="50%"
-                  labelLine={false}
-                  label={({ name, value, percent }) => {
-                    const totalAllocation = allocation.investments.amount + allocation.incomeProtection.amount + 
-                                            allocation.propertyProtection.amount + allocation.loans.amount + allocation.reserve.amount;
-                    const percentValue = ((value / totalAllocation) * 100).toFixed(1);
-                    return `${name}: ${value.toFixed(0)} EUR (${percentValue}%)`;
-                  }}
-                  outerRadius={140}
-                  fill="#8884d8"
-                  dataKey="value"
-                >
-                  {allocationData.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={entry.color} />
-                  ))}
-                </Pie>
-                <Tooltip 
-                  contentStyle={{ backgroundColor: '#fff', border: '1px solid #e2e8f0', borderRadius: '8px' }}
-                  formatter={(value, name) => {
-                    const monthlyIncomeEUR = ((analysisData?.client_net_income || 0) + (analysisData?.partner_net_income || 0)) / EUR_BGN_RATE;
-                    const percentOfIncome = monthlyIncomeEUR > 0 ? ((value / monthlyIncomeEUR) * 100).toFixed(1) : 0;
-                    return [`${value.toFixed(0)} EUR (${percentOfIncome}% от доход)`, name];
-                  }}
-                />
-                <Legend 
-                  verticalAlign="bottom" 
-                  height={36}
-                  formatter={(value, entry) => {
-                    const item = allocationData.find(d => d.name === value);
-                    return `${item?.icon || ''} ${value}`;
-                  }}
-                />
-              </PieChart>
-            </ResponsiveContainer>
+          <div className="grid md:grid-cols-2 gap-6">
+            {/* Left Pie Chart - Разпределение от план */}
+            <div className="bg-white rounded-xl p-6 shadow-lg border border-slate-200">
+              <h3 className="text-lg font-bold text-slate-900 mb-4 text-center">
+                Разпределение от месечния план
+              </h3>
+              <ResponsiveContainer width="100%" height={350}>
+                <PieChart>
+                  <Pie
+                    data={allocationData}
+                    cx="50%"
+                    cy="50%"
+                    labelLine={false}
+                    label={({ name, value }) => {
+                      const totalAllocation = allocation.investments.amount + allocation.incomeProtection.amount + 
+                                              allocation.propertyProtection.amount + allocation.loans.amount + allocation.reserve.amount;
+                      const percentValue = ((value / totalAllocation) * 100).toFixed(1);
+                      return `${percentValue}%`;
+                    }}
+                    outerRadius={100}
+                    fill="#8884d8"
+                    dataKey="value"
+                  >
+                    {allocationData.map((entry, index) => (
+                      <Cell key={`cell-${index}`} fill={entry.color} />
+                    ))}
+                  </Pie>
+                  <Tooltip 
+                    contentStyle={{ backgroundColor: '#fff', border: '1px solid #e2e8f0', borderRadius: '8px' }}
+                    formatter={(value, name) => {
+                      const totalAllocation = allocation.investments.amount + allocation.incomeProtection.amount + 
+                                              allocation.propertyProtection.amount + allocation.loans.amount + allocation.reserve.amount;
+                      const percentValue = ((value / totalAllocation) * 100).toFixed(1);
+                      return [`${value.toFixed(0)} EUR (${percentValue}%)`, name];
+                    }}
+                  />
+                  <Legend 
+                    verticalAlign="bottom" 
+                    height={60}
+                    formatter={(value, entry) => {
+                      const item = allocationData.find(d => d.name === value);
+                      return `${item?.icon || ''} ${value}`;
+                    }}
+                  />
+                </PieChart>
+              </ResponsiveContainer>
+            </div>
+
+            {/* Right Pie Chart - Разпределение от доход */}
+            <div className="bg-white rounded-xl p-6 shadow-lg border border-slate-200">
+              <h3 className="text-lg font-bold text-slate-900 mb-4 text-center">
+                Разпределение от месечния доход
+              </h3>
+              <ResponsiveContainer width="100%" height={350}>
+                <PieChart>
+                  <Pie
+                    data={(() => {
+                      const monthlyIncomeEUR = ((analysisData?.client_net_income || 0) + (analysisData?.partner_net_income || 0)) / EUR_BGN_RATE;
+                      const monthlyExpensesEUR = totalExpenses / EUR_BGN_RATE;
+                      
+                      return [
+                        ...allocationData,
+                        { 
+                          name: 'Месечни разходи', 
+                          value: monthlyExpensesEUR, 
+                          color: '#64748b', 
+                          icon: '💸' 
+                        }
+                      ];
+                    })()}
+                    cx="50%"
+                    cy="50%"
+                    labelLine={false}
+                    label={({ name, value }) => {
+                      const monthlyIncomeEUR = ((analysisData?.client_net_income || 0) + (analysisData?.partner_net_income || 0)) / EUR_BGN_RATE;
+                      const percentValue = monthlyIncomeEUR > 0 ? ((value / monthlyIncomeEUR) * 100).toFixed(1) : 0;
+                      return `${percentValue}%`;
+                    }}
+                    outerRadius={100}
+                    fill="#8884d8"
+                    dataKey="value"
+                  >
+                    {[...allocationData, { name: 'Месечни разходи', value: totalExpenses / EUR_BGN_RATE, color: '#64748b' }].map((entry, index) => (
+                      <Cell key={`cell-${index}`} fill={entry.color} />
+                    ))}
+                  </Pie>
+                  <Tooltip 
+                    contentStyle={{ backgroundColor: '#fff', border: '1px solid #e2e8f0', borderRadius: '8px' }}
+                    formatter={(value, name) => {
+                      const monthlyIncomeEUR = ((analysisData?.client_net_income || 0) + (analysisData?.partner_net_income || 0)) / EUR_BGN_RATE;
+                      const percentValue = monthlyIncomeEUR > 0 ? ((value / monthlyIncomeEUR) * 100).toFixed(1) : 0;
+                      return [`${value.toFixed(0)} EUR (${percentValue}% от доход)`, name];
+                    }}
+                  />
+                  <Legend 
+                    verticalAlign="bottom" 
+                    height={60}
+                    formatter={(value, entry) => {
+                      const allData = [...allocationData, { name: 'Месечни разходи', icon: '💸' }];
+                      const item = allData.find(d => d.name === value);
+                      return `${item?.icon || ''} ${value}`;
+                    }}
+                  />
+                </PieChart>
+              </ResponsiveContainer>
+            </div>
+          </div>
+
+          <div className="bg-white rounded-xl p-6 shadow-lg border border-slate-200 mt-6">
 
             {/* Детайлна разбивка */}
             <div className="mt-6 pt-4 border-t-2 border-slate-300">

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend, Area, AreaChart, Cell, Treemap, Sankey, Rectangle } from 'recharts';
+import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend, Area, AreaChart, Cell, PieChart, Pie, Sankey, Rectangle } from 'recharts';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Slider } from '@/components/ui/slider';
@@ -866,204 +866,43 @@ export default function FinancialPlanPresentation({ planData, clientData, analys
 
           <div className="bg-white rounded-xl p-6 shadow-lg border border-slate-200">
             <ResponsiveContainer width="100%" height={400}>
-              <Treemap
-                data={allocationData}
-                dataKey="value"
-                aspectRatio={4/3}
-                stroke="#fff"
-                fill="#8884d8"
-                content={({ x, y, width, height, index, name, value, color, icon, root, ...props }) => {
-                  const totalAllocation = allocation.investments.amount + allocation.incomeProtection.amount + 
-                                          allocation.propertyProtection.amount + allocation.loans.amount + allocation.reserve.amount;
-                  const monthlyIncomeEUR = ((analysisData?.client_net_income || 0) + (analysisData?.partner_net_income || 0)) / EUR_BGN_RATE;
-                  const percent = ((value / totalAllocation) * 100).toFixed(1);
-                  const percentOfIncome = monthlyIncomeEUR > 0 ? ((value / monthlyIncomeEUR) * 100).toFixed(1) : 0;
-
-                  const isSmall = width < 120 || height < 100;
-
-                  // Label positions - default in bottom third of own field
-                  let labelX = x + width / 2;
-                  let labelY = y + height * 2/3;
-
-                  if (isSmall && root && root.children) {
-                    // Get current small box info
-                    const smallCenterX = x + width / 2;
-                    const smallCenterY = y + height / 2;
-                    const smallArea = width * height;
-
-                    // Find the largest neighbor that's close
-                    let bestNeighbor = null;
-                    let bestScore = -Infinity;
-
-                    root.children.forEach(child => {
-                      const neighborData = child.data || child;
-                      if (neighborData.name === name) return; // Skip self
-
-                      const neighborX = child.x0;
-                      const neighborY = child.y0;
-                      const neighborWidth = child.x1 - child.x0;
-                      const neighborHeight = child.y1 - child.y0;
-                      const neighborArea = neighborWidth * neighborHeight;
-
-                      // Must be significantly larger
-                      if (neighborArea <= smallArea * 2) return;
-
-                      // Calculate distance between centers
-                      const neighborCenterX = neighborX + neighborWidth / 2;
-                      const neighborCenterY = neighborY + neighborHeight / 2;
-                      const distance = Math.sqrt(
-                        Math.pow(neighborCenterX - smallCenterX, 2) + 
-                        Math.pow(neighborCenterY - smallCenterY, 2)
-                      );
-
-                      // Score: prioritize larger areas and closer distance
-                      // Higher area = better, lower distance = better
-                      const score = (neighborArea / 10000) - (distance / 100);
-
-                      if (score > bestScore) {
-                        bestScore = score;
-                        bestNeighbor = {
-                          name: neighborData.name,
-                          x: neighborX,
-                          y: neighborY,
-                          width: neighborWidth,
-                          height: neighborHeight
-                        };
-                      }
-                    });
-
-                    // Position label in top 1/3 of best neighbor
-                    if (bestNeighbor) {
-                      labelX = bestNeighbor.x + bestNeighbor.width / 2;
-                      labelY = bestNeighbor.y + bestNeighbor.height / 3;
-                    }
-                  }
-
-                  return (
-                    <g>
-                      <rect
-                        x={x}
-                        y={y}
-                        width={width}
-                        height={height}
-                        style={{
-                          fill: color,
-                          stroke: '#fff',
-                          strokeWidth: 2,
-                        }}
-                      />
-                      {!isSmall && (
-                        <>
-                          <text
-                            x={labelX}
-                            y={labelY - 30}
-                            textAnchor="middle"
-                            fill="#fff"
-                            fontSize={18}
-                            fontWeight="bold"
-                          >
-                            {name}
-                          </text>
-                          <text
-                            x={labelX}
-                            y={labelY}
-                            textAnchor="middle"
-                            fill="#fff"
-                            fontSize={20}
-                            fontWeight="bold"
-                          >
-                            {value.toFixed(0)} EUR
-                          </text>
-                          <text
-                            x={labelX}
-                            y={labelY + 22}
-                            textAnchor="middle"
-                            fill="rgba(255,255,255,0.95)"
-                            fontSize={13}
-                          >
-                            {percent}% от спестявания
-                          </text>
-                          <text
-                            x={labelX}
-                            y={labelY + 40}
-                            textAnchor="middle"
-                            fill="rgba(255,255,255,0.9)"
-                            fontSize={13}
-                          >
-                            {percentOfIncome}% от доход
-                          </text>
-                        </>
-                      )}
-                      {isSmall && (
-                        <>
-                          {/* Arrow from label to small box */}
-                          <line
-                            x1={labelX}
-                            y1={labelY + 50}
-                            x2={x + width / 2}
-                            y2={y + height / 2}
-                            stroke="#fff"
-                            strokeWidth={2}
-                            markerEnd="url(#arrowhead)"
-                          />
-                          {/* Label with same styling as other fields */}
-                          <text
-                            x={labelX}
-                            y={labelY - 30}
-                            textAnchor="middle"
-                            fill="#fff"
-                            fontSize={18}
-                            fontWeight="bold"
-                          >
-                            {name}
-                          </text>
-                          <text
-                            x={labelX}
-                            y={labelY}
-                            textAnchor="middle"
-                            fill="#fff"
-                            fontSize={20}
-                            fontWeight="bold"
-                          >
-                            {value.toFixed(0)} EUR
-                          </text>
-                          <text
-                            x={labelX}
-                            y={labelY + 22}
-                            textAnchor="middle"
-                            fill="rgba(255,255,255,0.95)"
-                            fontSize={13}
-                          >
-                            {percent}% от спестявания
-                          </text>
-                          <text
-                            x={labelX}
-                            y={labelY + 40}
-                            textAnchor="middle"
-                            fill="rgba(255,255,255,0.9)"
-                            fontSize={13}
-                          >
-                            {percentOfIncome}% от доход
-                          </text>
-                        </>
-                      )}
-                    </g>
-                  );
-                }}
-              >
-                <defs>
-                  <marker
-                    id="arrowhead"
-                    markerWidth="10"
-                    markerHeight="10"
-                    refX="5"
-                    refY="5"
-                    orient="auto"
-                  >
-                    <polygon points="0 0, 10 5, 0 10" fill="#fff" />
-                  </marker>
-                </defs>
-              </Treemap>
+              <PieChart>
+                <Pie
+                  data={allocationData}
+                  cx="50%"
+                  cy="50%"
+                  labelLine={false}
+                  label={({ name, value, percent }) => {
+                    const totalAllocation = allocation.investments.amount + allocation.incomeProtection.amount + 
+                                            allocation.propertyProtection.amount + allocation.loans.amount + allocation.reserve.amount;
+                    const percentValue = ((value / totalAllocation) * 100).toFixed(1);
+                    return `${name}: ${value.toFixed(0)} EUR (${percentValue}%)`;
+                  }}
+                  outerRadius={140}
+                  fill="#8884d8"
+                  dataKey="value"
+                >
+                  {allocationData.map((entry, index) => (
+                    <Cell key={`cell-${index}`} fill={entry.color} />
+                  ))}
+                </Pie>
+                <Tooltip 
+                  contentStyle={{ backgroundColor: '#fff', border: '1px solid #e2e8f0', borderRadius: '8px' }}
+                  formatter={(value, name) => {
+                    const monthlyIncomeEUR = ((analysisData?.client_net_income || 0) + (analysisData?.partner_net_income || 0)) / EUR_BGN_RATE;
+                    const percentOfIncome = monthlyIncomeEUR > 0 ? ((value / monthlyIncomeEUR) * 100).toFixed(1) : 0;
+                    return [`${value.toFixed(0)} EUR (${percentOfIncome}% от доход)`, name];
+                  }}
+                />
+                <Legend 
+                  verticalAlign="bottom" 
+                  height={36}
+                  formatter={(value, entry) => {
+                    const item = allocationData.find(d => d.name === value);
+                    return `${item?.icon || ''} ${value}`;
+                  }}
+                />
+              </PieChart>
             </ResponsiveContainer>
 
             {/* Детайлна разбивка */}

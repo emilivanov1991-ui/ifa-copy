@@ -32,6 +32,7 @@ export default function AutoPlanGenerator({ analysisId, analysisData, onComplete
   const [progress, setProgress] = useState(0);
   const [result, setResult] = useState(null);
   const [error, setError] = useState(null);
+  const [showPresentation, setShowPresentation] = useState(false);
 
   const handleGenerate = async () => {
     setGenerating(true);
@@ -66,8 +67,48 @@ export default function AutoPlanGenerator({ analysisId, analysisData, onComplete
     }
   };
 
+  // Подготовка на данни за презентацията
+  const clientData = analysisData ? {
+    age: analysisData.client_age || 35,
+    monthlyNetIncome: (analysisData.client_net_income || 0) + (analysisData.partner_net_income || 0),
+    retirementAge: analysisData.client_retirement_age || 65,
+    yearsToRetirement: (analysisData.client_retirement_age || 65) - (analysisData.client_age || 35)
+  } : null;
+
+  // Конвертиране на планови данни за презентацията
+  const planDataForPresentation = result ? {
+    total_monthly_premium: result.summary.total_monthly_premium,
+    products: result.products.map(p => ({
+      name: p.product_name,
+      monthlyPremium: p.monthly_premium,
+      annualPremium: p.monthly_premium * 12,
+      benefit: p.product_type,
+      type: p.product_type,
+      coverage: p.coverage_amount,
+      termYears: p.term_years,
+      coverages: p.selected_coverages || {}
+    })),
+    calculations: {
+      monthlyBalance: (analysisData?.client_net_income || 0) + (analysisData?.partner_net_income || 0) - 
+        ((analysisData?.expense_rent || 0) + (analysisData?.expense_utilities || 0) + (analysisData?.expense_food || 0)),
+      laborCapital: result.summary.labor_capital_total,
+      totalTaxRelief: result.summary.tax_relief_annual * clientData?.yearsToRetirement || 1,
+      projectedValue: result.products.reduce((sum, p) => sum + (p.expected_value || 0), 0)
+    }
+  } : null;
+
   return (
-    <div className="space-y-6">
+    <>
+      {showPresentation && result && analysisData && (
+        <FinancialPlanPresentation
+          planData={planDataForPresentation}
+          clientData={clientData}
+          analysisData={analysisData}
+          onClose={() => setShowPresentation(false)}
+        />
+      )}
+      
+      <div className="space-y-6">
       {/* Header */}
       <Card className="bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 overflow-hidden shadow-2xl">
         <CardHeader>
@@ -211,53 +252,26 @@ export default function AutoPlanGenerator({ analysisId, analysisData, onComplete
             </CardContent>
           </Card>
 
-          {/* Plan Visualization Tabs */}
+          {/* Presentation Button */}
           <Card>
-            <Tabs defaultValue="overview" className="w-full">
-              <TabsList className="w-full grid grid-cols-5">
-                <TabsTrigger value="overview">Преглед</TabsTrigger>
-                <TabsTrigger value="main">Главна</TabsTrigger>
-                <TabsTrigger value="protection">Защита</TabsTrigger>
-                <TabsTrigger value="portfolio">Портфейл</TabsTrigger>
-                <TabsTrigger value="summary">Резюме</TabsTrigger>
-              </TabsList>
-
-              <TabsContent value="overview" className="p-6">
-                <CoverPage 
-                  plan={result.plan_data} 
-                  analysis={analysisData}
-                  consultant={{ name: 'Консултант', email: 'consultant@company.bg' }}
-                />
-              </TabsContent>
-
-              <TabsContent value="main" className="p-6">
-                <FinancialPlanMainPage 
-                  plan={result.plan_data} 
-                  analysis={analysisData}
-                />
-              </TabsContent>
-
-              <TabsContent value="protection" className="p-6">
-                <IncomeProtectionPage 
-                  plan={result.plan_data} 
-                  analysis={analysisData}
-                />
-              </TabsContent>
-
-              <TabsContent value="portfolio" className="p-6">
-                <PortfolioStructurePage 
-                  plan={result.plan_data} 
-                  analysis={analysisData}
-                />
-              </TabsContent>
-
-              <TabsContent value="summary" className="p-6">
-                <SummaryPage 
-                  plan={result.plan_data} 
-                  analysis={analysisData}
-                />
-              </TabsContent>
-            </Tabs>
+            <CardContent className="p-8 text-center">
+              <Sparkles className="w-16 h-16 text-blue-600 mx-auto mb-4" />
+              <h3 className="text-2xl font-bold text-slate-900 mb-2">
+                Прегледайте вашия финансов план
+              </h3>
+              <p className="text-slate-600 mb-6">
+                Вижте визуализация на 7 страници с графики, анализи и детайлна разбивка
+              </p>
+              <Button 
+                size="lg"
+                className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 shadow-lg px-8"
+                onClick={() => setShowPresentation(true)}
+              >
+                <FileText className="w-5 h-5 mr-2" />
+                Отвори презентация на плана
+                <ArrowRight className="w-5 h-5 ml-2" />
+              </Button>
+            </CardContent>
           </Card>
 
 

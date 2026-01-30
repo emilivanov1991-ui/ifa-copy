@@ -271,9 +271,25 @@ export default function FinancialPlanPresentation({ planData, clientData, analys
       ? monthlyInvestment * (((Math.pow(1 + monthlyReturn, monthsInvested) - 1) / monthlyReturn) * (1 + monthlyReturn))
       : 0;
 
-    // Начално имущество също расте с времето (предполагаме 4% доходност)
+    // Начално имущество също расте с времето
+    // Активи растат с 4%, имущество с 5%, кредити намаляват линейно
     const wealthGrowthRate = 0.04;
-    const grownInitialWealth = initialNetWorth * Math.pow(1 + wealthGrowthRate, i);
+    const propertyGrowthRate = 0.05;
+    
+    const currentPropertyValue = (
+      (analysisData?.current_housing === 'owned' ? (analysisData?.current_housing_value || 0) : 0) +
+      (analysisData?.property_apartment_value || 0) +
+      (analysisData?.property_house_value || 0)
+    ) / EUR_BGN_RATE;
+    
+    const grownAssets = (assets) * Math.pow(1 + wealthGrowthRate, i);
+    const grownProperty = currentPropertyValue * Math.pow(1 + propertyGrowthRate, i);
+    
+    // Кредити намаляват линейно (средно 15 години погасяване)
+    const avgLoanYears = 15;
+    const remainingDebt = i < avgLoanYears ? liabilities * (1 - i / avgLoanYears) : 0;
+    
+    const grownInitialWealth = grownAssets + grownProperty - remainingDebt;
 
     const financialCapital = grownInitialWealth + investmentGrowth;
     

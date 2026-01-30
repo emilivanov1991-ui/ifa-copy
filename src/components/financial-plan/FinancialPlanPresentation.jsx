@@ -20,18 +20,18 @@ const calculateAllocation = (planData, monthlyReserve, productsEUR, eurRate) => 
 
   products.forEach(p => {
     const premium = p.monthlyPremium || 0;
-    if (p.name.includes('Unit Linked') || p.name.includes('УПФ')) {
+    if (p.name.includes('Unit Linked') || p.name.includes('УПФ') || p.name.includes('Partners')) {
       investments += premium;
-    } else if (p.name.includes('Uniqa') || p.name.includes('Generali') || p.name.includes('Срочен живот') || p.name.includes('Care')) {
+    } else if (p.name.includes('Uniqa') || p.name.includes('Generali') || p.name.includes('Срочен живот') || p.name.includes('Care') || p.name.includes('ДЗИ Закрила')) {
       incomeProtection += premium;
-    } else if (p.name.includes('Дом') || p.name.includes('Каско')) {
+    } else if (p.name.includes('Дом') || p.name.includes('Каско') || p.name.includes('Инстинкт') || p.name.includes('ГО')) {
       propertyProtection += premium;
     } else if (p.name.includes('кредит') || p.name.includes('Ипотека')) {
       loans += premium;
     }
   });
 
-  const reserve = Math.max(monthlyReserve / eurRate, 0); // конвертираме резерва в EUR
+  const reserve = Math.max(monthlyReserve, 0); // monthlyReserve е вече в EUR
   const total = investments + incomeProtection + propertyProtection + loans + reserve || 1;
 
   return {
@@ -176,7 +176,7 @@ export default function FinancialPlanPresentation({ planData, clientData, analys
   };
   
   const wealth = calculateWealthFromChart();
-  const allocation = calculateAllocation(planData, monthlyReserveEUR * EUR_BGN_RATE, productsEUR, EUR_BGN_RATE);
+  const allocation = calculateAllocation(planData, monthlyReserveEUR, productsEUR, EUR_BGN_RATE);
   
   // Нетно имущество от анализа (в лева, конвертираме към евро)
   const assets = (
@@ -866,9 +866,9 @@ export default function FinancialPlanPresentation({ planData, clientData, analys
                 content={({ x, y, width, height, index, name, value, color, icon, root, ...props }) => {
                   const totalAllocation = allocation.investments.amount + allocation.incomeProtection.amount + 
                                           allocation.propertyProtection.amount + allocation.loans.amount + allocation.reserve.amount;
-                  const monthlyIncome = (analysisData?.client_net_income || 0) + (analysisData?.partner_net_income || 0);
+                  const monthlyIncomeEUR = ((analysisData?.client_net_income || 0) + (analysisData?.partner_net_income || 0)) / EUR_BGN_RATE;
                   const percent = ((value / totalAllocation) * 100).toFixed(1);
-                  const percentOfIncome = monthlyIncome > 0 ? ((value / monthlyIncome) * 100).toFixed(1) : 0;
+                  const percentOfIncome = monthlyIncomeEUR > 0 ? ((value / monthlyIncomeEUR) * 100).toFixed(1) : 0;
 
                   const isSmall = width < 120 || height < 100;
 
@@ -1057,10 +1057,10 @@ export default function FinancialPlanPresentation({ planData, clientData, analys
               </Treemap>
             </ResponsiveContainer>
 
-            {/* Легенда за всички категории */}
-            <div className="mt-4 pt-4 border-t border-slate-200">
-              <p className="text-xs text-slate-500 mb-2 font-medium">Пълна разбивка:</p>
-              <div className="grid grid-cols-2 md:grid-cols-5 gap-2">
+            {/* Детайлна разбивка */}
+            <div className="mt-6 pt-4 border-t-2 border-slate-300">
+              <h4 className="text-sm font-bold text-slate-900 mb-4 uppercase tracking-wide">Детайлна разбивка на месечните спестявания</h4>
+              <div className="space-y-3">
                 {[
                   { name: 'Инвестиции', ...allocation.investments, color: '#3b82f6', icon: '📈' },
                   { name: 'Защита на дохода', ...allocation.incomeProtection, color: '#10b981', icon: '🛡️' },
@@ -1068,38 +1068,62 @@ export default function FinancialPlanPresentation({ planData, clientData, analys
                   { name: 'Кредити', ...allocation.loans, color: '#8b5cf6', icon: '💳' },
                   { name: 'Резерв', ...allocation.reserve, color: '#06b6d4', icon: '💰' }
                 ].filter(item => item.amount > 0).map((item, idx) => {
-                  const monthlyIncome = (analysisData?.client_net_income || 0) + (analysisData?.partner_net_income || 0);
-                  const percentOfIncome = monthlyIncome > 0 ? ((item.amount / monthlyIncome) * 100).toFixed(1) : 0;
+                  const monthlyIncomeEUR = ((analysisData?.client_net_income || 0) + (analysisData?.partner_net_income || 0)) / EUR_BGN_RATE;
+                  const percentOfIncome = monthlyIncomeEUR > 0 ? ((item.amount / monthlyIncomeEUR) * 100).toFixed(1) : 0;
+                  const totalAllocation = allocation.investments.amount + allocation.incomeProtection.amount + 
+                    allocation.propertyProtection.amount + allocation.loans.amount + allocation.reserve.amount;
+                  
                   return (
-                    <div key={idx} className="flex items-center gap-2 bg-slate-50 rounded-lg p-2">
-                      <div 
-                        className="w-3 h-3 rounded-sm flex-shrink-0" 
-                        style={{ backgroundColor: item.color }}
-                      />
-                      <div className="flex-1 min-w-0">
-                        <p className="text-xs font-semibold text-slate-700 truncate">{item.name}</p>
-                        <p className="text-xs text-slate-900 font-bold">{item.amount.toFixed(0)} EUR</p>
-                        <p className="text-[10px] text-slate-500">
-                          {item.percent.toFixed(1)}% от спестявания • {percentOfIncome}% от доход
-                        </p>
+                    <div key={idx} className="bg-white rounded-lg p-4 shadow-sm border-l-4" style={{ borderColor: item.color }}>
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-3">
+                          <span className="text-3xl">{item.icon}</span>
+                          <div>
+                            <p className="font-bold text-slate-900">{item.name}</p>
+                            <p className="text-xs text-slate-600">
+                              {item.percent.toFixed(1)}% от спестявания • {percentOfIncome}% от доход
+                            </p>
+                          </div>
+                        </div>
+                        <div className="text-right">
+                          <p className="text-2xl font-bold" style={{ color: item.color }}>
+                            {item.amount.toFixed(0)} EUR
+                          </p>
+                          <p className="text-xs text-slate-500">месечно</p>
+                        </div>
                       </div>
                     </div>
                   );
                 })}
               </div>
+              
+              {/* Total */}
+              <div className="mt-4 bg-gradient-to-r from-slate-100 to-slate-200 rounded-lg p-4 border-2 border-slate-300">
+                <div className="flex items-center justify-between">
+                  <p className="font-bold text-slate-900 text-lg">ОБЩО МЕСЕЧНО:</p>
+                  <p className="text-3xl font-bold text-slate-900">
+                    {(allocation.investments.amount + allocation.incomeProtection.amount + 
+                      allocation.propertyProtection.amount + allocation.loans.amount + allocation.reserve.amount).toFixed(0)} EUR
+                  </p>
+                </div>
+              </div>
             </div>
           </div>
 
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-            {allocationData.map((item, idx) => {
-              const totalSavings = allocation.investments.amount + allocation.incomeProtection.amount + 
-                allocation.propertyProtection.amount + allocation.loans.amount + allocation.reserve.amount;
-              const monthlyIncome = (analysisData?.client_net_income || 0) + (analysisData?.partner_net_income || 0);
-              const percentOfSavings = ((item.value / totalSavings) * 100).toFixed(1);
-              const percentOfIncome = monthlyIncome > 0 ? ((item.value / monthlyIncome) * 100).toFixed(1) : 0;
+          {/* Обобщение в карти */}
+          <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
+            {[
+              { name: 'Инвестиции', ...allocation.investments, color: '#3b82f6', icon: '📈' },
+              { name: 'Защита на дохода', ...allocation.incomeProtection, color: '#10b981', icon: '🛡️' },
+              { name: 'Защита на имущество', ...allocation.propertyProtection, color: '#f59e0b', icon: '🏠' },
+              { name: 'Кредити', ...allocation.loans, color: '#8b5cf6', icon: '💳' },
+              { name: 'Резерв', ...allocation.reserve, color: '#06b6d4', icon: '💰' }
+            ].filter(item => item.amount > 0).map((item, idx) => {
+              const monthlyIncomeEUR = ((analysisData?.client_net_income || 0) + (analysisData?.partner_net_income || 0)) / EUR_BGN_RATE;
+              const percentOfIncome = monthlyIncomeEUR > 0 ? ((item.amount / monthlyIncomeEUR) * 100).toFixed(1) : 0;
               
               return (
-                <Card key={idx} className="border-2" style={{ borderColor: item.color }}>
+                <Card key={idx} className="border-2 hover:shadow-lg transition-shadow" style={{ borderColor: item.color }}>
                   <CardContent className="p-3 text-center">
                     <div className="text-2xl mb-1">{item.icon}</div>
                     <p className="text-xs font-semibold text-slate-700 mb-1">{item.name}</p>
@@ -1107,9 +1131,9 @@ export default function FinancialPlanPresentation({ planData, clientData, analys
                       {item.value.toFixed(0)} EUR
                     </p>
                     <p className="text-xs text-slate-600 font-medium">
-                      {percentOfSavings}% от спестявания
+                      {item.percent.toFixed(1)}%
                     </p>
-                    <p className="text-xs text-slate-500">
+                    <p className="text-[10px] text-slate-500">
                       {percentOfIncome}% от доход
                     </p>
                   </CardContent>

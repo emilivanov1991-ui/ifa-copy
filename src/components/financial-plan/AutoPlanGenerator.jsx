@@ -512,60 +512,7 @@ export default function AutoPlanGenerator({ analysisId, analysisData, onComplete
             </Card>
           </div>
 
-          {/* AI Analysis Section */}
-          {!aiAnalysis && !analyzing && (
-            <Card className="border-2 border-purple-200 bg-gradient-to-br from-purple-50 to-pink-50">
-              <CardContent className="pt-6">
-                <div className="flex items-start gap-4">
-                  <div className="w-12 h-12 rounded-full bg-purple-600 flex items-center justify-center flex-shrink-0">
-                    <Sparkles className="w-6 h-6 text-white" />
-                  </div>
-                  <div className="flex-1">
-                    <h3 className="font-semibold text-lg text-purple-900 mb-1">
-                      AI Анализ на плана
-                    </h3>
-                    <p className="text-sm text-purple-700 mb-4">
-                      Получете задълбочен анализ и препоръки от нашия AI агент
-                    </p>
-                    <Button
-                      onClick={() => handleAIAnalysis(result.plan_id)}
-                      className="bg-purple-600 hover:bg-purple-700"
-                    >
-                      <Sparkles className="w-4 h-4 mr-2" />
-                      Анализирай с AI
-                    </Button>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          )}
 
-          {analyzing && (
-            <Card className="border-2 border-purple-200">
-              <CardContent className="pt-6">
-                <div className="flex items-center gap-3 text-purple-600">
-                  <Loader2 className="w-5 h-5 animate-spin" />
-                  <span className="font-medium">AI агентът анализира плана...</span>
-                </div>
-              </CardContent>
-            </Card>
-          )}
-
-          {aiAnalysis && (
-            <Card className="border-2 border-purple-200 bg-gradient-to-br from-purple-50 to-pink-50">
-              <CardHeader className="bg-gradient-to-r from-purple-600 to-pink-600 text-white">
-                <CardTitle className="flex items-center gap-2">
-                  <Sparkles className="w-5 h-5" />
-                  AI Анализ и Препоръки
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="pt-6">
-                <div className="prose prose-sm max-w-none">
-                  <div className="whitespace-pre-wrap text-slate-700">{aiAnalysis}</div>
-                </div>
-              </CardContent>
-            </Card>
-          )}
 
           {/* Actions */}
           <div className="flex gap-3">

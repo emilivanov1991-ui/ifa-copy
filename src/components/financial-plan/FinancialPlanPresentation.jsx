@@ -133,7 +133,10 @@ export default function FinancialPlanPresentation({ planData, clientData, analys
         : product.annualPremium,
       coverage: needsConversion && product.coverage
         ? product.coverage / EUR_BGN_RATE
-        : product.coverage
+        : product.coverage,
+      // Запазване на инвестиционна и застрахователна премия (в EUR)
+      investmentPremium: product.investmentPremium,
+      insurancePremium: product.insurancePremium
     };
 
     // Explicit запазване на критични свойства
@@ -143,8 +146,8 @@ export default function FinancialPlanPresentation({ planData, clientData, analys
     if (product.name) converted.name = product.name;
 
     console.log('Product conversion:', {
-      original: { name: product.name, type: product.type, product_type: product.product_type, provider: product.provider },
-      converted: { name: converted.name, type: converted.type, product_type: converted.product_type, provider: converted.provider }
+      original: { name: product.name, type: product.type, product_type: product.product_type, provider: product.provider, investmentPremium: product.investmentPremium, insurancePremium: product.insurancePremium },
+      converted: { name: converted.name, type: converted.type, product_type: converted.product_type, provider: converted.provider, investmentPremium: converted.investmentPremium, insurancePremium: converted.insurancePremium }
     });
 
     return converted;

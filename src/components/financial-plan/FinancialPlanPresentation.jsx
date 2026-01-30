@@ -221,12 +221,77 @@ export default function FinancialPlanPresentation({ planData, clientData, analys
   const monthlyBalanceEUR = actualMonthlyBalanceBGN / EUR_BGN_RATE;
   const monthlyReserveEUR = monthlyBalanceEUR - totalMonthlyPremiumEUR;
   
-  // Wealth projection with correct formulas - ВСИЧКО В EUR
-  const wealth = calculateWealthProjection(
-    { ...planData, calculations: { ...planData.calculations, monthlyBalanceEUR } }, 
-    clientData, 
-    analysisData
-  );
+  // Изчисляваме wealth от последната точка на графиката (за да сме синхронизирани)
+  const calculateWealthFromChart = () => {
+    const years = Math.min(yearsToRetirement, 41);
+    const i = years; // последна точка
+    const currentMonths = i * 12;
+    
+    // БЕЗ ПЛАН: просто натрупване без растеж
+    const withoutPlan = monthlyBalanceEUR * currentMonths;
+    
+    // С ПЛАН: СЪЩОТО изчисление като financialCapital от страница 1
+    const monthlyInvestment = (productsEUR || [])
+      .filter(p => p.type === 'ul_investment' || p.name.includes('Unit Linked') || p.name.includes('УПФ') || p.name.includes('Partners'))
+      .reduce((sum, p) => sum + (p.monthlyPremium || 0), 0);
+    
+    // Настоящи активи с растеж
+    const liquidAssetsValue = (
+      (analysisData?.client_checking_account || 0) +
+      (analysisData?.client_savings_book || 0) +
+      (analysisData?.client_term_deposit || 0) +
+      (analysisData?.client_savings_account || 0) +
+      (analysisData?.client_cash || 0) +
+      (analysisData?.partner_checking_account || 0) +
+      (analysisData?.partner_savings_book || 0) +
+      (analysisData?.partner_term_deposit || 0) +
+      (analysisData?.partner_savings_account || 0) +
+      (analysisData?.partner_cash || 0)
+    ) / EUR_BGN_RATE;
+    
+    const investmentAssetsValue = (
+      (analysisData?.client_mutual_funds || 0) +
+      (analysisData?.partner_mutual_funds || 0)
+    ) / EUR_BGN_RATE;
+    
+    const realEstateValue = (
+      (analysisData?.current_housing === 'owned' ? (analysisData?.current_housing_value || 0) : 0) +
+      (analysisData?.property_apartment_value || 0) +
+      (analysisData?.property_house_value || 0)
+    ) / EUR_BGN_RATE;
+    
+    const vehiclesValue = (analysisData?.property_car_value || 0) / EUR_BGN_RATE;
+    const liabilities = (
+      (analysisData?.liability_mortgage || 0) +
+      (analysisData?.liability_consumer_loans || 0) +
+      (analysisData?.liability_credit_cards || 0) +
+      (analysisData?.liability_leasing || 0) +
+      (analysisData?.liability_overdraft || 0)
+    ) / EUR_BGN_RATE;
+    
+    const grownLiquidAssets = liquidAssetsValue * Math.pow(1.04, i);
+    const grownInvestmentAssets = investmentAssetsValue * Math.pow(1.08, i);
+    const grownRealEstate = realEstateValue * Math.pow(1.05, i);
+    const grownVehicles = vehiclesValue * Math.pow(0.97, i);
+    
+    // Кредити намаляват линейно
+    const avgLoanYears = 15;
+    const remainingDebt = i < avgLoanYears ? liabilities * (1 - i / avgLoanYears) : 0;
+    
+    const grownInitialWealth = grownLiquidAssets + grownInvestmentAssets + grownRealEstate + grownVehicles - remainingDebt;
+    
+    // Нови инвестиции с растеж
+    const monthlyReturn = 0.08 / 12;
+    const investmentGrowth = currentMonths > 0 && monthlyInvestment > 0
+      ? monthlyInvestment * (((Math.pow(1 + monthlyReturn, currentMonths) - 1) / monthlyReturn) * (1 + monthlyReturn))
+      : 0;
+    
+    const withPlan = grownInitialWealth + investmentGrowth;
+    
+    return { withoutPlan, withPlan, monthlyReserveEUR };
+  };
+  
+  const wealth = calculateWealthFromChart();
   const allocation = calculateAllocation(planData, monthlyReserveEUR * EUR_BGN_RATE, productsEUR, EUR_BGN_RATE);
   
   // Нетно имущество от анализа (в лева, конвертираме към евро)

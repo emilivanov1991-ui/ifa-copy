@@ -26,14 +26,34 @@ const calculateAllocation = (planData, monthlyReserve, productsEUR, eurRate) => 
       type: p.type,
       product_type: p.product_type,
       provider: p.provider,
-      premium: premium
+      premium: premium,
+      investmentPremium: p.investmentPremium,
+      insurancePremium: p.insurancePremium
     });
 
-    // Първо проверяваме по product_type или name за точна категоризация
+    // MetLife Unit Linked продукти - разделяме на компоненти
     if (
-      p.product_type === 'ul_investment' || 
+      (p.product_type === 'ul_investment' || (p.name && p.name.includes('Unit Linked'))) &&
+      (p.provider && p.provider.includes('MetLife'))
+    ) {
+      // Ако има explicit разделение, използваме го
+      if (p.investmentPremium !== undefined && p.insurancePremium !== undefined) {
+        investments += p.investmentPremium || 0;
+        incomeProtection += p.insurancePremium || 0;
+        console.log('→ MetLife UL: Инвестиции:', p.investmentPremium, 'Застраховка:', p.insurancePremium);
+      } else {
+        // Иначе приблизително 85% отива в инвестиции, 15% е застрахователна част + такси
+        const investmentPart = premium * 0.85;
+        const insurancePart = premium * 0.15;
+        investments += investmentPart;
+        incomeProtection += insurancePart;
+        console.log('→ MetLife UL (изчислено): Инвестиции:', investmentPart, 'Застраховка:', insurancePart);
+      }
+    }
+    // УПФ и Partners - чисти инвестиции
+    else if (
       p.product_type === 'pension_plan' || 
-      (p.name && (p.name.includes('Unit Linked') || p.name.includes('УПФ'))) ||
+      (p.name && p.name.includes('УПФ')) ||
       (p.provider && p.provider.includes('Partners'))
     ) {
       investments += premium;

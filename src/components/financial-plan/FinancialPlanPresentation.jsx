@@ -22,30 +22,41 @@ const calculateWealthProjection = (planData, clientData, analysisData) => {
   
   // WITH PLAN - detailed calculation with all components
   
-  // 1. НАСТОЯЩИ АКТИВИ (спестявания и инвестиции) - растат с 4% годишно
-  const currentAssets = (
+  // 1. НАСТОЯЩИ АКТИВИ - разделени на ликвидни (4%) и инвестиционни (8%)
+  const liquidAssets = (
     (analysisData?.client_checking_account || 0) +
     (analysisData?.client_savings_book || 0) +
     (analysisData?.client_term_deposit || 0) +
-    (analysisData?.client_mutual_funds || 0) +
     (analysisData?.client_savings_account || 0) +
     (analysisData?.client_cash || 0) +
     (analysisData?.partner_checking_account || 0) +
     (analysisData?.partner_savings_book || 0) +
     (analysisData?.partner_term_deposit || 0) +
-    (analysisData?.partner_mutual_funds || 0) +
     (analysisData?.partner_savings_account || 0) +
     (analysisData?.partner_cash || 0)
   ) / EUR_BGN_RATE;
-  const currentAssetsFutureValue = currentAssets * Math.pow(1.04, yearsToRetirement);
   
-  // 2. НАСТОЯЩО НЕДВИЖИМО ИМУЩЕСТВО - расте с 5% годишно
-  const currentProperty = (
+  const investmentAssets = (
+    (analysisData?.client_mutual_funds || 0) +
+    (analysisData?.partner_mutual_funds || 0)
+  ) / EUR_BGN_RATE;
+  
+  const liquidAssetsFutureValue = liquidAssets * Math.pow(1.04, yearsToRetirement);
+  const investmentAssetsFutureValue = investmentAssets * Math.pow(1.08, yearsToRetirement);
+  const currentAssetsFutureValue = liquidAssetsFutureValue + investmentAssetsFutureValue;
+  
+  // 2. НАСТОЯЩО ИМУЩЕСТВО - недвижимо (5% растеж) + движимо (3% обезценка за коли)
+  const currentRealEstate = (
     (analysisData?.current_housing === 'owned' ? (analysisData?.current_housing_value || 0) : 0) +
     (analysisData?.property_apartment_value || 0) +
     (analysisData?.property_house_value || 0)
   ) / EUR_BGN_RATE;
-  const currentPropertyFutureValue = currentProperty * Math.pow(1.05, yearsToRetirement);
+  
+  const currentVehicles = (analysisData?.property_car_value || 0) / EUR_BGN_RATE;
+  
+  const realEstateFutureValue = currentRealEstate * Math.pow(1.05, yearsToRetirement);
+  const vehiclesFutureValue = currentVehicles * Math.pow(0.97, yearsToRetirement); // 3% обезценка
+  const currentPropertyFutureValue = realEstateFutureValue + vehiclesFutureValue;
   
   // 3. НАСТОЯЩИ ЗАДЪЛЖЕНИЯ (кредити) - намаляват линейно до 0
   const currentLiabilities = (
@@ -272,24 +283,43 @@ export default function FinancialPlanPresentation({ planData, clientData, analys
       : 0;
 
     // Начално имущество също расте с времето
-    // Активи растат с 4%, имущество с 5%, кредити намаляват линейно
-    const wealthGrowthRate = 0.04;
-    const propertyGrowthRate = 0.05;
+    // Ликвидни активи 4%, инвестиции 8%, недвижимо 5%, коли 3% обезценка
+    const liquidAssetsValue = (
+      (analysisData?.client_checking_account || 0) +
+      (analysisData?.client_savings_book || 0) +
+      (analysisData?.client_term_deposit || 0) +
+      (analysisData?.client_savings_account || 0) +
+      (analysisData?.client_cash || 0) +
+      (analysisData?.partner_checking_account || 0) +
+      (analysisData?.partner_savings_book || 0) +
+      (analysisData?.partner_term_deposit || 0) +
+      (analysisData?.partner_savings_account || 0) +
+      (analysisData?.partner_cash || 0)
+    ) / EUR_BGN_RATE;
     
-    const currentPropertyValue = (
+    const investmentAssetsValue = (
+      (analysisData?.client_mutual_funds || 0) +
+      (analysisData?.partner_mutual_funds || 0)
+    ) / EUR_BGN_RATE;
+    
+    const realEstateValue = (
       (analysisData?.current_housing === 'owned' ? (analysisData?.current_housing_value || 0) : 0) +
       (analysisData?.property_apartment_value || 0) +
       (analysisData?.property_house_value || 0)
     ) / EUR_BGN_RATE;
     
-    const grownAssets = (assets) * Math.pow(1 + wealthGrowthRate, i);
-    const grownProperty = currentPropertyValue * Math.pow(1 + propertyGrowthRate, i);
+    const vehiclesValue = (analysisData?.property_car_value || 0) / EUR_BGN_RATE;
+    
+    const grownLiquidAssets = liquidAssetsValue * Math.pow(1.04, i);
+    const grownInvestmentAssets = investmentAssetsValue * Math.pow(1.08, i);
+    const grownRealEstate = realEstateValue * Math.pow(1.05, i);
+    const grownVehicles = vehiclesValue * Math.pow(0.97, i);
     
     // Кредити намаляват линейно (средно 15 години погасяване)
     const avgLoanYears = 15;
     const remainingDebt = i < avgLoanYears ? liabilities * (1 - i / avgLoanYears) : 0;
     
-    const grownInitialWealth = grownAssets + grownProperty - remainingDebt;
+    const grownInitialWealth = grownLiquidAssets + grownInvestmentAssets + grownRealEstate + grownVehicles - remainingDebt;
 
     const financialCapital = grownInitialWealth + investmentGrowth;
     

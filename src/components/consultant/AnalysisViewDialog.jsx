@@ -2,17 +2,53 @@ import React, { useState, useEffect } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Edit, User, Users, Home, DollarSign, Shield, Heart, GraduationCap } from 'lucide-react';
+import { 
+  Edit, 
+  Shield,
+  User,
+  Home,
+  PiggyBank,
+  Umbrella,
+  Baby,
+  Wallet,
+  BarChart3,
+  CheckCircle,
+  AlertTriangle
+} from 'lucide-react';
 import { base44 } from '@/api/base44Client';
 import { toast } from 'sonner';
 import { createPageUrl } from '@/utils';
 import { useNavigate } from 'react-router-dom';
+import { motion, AnimatePresence } from 'framer-motion';
+import { cn } from "@/lib/utils";
+
+import ConsentStep from '../analysis/ConsentStep';
+import PersonalDataStep from '../analysis/PersonalDataStep';
+import HousingStep from '../analysis/HousingStep';
+import ReserveStep from '../analysis/ReserveStep';
+import PensionStep from '../analysis/PensionStep';
+import ChildrenGoalsStep from '../analysis/ChildrenGoalsStep';
+import ProtectionStep from '../analysis/ProtectionStep';
+import FinancialFlowStep from '../analysis/FinancialFlowStep';
+import PrioritiesStep from '../analysis/PrioritiesStep';
+
+const steps = [
+  { id: 1, title: 'Съгласие', icon: Shield },
+  { id: 2, title: 'Лични данни', icon: User },
+  { id: 3, title: 'Ново жилище', icon: Home },
+  { id: 4, title: 'Резерв', icon: PiggyBank },
+  { id: 5, title: 'Пенсия', icon: Umbrella },
+  { id: 6, title: 'Деца и Други цели', icon: Baby },
+  { id: 7, title: 'Защита', icon: Wallet },
+  { id: 8, title: 'Финансов поток', icon: BarChart3 },
+  { id: 9, title: 'Обобщение', icon: BarChart3 },
+];
 
 export default function AnalysisViewDialog({ analysisId, open, onOpenChange }) {
   const [analysis, setAnalysis] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [currentStep, setCurrentStep] = useState(1);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -53,10 +89,42 @@ export default function AnalysisViewDialog({ analysisId, open, onOpenChange }) {
     }
   };
 
+  // Validate step for progress indicator
+  const validateStep = (step) => {
+    // Simple validation - we'll mark steps as complete if they have any data
+    switch (step) {
+      case 1:
+        return analysis.gdpr_consent_a && analysis.gdpr_consent_c;
+      case 2:
+        return !!(analysis.client_first_name && analysis.client_email);
+      case 3:
+        return !!analysis.current_housing;
+      case 4:
+        return analysis.client_monthly_net_income !== undefined;
+      case 5:
+        return analysis.client_gross_income_pension !== undefined;
+      case 6:
+        return true; // Optional step
+      case 7:
+        return !!analysis.income_source;
+      case 8:
+        return analysis.client_gross_income !== undefined;
+      case 9:
+        return analysis.priority_income_protection !== undefined;
+      default:
+        return false;
+    }
+  };
+
+  const getStepStatus = (stepId) => {
+    if (validateStep(stepId)) return 'complete';
+    return 'future';
+  };
+
   if (loading || !analysis) {
     return (
       <Dialog open={open} onOpenChange={onOpenChange}>
-        <DialogContent className="max-w-4xl max-h-[90vh]">
+        <DialogContent className="max-w-5xl max-h-[90vh]">
           <div className="flex items-center justify-center h-64">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600" />
           </div>
@@ -67,11 +135,12 @@ export default function AnalysisViewDialog({ analysisId, open, onOpenChange }) {
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-5xl max-h-[90vh] overflow-hidden flex flex-col">
-        <DialogHeader>
-          <div className="flex items-center justify-between">
-            <DialogTitle className="text-2xl">
-              Преглед на анализ
+      <DialogContent className="max-w-5xl max-h-[90vh] overflow-hidden flex flex-col p-0">
+        {/* Header */}
+        <div className="px-6 pt-6 pb-4 border-b border-slate-200">
+          <div className="flex items-center justify-between mb-2">
+            <DialogTitle className="text-2xl font-light">
+              Преглед на <span className="font-semibold text-blue-600">Финансов</span> Анализ
             </DialogTitle>
             <div className="flex items-center gap-2">
               <Badge variant={analysis.status === 'converted' ? 'default' : 'secondary'}>
@@ -90,213 +159,101 @@ export default function AnalysisViewDialog({ analysisId, open, onOpenChange }) {
           <p className="text-sm text-slate-500">
             Създаден на {new Date(analysis.created_date).toLocaleDateString('bg-BG')}
           </p>
-        </DialogHeader>
+        </div>
 
-        <ScrollArea className="flex-1 pr-4">
-          <Tabs defaultValue="personal" className="w-full">
-            <TabsList className="grid w-full grid-cols-6 mb-4">
-              <TabsTrigger value="personal">
-                <User className="h-4 w-4 mr-2" />
-                Лични
-              </TabsTrigger>
-              <TabsTrigger value="family">
-                <Users className="h-4 w-4 mr-2" />
-                Семейство
-              </TabsTrigger>
-              <TabsTrigger value="housing">
-                <Home className="h-4 w-4 mr-2" />
-                Жилище
-              </TabsTrigger>
-              <TabsTrigger value="financial">
-                <DollarSign className="h-4 w-4 mr-2" />
-                Финанси
-              </TabsTrigger>
-              <TabsTrigger value="protection">
-                <Shield className="h-4 w-4 mr-2" />
-                Защита
-              </TabsTrigger>
-              <TabsTrigger value="goals">
-                <Heart className="h-4 w-4 mr-2" />
-                Цели
-              </TabsTrigger>
-            </TabsList>
-
-            <TabsContent value="personal" className="space-y-4">
-              <div className="grid md:grid-cols-2 gap-4">
-                <InfoCard title="Клиент">
-                  <InfoRow label="Име" value={`${analysis.client_first_name} ${analysis.client_middle_name} ${analysis.client_last_name}`} />
-                  <InfoRow label="Възраст" value={`${analysis.client_age} год.`} />
-                  <InfoRow label="Пол" value={analysis.client_gender === 'male' ? 'Мъж' : 'Жена'} />
-                  <InfoRow label="ЕГН" value={analysis.client_egn} />
-                  <InfoRow label="Телефон" value={analysis.client_phone} />
-                  <InfoRow label="Имейл" value={analysis.client_email} />
-                  <InfoRow label="Пушач" value={analysis.client_is_smoker ? 'Да' : 'Не'} />
-                </InfoCard>
-
-                <InfoCard title="Заетост">
-                  <InfoRow label="Статус" value={analysis.client_is_employed ? 'Нает' : 'Безработен'} />
-                  <InfoRow label="Длъжност" value={analysis.client_job_description} />
-                  <InfoRow label="Работодател" value={analysis.client_employer_name} />
-                  <InfoRow label="Тип договор" value={analysis.client_contract_type === 'labor' ? 'Трудов' : 'Граждански'} />
-                  <InfoRow label="Срок" value={analysis.client_contract_term === 'permanent' ? 'Безсрочен' : 'Срочен'} />
-                </InfoCard>
-              </div>
-            </TabsContent>
-
-            <TabsContent value="family" className="space-y-4">
-              {analysis.include_partner && (
-                <InfoCard title="Партньор">
-                  <InfoRow label="Име" value={`${analysis.partner_first_name} ${analysis.partner_middle_name} ${analysis.partner_last_name}`} />
-                  <InfoRow label="Възраст" value={`${analysis.partner_age} год.`} />
-                  <InfoRow label="Пол" value={analysis.partner_gender === 'male' ? 'Мъж' : 'Жена'} />
-                  <InfoRow label="Телефон" value={analysis.partner_phone} />
-                  <InfoRow label="Пушач" value={analysis.partner_is_smoker ? 'Да' : 'Не'} />
-                </InfoCard>
-              )}
-              {analysis.children_count > 0 && (
-                <InfoCard title={`Деца (${analysis.children_count})`}>
-                  {[...Array(analysis.children_count)].map((_, i) => {
-                    const name = analysis[`child_${i + 1}_name`];
-                    const birthdate = analysis[`child_${i + 1}_birthdate`];
-                    if (!name) return null;
-                    return (
-                      <InfoRow key={i} label={`Дете ${i + 1}`} value={`${name} (${birthdate})`} />
-                    );
-                  })}
-                </InfoCard>
-              )}
-            </TabsContent>
-
-            <TabsContent value="housing" className="space-y-4">
-              <InfoCard title="Настоящо жилище">
-                <InfoRow label="Тип" value={
-                  analysis.current_housing === 'owned' ? 'Собствено' :
-                  analysis.current_housing === 'rented' ? 'Под наем' :
-                  analysis.current_housing === 'subrented' ? 'Поднаем' : 'При родители'
-                } />
-                <InfoRow label="Стаи" value={analysis.current_housing_rooms} />
-                <InfoRow label="Площ" value={`${analysis.current_housing_area} м²`} />
-                {analysis.current_housing_value && (
-                  <InfoRow label="Стойност" value={`${analysis.current_housing_value.toLocaleString()} лв`} />
+        {/* Progress Steps */}
+        <div className="px-6 py-4 bg-slate-50 border-b border-slate-200">
+          <div className="flex justify-between items-center overflow-x-auto">
+            {steps.map((step, index) => (
+              <React.Fragment key={step.id}>
+                <button
+                  onClick={() => setCurrentStep(step.id)}
+                  className="flex flex-col items-center cursor-pointer hover:opacity-80 transition-opacity min-w-[60px]"
+                >
+                  <div 
+                    className={cn(
+                      "w-8 h-8 rounded-full flex items-center justify-center transition-all duration-300 text-xs",
+                      currentStep === step.id 
+                        ? "bg-blue-600 text-white" 
+                        : getStepStatus(step.id) === 'complete'
+                          ? "bg-green-500 text-white"
+                          : "bg-slate-300 text-white"
+                    )}
+                  >
+                    {currentStep === step.id ? (
+                      <step.icon className="h-4 w-4" />
+                    ) : getStepStatus(step.id) === 'complete' ? (
+                      <CheckCircle className="h-4 w-4" />
+                    ) : (
+                      <step.icon className="h-3 w-3" />
+                    )}
+                  </div>
+                  <span className={cn(
+                    "text-[10px] mt-1 font-medium whitespace-nowrap",
+                    currentStep === step.id 
+                      ? "text-blue-600" 
+                      : getStepStatus(step.id) === 'complete' 
+                        ? "text-green-600" 
+                        : "text-slate-400"
+                  )}>
+                    {step.title}
+                  </span>
+                </button>
+                {index < steps.length - 1 && (
+                  <div className={cn(
+                    "flex-1 h-0.5 mx-1 min-w-[12px] rounded-full transition-all duration-300",
+                    getStepStatus(step.id) === 'complete' ? "bg-green-500" : "bg-slate-200"
+                  )} />
                 )}
-              </InfoCard>
+              </React.Fragment>
+            ))}
+          </div>
+        </div>
 
-              {analysis.planning_housing_change && (
-                <InfoCard title="Планирана промяна">
-                  <InfoRow label="Тип" value={
-                    analysis.planned_housing_type === 'apartment' ? 'Апартамент' :
-                    analysis.planned_housing_type === 'house' ? 'Къща' :
-                    analysis.planned_housing_type === 'reconstruction' ? 'Реконструкция' : 'Оптимизация'
-                  } />
-                  <InfoRow label="Стойност" value={`${analysis.planned_housing_value?.toLocaleString()} лв`} />
-                  <InfoRow label="Срок" value={`${analysis.planned_housing_timeline_years} год.`} />
-                  <InfoRow label="Финансиране" value={
-                    analysis.financing_method === 'cash' ? 'Кеш' :
-                    analysis.financing_method === 'loan' ? 'Кредит' : 'Кеш и кредит'
-                  } />
-                </InfoCard>
-              )}
-            </TabsContent>
-
-            <TabsContent value="financial" className="space-y-4">
-              <div className="grid md:grid-cols-2 gap-4">
-                <InfoCard title="Доходи">
-                  <InfoRow label="Клиент (нето)" value={`${analysis.client_net_income?.toLocaleString()} лв`} />
-                  {analysis.include_partner && (
-                    <InfoRow label="Партньор (нето)" value={`${analysis.partner_net_income?.toLocaleString()} лв`} />
-                  )}
-                  <InfoRow label="Общо месечно" value={`${((analysis.client_net_income || 0) + (analysis.partner_net_income || 0)).toLocaleString()} лв`} className="font-semibold" />
-                </InfoCard>
-
-                <InfoCard title="Разходи">
-                  <InfoRow label="Жилище" value={`${((analysis.expense_rent || 0) + (analysis.expense_utilities || 0)).toLocaleString()} лв`} />
-                  <InfoRow label="Комуникации" value={`${((analysis.expense_phone || 0) + (analysis.expense_internet || 0)).toLocaleString()} лв`} />
-                  <InfoRow label="Храна" value={`${analysis.expense_food?.toLocaleString()} лв`} />
-                  <InfoRow label="Транспорт" value={`${((analysis.expense_fuel || 0) + (analysis.expense_car_maintenance || 0)).toLocaleString()} лв`} />
-                </InfoCard>
-              </div>
-
-              <div className="grid md:grid-cols-2 gap-4">
-                <InfoCard title="Активи">
-                  <InfoRow label="Спестявания" value={`${((analysis.client_savings_book || 0) + (analysis.partner_savings_book || 0)).toLocaleString()} лв`} />
-                  <InfoRow label="Депозити" value={`${((analysis.client_term_deposit || 0) + (analysis.partner_term_deposit || 0)).toLocaleString()} лв`} />
-                  <InfoRow label="Инвестиции" value={`${((analysis.client_mutual_funds || 0) + (analysis.partner_mutual_funds || 0)).toLocaleString()} лв`} />
-                </InfoCard>
-
-                <InfoCard title="Задължения">
-                  <InfoRow label="Ипотека" value={`${analysis.liability_mortgage?.toLocaleString() || 0} лв`} />
-                  <InfoRow label="Потребителски" value={`${analysis.liability_consumer_loans?.toLocaleString() || 0} лв`} />
-                  <InfoRow label="Кредитни карти" value={`${analysis.liability_credit_cards?.toLocaleString() || 0} лв`} />
-                </InfoCard>
-              </div>
-            </TabsContent>
-
-            <TabsContent value="protection" className="space-y-4">
-              <InfoCard title="Защита на доходите">
-                <InfoRow label="Интерес" value={analysis.include_income_protection_in_plan ? 'Да' : 'Не'} />
-                <InfoRow label="Рискове" value={
-                  [
-                    analysis.risk_layoff && 'Уволнение',
-                    analysis.risk_maternity && 'Майчинство',
-                    analysis.risk_sick_leave && 'Болнични',
-                    analysis.risk_disability && 'Инвалидност',
-                    analysis.risk_death && 'Смърт'
-                  ].filter(Boolean).join(', ') || 'Няма'
-                } />
-              </InfoCard>
-
-              <InfoCard title="Застраховки">
-                <InfoRow label="Жилище" value={analysis.has_property_insurance ? 'Да' : 'Не'} />
-                <InfoRow label="Каско" value={analysis.has_casco_insurance ? 'Да' : 'Не'} />
-                <InfoRow label="Здраве от работодател" value={analysis.has_employer_health_insurance ? 'Да' : 'Не'} />
-              </InfoCard>
-            </TabsContent>
-
-            <TabsContent value="goals" className="space-y-4">
-              <InfoCard title="Приоритети">
-                <InfoRow label="Защита доходи" value={analysis.priority_income_protection} />
-                <InfoRow label="Защита имущество" value={analysis.priority_property_protection} />
-                <InfoRow label="Резерв" value={analysis.priority_reserve} />
-                <InfoRow label="Жилище" value={analysis.priority_housing} />
-                <InfoRow label="Пенсия" value={analysis.priority_pension} />
-                <InfoRow label="Деца" value={analysis.priority_children} />
-              </InfoCard>
-
-              <InfoCard title="Инвестиции">
-                <InfoRow label="Месечна фиксирана" value={`${analysis.monthly_fixed_investment?.toLocaleString() || 0} лв`} />
-                <InfoRow label="Месечна променлива" value={`${analysis.monthly_variable_investment?.toLocaleString() || 0} лв`} />
-                <InfoRow label="Еднократна" value={`${analysis.one_time_investment?.toLocaleString() || 0} лв`} />
-                <InfoRow label="Рисков профил" value={
-                  analysis.risk_profile === 'conservative' ? 'Консервативен' :
-                  analysis.risk_profile === 'moderate' ? 'Умерен' :
-                  analysis.risk_profile === 'dynamic' ? 'Динамичен' : 'Агресивен'
-                } />
-              </InfoCard>
-            </TabsContent>
-          </Tabs>
+        {/* Content */}
+        <ScrollArea className="flex-1 px-6 py-6">
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={currentStep}
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -20 }}
+              transition={{ duration: 0.2 }}
+            >
+              {currentStep === 1 && <ConsentStep data={analysis} onChange={() => {}} showErrors={false} readOnly />}
+              {currentStep === 2 && <PersonalDataStep data={analysis} onChange={() => {}} showErrors={false} readOnly />}
+              {currentStep === 3 && <HousingStep data={analysis} onChange={() => {}} showErrors={false} readOnly />}
+              {currentStep === 4 && <ReserveStep data={analysis} onChange={() => {}} showErrors={false} readOnly />}
+              {currentStep === 5 && <PensionStep data={analysis} onChange={() => {}} showErrors={false} readOnly />}
+              {currentStep === 6 && <ChildrenGoalsStep data={analysis} onChange={() => {}} showErrors={false} readOnly />}
+              {currentStep === 7 && <ProtectionStep data={analysis} onChange={() => {}} showErrors={false} readOnly />}
+              {currentStep === 8 && <FinancialFlowStep data={analysis} onChange={() => {}} showErrors={false} readOnly />}
+              {currentStep === 9 && <PrioritiesStep data={analysis} onChange={() => {}} showErrors={false} readOnly />}
+            </motion.div>
+          </AnimatePresence>
         </ScrollArea>
+
+        {/* Footer */}
+        <div className="px-6 py-4 border-t border-slate-200 flex justify-between items-center">
+          <Button
+            variant="outline"
+            onClick={() => setCurrentStep(prev => Math.max(1, prev - 1))}
+            disabled={currentStep === 1}
+          >
+            Назад
+          </Button>
+          <span className="text-sm text-slate-500">
+            Стъпка {currentStep} от {steps.length}
+          </span>
+          <Button
+            onClick={() => setCurrentStep(prev => Math.min(9, prev + 1))}
+            disabled={currentStep === 9}
+            className="bg-blue-600 hover:bg-blue-700"
+          >
+            Напред
+          </Button>
+        </div>
       </DialogContent>
     </Dialog>
-  );
-}
-
-function InfoCard({ title, children }) {
-  return (
-    <div className="bg-slate-50 rounded-lg p-4 border border-slate-200">
-      <h3 className="font-semibold text-slate-900 mb-3">{title}</h3>
-      <div className="space-y-2">
-        {children}
-      </div>
-    </div>
-  );
-}
-
-function InfoRow({ label, value, className }) {
-  if (!value) return null;
-  return (
-    <div className={`flex justify-between text-sm ${className || ''}`}>
-      <span className="text-slate-600">{label}:</span>
-      <span className="text-slate-900 font-medium">{value}</span>
-    </div>
   );
 }

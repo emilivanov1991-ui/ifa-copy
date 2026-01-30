@@ -87,7 +87,34 @@ export default function AutoPlanGenerator({ analysisId, analysisData, onComplete
       type: p.product_type,
       coverage: p.coverage_amount,
       termYears: p.term_years,
-      coverages: p.details?.coverages || {},
+      coverages: (() => {
+        // Конвертираме покритията от details.coverages във формат за презентацията
+        const details = p.details || {};
+        const coveragesObj = details.coverages || {};
+        
+        // За MetLife UL продукти с детайлни покрития
+        if (typeof coveragesObj === 'object' && !Array.isArray(coveragesObj)) {
+          const formatted = {};
+          
+          if (coveragesObj.integratedLifeCoverage) formatted.death = coveragesObj.integratedLifeCoverage;
+          if (coveragesObj.ptdCoverage) formatted.permanent_disability = coveragesObj.ptdCoverage;
+          if (coveragesObj.fracturesCoverage) formatted.fractures = coveragesObj.fracturesCoverage;
+          if (coveragesObj.criticalIllness40Coverage) formatted.critical_illness = coveragesObj.criticalIllness40Coverage;
+          if (coveragesObj.telemedicine) formatted.telemedicine = 'Включено';
+          if (coveragesObj.premiumWaiver) formatted.premium_waiver = 'Включено';
+          
+          // За детски продукти
+          if (coveragesObj.ptd) formatted.permanent_disability = coveragesObj.ptd;
+          if (coveragesObj.hospital_daily) formatted.critical_illness = `${coveragesObj.hospital_daily} EUR/ден`;
+          if (coveragesObj.surgical) formatted.critical_illness = coveragesObj.surgical;
+          if (coveragesObj.fractures) formatted.fractures = coveragesObj.fractures;
+          if (coveragesObj.child_protection_agreement) formatted.premium_waiver = 'Включено';
+          
+          return formatted;
+        }
+        
+        return coveragesObj;
+      })(),
       strategy: p.strategy,
       beneficiary: p.beneficiary,
       beneficiary_name: p.beneficiary_name,

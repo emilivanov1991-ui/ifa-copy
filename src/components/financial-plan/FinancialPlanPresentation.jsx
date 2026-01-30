@@ -148,9 +148,29 @@ export default function FinancialPlanPresentation({ planData, clientData, analys
   const yearsToRetirement = clientData?.yearsToRetirement || (retirementAge - age);
   const monthsToRetirement = yearsToRetirement * 12;
   
+  // Изчисляване на месечния баланс (доходи - разходи)
+  const totalIncome = (analysisData?.client_net_income || 0) + (analysisData?.partner_net_income || 0);
+  const totalExpenses = (analysisData?.expense_rent || 0) + (analysisData?.expense_utilities || 0) + 
+    (analysisData?.expense_food || 0) + (analysisData?.expense_phone || 0) + (analysisData?.expense_internet || 0) +
+    (analysisData?.expense_tv || 0) + (analysisData?.expense_other_housing || 0) + (analysisData?.expense_fuel || 0) +
+    (analysisData?.expense_car_maintenance || 0) + (analysisData?.expense_car_other || 0) +
+    (analysisData?.expense_clothing || 0) + (analysisData?.expense_culture || 0) + (analysisData?.expense_travel || 0) +
+    (analysisData?.expense_children || 0) + (analysisData?.expense_cigarettes || 0) + (analysisData?.expense_pets || 0) +
+    (analysisData?.expense_vacation || 0) + (analysisData?.expense_business || 0) + (analysisData?.expense_other || 0);
+  
+  const actualMonthlyBalance = totalIncome - totalExpenses;
+  
+  // Използваме реалния месечен баланс вместо calculations.monthlyBalance
+  const monthlyBalance = actualMonthlyBalance;
+  const monthlyReserve = monthlyBalance - totalMonthlyPremiumEUR;
+  
   // Wealth projection with correct formulas
-  const wealth = calculateWealthProjection(planData, clientData, analysisData);
-  const allocation = calculateAllocation(planData, wealth.monthlyReserve, productsEUR, EUR_BGN_RATE);
+  const wealth = calculateWealthProjection(
+    { ...planData, calculations: { ...planData.calculations, monthlyBalance } }, 
+    clientData, 
+    analysisData
+  );
+  const allocation = calculateAllocation(planData, monthlyReserve, productsEUR, EUR_BGN_RATE);
   
   // Нетно имущество от анализа (в лева, конвертираме към евро)
   const assets = (
@@ -179,8 +199,9 @@ export default function FinancialPlanPresentation({ planData, clientData, analys
   const initialNetWorth = assets - liabilities;
 
   // Capital chart data - real values in EUR
+  // Вземаме месечните инвестиции от реалните продукти в плана
   const monthlyInvestment = (productsEUR || [])
-    .filter(p => p.name.includes('Unit Linked') || p.name.includes('УПФ'))
+    .filter(p => p.type === 'ul_investment' || p.name.includes('Unit Linked') || p.name.includes('УПФ') || p.name.includes('Partners'))
     .reduce((sum, p) => sum + (p.monthlyPremium || 0), 0);
 
   const annualSalaryGrowth = 0.03; // 3% годишен растеж на заплатата

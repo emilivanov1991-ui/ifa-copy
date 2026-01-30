@@ -606,17 +606,23 @@ export default function FinancialPlanPresentation({ planData, clientData, analys
               <AreaChart data={(() => {
                 const years = Math.min(yearsToRetirement, 41);
                 
-                // Реално изчисление на растежа по години
+                // Използваме СЪЩАТА логика като на страница 1 за финансовия капитал
                 return Array.from({ length: years + 1 }, (_, i) => {
                   const year = i;
                   const currentMonths = i * 12;
                   
-                  // БЕЗ ПЛАН: просто натрупване без растеж
+                  // БЕЗ ПЛАН: просто натрупване без инвестиции и растеж
                   const withoutPlanValue = monthlyBalanceEUR * currentMonths;
                   
-                  // С ПЛАН: текущи активи растат + нови инвестиции натрупват
+                  // С ПЛАН: СЪЩОТО изчисление като financialCapital от страница 1
+                  const monthlyNetIncome = (analysisData?.client_net_income || 0) + (analysisData?.partner_net_income || 0);
+                  const monthlyNetIncomeEUR = monthlyNetIncome / EUR_BGN_RATE;
+                  const monthlyInvestment = (productsEUR || [])
+                    .filter(p => p.type === 'ul_investment' || p.name.includes('Unit Linked') || p.name.includes('УПФ') || p.name.includes('Partners'))
+                    .reduce((sum, p) => sum + (p.monthlyPremium || 0), 0);
+                  
                   // Настоящи активи с растеж
-                  const liquidAssets = (
+                  const liquidAssetsValue = (
                     (analysisData?.client_checking_account || 0) +
                     (analysisData?.client_savings_book || 0) +
                     (analysisData?.client_term_deposit || 0) +
@@ -629,30 +635,44 @@ export default function FinancialPlanPresentation({ planData, clientData, analys
                     (analysisData?.partner_cash || 0)
                   ) / EUR_BGN_RATE;
                   
-                  const investmentAssets = (
+                  const investmentAssetsValue = (
                     (analysisData?.client_mutual_funds || 0) +
                     (analysisData?.partner_mutual_funds || 0)
                   ) / EUR_BGN_RATE;
                   
-                  const currentAssetsGrowth = liquidAssets * Math.pow(1.04, i) + investmentAssets * Math.pow(1.08, i);
+                  const realEstateValue = (
+                    (analysisData?.current_housing === 'owned' ? (analysisData?.current_housing_value || 0) : 0) +
+                    (analysisData?.property_apartment_value || 0) +
+                    (analysisData?.property_house_value || 0)
+                  ) / EUR_BGN_RATE;
                   
-                  // Unit Linked инвестиции от плана
-                  const ulMonthlyPremium = (productsEUR || [])
-                    .filter(p => p.name.includes('Unit Linked') || p.name.includes('УПФ'))
-                    .reduce((sum, p) => sum + (p.monthlyPremium || 0), 0);
+                  const vehiclesValue = (analysisData?.property_car_value || 0) / EUR_BGN_RATE;
+                  const liabilities = (
+                    (analysisData?.liability_mortgage || 0) +
+                    (analysisData?.liability_consumer_loans || 0) +
+                    (analysisData?.liability_credit_cards || 0) +
+                    (analysisData?.liability_leasing || 0) +
+                    (analysisData?.liability_overdraft || 0)
+                  ) / EUR_BGN_RATE;
                   
-                  const ulReturn = 0.08 / 12;
-                  const ulGrowth = currentMonths > 0 && ulMonthlyPremium > 0
-                    ? ulMonthlyPremium * (((Math.pow(1 + ulReturn, currentMonths) - 1) / ulReturn) * (1 + ulReturn))
+                  const grownLiquidAssets = liquidAssetsValue * Math.pow(1.04, i);
+                  const grownInvestmentAssets = investmentAssetsValue * Math.pow(1.08, i);
+                  const grownRealEstate = realEstateValue * Math.pow(1.05, i);
+                  const grownVehicles = vehiclesValue * Math.pow(0.97, i);
+                  
+                  // Кредити намаляват линейно
+                  const avgLoanYears = 15;
+                  const remainingDebt = i < avgLoanYears ? liabilities * (1 - i / avgLoanYears) : 0;
+                  
+                  const grownInitialWealth = grownLiquidAssets + grownInvestmentAssets + grownRealEstate + grownVehicles - remainingDebt;
+                  
+                  // Нови инвестиции с растеж
+                  const monthlyReturn = 0.08 / 12;
+                  const investmentGrowth = currentMonths > 0 && monthlyInvestment > 0
+                    ? monthlyInvestment * (((Math.pow(1 + monthlyReturn, currentMonths) - 1) / monthlyReturn) * (1 + monthlyReturn))
                     : 0;
                   
-                  // Резерв с растеж
-                  const reserveReturn = 0.02 / 12;
-                  const reserveGrowth = currentMonths > 0 && monthlyReserveEUR > 0
-                    ? monthlyReserveEUR * (((Math.pow(1 + reserveReturn, currentMonths) - 1) / reserveReturn) * (1 + reserveReturn))
-                    : 0;
-                  
-                  const withPlanValue = currentAssetsGrowth + ulGrowth + reserveGrowth;
+                  const withPlanValue = grownInitialWealth + investmentGrowth;
 
                   return {
                     year,

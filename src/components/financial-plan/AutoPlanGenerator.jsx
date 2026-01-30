@@ -26,6 +26,7 @@ import {
   PortfolioStructurePage, 
   SummaryPage 
 } from './FinancialPlanPDF';
+import FinancialPlanPresentation from './FinancialPlanPresentation';
 
 export default function AutoPlanGenerator({ analysisId, analysisData, onComplete }) {
   const [generating, setGenerating] = useState(false);

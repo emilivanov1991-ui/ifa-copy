@@ -82,6 +82,11 @@ export default function FinancialPlanPresentation({ planData, clientData, analys
   // Конвертираме продуктите
   const productsEUR = (planData.products || []).map(convertToEUR);
   const totalMonthlyPremiumEUR = productsEUR.reduce((sum, p) => sum + (p.monthlyPremium || 0), 0);
+  
+  // Debug - показваме какви продукти има в плана
+  console.log('Plan products:', planData.products);
+  console.log('Products EUR:', productsEUR);
+  console.log('Total monthly premium EUR:', totalMonthlyPremiumEUR);
 
   // Calculate data
   const age = clientData?.age || 24;

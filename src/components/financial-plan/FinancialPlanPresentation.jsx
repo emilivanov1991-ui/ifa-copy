@@ -71,7 +71,7 @@ export default function FinancialPlanPresentation({ planData, clientData, analys
 
   // Функция за конвертиране на премия към EUR ако е нужно
   const convertToEUR = (product) => {
-    const needsConversion = productsInBGN.some(name => product.name.includes(name));
+    const needsConversion = productsInBGN.some(name => product.provider && product.provider.includes(name));
     return {
       ...product,
       monthlyPremium: needsConversion && product.monthlyPremium 

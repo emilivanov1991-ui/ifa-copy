@@ -11,40 +11,83 @@ import { toast } from 'sonner';
 // Calculate wealth projection with correct formulas
 const calculateWealthProjection = (planData, clientData, analysisData) => {
   const monthsToRetirement = (clientData.yearsToRetirement || 0) * 12;
+  const yearsToRetirement = clientData.yearsToRetirement || 30;
   const monthlyBalance = planData.calculations?.monthlyBalance || 0;
   const totalMonthlyPremium = planData.total_monthly_premium || 0;
   const monthlyReserve = monthlyBalance - totalMonthlyPremium;
+  const EUR_BGN_RATE = 1.95583;
   
-  // WITHOUT PLAN - just monthly savings
+  // WITHOUT PLAN - just monthly savings with no growth
   const withoutPlan = monthlyBalance * monthsToRetirement;
   
-  // WITH PLAN - detailed calculation
+  // WITH PLAN - detailed calculation with all components
   
-  // 1. УПФ accumulated (using 5% contribution, 6% return, до 65г)
+  // 1. НАСТОЯЩИ АКТИВИ (спестявания и инвестиции) - растат с 4% годишно
+  const currentAssets = (
+    (analysisData?.client_checking_account || 0) +
+    (analysisData?.client_savings_book || 0) +
+    (analysisData?.client_term_deposit || 0) +
+    (analysisData?.client_mutual_funds || 0) +
+    (analysisData?.client_savings_account || 0) +
+    (analysisData?.client_cash || 0) +
+    (analysisData?.partner_checking_account || 0) +
+    (analysisData?.partner_savings_book || 0) +
+    (analysisData?.partner_term_deposit || 0) +
+    (analysisData?.partner_mutual_funds || 0) +
+    (analysisData?.partner_savings_account || 0) +
+    (analysisData?.partner_cash || 0)
+  ) / EUR_BGN_RATE;
+  const currentAssetsFutureValue = currentAssets * Math.pow(1.04, yearsToRetirement);
+  
+  // 2. НАСТОЯЩО НЕДВИЖИМО ИМУЩЕСТВО - расте с 5% годишно
+  const currentProperty = (
+    (analysisData?.current_housing === 'owned' ? (analysisData?.current_housing_value || 0) : 0) +
+    (analysisData?.property_apartment_value || 0) +
+    (analysisData?.property_house_value || 0)
+  ) / EUR_BGN_RATE;
+  const currentPropertyFutureValue = currentProperty * Math.pow(1.05, yearsToRetirement);
+  
+  // 3. НАСТОЯЩИ ЗАДЪЛЖЕНИЯ (кредити) - намаляват линейно до 0
+  const currentLiabilities = (
+    (analysisData?.liability_mortgage || 0) +
+    (analysisData?.liability_consumer_loans || 0) +
+    (analysisData?.liability_credit_cards || 0) +
+    (analysisData?.liability_leasing || 0) +
+    (analysisData?.liability_overdraft || 0)
+  ) / EUR_BGN_RATE;
+  // Предполагаме средно 15 години за погасяване
+  const avgLoanYears = 15;
+  const remainingLiabilities = currentLiabilities > 0 && yearsToRetirement < avgLoanYears
+    ? currentLiabilities * (1 - yearsToRetirement / avgLoanYears)
+    : 0;
+  
+  // 4. УПФ accumulated (using 5% contribution, 6% return, до 65г)
   const grossIncome = (analysisData?.client_gross_income || 0) + (analysisData?.partner_gross_income || 0);
   const maxInsurableIncome = 3400; // BGN cap
   const monthlyContribution = Math.min(grossIncome, maxInsurableIncome) * 0.05;
-  const yearsToRetirement = clientData.yearsToRetirement || 30;
   const upfReturn = 0.06 / 12; // 6% annual = 0.5% monthly
   const upfMonths = yearsToRetirement * 12;
   const upfValue = monthlyContribution * (((Math.pow(1 + upfReturn, upfMonths) - 1) / upfReturn) * (1 + upfReturn));
   
-  // 2. 30% от надплатени лихви по ипотека
-  const mortgageAmount = analysisData?.liability_mortgage || 0;
-  const mortgageRate = 0.06; // 6% средно
-  const mortgageTerm = 20; // средно 20 години
+  // 5. 30% от спестени лихви по нов ипотечен кредит (ако ще се рефинансира или вземе нов)
   let mortgageInterestSavings = 0;
-  if (mortgageAmount > 0) {
-    const totalInterestPaid = (mortgageAmount * mortgageRate * mortgageTerm) * 0.5; // approximate
-    mortgageInterestSavings = totalInterestPaid * 0.3;
+  if (analysisData?.planning_housing_change && analysisData?.financing_method !== 'cash') {
+    const loanAmount = (analysisData?.planned_housing_value || 0) - (analysisData?.available_cash || 0);
+    const mortgageRate = 0.06; // 6% средно
+    const mortgageTerm = analysisData?.loan_term_years || 20;
+    const totalInterestPaid = (loanAmount * mortgageRate * mortgageTerm) * 0.5; // approximate
+    mortgageInterestSavings = (totalInterestPaid * 0.3) / EUR_BGN_RATE;
   }
   
-  // 3. Стойност на имот (ако ще се закупува)
-  const propertyValue = analysisData?.planning_housing_change && analysisData?.planned_housing_value 
-    ? analysisData.planned_housing_value 
+  // 6. Стойност на нов имот (ако ще се закупува) - расте с 5% годишно
+  const newPropertyValue = analysisData?.planning_housing_change && analysisData?.planned_housing_value 
+    ? analysisData.planned_housing_value / EUR_BGN_RATE
     : 0;
+  const yearsUntilPurchase = analysisData?.planned_housing_timeline_years || 1;
+  const yearsAfterPurchase = Math.max(yearsToRetirement - yearsUntilPurchase, 0);
+  const newPropertyFutureValue = newPropertyValue * Math.pow(1.05, yearsAfterPurchase);
   
-  // 4. Unit Linked инвестиции до 65г (8% доходност)
+  // 7. Unit Linked инвестиции до 65г (8% доходност)
   const ulProducts = (planData.products || []).filter(p => 
     p.name.includes('Unit Linked') && !p.name.includes('Junior')
   );
@@ -52,7 +95,7 @@ const calculateWealthProjection = (planData, clientData, analysisData) => {
   const ulReturn = 0.08 / 12; // 8% annual
   const ulValue = ulMonthlyPremium * (((Math.pow(1 + ulReturn, upfMonths) - 1) / ulReturn) * (1 + ulReturn));
   
-  // 5. Unit Linked Junior до 19г
+  // 8. Unit Linked Junior до 19г
   const juniorProducts = (planData.products || []).filter(p => p.name.includes('Junior'));
   const juniorMonthlyPremium = juniorProducts.reduce((sum, p) => sum + (p.monthlyPremium || 0), 0);
   const juniorYears = Math.max(19 - 5, 0); // assume child is 5 years old
@@ -61,10 +104,13 @@ const calculateWealthProjection = (planData, clientData, analysisData) => {
     ? juniorMonthlyPremium * (((Math.pow(1 + ulReturn, juniorMonths) - 1) / ulReturn) * (1 + ulReturn))
     : 0;
   
-  // 6. Резервен остатък * месеци
-  const reserveAccumulation = monthlyReserve * monthsToRetirement;
+  // 9. Резервен остатък * месеци (с 2% растеж)
+  const reserveReturn = 0.02 / 12; // 2% annual на резерва
+  const reserveAccumulation = monthlyReserve * (((Math.pow(1 + reserveReturn, monthsToRetirement) - 1) / reserveReturn) * (1 + reserveReturn));
   
-  const withPlan = upfValue + mortgageInterestSavings + propertyValue + ulValue + juniorValue + reserveAccumulation;
+  // ОБЩО "С ПЛАН" = активи + имущество - задължения + натрупвания
+  const withPlan = currentAssetsFutureValue + currentPropertyFutureValue + newPropertyFutureValue - remainingLiabilities +
+    upfValue + mortgageInterestSavings + ulValue + juniorValue + reserveAccumulation;
   
   return { withoutPlan, withPlan, monthlyReserve };
 };

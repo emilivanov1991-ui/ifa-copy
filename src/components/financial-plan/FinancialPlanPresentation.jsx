@@ -20,25 +20,56 @@ const calculateAllocation = (planData, monthlyReserve, productsEUR, eurRate) => 
 
   products.forEach(p => {
     const premium = p.monthlyPremium || 0;
-    // Investments
-    if (p.product_type === 'ul_investment' || p.product_type === 'pension_plan' || (p.provider && p.provider.includes('Partners'))) {
+
+    console.log('Categorizing product:', {
+      name: p.name,
+      type: p.type,
+      product_type: p.product_type,
+      provider: p.provider,
+      premium: premium
+    });
+
+    // Първо проверяваме по product_type или name за точна категоризация
+    if (
+      p.product_type === 'ul_investment' || 
+      p.product_type === 'pension_plan' || 
+      (p.name && (p.name.includes('Unit Linked') || p.name.includes('УПФ'))) ||
+      (p.provider && p.provider.includes('Partners'))
+    ) {
       investments += premium;
+      console.log('→ Категория: Инвестиции');
     } 
-    // Income Protection
-    else if (p.product_type === 'term_life' || p.product_type === 'health_insurance' || p.product_type === 'critical_illness' || p.product_type === 'personal_accident' || (p.provider && (p.provider.includes('УНИКА') || p.provider.includes('Generali') || p.provider.includes('MetLife')))) {
-      incomeProtection += premium;
-    } 
-    // Property Protection
-    else if (p.product_type === 'property_insurance' || p.product_type === 'car_insurance' || p.product_type === 'home_insurance' || (p.provider && (p.provider.includes('Инстинкт') || p.provider.includes('ДЗИ')))) {
-      propertyProtection += premium;
-    } 
-    // Loans
+    // Кредити
     else if (p.product_type === 'mortgage_loan' || p.product_type === 'consumer_loan') {
       loans += premium;
+      console.log('→ Категория: Кредити');
+    }
+    // Защита на имущество
+    else if (
+      p.product_type === 'property_insurance' || 
+      p.product_type === 'car_insurance' || 
+      p.product_type === 'home_insurance' ||
+      (p.name && (p.name.includes('Каско') || p.name.includes('ГО') || p.name.includes('Дом'))) ||
+      (p.provider && (p.provider.includes('Инстинкт') || p.provider.includes('ДЗИ')))
+    ) {
+      propertyProtection += premium;
+      console.log('→ Категория: Защита на имущество');
+    }
+    // Защита на дохода (останалото)
+    else {
+      incomeProtection += premium;
+      console.log('→ Категория: Защита на дохода');
     }
   });
 
-  const reserve = Math.max(monthlyReserve, 0); // monthlyReserve е вече в EUR
+  console.log('Final allocation:', {
+    investments,
+    incomeProtection,
+    propertyProtection,
+    loans
+  });
+
+  const reserve = Math.max(monthlyReserve, 0);
   const total = investments + incomeProtection + propertyProtection + loans + reserve || 1;
 
   return {

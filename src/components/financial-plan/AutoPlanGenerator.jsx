@@ -44,10 +44,6 @@ export default function AutoPlanGenerator({ analysisId, analysisData, onComplete
         setResult(response.data);
         setProgress(100);
         toast.success('Финансовият план е генериран успешно!');
-        
-        if (onComplete) {
-          setTimeout(() => onComplete(response.data), 1000);
-        }
       } else {
         throw new Error(response.data.error || 'Грешка при генериране');
       }

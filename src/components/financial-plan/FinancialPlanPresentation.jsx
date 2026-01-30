@@ -72,7 +72,7 @@ export default function FinancialPlanPresentation({ planData, clientData, analys
   // Функция за конвертиране на премия към EUR ако е нужно
   const convertToEUR = (product) => {
     const needsConversion = productsInBGN.some(name => product.provider && product.provider.includes(name));
-    return {
+    const converted = {
       ...product,
       monthlyPremium: needsConversion && product.monthlyPremium 
         ? product.monthlyPremium / EUR_BGN_RATE 
@@ -84,6 +84,19 @@ export default function FinancialPlanPresentation({ planData, clientData, analys
         ? product.coverage / EUR_BGN_RATE
         : product.coverage
     };
+
+    // Explicit запазване на критични свойства
+    if (product.product_type) converted.product_type = product.product_type;
+    if (product.provider) converted.provider = product.provider;
+    if (product.type) converted.type = product.type;
+    if (product.name) converted.name = product.name;
+
+    console.log('Product conversion:', {
+      original: { name: product.name, type: product.type, product_type: product.product_type, provider: product.provider },
+      converted: { name: converted.name, type: converted.type, product_type: converted.product_type, provider: converted.provider }
+    });
+
+    return converted;
   };
 
   // Конвертираме продуктите

@@ -521,7 +521,6 @@ export default function AutoPlanGenerator({ analysisId, analysisData, onComplete
               onClick={() => {
                 setResult(null);
                 setProgress(0);
-                setAiAnalysis(null);
               }}
             >
               Генерирай отново

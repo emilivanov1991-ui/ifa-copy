@@ -135,7 +135,7 @@ export default function AnalysisViewDialog({ analysisId, open, onOpenChange }) {
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-5xl max-h-[90vh] overflow-hidden flex flex-col p-0">
+      <DialogContent className="max-w-5xl h-[90vh] overflow-hidden flex flex-col p-0">
         {/* Header */}
         <div className="px-6 pt-6 pb-4 border-b border-slate-200">
           <div className="flex items-center justify-between mb-2">
@@ -211,7 +211,7 @@ export default function AnalysisViewDialog({ analysisId, open, onOpenChange }) {
         </div>
 
         {/* Content */}
-        <ScrollArea className="flex-1 px-6 py-6">
+        <div className="flex-1 overflow-auto px-6 py-6">
           <AnimatePresence mode="wait">
             <motion.div
               key={currentStep}
@@ -231,7 +231,7 @@ export default function AnalysisViewDialog({ analysisId, open, onOpenChange }) {
               {currentStep === 9 && <PrioritiesStep data={analysis} onChange={() => {}} showErrors={false} readOnly />}
             </motion.div>
           </AnimatePresence>
-        </ScrollArea>
+        </div>
 
         {/* Footer */}
         <div className="px-6 py-4 border-t border-slate-200 flex justify-between items-center">

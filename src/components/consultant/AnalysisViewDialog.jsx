@@ -138,27 +138,29 @@ export default function AnalysisViewDialog({ analysisId, open, onOpenChange }) {
       <DialogContent className="max-w-5xl h-[90vh] overflow-hidden flex flex-col p-0">
         {/* Header */}
         <div className="px-6 pt-6 pb-4 border-b border-slate-200">
-          <div className="flex items-center justify-between mb-2">
-            <DialogTitle className="text-2xl font-light">
-              Преглед на <span className="font-semibold text-blue-600">Финансов</span> Анализ
-            </DialogTitle>
-            <div className="flex items-center gap-2">
-              <Badge variant={analysis.status === 'converted' ? 'default' : 'secondary'}>
-                {analysis.status === 'new' && 'Нов'}
-                {analysis.status === 'contacted' && 'Контактиран'}
-                {analysis.status === 'in_progress' && 'В процес'}
-                {analysis.status === 'converted' && 'Конвертиран'}
-                {analysis.status === 'closed' && 'Затворен'}
-              </Badge>
-              <Button onClick={handleEdit} className="bg-blue-600 hover:bg-blue-700">
-                <Edit className="h-4 w-4 mr-2" />
-                Промени
-              </Button>
+          <div className="flex items-start justify-between gap-4">
+            <div className="flex-1">
+              <div className="flex items-center gap-3 mb-1">
+                <DialogTitle className="text-xl font-semibold text-slate-900">
+                  {analysis.client_first_name} {analysis.client_last_name}
+                </DialogTitle>
+                <Badge variant={analysis.status === 'converted' ? 'default' : 'secondary'}>
+                  {analysis.status === 'new' && 'Нов'}
+                  {analysis.status === 'contacted' && 'Контактиран'}
+                  {analysis.status === 'in_progress' && 'В процес'}
+                  {analysis.status === 'converted' && 'Конвертиран'}
+                  {analysis.status === 'closed' && 'Затворен'}
+                </Badge>
+              </div>
+              <p className="text-sm text-slate-500">
+                Създаден на {new Date(analysis.created_date).toLocaleDateString('bg-BG')}
+              </p>
             </div>
+            <Button onClick={handleEdit} className="bg-blue-600 hover:bg-blue-700 mt-1">
+              <Edit className="h-4 w-4 mr-2" />
+              Промени
+            </Button>
           </div>
-          <p className="text-sm text-slate-500">
-            Създаден на {new Date(analysis.created_date).toLocaleDateString('bg-BG')}
-          </p>
         </div>
 
         {/* Progress Steps */}

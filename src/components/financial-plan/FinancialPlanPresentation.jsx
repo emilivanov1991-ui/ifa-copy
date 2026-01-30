@@ -829,27 +829,6 @@ export default function FinancialPlanPresentation({ planData, clientData, analys
         <div className="space-y-6">
           <h2 className="text-3xl font-bold text-slate-900 text-center mb-6">Предимства на плана</h2>
 
-          <motion.div
-            initial={{ scale: 0.95, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            transition={{ delay: 0.6 }}
-            className="bg-gradient-to-r from-green-500 to-emerald-500 text-white rounded-xl p-6 shadow-xl"
-          >
-            <div className="flex items-center justify-between">
-              <div>
-                <h4 className="text-lg font-bold mb-1 flex items-center gap-2">
-                  <Euro className="w-6 h-6" />
-                  Данъчно облекчение
-                </h4>
-                <p className="text-green-100 text-sm">Спестени данъци за {yearsToRetirement} години</p>
-              </div>
-              <div className="text-right">
-                <p className="text-5xl font-bold">{totalTaxRelief.toLocaleString()}</p>
-                <p className="text-xl text-green-100">EUR</p>
-              </div>
-            </div>
-          </motion.div>
-
           <div className="grid md:grid-cols-2 gap-4">
             {[
               { title: 'Гъвкавост', desc: 'възможност да се променят сумите, определени за отделните цели', color: 'blue', icon: '🔄' },
@@ -878,9 +857,30 @@ export default function FinancialPlanPresentation({ planData, clientData, analys
                 </Card>
               </motion.div>
             ))}
-          </div>
+            </div>
 
-          {/* Priorities Section */}
+            <motion.div
+            initial={{ scale: 0.95, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            transition={{ delay: 0.6 }}
+            className="bg-gradient-to-r from-green-500 to-emerald-500 text-white rounded-xl p-6 shadow-xl"
+            >
+            <div className="flex items-center justify-between">
+              <div>
+                <h4 className="text-lg font-bold mb-1 flex items-center gap-2">
+                  <Euro className="w-6 h-6" />
+                  Данъчно облекчение
+                </h4>
+                <p className="text-green-100 text-sm">Спестени данъци за {yearsToRetirement} години</p>
+              </div>
+              <div className="text-right">
+                <p className="text-5xl font-bold">{totalTaxRelief.toLocaleString()}</p>
+                <p className="text-xl text-green-100">EUR</p>
+              </div>
+            </div>
+            </motion.div>
+
+            {/* Priorities Section */}
           {(() => {
             const priorityLabels = {
               priority_income_protection: 'Защита на дохода',

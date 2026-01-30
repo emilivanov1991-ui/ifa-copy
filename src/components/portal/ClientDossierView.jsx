@@ -190,7 +190,9 @@ export default function ClientDossierView({ clientId }) {
                             variant="outline" 
                             size="sm"
                             onClick={() => {
-                              // TODO: Show analysis details
+                              if (window.setViewAnalysisId) {
+                                window.setViewAnalysisId(analysis.id);
+                              }
                             }}
                           >
                             <Eye className="w-4 h-4 mr-2" />

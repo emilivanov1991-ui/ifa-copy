@@ -56,6 +56,16 @@ export default function DossiersManager() {
     );
   });
 
+  // Expose setViewAnalysisId to child components
+  React.useEffect(() => {
+    if (selectedClient) {
+      window.setViewAnalysisId = setViewAnalysisId;
+    }
+    return () => {
+      window.setViewAnalysisId = null;
+    };
+  }, [selectedClient]);
+
   if (selectedClient) {
     return (
       <div className="space-y-4">

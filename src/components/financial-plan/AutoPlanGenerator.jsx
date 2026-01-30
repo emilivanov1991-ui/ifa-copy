@@ -82,20 +82,34 @@ export default function AutoPlanGenerator({ analysisId, analysisData, onComplete
     products: result.products.map(p => ({
       name: p.product_name,
       monthlyPremium: p.monthly_premium,
-      annualPremium: p.monthly_premium * 12,
-      benefit: p.product_type,
+      annualPremium: p.total_premium,
+      benefit: p.product_name,
       type: p.product_type,
       coverage: p.coverage_amount,
       termYears: p.term_years,
-      coverages: p.selected_coverages || {}
+      coverages: p.details?.coverages || {},
+      strategy: p.strategy,
+      beneficiary: p.beneficiary,
+      beneficiary_name: p.beneficiary_name,
+      provider: p.provider,
+      expectedValue: p.expected_value
     })),
     calculations: {
       monthlyBalance: (analysisData?.client_net_income || 0) + (analysisData?.partner_net_income || 0) - 
-        ((analysisData?.expense_rent || 0) + (analysisData?.expense_utilities || 0) + (analysisData?.expense_food || 0)),
+        ((analysisData?.expense_rent || 0) + (analysisData?.expense_utilities || 0) + (analysisData?.expense_food || 0) +
+         (analysisData?.expense_phone || 0) + (analysisData?.expense_internet || 0) + (analysisData?.expense_tv || 0) +
+         (analysisData?.expense_other_housing || 0) + (analysisData?.expense_fuel || 0) + 
+         (analysisData?.expense_car_maintenance || 0) + (analysisData?.expense_car_other || 0) +
+         (analysisData?.expense_clothing || 0) + (analysisData?.expense_culture || 0) + 
+         (analysisData?.expense_travel || 0) + (analysisData?.expense_children || 0) + 
+         (analysisData?.expense_cigarettes || 0) + (analysisData?.expense_pets || 0) + 
+         (analysisData?.expense_vacation || 0) + (analysisData?.expense_business || 0) + 
+         (analysisData?.expense_other || 0)),
       laborCapital: result.summary.labor_capital_total,
-      totalTaxRelief: result.summary.tax_relief_annual * clientData?.yearsToRetirement || 1,
+      totalTaxRelief: result.summary.tax_relief_annual * (clientData?.yearsToRetirement || 1),
       projectedValue: result.products.reduce((sum, p) => sum + (p.expected_value || 0), 0)
-    }
+    },
+    optimizations: result.optimizations || []
   } : null;
 
   return (

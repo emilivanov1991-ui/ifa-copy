@@ -306,18 +306,48 @@ export default function FinancialPlanPresentation({ planData, clientData, analys
   
   const products = productsEUR;
 
-  // Изчисляване на данъчно облекчение за целия период
-  const taxReliefProducts = productsEUR.filter(p => 
-    p.type === 'ul_investment' || 
-    p.type === 'pension_plan' ||
-    p.type === 'health_insurance' ||
-    p.name.includes('Unit Linked') ||
-    p.name.includes('УПФ') ||
-    p.name.includes('Здраве')
-  );
-  const annualTaxReliefBase = taxReliefProducts.reduce((sum, p) => sum + ((p.monthlyPremium || 0) * 12), 0);
-  const annualTaxRelief = annualTaxReliefBase * 0.10; // 10% от годишната премия
-  const totalTaxRelief = annualTaxRelief * yearsToRetirement; // За целия период
+  // Изчисляване на данъчно облекчение за целия период (различен период за всеки продукт)
+  let totalTaxRelief = 0;
+
+  productsEUR.forEach(p => {
+    // Проверка дали продуктът е данъчно облагаем
+    const isTaxDeductible = p.type === 'ul_investment' || 
+      p.type === 'pension_plan' ||
+      p.type === 'health_insurance' ||
+      p.name.includes('Unit Linked') ||
+      p.name.includes('УПФ') ||
+      p.name.includes('Здраве');
+
+    if (!isTaxDeductible) return;
+
+    const annualPremium = (p.monthlyPremium || 0) * 12;
+
+    // Определяме периода според типа продукт и бенефициент
+    let yearsForTax = 0;
+
+    if (p.name.includes('Junior') || p.name.includes('Детство')) {
+      // За деца - до 19 години
+      const childAge = p.age || 5; // По подразбиране 5 години ако няма възраст
+      yearsForTax = Math.max(0, 19 - childAge);
+    } else if (p.type === 'pension_plan' || p.name.includes('УПФ') || p.name.includes('ДПФ')) {
+      // За пенсионни продукти - до пенсия на бенефициента
+      const beneficiaryAge = p.age || clientData.age;
+      const retirementAge = 65;
+      yearsForTax = Math.max(0, retirementAge - beneficiaryAge);
+    } else if (p.type === 'health_insurance' || p.name.includes('Здраве')) {
+      // За здравни продукти - до 65 години на бенефициента
+      const beneficiaryAge = p.age || clientData.age;
+      yearsForTax = Math.max(0, 65 - beneficiaryAge);
+    } else {
+      // За Unit Linked на възрастни - до пенсия
+      const beneficiaryAge = p.age || clientData.age;
+      const retirementAge = clientData.retirementAge || 65;
+      yearsForTax = Math.max(0, retirementAge - beneficiaryAge);
+    }
+
+    // Данъчно облекчение = 10% от годишната премия × брой години
+    totalTaxRelief += annualPremium * 0.10 * yearsForTax;
+  });
 
   const dailyCost = (totalMonthlyPremiumEUR / 30).toFixed(2);
 

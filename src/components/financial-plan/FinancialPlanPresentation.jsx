@@ -807,19 +807,16 @@ export default function FinancialPlanPresentation({ planData, clientData, analys
             
             <div className="mt-4 bg-amber-50 border-l-4 border-amber-400 p-4 rounded">
               <div className="flex items-center justify-center gap-2">
-                <TrendingUp className="w-6 h-6 text-amber-600" />
-                <p className="text-xl font-bold text-amber-900 text-center">
+                <TrendingUp className="w-8 h-8 text-amber-600" />
+                <p className="text-3xl font-bold text-amber-900 text-center">
                   +{(() => {
                     const growthPercent = ((wealth.withPlan - wealth.withoutPlan) / wealth.withoutPlan) * 100;
                     return growthPercent.toFixed(0);
                   })()}% ръст с нашия план! 🚀
                 </p>
               </div>
-              <p className="text-xs text-amber-700 mt-2 text-center">
+              <p className="text-sm text-amber-700 mt-3 text-center">
                 *Проекция при {yearsToRetirement} години инвестиции до {retirementAge} г. възраст
-              </p>
-              <p className="text-xs text-amber-600 mt-2 font-semibold text-center">
-                Месечен резерв: {wealth.monthlyReserveEUR.toFixed(0)} EUR (спестявания извън плана)
               </p>
             </div>
           </div>

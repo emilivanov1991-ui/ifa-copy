@@ -15,25 +15,32 @@ import {
 import { base44 } from '@/api/base44Client';
 import { toast } from 'sonner';
 import ClientDossierView from '../portal/ClientDossierView';
+import AnalysisViewDialog from './AnalysisViewDialog';
 
 export default function DossiersManager() {
   const [clients, setClients] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [loading, setLoading] = useState(true);
   const [selectedClient, setSelectedClient] = useState(null);
+  const [viewAnalysisId, setViewAnalysisId] = useState(null);
+  const [analyses, setAnalyses] = useState([]);
 
   useEffect(() => {
-    loadClients();
+    loadData();
   }, []);
 
-  const loadClients = async () => {
+  const loadData = async () => {
     setLoading(true);
     try {
-      const clientsData = await base44.entities.Client.list('-created_date', 100);
+      const [clientsData, analysesData] = await Promise.all([
+        base44.entities.Client.list('-created_date', 100),
+        base44.entities.FinancialAnalysisSubmission.list('-created_date', 200)
+      ]);
       setClients(clientsData);
+      setAnalyses(analysesData);
     } catch (error) {
       console.error(error);
-      toast.error('Грешка при зареждане на клиентите');
+      toast.error('Грешка при зареждане на данните');
     } finally {
       setLoading(false);
     }
@@ -50,6 +57,8 @@ export default function DossiersManager() {
   });
 
   if (selectedClient) {
+    const clientAnalyses = analyses.filter(a => a.client_id === selectedClient.id);
+    
     return (
       <div className="space-y-4">
         <Button 
@@ -59,7 +68,67 @@ export default function DossiersManager() {
         >
           ← Назад към списък
         </Button>
+        
+        {/* Client Header */}
+        <Card className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white border-0">
+          <CardContent className="p-6">
+            <div className="flex items-center gap-4">
+              <div className="w-16 h-16 rounded-full bg-white/20 flex items-center justify-center text-white font-bold text-xl">
+                {selectedClient.first_name?.[0]}{selectedClient.last_name?.[0]}
+              </div>
+              <div>
+                <h2 className="text-2xl font-bold">{selectedClient.first_name} {selectedClient.last_name}</h2>
+                <p className="text-blue-100">{selectedClient.email} • {selectedClient.phone}</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Analyses List */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Финансови анализи</CardTitle>
+          </CardHeader>
+          <CardContent>
+            {clientAnalyses.length === 0 ? (
+              <p className="text-slate-500 text-center py-8">Няма създадени анализи</p>
+            ) : (
+              <div className="space-y-3">
+                {clientAnalyses.map((analysis) => (
+                  <div key={analysis.id} className="flex items-center justify-between p-4 border rounded-lg hover:bg-slate-50">
+                    <div className="flex items-center gap-4">
+                      <User className="w-5 h-5 text-slate-400" />
+                      <div>
+                        <p className="font-medium">{analysis.client_first_name} {analysis.client_last_name}</p>
+                        <p className="text-sm text-slate-500">
+                          {new Date(analysis.created_date).toLocaleDateString('bg-BG')}
+                          {analysis.include_partner && ` • С партньор`}
+                          {analysis.children_count > 0 && ` • ${analysis.children_count} деца`}
+                        </p>
+                      </div>
+                    </div>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => setViewAnalysisId(analysis.id)}
+                    >
+                      <Eye className="w-4 h-4 mr-2" />
+                      Преглед
+                    </Button>
+                  </div>
+                ))}
+              </div>
+            )}
+          </CardContent>
+        </Card>
+
         <ClientDossierView clientId={selectedClient.id} />
+        
+        <AnalysisViewDialog
+          analysisId={viewAnalysisId}
+          open={!!viewAnalysisId}
+          onOpenChange={(open) => !open && setViewAnalysisId(null)}
+        />
       </div>
     );
   }

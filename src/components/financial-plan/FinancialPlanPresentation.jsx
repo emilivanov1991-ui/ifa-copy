@@ -1074,7 +1074,7 @@ export default function FinancialPlanPresentation({ planData, clientData, analys
                   { name: 'Защита на имущество', ...allocation.propertyProtection, color: '#f59e0b', icon: '🏠' },
                   { name: 'Кредити', ...allocation.loans, color: '#8b5cf6', icon: '💳' },
                   { name: 'Резерв', ...allocation.reserve, color: '#06b6d4', icon: '💰' }
-                ].filter(item => item.amount > 0).map((item, idx) => {
+                ].filter(item => item.amount > 0).sort((a, b) => b.amount - a.amount).map((item, idx) => {
                   const monthlyIncomeEUR = ((analysisData?.client_net_income || 0) + (analysisData?.partner_net_income || 0)) / EUR_BGN_RATE;
                   const percentOfIncome = monthlyIncomeEUR > 0 ? ((item.amount / monthlyIncomeEUR) * 100).toFixed(1) : 0;
                   const totalAllocation = allocation.investments.amount + allocation.incomeProtection.amount + 
@@ -1125,7 +1125,7 @@ export default function FinancialPlanPresentation({ planData, clientData, analys
               { name: 'Защита на имущество', ...allocation.propertyProtection, color: '#f59e0b', icon: '🏠' },
               { name: 'Кредити', ...allocation.loans, color: '#8b5cf6', icon: '💳' },
               { name: 'Резерв', ...allocation.reserve, color: '#06b6d4', icon: '💰' }
-            ].filter(item => item.amount > 0).map((item, idx) => {
+            ].filter(item => item.amount > 0).sort((a, b) => b.amount - a.amount).map((item, idx) => {
               const monthlyIncomeEUR = ((analysisData?.client_net_income || 0) + (analysisData?.partner_net_income || 0)) / EUR_BGN_RATE;
               const percentOfIncome = monthlyIncomeEUR > 0 ? ((item.amount / monthlyIncomeEUR) * 100).toFixed(1) : 0;
               

@@ -33,63 +33,62 @@ const calculateAllocation = (planData, monthlyReserve, productsEUR, eurRate) => 
       insurancePremium: insurancePremium
     });
 
-    // MetLife Unit Linked продукти - разделяме на компоненти
-    if (
-      (p.product_type === 'ul_investment' || (p.name && p.name.includes('Unit Linked'))) &&
-      (p.provider && p.provider.includes('MetLife'))
-    ) {
-      // Винаги използваме explicit разделението ако съществува
-      if (investmentPremium > 0 || insurancePremium > 0) {
-        investments += investmentPremium;
-        incomeProtection += insurancePremium;
-        console.log('→ MetLife UL: Инвестиции:', investmentPremium, 'Застраховка:', insurancePremium);
-      } else {
-        // Fallback: приблизително 85% отива в инвестиции, 15% е застрахователна част + такси
-        const investmentPart = premium * 0.85;
-        const insurancePart = premium * 0.15;
-        investments += investmentPart;
-        incomeProtection += insurancePart;
-        console.log('→ MetLife UL (fallback): Инвестиции:', investmentPart, 'Застраховка:', insurancePart);
-      }
-    }
-    // УПФ и Partners - чисти инвестиции
-    else if (
-      p.product_type === 'pension_plan' || 
-      (p.name && p.name.includes('УПФ')) ||
-      (p.provider && p.provider.includes('Partners'))
-    ) {
-      investments += premium;
-      console.log('→ Категория: Инвестиции');
-    } 
-    // Кредити
-    else if (p.product_type === 'mortgage_loan' || p.product_type === 'consumer_loan') {
-      loans += premium;
-      console.log('→ Категория: Кредити');
-    }
-    // Защита на имущество
-    else if (
-      p.product_type === 'property_insurance' || 
-      p.product_type === 'car_insurance' || 
-      p.product_type === 'home_insurance' ||
-      (p.name && (p.name.includes('Каско') || p.name.includes('ГО') || p.name.includes('Дом'))) ||
-      (p.provider && (p.provider.includes('Инстинкт') || p.provider.includes('ДЗИ')))
-    ) {
-      propertyProtection += premium;
-      console.log('→ Категория: Защита на имущество');
-    }
-    // Здравни застраховки - също защита на дохода
-        else if (
-          p.product_type === 'health_insurance' ||
-          (p.name && (p.name.includes('Здраве') || p.name.includes('Health'))) ||
-          (p.provider && (p.provider.includes('Generali') || p.provider.includes('Uniqa')))
+    // Категоризация на продуктите
+
+        // 1. ИНВЕСТИЦИИ
+        // MetLife Unit Linked - разделяме на инвестиционна и застрахователна част
+        if (
+          (p.product_type === 'ul_investment' || (p.name && p.name.includes('Unit Linked'))) &&
+          (p.provider && p.provider.includes('MetLife'))
         ) {
-          incomeProtection += premium;
-          console.log('→ Категория: Защита на дохода (здраве)');
+          if (investmentPremium > 0 || insurancePremium > 0) {
+            investments += investmentPremium;
+            incomeProtection += insurancePremium;
+            console.log('→ MetLife UL:', { investmentPremium, insurancePremium });
+          } else {
+            const investmentPart = premium * 0.85;
+            const insurancePart = premium * 0.15;
+            investments += investmentPart;
+            incomeProtection += insurancePart;
+            console.log('→ MetLife UL (fallback 85/15):', { investmentPart, insurancePart });
+          }
         }
-        // Защита на дохода (останалото)
+        // УПФ, Partners, чисти инвестиционни продукти
+        else if (
+          p.product_type === 'pension_plan' || 
+          p.product_type === 'ul_investment' ||
+          (p.name && (p.name.includes('УПФ') || p.name.includes('ДПФ') || p.name.includes('Partners')))
+        ) {
+          investments += premium;
+          console.log('→ Инвестиции:', premium);
+        }
+
+        // 2. КРЕДИТИ
+        else if (
+          p.product_type === 'mortgage_loan' || 
+          p.product_type === 'consumer_loan' ||
+          (p.name && (p.name.includes('Кредит') || p.name.includes('Ипотека')))
+        ) {
+          loans += premium;
+          console.log('→ Кредити:', premium);
+        }
+
+        // 3. ЗАЩИТА НА ИМУЩЕСТВО
+        else if (
+          p.product_type === 'property_insurance' || 
+          p.product_type === 'car_insurance' || 
+          p.product_type === 'home_insurance' ||
+          (p.name && (p.name.includes('Каско') || p.name.includes('ГО') || p.name.includes('Дом') || p.name.includes('Имущество'))) ||
+          (p.provider && p.provider.includes('Инстинкт'))
+        ) {
+          propertyProtection += premium;
+          console.log('→ Защита на имущество:', premium);
+        }
+
+        // 4. ЗАЩИТА НА ДОХОДА (включва застраховки живот и здраве)
         else {
           incomeProtection += premium;
-          console.log('→ Категория: Защита на дохода');
+          console.log('→ Защита на дохода:', premium, p.name);
         }
       });
 

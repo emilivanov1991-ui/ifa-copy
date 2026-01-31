@@ -1214,20 +1214,22 @@ export default function FinancialPlanPresentation({ planData, clientData, analys
                         'disability': 'Тежки заболявания',
                         'permanent_disability': 'Трайна загуба на работоспособност от злополука',
                         'fractures': 'Фрактури и изгаряния',
-                        'critical_illness': 'Лечение на критични заболявания',
+                        'critical_illness': 'Тежки заболявания',
                         'telemedicine': 'Телемедицина',
                         'health_insurance': 'Допълнително здравно осигуряване',
                         'premium_waiver': 'Споразумение за защита на детето'
                       };
 
-                      return Object.entries(coverages).map(([key, value], idx) => (
+                      return Object.entries(coverages)
+                        .filter(([key]) => !key.match(/^\d+$/))
+                        .map(([key, value], idx) => (
                         <div key={idx} className="flex justify-between items-center py-1 border-b border-slate-100 last:border-0">
                           <span className="text-slate-700">{coverageLabels[key] || key}</span>
                           <span className="font-bold text-green-700">
                             {value === 'Включено' ? (
                               <CheckCircle className="w-4 h-4 text-green-600" />
                             ) : (
-                              `${(value / EUR_BGN_RATE).toLocaleString('bg-BG', { maximumFractionDigits: 0 })} EUR`
+                              `${(typeof value === 'number' ? value : 0).toLocaleString('bg-BG', { maximumFractionDigits: 0 })} EUR`
                             )}
                           </span>
                         </div>

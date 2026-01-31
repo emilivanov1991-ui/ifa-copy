@@ -77,19 +77,28 @@ const calculateAllocation = (planData, monthlyReserve, productsEUR, eurRate) => 
       propertyProtection += premium;
       console.log('→ Категория: Защита на имущество');
     }
-    // Защита на дохода (останалото)
-    else {
-      incomeProtection += premium;
-      console.log('→ Категория: Защита на дохода');
-    }
-  });
+    // Здравни застраховки - също защита на дохода
+        else if (
+          p.product_type === 'health_insurance' ||
+          (p.name && (p.name.includes('Здраве') || p.name.includes('Health'))) ||
+          (p.provider && (p.provider.includes('Generali') || p.provider.includes('Uniqa')))
+        ) {
+          incomeProtection += premium;
+          console.log('→ Категория: Защита на дохода (здраве)');
+        }
+        // Защита на дохода (останалото)
+        else {
+          incomeProtection += premium;
+          console.log('→ Категория: Защита на дохода');
+        }
+      });
 
-  console.log('Final allocation:', {
-    investments,
-    incomeProtection,
-    propertyProtection,
-    loans
-  });
+      console.log('Final allocation:', {
+        investments,
+        incomeProtection,
+        propertyProtection,
+        loans
+      });
 
   const reserve = Math.max(monthlyReserve, 0);
   const total = investments + incomeProtection + propertyProtection + loans + reserve || 1;

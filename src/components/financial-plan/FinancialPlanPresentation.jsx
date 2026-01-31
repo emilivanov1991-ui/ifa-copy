@@ -18,86 +18,85 @@ const calculateAllocation = (planData, monthlyReserve, productsEUR, eurRate) => 
   let propertyProtection = 0;
   let loans = 0;
 
-  products.forEach(p => {
+  console.log('=== Starting allocation calculation ===');
+  console.log('Total products:', products.length);
+
+  products.forEach((p, idx) => {
     const premium = p.monthlyPremium || 0;
     const investmentPremium = p.investmentPremium || 0;
     const insurancePremium = p.insurancePremium || 0;
 
-    console.log('Categorizing product:', {
-      name: p.name,
-      type: p.type,
-      product_type: p.product_type,
-      provider: p.provider,
-      premium: premium,
-      investmentPremium: investmentPremium,
-      insurancePremium: insurancePremium
-    });
+    console.log(`\n[Product ${idx + 1}] ${p.name}`);
+    console.log('  Type:', p.type);
+    console.log('  Product Type:', p.product_type);
+    console.log('  Provider:', p.provider);
+    console.log('  Premium:', premium);
+    console.log('  Investment Premium:', investmentPremium);
+    console.log('  Insurance Premium:', insurancePremium);
 
     // Категоризация на продуктите
 
-        // 1. ИНВЕСТИЦИИ
-        // MetLife Unit Linked - разделяме на инвестиционна и застрахователна част
-        if (
-          (p.product_type === 'ul_investment' || (p.name && p.name.includes('Unit Linked'))) &&
-          (p.provider && p.provider.includes('MetLife'))
-        ) {
-          if (investmentPremium > 0 || insurancePremium > 0) {
-            investments += investmentPremium;
-            incomeProtection += insurancePremium;
-            console.log('→ MetLife UL:', { investmentPremium, insurancePremium });
-          } else {
-            const investmentPart = premium * 0.85;
-            const insurancePart = premium * 0.15;
-            investments += investmentPart;
-            incomeProtection += insurancePart;
-            console.log('→ MetLife UL (fallback 85/15):', { investmentPart, insurancePart });
-          }
-        }
-        // УПФ, Partners, чисти инвестиционни продукти
-        else if (
-          p.product_type === 'pension_plan' || 
-          p.product_type === 'ul_investment' ||
-          (p.name && (p.name.includes('УПФ') || p.name.includes('ДПФ') || p.name.includes('Partners')))
-        ) {
-          investments += premium;
-          console.log('→ Инвестиции:', premium);
-        }
+    // 1. ИНВЕСТИЦИИ
+    // MetLife Unit Linked - разделяме на инвестиционна и застрахователна част
+    if (
+      (p.product_type === 'ul_investment' || (p.name && p.name.includes('Unit Linked'))) &&
+      (p.provider && p.provider.includes('MetLife'))
+    ) {
+      if (investmentPremium > 0 || insurancePremium > 0) {
+        investments += investmentPremium;
+        incomeProtection += insurancePremium;
+        console.log('  ✓ Category: MetLife UL - Investment:', investmentPremium, 'Insurance:', insurancePremium);
+      } else {
+        const investmentPart = premium * 0.85;
+        const insurancePart = premium * 0.15;
+        investments += investmentPart;
+        incomeProtection += insurancePart;
+        console.log('  ✓ Category: MetLife UL (85/15 split) - Investment:', investmentPart, 'Insurance:', insurancePart);
+      }
+    }
+    // УПФ, Partners, чисти инвестиционни продукти
+    else if (
+      p.product_type === 'pension_plan' || 
+      (p.name && (p.name.includes('УПФ') || p.name.includes('ДПФ') || p.name.includes('Partners')))
+    ) {
+      investments += premium;
+      console.log('  ✓ Category: ИНВЕСТИЦИИ (pension/UPF/Partners)');
+    }
 
-        // 2. КРЕДИТИ
-        else if (
-          p.product_type === 'mortgage_loan' || 
-          p.product_type === 'consumer_loan' ||
-          (p.name && (p.name.includes('Кредит') || p.name.includes('Ипотека')))
-        ) {
-          loans += premium;
-          console.log('→ Кредити:', premium);
-        }
+    // 2. КРЕДИТИ
+    else if (
+      p.product_type === 'mortgage_loan' || 
+      p.product_type === 'consumer_loan' ||
+      (p.name && (p.name.includes('Кредит') || p.name.includes('Ипотека')))
+    ) {
+      loans += premium;
+      console.log('  ✓ Category: КРЕДИТИ');
+    }
 
-        // 3. ЗАЩИТА НА ИМУЩЕСТВО
-        else if (
-          p.product_type === 'property_insurance' || 
-          p.product_type === 'car_insurance' || 
-          p.product_type === 'home_insurance' ||
-          (p.name && (p.name.includes('Каско') || p.name.includes('ГО') || p.name.includes('Дом') || p.name.includes('Имущество'))) ||
-          (p.provider && p.provider.includes('Инстинкт'))
-        ) {
-          propertyProtection += premium;
-          console.log('→ Защита на имущество:', premium);
-        }
+    // 3. ЗАЩИТА НА ИМУЩЕСТВО
+    else if (
+      p.product_type === 'property_insurance' || 
+      p.product_type === 'car_insurance' || 
+      p.product_type === 'home_insurance' ||
+      (p.name && (p.name.includes('Каско') || p.name.includes('ГО') || p.name.includes('Дом') || p.name.includes('Имущество'))) ||
+      (p.provider && p.provider.includes('Инстинкт'))
+    ) {
+      propertyProtection += premium;
+      console.log('  ✓ Category: ЗАЩИТА НА ИМУЩЕСТВО');
+    }
 
-        // 4. ЗАЩИТА НА ДОХОДА (включва застраховки живот и здраве)
-        else {
-          incomeProtection += premium;
-          console.log('→ Защита на дохода:', premium, p.name);
-        }
-      });
+    // 4. ЗАЩИТА НА ДОХОДА (включва застраховки живот и здраве)
+    else {
+      incomeProtection += premium;
+      console.log('  ✓ Category: ЗАЩИТА НА ДОХОДА (fallback)');
+    }
+  });
 
-      console.log('Final allocation:', {
-        investments,
-        incomeProtection,
-        propertyProtection,
-        loans
-      });
+  console.log('\n=== Final allocation totals ===');
+  console.log('Investments:', investments.toFixed(2), 'EUR');
+  console.log('Income Protection:', incomeProtection.toFixed(2), 'EUR');
+  console.log('Property Protection:', propertyProtection.toFixed(2), 'EUR');
+  console.log('Loans:', loans.toFixed(2), 'EUR');
 
   const reserve = Math.max(monthlyReserve, 0);
   const total = investments + incomeProtection + propertyProtection + loans + reserve || 1;

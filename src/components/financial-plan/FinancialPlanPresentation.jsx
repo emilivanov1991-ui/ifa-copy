@@ -253,16 +253,6 @@ export default function FinancialPlanPresentation({ planData, clientData, analys
   
   const wealth = calculateWealthFromChart();
   const allocation = calculateAllocation(planData, monthlyReserveEUR, productsEUR, EUR_BGN_RATE);
-
-  // Overwrite allocation with correct calculated values for display
-  const calculatedAllocation = {
-    investments: { amount: 2368.10, percent: 81.9 },
-    incomeProtection: { amount: 417.90, percent: 2.8 },
-    propertyProtection: { amount: 0, percent: 0 },
-    loans: { amount: 0, percent: 0 },
-    reserve: { amount: 4316.00, percent: 13.8 },
-    health: { amount: 38.00, percent: 1.2 }
-  };
   
   // Нетно имущество от анализа (в лева, конвертираме към евро)
   const assets = (
@@ -385,10 +375,11 @@ export default function FinancialPlanPresentation({ planData, clientData, analys
   // Използваме директно продуктите от финансовия план
   const planProducts = planData.products || [];
   const allocationData = [
-    { name: 'Инвестиции', value: calculatedAllocation.investments.amount, color: '#3b82f6', icon: '📈' },
-    { name: 'Резерв', value: calculatedAllocation.reserve.amount, color: '#06b6d4', icon: '💰' },
-    { name: 'Защита на дохода', value: calculatedAllocation.incomeProtection.amount, color: '#10b981', icon: '🛡️' },
-    { name: 'Защита на здравето', value: calculatedAllocation.health.amount, color: '#8b5cf6', icon: '🏥' }
+    { name: 'Инвестиции', value: allocation.investments.amount, color: '#3b82f6', icon: '📈' },
+    { name: 'Резерв', value: allocation.reserve.amount, color: '#06b6d4', icon: '💰' },
+    { name: 'Защита на дохода', value: allocation.incomeProtection.amount, color: '#10b981', icon: '🛡️' },
+    { name: 'Защита на имущество', value: allocation.propertyProtection.amount, color: '#f59e0b', icon: '🏠' },
+    { name: 'Кредити', value: allocation.loans.amount, color: '#8b5cf6', icon: '💳' }
   ].filter(item => item.value > 0);
   
   const products = productsEUR;

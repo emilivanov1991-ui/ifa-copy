@@ -1188,9 +1188,14 @@ export default function FinancialPlanPresentation({ planData, clientData, analys
                     {(() => {
                       const coverages = {};
                       
-                      products.forEach(product => {
+                      console.log('\n=== Collecting coverages from products ===');
+                      products.forEach((product, idx) => {
+                        console.log(`\nProduct ${idx + 1}: ${product.name}`);
+                        console.log('  Coverages:', product.coverages);
+                        
                         if (product.coverages) {
                           Object.entries(product.coverages).forEach(([key, value]) => {
+                            console.log(`    ${key}: ${value}`);
                             if (value && value !== 'Включено') {
                               coverages[key] = (coverages[key] || 0) + parseFloat(value);
                             } else if (value === 'Включено') {
@@ -1199,6 +1204,9 @@ export default function FinancialPlanPresentation({ planData, clientData, analys
                           });
                         }
                       });
+
+                      console.log('\n=== Final coverages totals ===');
+                      console.log(coverages);
 
                       const coverageLabels = {
                         'death': 'Смърт',

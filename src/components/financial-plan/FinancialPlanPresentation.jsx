@@ -1203,6 +1203,16 @@ export default function FinancialPlanPresentation({ planData, clientData, analys
                             }
                           });
                         }
+                        
+                        // Добавяме Уника здраве и ценност
+                        if (product.name && product.name.includes('Здраве и ценност') && product.provider === 'УНИКА') {
+                          coverages['uniqa_critical_illness'] = product.coverage || 2242300;
+                        }
+                        
+                        // Добавяме Generali Health Line
+                        if (product.name && product.name.includes('Health Line') && product.provider === 'Generali') {
+                          coverages['generali_health'] = product.coverage || 50000;
+                        }
                       });
 
                       console.log('\n=== Final coverages totals ===');
@@ -1217,7 +1227,9 @@ export default function FinancialPlanPresentation({ planData, clientData, analys
                         'critical_illness': 'Тежки заболявания',
                         'telemedicine': 'Телемедицина',
                         'health_insurance': 'Допълнително здравно осигуряване',
-                        'premium_waiver': 'Споразумение за защита на детето'
+                        'premium_waiver': 'Споразумение за защита на детето',
+                        'uniqa_critical_illness': 'Лечение на критични заболявания',
+                        'generali_health': 'Допълнително здравно'
                       };
 
                       return Object.entries(coverages)

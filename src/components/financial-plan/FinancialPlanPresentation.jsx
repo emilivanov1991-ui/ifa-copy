@@ -382,13 +382,14 @@ export default function FinancialPlanPresentation({ planData, clientData, analys
 
   // Използваме директно продуктите от финансовия план
   const planProducts = planData.products || [];
+  // Разпределение от месечния план - ВИНАГИ показваме всички категории
   const allocationData = [
-    { name: 'Инвестиции', value: allocation.investments.amount, color: '#3b82f6', icon: '📈' },
     { name: 'Резерв', value: allocation.reserve.amount, color: '#06b6d4', icon: '💰' },
+    { name: 'Инвестиции', value: allocation.investments.amount, color: '#3b82f6', icon: '📈' },
     { name: 'Защита на дохода', value: allocation.incomeProtection.amount, color: '#10b981', icon: '🛡️' },
     { name: 'Защита на имущество', value: allocation.propertyProtection.amount, color: '#f59e0b', icon: '🏠' },
-    { name: 'Кредити', value: allocation.loans.amount, color: '#8b5cf6', icon: '💳' }
-  ].filter(item => item.value > 0);
+    { name: 'Заеми и кредити', value: allocation.loans.amount, color: '#8b5cf6', icon: '💳' }
+  ];
   
   const products = productsEUR;
 
@@ -1000,15 +1001,15 @@ export default function FinancialPlanPresentation({ planData, clientData, analys
                     data={(() => {
                       const monthlyIncomeEUR = ((analysisData?.client_net_income || 0) + (analysisData?.partner_net_income || 0)) / EUR_BGN_RATE;
                       const monthlyExpensesEUR = totalExpenses / EUR_BGN_RATE;
-                      
+
+                      // Разпределение от месечния доход - ВИНАГИ показваме всички категории
                       return [
-                        ...allocationData,
-                        { 
-                          name: 'Месечни разходи', 
-                          value: monthlyExpensesEUR, 
-                          color: '#64748b', 
-                          icon: '💸' 
-                        }
+                        { name: 'Резерв', value: allocation.reserve.amount, color: '#06b6d4', icon: '💰' },
+                        { name: 'Инвестиции', value: allocation.investments.amount, color: '#3b82f6', icon: '📈' },
+                        { name: 'Защита на дохода', value: allocation.incomeProtection.amount, color: '#10b981', icon: '🛡️' },
+                        { name: 'Защита на имущество', value: allocation.propertyProtection.amount, color: '#f59e0b', icon: '🏠' },
+                        { name: 'Заеми и кредити', value: allocation.loans.amount, color: '#8b5cf6', icon: '💳' },
+                        { name: 'Месечни разходи', value: monthlyExpensesEUR, color: '#64748b', icon: '💸' }
                       ];
                     })()}
                     cx="50%"
@@ -1023,7 +1024,14 @@ export default function FinancialPlanPresentation({ planData, clientData, analys
                     fill="#8884d8"
                     dataKey="value"
                   >
-                    {[...allocationData, { name: 'Месечни разходи', value: totalExpenses / EUR_BGN_RATE, color: '#64748b' }].map((entry, index) => (
+                    {[
+                      { color: '#06b6d4' },
+                      { color: '#3b82f6' },
+                      { color: '#10b981' },
+                      { color: '#f59e0b' },
+                      { color: '#8b5cf6' },
+                      { color: '#64748b' }
+                    ].map((entry, index) => (
                       <Cell key={`cell-${index}`} fill={entry.color} />
                     ))}
                   </Pie>
@@ -1038,10 +1046,16 @@ export default function FinancialPlanPresentation({ planData, clientData, analys
                   <Legend 
                     verticalAlign="bottom" 
                     height={60}
-                    formatter={(value, entry) => {
-                      const allData = [...allocationData, { name: 'Месечни разходи', icon: '💸' }];
-                      const item = allData.find(d => d.name === value);
-                      return `${item?.icon || ''} ${value}`;
+                    formatter={(value) => {
+                      const icons = {
+                        'Резерв': '💰',
+                        'Инвестиции': '📈',
+                        'Защита на дохода': '🛡️',
+                        'Защита на имущество': '🏠',
+                        'Заеми и кредити': '💳',
+                        'Месечни разходи': '💸'
+                      };
+                      return `${icons[value] || ''} ${value}`;
                     }}
                   />
                 </PieChart>

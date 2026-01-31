@@ -1211,7 +1211,7 @@ export default function FinancialPlanPresentation({ planData, clientData, analys
                         
                         // Добавяме Generali Health Line
                         if (product.name && product.name.includes('Health Line') && product.provider === 'Generali') {
-                          coverages['generali_health'] = product.coverage || 50000;
+                          coverages['generali_health'] = product.coverage || (10200 / EUR_BGN_RATE); // 10200 BGN = ~5215 EUR
                         }
                       });
 

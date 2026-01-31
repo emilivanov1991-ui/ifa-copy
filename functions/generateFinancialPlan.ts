@@ -612,6 +612,8 @@ Deno.serve(async (req) => {
       const generaliMonthly = clientAge < 40 ? 25 : clientAge < 50 ? 35 : 45;
       
       if (currentBudget >= generaliMonthly) {
+        const generaliLimit = 10200 / EUR_BGN_RATE; // 10200 BGN = ~5215 EUR
+        
         planProducts.push({
           product_type: 'health_insurance',
           provider: 'Generali',
@@ -621,11 +623,11 @@ Deno.serve(async (req) => {
           beneficiary_age: clientAge,
           monthly_premium: generaliMonthly,
           total_premium: generaliMonthly * 12,
-          coverage_amount: 50000,
+          coverage_amount: generaliLimit,
           is_active: true,
           details: {
             plan: 'Basic',
-            annual_limit: 50000,
+            annual_limit: generaliLimit,
             daily_cost: (generaliMonthly / 30).toFixed(2),
             coverages: [
               'Амбулаторни прегледи',

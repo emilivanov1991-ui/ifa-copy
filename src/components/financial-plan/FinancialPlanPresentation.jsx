@@ -1308,8 +1308,6 @@ export default function FinancialPlanPresentation({ planData, clientData, analys
                         .filter(p => p.type !== 'mortgage_loan' && p.type !== 'consumer_loan')
                         .reduce((sum, p) => sum + (p.monthlyPremium || 0), 0);
 
-                      const monthlyNewLoanPayment = newLoanProducts.reduce((sum, p) => sum + (p.monthlyPremium || 0), 0);
-
                       // Периодичност на плащане - изчисляване на първоначално плащане
                       const paymentFrequency = planData.payment_frequency || 'annual';
                       const frequencyMultipliers = {

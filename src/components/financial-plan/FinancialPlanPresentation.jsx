@@ -1308,13 +1308,6 @@ export default function FinancialPlanPresentation({ planData, clientData, analys
                         .filter(p => p.type !== 'mortgage_loan' && p.type !== 'consumer_loan')
                         .reduce((sum, p) => sum + (p.monthlyPremium || 0), 0);
 
-                      // НОВИ кредити (не рефинансирани)
-                      const newLoanProducts = productsEUR.filter(p => 
-                        (p.type === 'mortgage_loan' || p.type === 'consumer_loan') &&
-                        analysisData?.planning_housing_change === true &&
-                        analysisData?.loan_amount > 0
-                      );
-
                       const monthlyNewLoanPayment = newLoanProducts.reduce((sum, p) => sum + (p.monthlyPremium || 0), 0);
 
                       // Периодичност на плащане - изчисляване на първоначално плащане

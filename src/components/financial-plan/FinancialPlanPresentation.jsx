@@ -1259,15 +1259,73 @@ export default function FinancialPlanPresentation({ planData, clientData, analys
                   <h3 className="text-lg font-bold text-blue-900 mb-3">Разпределение на средствата</h3>
                   <div className="space-y-2 text-sm">
                     {/* Reserve */}
-                    {wealth.monthlyReserveEUR > 0 && (
-                      <div className="flex justify-between items-center py-2 border-b border-slate-100">
-                        <span className="text-slate-700 font-medium">Резерв</span>
-                        <div className="text-right">
-                          <p className="font-bold text-cyan-700">{wealth.monthlyReserveEUR.toFixed(0)} EUR</p>
-                          <p className="text-xs text-slate-500">месечно</p>
-                        </div>
-                      </div>
-                    )}
+                    {(() => {
+                      // Изчисляване на резерв според новата логика
+                      const monthlyExpensesEUR = totalExpenses / EUR_BGN_RATE;
+                      const targetReserve = monthlyExpensesEUR * 6; // 6 месеца разходи
+
+                      // Начален резерв = Разплащателна сметка + Краткосрочни спестявания
+                      const initialReserve = (
+                        (analysisData?.client_checking_account || 0) +
+                        (analysisData?.partner_checking_account || 0) +
+                        (analysisData?.client_savings_account || 0) +
+                        (analysisData?.partner_savings_account || 0)
+                      ) / EUR_BGN_RATE;
+
+                      // Месечни застраховки и инвестиции
+                      const monthlyInsuranceInvestment = productsEUR
+                        .filter(p => p.type !== 'mortgage_loan' && p.type !== 'consumer_loan')
+                        .reduce((sum, p) => sum + (p.monthlyPremium || 0), 0);
+
+                      // НОВИ кредити (не рефинансирани)
+                      const newLoanProducts = productsEUR.filter(p => 
+                        (p.type === 'mortgage_loan' || p.type === 'consumer_loan') &&
+                        analysisData?.planning_housing_change === true &&
+                        analysisData?.loan_amount > 0
+                      );
+
+                      const monthlyNewLoanPayment = newLoanProducts.reduce((sum, p) => sum + (p.monthlyPremium || 0), 0);
+
+                      // Периодичност на плащане - изчисляване на първоначално плащане
+                      const paymentFrequency = planData.payment_frequency || 'annual';
+                      const frequencyMultipliers = {
+                        'monthly': 1,
+                        'quarterly': 3,
+                        'semiannual': 6,
+                        'annual': 12
+                      };
+                      const multiplier = frequencyMultipliers[paymentFrequency] || 12;
+
+                      // Първоначално плащане
+                      const initialPayment = (monthlyInsuranceInvestment * multiplier) + (monthlyNewLoanPayment * multiplier);
+
+                      // Резерв след първо плащане
+                      const reserveAfterInitialPayment = Math.max(0, initialReserve - initialPayment);
+
+                      // Месечно натрупване
+                      const monthlyAccumulation = monthlyBalanceEUR - monthlyInsuranceInvestment - monthlyNewLoanPayment;
+
+                      // Месеци до целеви резерв
+                      const monthsToTarget = monthlyAccumulation > 0 
+                        ? Math.ceil(Math.max(0, targetReserve - reserveAfterInitialPayment) / monthlyAccumulation)
+                        : 0;
+
+                      // Общ натрупан резерв
+                      const totalReserveAccumulated = reserveAfterInitialPayment + (monthlyAccumulation * monthsToTarget);
+
+                      if (monthsToTarget > 0) {
+                        return (
+                          <div className="flex justify-between items-center py-2 border-b border-slate-100">
+                            <span className="text-slate-700 font-medium">Резерв</span>
+                            <div className="text-right">
+                              <p className="font-bold text-cyan-700">{Math.min(totalReserveAccumulated, targetReserve).toFixed(0)} EUR</p>
+                              <p className="text-xs text-slate-500">след {monthsToTarget} месеца</p>
+                            </div>
+                          </div>
+                        );
+                      }
+                      return null;
+                    })()}
 
                     {/* Investments breakdown */}
                     {(() => {

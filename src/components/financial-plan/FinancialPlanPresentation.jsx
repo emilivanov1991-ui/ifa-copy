@@ -1261,8 +1261,39 @@ export default function FinancialPlanPresentation({ planData, clientData, analys
                     {/* Reserve */}
                     {(() => {
                       // Изчисляване на резерв според новата логика
-                      const monthlyExpensesEUR = totalExpenses / EUR_BGN_RATE;
-                      const targetReserve = monthlyExpensesEUR * 6; // 6 месеца разходи
+                      let monthlyExpensesEUR = totalExpenses / EUR_BGN_RATE;
+
+                      // Проверка за НОВИ кредити - добавяме месечната вноска към разходите
+                      const newLoanProducts = productsEUR.filter(p => 
+                        (p.type === 'mortgage_loan' || p.type === 'consumer_loan') &&
+                        analysisData?.planning_housing_change === true &&
+                        analysisData?.loan_amount > 0
+                      );
+
+                      if (newLoanProducts.length > 0) {
+                        const newLoanMonthlyPayment = newLoanProducts.reduce((sum, p) => sum + (p.monthlyPremium || 0), 0);
+                        monthlyExpensesEUR += newLoanMonthlyPayment;
+                      }
+
+                      // Проверка за РЕФИНАНСИРАНИ кредити - коригираме разходите със спестената сума
+                      const refinancedProducts = productsEUR.filter(p => 
+                        (p.type === 'mortgage_loan' || p.type === 'consumer_loan') &&
+                        (!analysisData?.planning_housing_change || !analysisData?.loan_amount)
+                      );
+
+                      if (refinancedProducts.length > 0) {
+                        // Изчисляваме разликата между старата и новата вноска
+                        const oldMortgagePayment = (analysisData?.current_mortgage_monthly_payment || 0) / EUR_BGN_RATE;
+                        const newRefinancedPayment = refinancedProducts.reduce((sum, p) => sum + (p.monthlyPremium || 0), 0);
+                        const savingsFromRefinancing = oldMortgagePayment - newRefinancedPayment;
+
+                        // Намаляваме разходите със спестената сума
+                        if (savingsFromRefinancing > 0) {
+                          monthlyExpensesEUR -= savingsFromRefinancing;
+                        }
+                      }
+
+                      const targetReserve = monthlyExpensesEUR * 6; // 6 месеца коригирани разходи
 
                       // Начален резерв = Разплащателна сметка + Краткосрочни спестявания
                       const initialReserve = (

@@ -1270,9 +1270,10 @@ export default function FinancialPlanPresentation({ planData, clientData, analys
                         analysisData?.loan_amount > 0
                       );
 
-                      if (newLoanProducts.length > 0) {
-                        const newLoanMonthlyPayment = newLoanProducts.reduce((sum, p) => sum + (p.monthlyPremium || 0), 0);
-                        monthlyExpensesEUR += newLoanMonthlyPayment;
+                      const monthlyNewLoanPayment = newLoanProducts.reduce((sum, p) => sum + (p.monthlyPremium || 0), 0);
+
+                      if (monthlyNewLoanPayment > 0) {
+                        monthlyExpensesEUR += monthlyNewLoanPayment;
                       }
 
                       // Проверка за РЕФИНАНСИРАНИ кредити - коригираме разходите със спестената сума

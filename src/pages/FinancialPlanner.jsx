@@ -175,6 +175,13 @@ export default function FinancialPlanner() {
   
   // Client ID for resuming
   const [clientId, setClientId] = useState(null);
+  
+  // Email validation
+  const isValidEmail = (email) => {
+    if (!email) return false;
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+  };
 
   // Derived values (handle empty string values)
   const clientIncomeNum = typeof monthlyIncome === 'number' ? monthlyIncome : 400;
@@ -899,11 +906,16 @@ export default function FinancialPlanner() {
                               placeholder="Вашият имейл"
                               className={cn(
                                 "w-full px-4 py-3 rounded-xl border-2 transition-all duration-200 outline-none",
-                                isDarkMode 
-                                  ? "bg-slate-800 border-slate-700 text-white placeholder:text-slate-500 focus:border-blue-500" 
-                                  : "bg-white border-slate-200 text-slate-900 placeholder:text-slate-400 focus:border-blue-500"
+                                clientEmail && !isValidEmail(clientEmail)
+                                  ? "border-red-500 focus:border-red-500"
+                                  : isDarkMode 
+                                    ? "bg-slate-800 border-slate-700 text-white placeholder:text-slate-500 focus:border-blue-500" 
+                                    : "bg-white border-slate-200 text-slate-900 placeholder:text-slate-400 focus:border-blue-500"
                               )}
                             />
+                            {clientEmail && !isValidEmail(clientEmail) && (
+                              <p className="text-red-500 text-xs mt-1">Моля въведете валиден имейл адрес</p>
+                            )}
                           </div>
                         </div>
 
@@ -1102,11 +1114,16 @@ export default function FinancialPlanner() {
                                 placeholder="Имейл на партньора"
                                 className={cn(
                                   "w-full px-4 py-3 rounded-xl border-2 transition-all duration-200 outline-none",
-                                  isDarkMode 
-                                    ? "bg-slate-800 border-slate-700 text-white placeholder:text-slate-500 focus:border-blue-500" 
-                                    : "bg-white border-slate-200 text-slate-900 placeholder:text-slate-400 focus:border-blue-500"
+                                  partnerEmail && !isValidEmail(partnerEmail)
+                                    ? "border-red-500 focus:border-red-500"
+                                    : isDarkMode 
+                                      ? "bg-slate-800 border-slate-700 text-white placeholder:text-slate-500 focus:border-blue-500" 
+                                      : "bg-white border-slate-200 text-slate-900 placeholder:text-slate-400 focus:border-blue-500"
                                 )}
                               />
+                              {partnerEmail && !isValidEmail(partnerEmail) && (
+                                <p className="text-red-500 text-xs mt-1">Моля въведете валиден имейл адрес</p>
+                              )}
                             </div>
                           </div>
                         </div>
@@ -1186,7 +1203,8 @@ export default function FinancialPlanner() {
                         !clientLastName.trim() ||
                         !clientPhone.trim() ||
                         !clientEmail.trim() ||
-                        (familyType === 'family' && (!partnerFirstName.trim() || !partnerLastName.trim() || !partnerPhone.trim() || !partnerEmail.trim())) ||
+                        !isValidEmail(clientEmail) ||
+                        (familyType === 'family' && (!partnerFirstName.trim() || !partnerLastName.trim() || !partnerPhone.trim() || !partnerEmail.trim() || !isValidEmail(partnerEmail))) ||
                         (childrenCount > 0 && childrenNames.some(name => !name.trim()))
                       }
                       className={cn(primaryButtonClass, "px-16 py-6 text-lg")}

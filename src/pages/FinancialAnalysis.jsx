@@ -85,7 +85,10 @@ export default function FinancialAnalysis() {
         partner_last_name: parsed.partner_last_name,
         children_count: parsed.children_count,
         client_age: parsed.client_age,
-        partner_age: parsed.partner_age
+        partner_age: parsed.partner_age,
+        client_monthly_net_income: parsed.monthly_income,
+        partner_monthly_net_income: parsed.partner_income,
+        total_monthly_income: (parsed.monthly_income || 0) + (parsed.partner_income || 0)
       }));
       
       // Изчистване на данните след зареждане

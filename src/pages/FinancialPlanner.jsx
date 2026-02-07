@@ -2464,7 +2464,9 @@ export default function FinancialPlanner() {
                             client_insurance_type: clientInsuranceType,
                             partner_insurance_type: partnerInsuranceType,
                             client_age: clientAge,
-                            partner_age: partnerAge
+                            partner_age: partnerAge,
+                            monthly_income: monthlyIncome,
+                            partner_income: partnerIncome
                           };
 
                           // Запазване в localStorage за използване в анализа

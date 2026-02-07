@@ -6,7 +6,7 @@ import { Slider } from "@/components/ui/slider";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
-import { RotateCcw, Loader2, Lock, Unlock, HelpCircle, ArrowLeft, ShieldAlert, Shield, ShieldCheck, Frown, Smile, PartyPopper, Home, HomeIcon, Car, GraduationCap, Wallet, TrendingUp, Briefcase, Baby, PiggyBank, Plane, Heart, Target, CheckCircle2, Calendar, Users, FileText, Info, User, XCircle, ArrowRight, Sparkles, ChevronDown } from 'lucide-react';
+import { RotateCcw, Loader2, Lock, Unlock, HelpCircle, ArrowLeft, ShieldAlert, Shield, ShieldCheck, Frown, Smile, PartyPopper, Home, HomeIcon, Car, GraduationCap, Wallet, TrendingUp, Briefcase, Baby, PiggyBank, Plane, Heart, Target, CheckCircle2, Calendar, Users, FileText, Info, User, XCircle, ArrowRight, Sparkles, ChevronDown, Search, Settings, Presentation, Handshake, Eye, Coins } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import { base44 } from '@/api/base44Client';
 import {
@@ -2888,6 +2888,7 @@ export default function FinancialPlanner() {
 
                   <div className="grid md:grid-cols-2 gap-4 flex-1">
                     <div className={cn("rounded-xl border-2 p-6 transition-all duration-300 group hover:border-blue-500 hover:bg-blue-600 flex flex-col justify-center", isDarkMode ? "border-slate-800" : "border-slate-200")}>
+                      <Search className={cn("w-10 h-10 mb-3 transition-colors", "text-blue-600 group-hover:text-white")} />
                       <p className={cn("text-xs tracking-widest mb-2 group-hover:text-blue-100", mutedTextClasses)}>ФАЗА 1</p>
                       <h3 className="text-xl font-semibold mb-2 group-hover:text-white">Анализ</h3>
                       <p className="text-blue-500 text-base mb-3 font-medium group-hover:text-blue-200">Нужди, цели, желания</p>
@@ -2897,6 +2898,7 @@ export default function FinancialPlanner() {
                     </div>
 
                     <div className={cn("rounded-xl border-2 p-6 transition-all duration-300 group hover:border-blue-500 hover:bg-blue-600 flex flex-col justify-center", isDarkMode ? "border-slate-800" : "border-slate-200")}>
+                      <Settings className={cn("w-10 h-10 mb-3 transition-colors", "text-blue-600 group-hover:text-white")} />
                       <p className={cn("text-xs tracking-widest mb-2 group-hover:text-blue-100", mutedTextClasses)}>ФАЗА 2</p>
                       <h3 className="text-xl font-semibold mb-2 group-hover:text-white">Оптимизация</h3>
                       <p className="text-blue-500 text-base mb-3 font-medium group-hover:text-blue-200">Подготовка на финансовия план</p>
@@ -2906,6 +2908,7 @@ export default function FinancialPlanner() {
                     </div>
 
                     <div className={cn("rounded-xl border-2 p-6 transition-all duration-300 group hover:border-blue-500 hover:bg-blue-600 flex flex-col justify-center", isDarkMode ? "border-slate-800" : "border-slate-200")}>
+                      <Presentation className={cn("w-10 h-10 mb-3 transition-colors", "text-blue-600 group-hover:text-white")} />
                       <p className={cn("text-xs tracking-widest mb-2 group-hover:text-blue-100", mutedTextClasses)}>ФАЗА 3</p>
                       <h3 className="text-xl font-semibold mb-2 group-hover:text-white">Представяне</h3>
                       <p className="text-blue-500 text-base mb-3 font-medium group-hover:text-blue-200">Финансовият план и реализацията</p>
@@ -2915,6 +2918,7 @@ export default function FinancialPlanner() {
                     </div>
 
                     <div className={cn("rounded-xl border-2 p-6 transition-all duration-300 group hover:border-blue-500 hover:bg-blue-600 flex flex-col justify-center", isDarkMode ? "border-slate-800" : "border-slate-200")}>
+                      <Handshake className={cn("w-10 h-10 mb-3 transition-colors", "text-blue-600 group-hover:text-white")} />
                       <p className={cn("text-xs tracking-widest mb-2 group-hover:text-blue-100", mutedTextClasses)}>ФАЗА 4</p>
                       <h3 className="text-xl font-semibold mb-2 group-hover:text-white">Дългосрочно обслужване</h3>
                       <p className="text-blue-500 text-base mb-3 font-medium group-hover:text-blue-200">Дългосрочно и редовно</p>
@@ -2971,6 +2975,7 @@ export default function FinancialPlanner() {
 
                   <div className="grid md:grid-cols-2 gap-4 mb-6">
                     <div className={cn("rounded-2xl border-2 p-6 transition-all duration-300 group hover:border-blue-500 hover:bg-blue-600", isDarkMode ? "border-slate-800" : "border-slate-200")}>
+                      <Lock className={cn("w-10 h-10 mb-3 transition-colors", "text-blue-600 group-hover:text-white")} />
                       <p className={cn("text-xs tracking-widest mb-2 group-hover:text-blue-100", mutedTextClasses)}>ПРАВИЛО 1</p>
                       <h3 className="text-xl font-semibold mb-2 group-hover:text-white">Дискретност</h3>
                       <p className="text-blue-500 text-base mb-3 font-medium group-hover:text-blue-200">Пълна конфиденциалност</p>
@@ -2981,6 +2986,7 @@ export default function FinancialPlanner() {
                     </div>
 
                     <div className={cn("rounded-2xl border-2 p-6 transition-all duration-300 group hover:border-blue-500 hover:bg-blue-600", isDarkMode ? "border-slate-800" : "border-slate-200")}>
+                      <Handshake className={cn("w-10 h-10 mb-3 transition-colors", "text-blue-600 group-hover:text-white")} />
                       <p className={cn("text-xs tracking-widest mb-2 group-hover:text-blue-100", mutedTextClasses)}>ПРАВИЛО 2</p>
                       <h3 className="text-xl font-semibold mb-2 group-hover:text-white">Коректност</h3>
                       <p className="text-blue-500 text-base mb-3 font-medium group-hover:text-blue-200">Честни взаимоотношения</p>
@@ -2991,6 +2997,7 @@ export default function FinancialPlanner() {
                     </div>
 
                     <div className={cn("rounded-2xl border-2 p-6 transition-all duration-300 group hover:border-blue-500 hover:bg-blue-600", isDarkMode ? "border-slate-800" : "border-slate-200")}>
+                      <Eye className={cn("w-10 h-10 mb-3 transition-colors", "text-blue-600 group-hover:text-white")} />
                       <p className={cn("text-xs tracking-widest mb-2 group-hover:text-blue-100", mutedTextClasses)}>ПРАВИЛО 3</p>
                       <h3 className="text-xl font-semibold mb-2 group-hover:text-white">Прозрачност</h3>
                       <p className="text-blue-500 text-base mb-3 font-medium group-hover:text-blue-200">Открита комуникация</p>
@@ -3001,6 +3008,7 @@ export default function FinancialPlanner() {
                     </div>
 
                     <div className={cn("rounded-2xl border-2 p-6 transition-all duration-300 group hover:border-blue-500 hover:bg-blue-600", isDarkMode ? "border-slate-800" : "border-slate-200")}>
+                      <Coins className={cn("w-10 h-10 mb-3 transition-colors", "text-blue-600 group-hover:text-white")} />
                       <p className={cn("text-xs tracking-widest mb-2 group-hover:text-blue-100", mutedTextClasses)}>ПРАВИЛО 4</p>
                       <h3 className="text-xl font-semibold mb-2 group-hover:text-white">Възнаграждение</h3>
                       <p className="text-blue-500 text-base mb-3 font-medium group-hover:text-blue-200">Без директни такси от клиенти</p>

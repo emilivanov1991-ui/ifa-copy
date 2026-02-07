@@ -138,6 +138,7 @@ export default function FinancialPlanner() {
   const [partnerInsuranceType, setPartnerInsuranceType] = useState(null); // 'employee' | 'entrepreneur'
   const [clientAge, setClientAge] = useState(35);
   const [partnerAge, setPartnerAge] = useState(35);
+  const [childrenAges, setChildrenAges] = useState([]);
   const [monthlyIncome, setMonthlyIncome] = useState(1000); // EUR
   const [selectedPriorities, setSelectedPriorities] = useState([]); // multi-select
   const [partnerIncome, setPartnerIncome] = useState(1000); // EUR
@@ -417,6 +418,7 @@ export default function FinancialPlanner() {
     setPartnerLastName('');
     setChildrenCount(0);
     setChildrenNames([]);
+    setChildrenAges([]);
     setClientInsuranceType(null);
     setPartnerInsuranceType(null);
     setClientAge(35);
@@ -1250,81 +1252,40 @@ export default function FinancialPlanner() {
                   <h2 className="text-3xl font-bold mb-8">Възраст</h2>
 
                   {/* Age inputs side by side */}
-                  <div className={cn("grid gap-8 mb-8 flex-1", familyType === 'family' ? "grid-cols-2" : "grid-cols-1")}>
-                    {/* Client Age */}
-                    <div className="flex flex-col justify-center">
-                      <p className={cn("text-base font-medium mb-4", mutedTextClasses)}>
-                        {familyType === 'family' ? 'КЛИЕНТ' : 'ВАШАТА ВЪЗРАСТ'}
-                      </p>
-                      <div className="text-center mb-4">
-                        <input
-                          type="text"
-                          inputMode="numeric"
-                          value={clientAge}
-                          onChange={(e) => {
-                            const inputVal = e.target.value;
-                            if (inputVal === '') {
-                              setClientAge('');
-                              return;
-                            }
-                            const numVal = parseInt(inputVal);
-                            if (!isNaN(numVal)) {
-                              setClientAge(numVal);
-                            }
-                          }}
-                          onBlur={() => {
-                            if (clientAge === '' || clientAge < 18) setClientAge(18);
-                            else if (clientAge > 70) setClientAge(70);
-                          }}
-                          className={cn("text-5xl font-bold text-blue-500 bg-transparent border-none text-center w-24 outline-none focus:ring-2 focus:ring-blue-500 rounded")}
-                        />
-                        <span className={cn("text-xl ml-2", mutedTextClasses)}>години</span>
-                      </div>
-                      <Slider
-                        value={[typeof clientAge === 'number' ? clientAge : 35]}
-                        onValueChange={(v) => setClientAge(v[0])}
-                        min={18}
-                        max={70}
-                        step={1}
-                        className="mb-2"
-                      />
-                      <div className={cn("flex justify-between text-sm", mutedTextClasses)}>
-                        <span>18</span>
-                        <span>70</span>
-                      </div>
-                    </div>
-
-                    {/* Partner Age (only for family) */}
-                    {familyType === 'family' && (
+                  <div className="space-y-8 mb-8 flex-1">
+                    <div className={cn("grid gap-8", familyType === 'family' ? "grid-cols-2" : "grid-cols-1")}>
+                      {/* Client Age */}
                       <div className="flex flex-col justify-center">
-                        <p className={cn("text-base font-medium mb-4", mutedTextClasses)}>ПАРТНЬОР</p>
+                        <p className={cn("text-base font-medium mb-4", mutedTextClasses)}>
+                          {familyType === 'family' ? (clientFirstName || 'КЛИЕНТ') : 'ВАШАТА ВЪЗРАСТ'}
+                        </p>
                         <div className="text-center mb-4">
                           <input
                             type="text"
                             inputMode="numeric"
-                            value={partnerAge}
+                            value={clientAge}
                             onChange={(e) => {
                               const inputVal = e.target.value;
                               if (inputVal === '') {
-                                setPartnerAge('');
+                                setClientAge('');
                                 return;
                               }
                               const numVal = parseInt(inputVal);
                               if (!isNaN(numVal)) {
-                                setPartnerAge(numVal);
+                                setClientAge(numVal);
                               }
                             }}
                             onBlur={() => {
-                              if (partnerAge === '' || partnerAge < 18) setPartnerAge(18);
-                              else if (partnerAge > 70) setPartnerAge(70);
+                              if (clientAge === '' || clientAge < 18) setClientAge(18);
+                              else if (clientAge > 70) setClientAge(70);
                             }}
                             className={cn("text-5xl font-bold text-blue-500 bg-transparent border-none text-center w-24 outline-none focus:ring-2 focus:ring-blue-500 rounded")}
                           />
                           <span className={cn("text-xl ml-2", mutedTextClasses)}>години</span>
                         </div>
                         <Slider
-                          value={[typeof partnerAge === 'number' ? partnerAge : 35]}
-                          onValueChange={(v) => setPartnerAge(v[0])}
+                          value={[typeof clientAge === 'number' ? clientAge : 35]}
+                          onValueChange={(v) => setClientAge(v[0])}
                           min={18}
                           max={70}
                           step={1}
@@ -1335,6 +1296,111 @@ export default function FinancialPlanner() {
                           <span>70</span>
                         </div>
                       </div>
+
+                      {/* Partner Age (only for family) */}
+                      {familyType === 'family' && (
+                        <div className="flex flex-col justify-center">
+                          <p className={cn("text-base font-medium mb-4", mutedTextClasses)}>{partnerFirstName || 'ПАРТНЬОР'}</p>
+                          <div className="text-center mb-4">
+                            <input
+                              type="text"
+                              inputMode="numeric"
+                              value={partnerAge}
+                              onChange={(e) => {
+                                const inputVal = e.target.value;
+                                if (inputVal === '') {
+                                  setPartnerAge('');
+                                  return;
+                                }
+                                const numVal = parseInt(inputVal);
+                                if (!isNaN(numVal)) {
+                                  setPartnerAge(numVal);
+                                }
+                              }}
+                              onBlur={() => {
+                                if (partnerAge === '' || partnerAge < 18) setPartnerAge(18);
+                                else if (partnerAge > 70) setPartnerAge(70);
+                              }}
+                              className={cn("text-5xl font-bold text-blue-500 bg-transparent border-none text-center w-24 outline-none focus:ring-2 focus:ring-blue-500 rounded")}
+                            />
+                            <span className={cn("text-xl ml-2", mutedTextClasses)}>години</span>
+                          </div>
+                          <Slider
+                            value={[typeof partnerAge === 'number' ? partnerAge : 35]}
+                            onValueChange={(v) => setPartnerAge(v[0])}
+                            min={18}
+                            max={70}
+                            step={1}
+                            className="mb-2"
+                          />
+                          <div className={cn("flex justify-between text-sm", mutedTextClasses)}>
+                            <span>18</span>
+                            <span>70</span>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Children Ages */}
+                    {childrenCount > 0 && (
+                      <motion.div
+                        initial={{ opacity: 0, height: 0 }}
+                        animate={{ opacity: 1, height: 'auto' }}
+                        className="space-y-6"
+                      >
+                        {Array.from({ length: childrenCount }).map((_, idx) => (
+                          <div key={idx}>
+                            <p className={cn("text-base font-medium mb-4", mutedTextClasses)}>
+                              {childrenNames[idx] || `ДЕТЕ ${idx + 1}`}
+                            </p>
+                            <div className="text-center mb-4">
+                              <input
+                                type="text"
+                                inputMode="numeric"
+                                value={childrenAges[idx] !== undefined ? childrenAges[idx] : ''}
+                                onChange={(e) => {
+                                  const inputVal = e.target.value;
+                                  const newAges = [...childrenAges];
+                                  if (inputVal === '') {
+                                    newAges[idx] = '';
+                                    setChildrenAges(newAges);
+                                    return;
+                                  }
+                                  const numVal = parseInt(inputVal);
+                                  if (!isNaN(numVal)) {
+                                    newAges[idx] = numVal;
+                                    setChildrenAges(newAges);
+                                  }
+                                }}
+                                onBlur={() => {
+                                  const newAges = [...childrenAges];
+                                  if (newAges[idx] === '' || newAges[idx] < 0) newAges[idx] = 0;
+                                  else if (newAges[idx] > 18) newAges[idx] = 18;
+                                  setChildrenAges(newAges);
+                                }}
+                                className={cn("text-5xl font-bold text-blue-500 bg-transparent border-none text-center w-24 outline-none focus:ring-2 focus:ring-blue-500 rounded")}
+                              />
+                              <span className={cn("text-xl ml-2", mutedTextClasses)}>години</span>
+                            </div>
+                            <Slider
+                              value={[typeof childrenAges[idx] === 'number' ? childrenAges[idx] : 0]}
+                              onValueChange={(v) => {
+                                const newAges = [...childrenAges];
+                                newAges[idx] = v[0];
+                                setChildrenAges(newAges);
+                              }}
+                              min={0}
+                              max={18}
+                              step={1}
+                              className="mb-2"
+                            />
+                            <div className={cn("flex justify-between text-sm", mutedTextClasses)}>
+                              <span>0</span>
+                              <span>18</span>
+                            </div>
+                          </div>
+                        ))}
+                      </motion.div>
                     )}
                   </div>
 

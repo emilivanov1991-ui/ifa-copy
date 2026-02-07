@@ -52,6 +52,8 @@ import AuxiliaryTools from './pages/AuxiliaryTools';
 import CRM from './pages/CRM';
 import Calculators from './pages/Calculators';
 import CascoOfferDemo from './pages/CascoOfferDemo';
+import ClientPortal from './pages/ClientPortal';
+import ConsultantPortal from './pages/ConsultantPortal';
 import Contact from './pages/Contact';
 import FinancialAnalysis from './pages/FinancialAnalysis';
 import FinancialPlanCreate from './pages/FinancialPlanCreate';
@@ -62,8 +64,6 @@ import ProductCatalogAdmin from './pages/ProductCatalogAdmin';
 import ProductConfigDemo from './pages/ProductConfigDemo';
 import Services from './pages/Services';
 import app from './pages/_app';
-import ClientPortal from './pages/ClientPortal';
-import ConsultantPortal from './pages/ConsultantPortal';
 import __Layout from './Layout.jsx';
 
 
@@ -73,6 +73,8 @@ export const PAGES = {
     "CRM": CRM,
     "Calculators": Calculators,
     "CascoOfferDemo": CascoOfferDemo,
+    "ClientPortal": ClientPortal,
+    "ConsultantPortal": ConsultantPortal,
     "Contact": Contact,
     "FinancialAnalysis": FinancialAnalysis,
     "FinancialPlanCreate": FinancialPlanCreate,
@@ -83,8 +85,6 @@ export const PAGES = {
     "ProductConfigDemo": ProductConfigDemo,
     "Services": Services,
     "_app": app,
-    "ClientPortal": ClientPortal,
-    "ConsultantPortal": ConsultantPortal,
 }
 
 export const pagesConfig = {

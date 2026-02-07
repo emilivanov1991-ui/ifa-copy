@@ -93,19 +93,30 @@ export default function PensionStep({ data, onChange, showErrors, plannerData })
   const includePartner = plannerData?.family_type === 'family' || data.include_partner;
 
   // Auto-populate gross income from net income (from Reserve step)
+  // For entrepreneurs from Financial Planner step 2, set 620 EUR
   useEffect(() => {
     if (data.client_monthly_net_income && !data.client_gross_income_pension) {
-      const grossIncome = Math.round(netToBruto(data.client_monthly_net_income));
+      let grossIncome;
+      if (plannerData?.client_insurance_type === 'entrepreneur') {
+        grossIncome = 620;
+      } else {
+        grossIncome = Math.round(netToBruto(data.client_monthly_net_income));
+      }
       onChange('client_gross_income_pension', grossIncome);
     }
-  }, [data.client_monthly_net_income]);
+  }, [data.client_monthly_net_income, plannerData?.client_insurance_type]);
 
   useEffect(() => {
     if (includePartner && data.partner_monthly_net_income && !data.partner_gross_income_pension) {
-      const grossIncome = Math.round(netToBruto(data.partner_monthly_net_income));
+      let grossIncome;
+      if (plannerData?.partner_insurance_type === 'entrepreneur') {
+        grossIncome = 620;
+      } else {
+        grossIncome = Math.round(netToBruto(data.partner_monthly_net_income));
+      }
       onChange('partner_gross_income_pension', grossIncome);
     }
-  }, [data.partner_monthly_net_income, includePartner]);
+  }, [data.partner_monthly_net_income, includePartner, plannerData?.partner_insurance_type]);
 
   // Auto-calculate client expected pension
   useEffect(() => {

@@ -1111,10 +1111,10 @@ export default function FinancialPlanner() {
                         animate={{ opacity: 1, y: 0 }}
                         className="space-y-6"
                       >
-                        <div className="grid grid-cols-2 gap-6">
+                        <div className="grid grid-cols-2 gap-6 items-start">
                           {/* Client names */}
                           <div className="space-y-4">
-                            <p className={cn("text-sm font-semibold", mutedTextClasses)}>КЛИЕНТ</p>
+                            <p className={cn("text-sm font-semibold uppercase tracking-wide", mutedTextClasses)}>КЛИЕНТ</p>
                             <div>
                               <label className={cn("text-sm font-medium mb-2 block", mutedTextClasses)}>Име</label>
                               <input
@@ -1179,7 +1179,7 @@ export default function FinancialPlanner() {
 
                           {/* Partner names - with floating labels */}
                           <div className="space-y-4">
-                            <p className={cn("text-sm font-semibold", mutedTextClasses)}>ПАРТНЬОР</p>
+                            <p className={cn("text-sm font-semibold uppercase tracking-wide", mutedTextClasses)}>ПАРТНЬОР</p>
                             <div className="relative">
                               <input
                                 type="text"
@@ -3044,20 +3044,53 @@ export default function FinancialPlanner() {
 
                   {/* GDPR Consents - Enhanced Cards */}
                   <motion.div 
-                    className={cn("rounded-2xl border-2 border-blue-200 p-6 mb-8", isDarkMode ? "bg-slate-800" : "bg-blue-50/50")}
+                    className={cn("rounded-2xl border-2 border-blue-200 p-6 mb-8", isDarkMode ? "bg-slate-800" : "bg-gradient-to-r from-blue-50/50 to-indigo-50/50")}
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 1 }}
                   >
-                    <div className="flex items-center gap-3 mb-4">
-                      <div className="w-10 h-10 rounded-full bg-blue-600 flex items-center justify-center">
-                        <Shield className="w-5 h-5 text-white" />
+                    <Collapsible open={gdprTextOpen} onOpenChange={setGdprTextOpen}>
+                      <div className="flex items-center justify-between mb-4">
+                        <div className="flex items-center gap-3">
+                          <div className="w-10 h-10 rounded-full bg-blue-600 flex items-center justify-center">
+                            <Shield className="w-5 h-5 text-white" />
+                          </div>
+                          <h3 className="text-lg font-bold text-blue-900">Защита на личните данни</h3>
+                        </div>
+                        <CollapsibleTrigger asChild>
+                          <Button variant="ghost" size="sm" className="text-blue-600 hover:text-blue-700 hover:bg-blue-100">
+                            <span className="text-xs mr-2">{gdprTextOpen ? 'Скрий текста' : 'Прочети пълния текст'}</span>
+                            <ChevronDown className={cn("w-4 h-4 transition-transform", gdprTextOpen && "rotate-180")} />
+                          </Button>
+                        </CollapsibleTrigger>
                       </div>
-                      <h3 className="text-lg font-bold text-blue-900">Защита на личните данни</h3>
-                    </div>
-                    <p className="text-sm text-slate-700 mb-6">
-                      APEX Financial гарантира пълна конфиденциалност и защита на Вашите лични данни съгласно GDPR и европейското законодателство.
-                    </p>
+                      
+                      <CollapsibleContent>
+                        <div className="bg-white rounded-xl p-4 mb-4 border border-blue-100 max-h-64 overflow-y-auto">
+                          <p className="text-xs text-slate-700 leading-relaxed whitespace-pre-line">
+{`С настоящото по смисъла на Закона за личните данни и на Регламент (ЕС) 2016/679 на Европейския парламент и на Съвета от 27 април 2016 година относно защитата на физическите лица във връзка с обработването на лични данни и относно свободното движение на такива данни и за отмяна на Директива 95/46/EО (Общ регламент относно защитата на данните) (по-долу наричан само „Приложимо законодателство") Давам съгласието си на "Интегрити Файненшъл Адвайзърс" ЕООД, с ЕИК: 208597115, със седалище и адрес на управление в гр. Бургас (8001), ул.Поморие, 20, ет. 5, ап. 1 ("Компанията") да обработва личните ми данни, посочени в този анализ.
+
+Данните включва: Име, фамилия адрес на електронна поща, телефон и друг начин за връзка, финансово-икономическо състояние, данни на низходящи (деца), брой деца, кредитна информация, доходи.
+
+Декларирам, че съм взел предвид и съм съгласен/а, че Компанията има право, на основание на даденото с настоящото от мен изрично съгласие, да обработва личните ми данни в съответствие с Приложимото законодателство, най-вече използвайки автоматизирани и не автоматизирани средства.
+
+Своето съгласие за обработване на личните ми данни по смисъла на Приложимото право давам за определен срок, а именно за срока, необходим за обработването на предоставените от мен лични данни, но за не повече от 2 години.
+
+С настоящото декларирам, че съм информиран и разбирам, че Компанията има основание да обработва моите лични данни и на база сключения с мен писмен договор.
+
+Имам право с писмена молба от Компанията да изисквам:
+
+• удостоверение дали личните ми данни са обработени или не
+• информация за състоянието на обработката на личните ми данни
+• точна информация за източника, от който са били получени данните
+• списък на личните ми данни, които са обработвани
+• поправка или заличаване на неправилните, непълните или неактуалните ми лични данни
+• заличаване на личните ми данни, които са изпълнили своята цел
+• блокиране на личните ми данни поради оттегляне на съгласието ми.`}
+                          </p>
+                        </div>
+                      </CollapsibleContent>
+                    </Collapsible>
                     
                     <div className="space-y-3">
                       <motion.label 

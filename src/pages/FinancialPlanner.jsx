@@ -2973,45 +2973,61 @@ export default function FinancialPlanner() {
                     Нашите принципи на работа гарантират професионализъм и доверие във всяка стъпка от процеса.
                   </p>
 
-                  <div className="grid md:grid-cols-2 gap-4 flex-1">
-                    <div className={cn("rounded-xl border-2 p-6 transition-all duration-300 group hover:border-blue-500 hover:bg-blue-600 flex flex-col justify-center relative", isDarkMode ? "border-slate-800" : "border-slate-200")}>
-                      <Search className={cn("w-20 h-20 absolute top-4 right-4 transition-colors", "text-blue-600/20 group-hover:text-white/30")} />
-                      <p className={cn("text-xs tracking-widest mb-2 group-hover:text-blue-100 relative z-10", mutedTextClasses)}>ФАЗА 1</p>
-                      <h3 className="text-xl font-semibold mb-2 group-hover:text-white relative z-10">Анализ</h3>
-                      <p className="text-blue-500 text-base mb-3 font-medium group-hover:text-blue-200 relative z-10">Нужди, цели, желания</p>
-                      <p className={cn("text-sm leading-relaxed group-hover:text-blue-100 relative z-10", mutedTextClasses)}>
-                        Анализираме целите на клиента за най-подходящите финансови решения.
-                      </p>
+                  <div className="grid md:grid-cols-2 gap-6 mb-8">
+                    <div className={cn("rounded-xl border-2 p-6", isDarkMode ? "border-slate-800 bg-slate-900/50" : "border-slate-200 bg-white")}>
+                      <div className="flex items-start gap-4">
+                        <div className="w-12 h-12 rounded-xl bg-blue-100 flex items-center justify-center flex-shrink-0">
+                          <FileText className="w-6 h-6 text-blue-600" />
+                        </div>
+                        <div>
+                          <h3 className="text-lg font-bold mb-2">Професионализъм</h3>
+                          <p className={cn("text-sm leading-relaxed", mutedTextClasses)}>
+                            Винаги работим с най-високи стандарти за качество и прозрачност във всяка услуга.
+                          </p>
+                        </div>
+                      </div>
                     </div>
 
-                    <div className={cn("rounded-xl border-2 p-6 transition-all duration-300 group hover:border-blue-500 hover:bg-blue-600 flex flex-col justify-center relative", isDarkMode ? "border-slate-800" : "border-slate-200")}>
-                      <Settings className={cn("w-20 h-20 absolute top-4 right-4 transition-colors", "text-blue-600/20 group-hover:text-white/30")} />
-                      <p className={cn("text-xs tracking-widest mb-2 group-hover:text-blue-100 relative z-10", mutedTextClasses)}>ФАЗА 2</p>
-                      <h3 className="text-xl font-semibold mb-2 group-hover:text-white relative z-10">Оптимизация</h3>
-                      <p className="text-blue-500 text-base mb-3 font-medium group-hover:text-blue-200 relative z-10">Подготовка на финансовия план</p>
-                      <p className={cn("text-sm leading-relaxed group-hover:text-blue-100 relative z-10", mutedTextClasses)}>
-                        Разглеждаме съществуващи продукти за оптимизация и спестяване.
-                      </p>
+                    <div className={cn("rounded-xl border-2 p-6", isDarkMode ? "border-slate-800 bg-slate-900/50" : "border-slate-200 bg-white")}>
+                      <div className="flex items-start gap-4">
+                        <div className="w-12 h-12 rounded-xl bg-blue-100 flex items-center justify-center flex-shrink-0">
+                          <Shield className="w-6 h-6 text-blue-600" />
+                        </div>
+                        <div>
+                          <h3 className="text-lg font-bold mb-2">Конфиденциалност</h3>
+                          <p className={cn("text-sm leading-relaxed", mutedTextClasses)}>
+                            Вашите данни са защитени и никога не се споделят без Ваше съгласие.
+                          </p>
+                        </div>
+                      </div>
                     </div>
 
-                    <div className={cn("rounded-xl border-2 p-6 transition-all duration-300 group hover:border-blue-500 hover:bg-blue-600 flex flex-col justify-center relative", isDarkMode ? "border-slate-800" : "border-slate-200")}>
-                      <Presentation className={cn("w-20 h-20 absolute top-4 right-4 transition-colors", "text-blue-600/20 group-hover:text-white/30")} />
-                      <p className={cn("text-xs tracking-widest mb-2 group-hover:text-blue-100 relative z-10", mutedTextClasses)}>ФАЗА 3</p>
-                      <h3 className="text-xl font-semibold mb-2 group-hover:text-white relative z-10">Представяне</h3>
-                      <p className="text-blue-500 text-base mb-3 font-medium group-hover:text-blue-200 relative z-10">Финансовият план и реализацията</p>
-                      <p className={cn("text-sm leading-relaxed group-hover:text-blue-100 relative z-10", mutedTextClasses)}>
-                        Представяме плана и привеждаме в действие решенията.
-                      </p>
+                    <div className={cn("rounded-xl border-2 p-6", isDarkMode ? "border-slate-800 bg-slate-900/50" : "border-slate-200 bg-white")}>
+                      <div className="flex items-start gap-4">
+                        <div className="w-12 h-12 rounded-xl bg-blue-100 flex items-center justify-center flex-shrink-0">
+                          <Target className="w-6 h-6 text-blue-600" />
+                        </div>
+                        <div>
+                          <h3 className="text-lg font-bold mb-2">Персонализиран подход</h3>
+                          <p className={cn("text-sm leading-relaxed", mutedTextClasses)}>
+                            Всеки план е изработен специално за Вашите уникални нужди и цели.
+                          </p>
+                        </div>
+                      </div>
                     </div>
 
-                    <div className={cn("rounded-xl border-2 p-6 transition-all duration-300 group hover:border-blue-500 hover:bg-blue-600 flex flex-col justify-center relative", isDarkMode ? "border-slate-800" : "border-slate-200")}>
-                      <Handshake className={cn("w-20 h-20 absolute top-4 right-4 transition-colors", "text-blue-600/20 group-hover:text-white/30")} />
-                      <p className={cn("text-xs tracking-widest mb-2 group-hover:text-blue-100 relative z-10", mutedTextClasses)}>ФАЗА 4</p>
-                      <h3 className="text-xl font-semibold mb-2 group-hover:text-white relative z-10">Дългосрочно обслужване</h3>
-                      <p className="text-blue-500 text-base mb-3 font-medium group-hover:text-blue-200 relative z-10">Дългосрочно и редовно</p>
-                      <p className={cn("text-sm leading-relaxed group-hover:text-blue-100 relative z-10", mutedTextClasses)}>
-                        Постоянна подкрепа с редовни срещи и актуализации.
-                      </p>
+                    <div className={cn("rounded-xl border-2 p-6", isDarkMode ? "border-slate-800 bg-slate-900/50" : "border-slate-200 bg-white")}>
+                      <div className="flex items-start gap-4">
+                        <div className="w-12 h-12 rounded-xl bg-blue-100 flex items-center justify-center flex-shrink-0">
+                          <Handshake className="w-6 h-6 text-blue-600" />
+                        </div>
+                        <div>
+                          <h3 className="text-lg font-bold mb-2">Дългосрочно партньорство</h3>
+                          <p className={cn("text-sm leading-relaxed", mutedTextClasses)}>
+                            Не просто консултация, а траен съюз за постигане на Вашите финансови цели.
+                          </p>
+                        </div>
+                      </div>
                     </div>
                   </div>
 

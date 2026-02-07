@@ -65,10 +65,14 @@ const calculateMonthlyInvestment = (targetAmount, years, annualRate) => {
   return Math.round(payment);
 };
 
-export default function PensionStep({ data, onChange, showErrors }) {
+export default function PensionStep({ data, onChange, showErrors, plannerData }) {
   // Helper to check if a field is invalid - only when showErrors is true
   const isFieldInvalid = (value) => showErrors && (value === undefined || value === '' || value === null);
-  const includePartner = data.include_partner || false;
+  
+  // Get names from Financial Planner
+  const clientName = plannerData?.client_first_name || 'Клиент';
+  const partnerName = plannerData?.partner_first_name || 'Партньор';
+  const includePartner = plannerData?.family_type === 'family' || data.include_partner;
 
   // Auto-calculate client expected pension
   useEffect(() => {

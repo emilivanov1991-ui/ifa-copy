@@ -36,9 +36,14 @@ const BANK_OPTIONS = [
   { value: 'other', label: 'Друга' },
 ];
 
-export default function ReserveStep({ data, onChange, showErrors }) {
+export default function ReserveStep({ data, onChange, showErrors, plannerData }) {
   // Helper to check if a field is invalid - only when showErrors is true
   const isFieldInvalid = (value) => showErrors && (value === undefined || value === '' || value === null);
+  
+  // Get names from Financial Planner
+  const clientName = plannerData?.client_first_name || 'Клиент';
+  const partnerName = plannerData?.partner_first_name || 'Партньор';
+  const includePartner = plannerData?.family_type === 'family' || data.include_partner;
   // Get total monthly income from input
   const totalMonthlyIncome = data.total_monthly_income || 0;
   
@@ -67,6 +72,11 @@ export default function ReserveStep({ data, onChange, showErrors }) {
   const monthlyExpenses = totalMonthlyIncome - monthlySavings;
 
   // Calculate total savings
+  // Get names from Financial Planner
+  const clientName = plannerData?.client_first_name || 'Клиент';
+  const partnerName = plannerData?.partner_first_name || 'Партньор';
+  const includePartner = plannerData?.family_type === 'family' || data.include_partner;
+  
   const clientTotal = (data.client_checking_account || 0) + (data.client_term_deposit || 0) + 
     (data.client_mutual_funds || 0) + (data.client_savings_account || 0) + (data.client_cash || 0) +
     (data.client_crypto || 0) + (data.client_gold || 0);
@@ -112,9 +122,9 @@ export default function ReserveStep({ data, onChange, showErrors }) {
         {/* Monthly Net Income */}
         <div className="mb-6 p-4 bg-white rounded-lg border border-slate-200">
           <h4 className="font-medium text-slate-700 mb-4">Месечен среден нетен доход <span className="text-red-500">*</span></h4>
-          <div className={data.include_partner ? "grid sm:grid-cols-2 gap-4" : ""}>
+          <div className={includePartner ? "grid sm:grid-cols-2 gap-4" : ""}>
             <div className="space-y-2" data-invalid={isFieldInvalid(data.client_monthly_net_income) ? "true" : undefined}>
-              <Label className="text-sm">Клиент (€) <span className="text-red-500">*</span></Label>
+              <Label className="text-sm">{clientName} (€) <span className="text-red-500">*</span></Label>
               <Input
                 type="number"
                 min="0"
@@ -129,9 +139,9 @@ export default function ReserveStep({ data, onChange, showErrors }) {
                 required
               />
             </div>
-            {data.include_partner && (
+            {includePartner && (
               <div className="space-y-2" data-invalid={isFieldInvalid(data.partner_monthly_net_income) ? "true" : undefined}>
-                <Label className="text-sm">Партньор (€) <span className="text-red-500">*</span></Label>
+                <Label className="text-sm">{partnerName} (€) <span className="text-red-500">*</span></Label>
                 <Input
                   type="number"
                   min="0"
@@ -193,12 +203,12 @@ export default function ReserveStep({ data, onChange, showErrors }) {
       <div className="bg-slate-50 rounded-xl p-6">
         <h3 className="font-semibold text-slate-900 mb-6">Текущи спестявания и инвестиции</h3>
 
-        <div className={data.include_partner ? "grid lg:grid-cols-2 gap-8" : ""}>
+        <div className={includePartner ? "grid lg:grid-cols-2 gap-8" : ""}>
           {/* Client */}
           <div>
             <div className="flex items-center gap-2 mb-4">
               <User className="h-4 w-4 text-slate-500" />
-              <span className="font-medium text-slate-700">Клиент</span>
+              <span className="font-medium text-slate-700">{clientName}</span>
             </div>
             
             {/* Header row */}
@@ -358,17 +368,17 @@ export default function ReserveStep({ data, onChange, showErrors }) {
 
             {/* Client subtotal */}
             <div className="mt-3 pt-3 border-t border-slate-200 flex justify-between items-center">
-              <span className="text-sm text-slate-600">Подсума клиент:</span>
+              <span className="text-sm text-slate-600">Подсума {clientName.toLowerCase()}:</span>
               <span className="font-semibold text-slate-700">{clientTotal.toLocaleString('bg-BG')} €</span>
             </div>
           </div>
 
           {/* Partner - only show if included */}
-          {data.include_partner && (
+          {includePartner && (
             <div>
               <div className="flex items-center gap-2 mb-4">
                 <Users className="h-4 w-4 text-slate-500" />
-                <span className="font-medium text-slate-700">Партньор</span>
+                <span className="font-medium text-slate-700">{partnerName}</span>
               </div>
               
               {/* Header row */}
@@ -528,7 +538,7 @@ export default function ReserveStep({ data, onChange, showErrors }) {
 
               {/* Partner subtotal */}
               <div className="mt-3 pt-3 border-t border-slate-200 flex justify-between items-center">
-                <span className="text-sm text-slate-600">Подсума партньор:</span>
+                <span className="text-sm text-slate-600">Подсума {partnerName.toLowerCase()}:</span>
                 <span className="font-semibold text-slate-700">{partnerTotal.toLocaleString('bg-BG')} €</span>
               </div>
             </div>

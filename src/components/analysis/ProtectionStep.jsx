@@ -32,10 +32,14 @@ const INSURANCE_COMPANIES = [
   { value: 'uniqa', label: 'ЗД Уника' },
 ];
 
-export default function ProtectionStep({ data, onChange, showErrors }) {
+export default function ProtectionStep({ data, onChange, showErrors, plannerData }) {
   // Helper to check if a field is invalid
   const isFieldInvalid = (value) => showErrors && (value === undefined || value === '' || value === null);
-  const includePartner = data.include_partner || false;
+  
+  // Get names from Financial Planner
+  const clientName = plannerData?.client_first_name || 'Клиент';
+  const partnerName = plannerData?.partner_first_name || 'Партньор';
+  const includePartner = plannerData?.family_type === 'family' || data.include_partner;
   
   // Check if any property or car exists
   const hasAnyProperty = data.has_property_1 || false;
@@ -1136,7 +1140,7 @@ export default function ProtectionStep({ data, onChange, showErrors }) {
               <div>
                 <div className="flex items-center gap-2 mb-4">
                   <User className="h-4 w-4 text-slate-500" />
-                  <span className="font-medium text-slate-700">Клиент</span>
+                  <span className="font-medium text-slate-700">{clientName}</span>
                 </div>
                 <div className="space-y-4">
                   {/* Layoff */}
@@ -1491,7 +1495,7 @@ export default function ProtectionStep({ data, onChange, showErrors }) {
                 <div>
                   <div className="flex items-center gap-2 mb-4">
                     <Users className="h-4 w-4 text-slate-500" />
-                    <span className="font-medium text-slate-700">Партньор</span>
+                    <span className="font-medium text-slate-700">{partnerName}</span>
                   </div>
                   <div className="space-y-4">
                     {/* Layoff */}

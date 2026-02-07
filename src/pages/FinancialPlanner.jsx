@@ -2898,7 +2898,7 @@ export default function FinancialPlanner() {
                     </div>
 
                     <div className={cn("rounded-xl border-2 p-6 transition-all duration-300 group hover:border-blue-500 hover:bg-blue-600 flex flex-col justify-center relative", isDarkMode ? "border-slate-800" : "border-slate-200")}>
-                      <Settings className={cn("w-20 h-20 absolute top-4 right-4 transition-colors", "text-blue-600/20 group-hover:text-white/30")} />
+                      <Settings className={cn("w-20 h-20 absolute top-4 right-4 transition-colors", "text-blue-500 group-hover:text-white")} />
                       <p className={cn("text-sm tracking-widest mb-2 group-hover:text-blue-100 relative z-10", mutedTextClasses)}>ФАЗА 2</p>
                       <h3 className="text-2xl font-semibold mb-2 group-hover:text-white relative z-10">Оптимизация</h3>
                       <p className="text-blue-500 text-lg mb-3 font-medium group-hover:text-blue-200 relative z-10">Подготовка на финансовия план</p>

@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { Slider } from "@/components/ui/slider";
 import { RotateCcw, Loader2, Lock, Unlock, HelpCircle, ArrowLeft, ShieldAlert, Shield, ShieldCheck, Frown, Smile, PartyPopper, Home, HomeIcon, Car, GraduationCap, Wallet, TrendingUp, Briefcase, Baby, PiggyBank, Plane, Heart, Target, CheckCircle2, Calendar, Users, FileText, Info } from 'lucide-react';
 import {
@@ -126,6 +127,10 @@ export default function FinancialPlanner() {
   
   // Data states
   const [familyType, setFamilyType] = useState(null); // 'individual' | 'family'
+  const [clientFirstName, setClientFirstName] = useState('');
+  const [clientLastName, setClientLastName] = useState('');
+  const [partnerFirstName, setPartnerFirstName] = useState('');
+  const [partnerLastName, setPartnerLastName] = useState('');
   const [clientInsuranceType, setClientInsuranceType] = useState(null); // 'employee' | 'entrepreneur'
   const [partnerInsuranceType, setPartnerInsuranceType] = useState(null); // 'employee' | 'entrepreneur'
   const [clientAge, setClientAge] = useState(35);
@@ -403,6 +408,10 @@ export default function FinancialPlanner() {
   const restart = () => {
     setCurrentStep(1);
     setFamilyType(null);
+    setClientFirstName('');
+    setClientLastName('');
+    setPartnerFirstName('');
+    setPartnerLastName('');
     setClientInsuranceType(null);
     setPartnerInsuranceType(null);
     setClientAge(35);
@@ -735,46 +744,172 @@ export default function FinancialPlanner() {
                     Изберете дали работим с един клиент или с домакинство.
                   </p>
 
-                  <div className="grid grid-cols-2 gap-6 mb-8 flex-1">
-                    <button
-                      onClick={() => setFamilyType('individual')}
-                      className={cn(
-                        "p-8 rounded-2xl border-2 text-left transition-all duration-300 group flex flex-col justify-center",
-                        familyType === 'individual'
-                          ? "border-blue-500 bg-blue-600 text-white"
-                          : isDarkMode 
-                            ? "border-slate-700 hover:border-blue-500 hover:bg-blue-600 hover:text-white" 
-                            : "border-slate-200 hover:border-blue-500 hover:bg-blue-600 hover:text-white"
-                      )}
-                    >
-                      <h3 className={cn("font-semibold text-xl mb-2", familyType !== 'individual' && "group-hover:text-white")}>Отделен индивид</h3>
-                      <p className={cn("text-base", familyType === 'individual' ? "text-blue-100" : mutedTextClasses, familyType !== 'individual' && "group-hover:text-blue-100")}>
-                        Фокус върху Вашите лични цели
-                      </p>
-                    </button>
-                    
-                    <button
-                      onClick={() => setFamilyType('family')}
-                      className={cn(
-                        "p-8 rounded-2xl border-2 text-left transition-all duration-300 group flex flex-col justify-center",
-                        familyType === 'family'
-                          ? "border-blue-500 bg-blue-600 text-white"
-                          : isDarkMode 
-                            ? "border-slate-700 hover:border-blue-500 hover:bg-blue-600 hover:text-white" 
-                            : "border-slate-200 hover:border-blue-500 hover:bg-blue-600 hover:text-white"
-                      )}
-                    >
-                      <h3 className={cn("font-semibold text-xl mb-2", familyType !== 'family' && "group-hover:text-white")}>Семейство</h3>
-                      <p className={cn("text-base", familyType === 'family' ? "text-blue-100" : mutedTextClasses, familyType !== 'family' && "group-hover:text-blue-100")}>
-                        Да планираме Вашия общ семеен бюджет!
-                      </p>
-                    </button>
+                  <div className="space-y-6 mb-8 flex-1">
+                    <div className="grid grid-cols-2 gap-6">
+                      <button
+                        onClick={() => setFamilyType('individual')}
+                        className={cn(
+                          "p-8 rounded-2xl border-2 text-left transition-all duration-300 group flex flex-col justify-center",
+                          familyType === 'individual'
+                            ? "border-blue-500 bg-blue-600 text-white"
+                            : isDarkMode 
+                              ? "border-slate-700 hover:border-blue-500 hover:bg-blue-600 hover:text-white" 
+                              : "border-slate-200 hover:border-blue-500 hover:bg-blue-600 hover:text-white"
+                        )}
+                      >
+                        <h3 className={cn("font-semibold text-xl mb-2", familyType !== 'individual' && "group-hover:text-white")}>Отделен индивид</h3>
+                        <p className={cn("text-base", familyType === 'individual' ? "text-blue-100" : mutedTextClasses, familyType !== 'individual' && "group-hover:text-blue-100")}>
+                          Фокус върху Вашите лични цели
+                        </p>
+                      </button>
+                      
+                      <button
+                        onClick={() => setFamilyType('family')}
+                        className={cn(
+                          "p-8 rounded-2xl border-2 text-left transition-all duration-300 group flex flex-col justify-center",
+                          familyType === 'family'
+                            ? "border-blue-500 bg-blue-600 text-white"
+                            : isDarkMode 
+                              ? "border-slate-700 hover:border-blue-500 hover:bg-blue-600 hover:text-white" 
+                              : "border-slate-200 hover:border-blue-500 hover:bg-blue-600 hover:text-white"
+                        )}
+                      >
+                        <h3 className={cn("font-semibold text-xl mb-2", familyType !== 'family' && "group-hover:text-white")}>Семейство</h3>
+                        <p className={cn("text-base", familyType === 'family' ? "text-blue-100" : mutedTextClasses, familyType !== 'family' && "group-hover:text-blue-100")}>
+                          Да планираме Вашия общ семеен бюджет!
+                        </p>
+                      </button>
+                    </div>
+
+                    {/* Name fields for individual */}
+                    {familyType === 'individual' && (
+                      <motion.div
+                        initial={{ opacity: 0, y: -10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        className="grid grid-cols-2 gap-4"
+                      >
+                        <div>
+                          <label className={cn("text-sm font-medium mb-2 block", mutedTextClasses)}>Име</label>
+                          <input
+                            type="text"
+                            value={clientFirstName}
+                            onChange={(e) => setClientFirstName(e.target.value)}
+                            placeholder="Вашето име"
+                            className={cn(
+                              "w-full px-4 py-3 rounded-xl border-2 transition-all duration-200 outline-none",
+                              isDarkMode 
+                                ? "bg-slate-800 border-slate-700 text-white placeholder:text-slate-500 focus:border-blue-500" 
+                                : "bg-white border-slate-200 text-slate-900 placeholder:text-slate-400 focus:border-blue-500"
+                            )}
+                          />
+                        </div>
+                        <div>
+                          <label className={cn("text-sm font-medium mb-2 block", mutedTextClasses)}>Фамилия</label>
+                          <input
+                            type="text"
+                            value={clientLastName}
+                            onChange={(e) => setClientLastName(e.target.value)}
+                            placeholder="Вашата фамилия"
+                            className={cn(
+                              "w-full px-4 py-3 rounded-xl border-2 transition-all duration-200 outline-none",
+                              isDarkMode 
+                                ? "bg-slate-800 border-slate-700 text-white placeholder:text-slate-500 focus:border-blue-500" 
+                                : "bg-white border-slate-200 text-slate-900 placeholder:text-slate-400 focus:border-blue-500"
+                            )}
+                          />
+                        </div>
+                      </motion.div>
+                    )}
+
+                    {/* Name fields for family */}
+                    {familyType === 'family' && (
+                      <motion.div
+                        initial={{ opacity: 0, y: -10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        className="grid grid-cols-2 gap-6"
+                      >
+                        {/* Client names */}
+                        <div className="space-y-4">
+                          <p className={cn("text-sm font-semibold", mutedTextClasses)}>КЛИЕНТ</p>
+                          <div>
+                            <label className={cn("text-sm font-medium mb-2 block", mutedTextClasses)}>Име</label>
+                            <input
+                              type="text"
+                              value={clientFirstName}
+                              onChange={(e) => setClientFirstName(e.target.value)}
+                              placeholder="Име на клиента"
+                              className={cn(
+                                "w-full px-4 py-3 rounded-xl border-2 transition-all duration-200 outline-none",
+                                isDarkMode 
+                                  ? "bg-slate-800 border-slate-700 text-white placeholder:text-slate-500 focus:border-blue-500" 
+                                  : "bg-white border-slate-200 text-slate-900 placeholder:text-slate-400 focus:border-blue-500"
+                              )}
+                            />
+                          </div>
+                          <div>
+                            <label className={cn("text-sm font-medium mb-2 block", mutedTextClasses)}>Фамилия</label>
+                            <input
+                              type="text"
+                              value={clientLastName}
+                              onChange={(e) => setClientLastName(e.target.value)}
+                              placeholder="Фамилия на клиента"
+                              className={cn(
+                                "w-full px-4 py-3 rounded-xl border-2 transition-all duration-200 outline-none",
+                                isDarkMode 
+                                  ? "bg-slate-800 border-slate-700 text-white placeholder:text-slate-500 focus:border-blue-500" 
+                                  : "bg-white border-slate-200 text-slate-900 placeholder:text-slate-400 focus:border-blue-500"
+                              )}
+                            />
+                          </div>
+                        </div>
+
+                        {/* Partner names */}
+                        <div className="space-y-4">
+                          <p className={cn("text-sm font-semibold", mutedTextClasses)}>ПАРТНЬОР</p>
+                          <div>
+                            <label className={cn("text-sm font-medium mb-2 block", mutedTextClasses)}>Име</label>
+                            <input
+                              type="text"
+                              value={partnerFirstName}
+                              onChange={(e) => setPartnerFirstName(e.target.value)}
+                              placeholder="Име на партньора"
+                              className={cn(
+                                "w-full px-4 py-3 rounded-xl border-2 transition-all duration-200 outline-none",
+                                isDarkMode 
+                                  ? "bg-slate-800 border-slate-700 text-white placeholder:text-slate-500 focus:border-blue-500" 
+                                  : "bg-white border-slate-200 text-slate-900 placeholder:text-slate-400 focus:border-blue-500"
+                              )}
+                            />
+                          </div>
+                          <div>
+                            <label className={cn("text-sm font-medium mb-2 block", mutedTextClasses)}>Фамилия</label>
+                            <input
+                              type="text"
+                              value={partnerLastName}
+                              onChange={(e) => setPartnerLastName(e.target.value)}
+                              placeholder="Фамилия на партньора"
+                              className={cn(
+                                "w-full px-4 py-3 rounded-xl border-2 transition-all duration-200 outline-none",
+                                isDarkMode 
+                                  ? "bg-slate-800 border-slate-700 text-white placeholder:text-slate-500 focus:border-blue-500" 
+                                  : "bg-white border-slate-200 text-slate-900 placeholder:text-slate-400 focus:border-blue-500"
+                              )}
+                            />
+                          </div>
+                        </div>
+                      </motion.div>
+                    )}
                   </div>
 
                   <div className="flex justify-center">
                     <Button 
                       onClick={goNext}
-                      disabled={!familyType}
+                      disabled={
+                        !familyType || 
+                        !clientFirstName.trim() || 
+                        !clientLastName.trim() ||
+                        (familyType === 'family' && (!partnerFirstName.trim() || !partnerLastName.trim()))
+                      }
                       className={cn(primaryButtonClass, "px-16 py-6 text-lg")}
                     >
                       СЛЕДВАЩА СТЪПКА

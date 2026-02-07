@@ -131,8 +131,12 @@ export default function FinancialPlanner() {
   const [familyType, setFamilyType] = useState(null); // 'individual' | 'family'
   const [clientFirstName, setClientFirstName] = useState('');
   const [clientLastName, setClientLastName] = useState('');
+  const [clientPhone, setClientPhone] = useState('');
+  const [clientEmail, setClientEmail] = useState('');
   const [partnerFirstName, setPartnerFirstName] = useState('');
   const [partnerLastName, setPartnerLastName] = useState('');
+  const [partnerPhone, setPartnerPhone] = useState('');
+  const [partnerEmail, setPartnerEmail] = useState('');
   const [childrenCount, setChildrenCount] = useState(0);
   const [childrenNames, setChildrenNames] = useState([]);
   const [clientInsuranceType, setClientInsuranceType] = useState(null); // 'employee' | 'entrepreneur'
@@ -415,8 +419,12 @@ export default function FinancialPlanner() {
     setFamilyType(null);
     setClientFirstName('');
     setClientLastName('');
+    setClientPhone('');
+    setClientEmail('');
     setPartnerFirstName('');
     setPartnerLastName('');
+    setPartnerPhone('');
+    setPartnerEmail('');
     setChildrenCount(0);
     setChildrenNames([]);
     setChildrenAges([]);
@@ -829,6 +837,39 @@ export default function FinancialPlanner() {
                           </div>
                         </div>
 
+                        <div className="grid grid-cols-2 gap-4">
+                          <div>
+                            <label className={cn("text-sm font-medium mb-2 block", mutedTextClasses)}>Телефонен номер</label>
+                            <input
+                              type="tel"
+                              value={clientPhone}
+                              onChange={(e) => setClientPhone(e.target.value)}
+                              placeholder="Вашият телефон"
+                              className={cn(
+                                "w-full px-4 py-3 rounded-xl border-2 transition-all duration-200 outline-none",
+                                isDarkMode 
+                                  ? "bg-slate-800 border-slate-700 text-white placeholder:text-slate-500 focus:border-blue-500" 
+                                  : "bg-white border-slate-200 text-slate-900 placeholder:text-slate-400 focus:border-blue-500"
+                              )}
+                            />
+                          </div>
+                          <div>
+                            <label className={cn("text-sm font-medium mb-2 block", mutedTextClasses)}>E-mail адрес</label>
+                            <input
+                              type="email"
+                              value={clientEmail}
+                              onChange={(e) => setClientEmail(e.target.value)}
+                              placeholder="Вашият имейл"
+                              className={cn(
+                                "w-full px-4 py-3 rounded-xl border-2 transition-all duration-200 outline-none",
+                                isDarkMode 
+                                  ? "bg-slate-800 border-slate-700 text-white placeholder:text-slate-500 focus:border-blue-500" 
+                                  : "bg-white border-slate-200 text-slate-900 placeholder:text-slate-400 focus:border-blue-500"
+                              )}
+                            />
+                          </div>
+                        </div>
+
                         {/* Children count */}
                         <div>
                           <label className={cn("text-sm font-medium mb-2 block", mutedTextClasses)}>Брой деца</label>
@@ -935,6 +976,36 @@ export default function FinancialPlanner() {
                                 )}
                               />
                             </div>
+                            <div>
+                              <label className={cn("text-sm font-medium mb-2 block", mutedTextClasses)}>Телефонен номер</label>
+                              <input
+                                type="tel"
+                                value={clientPhone}
+                                onChange={(e) => setClientPhone(e.target.value)}
+                                placeholder="Телефон на клиента"
+                                className={cn(
+                                  "w-full px-4 py-3 rounded-xl border-2 transition-all duration-200 outline-none",
+                                  isDarkMode 
+                                    ? "bg-slate-800 border-slate-700 text-white placeholder:text-slate-500 focus:border-blue-500" 
+                                    : "bg-white border-slate-200 text-slate-900 placeholder:text-slate-400 focus:border-blue-500"
+                                )}
+                              />
+                            </div>
+                            <div>
+                              <label className={cn("text-sm font-medium mb-2 block", mutedTextClasses)}>E-mail адрес</label>
+                              <input
+                                type="email"
+                                value={clientEmail}
+                                onChange={(e) => setClientEmail(e.target.value)}
+                                placeholder="Имейл на клиента"
+                                className={cn(
+                                  "w-full px-4 py-3 rounded-xl border-2 transition-all duration-200 outline-none",
+                                  isDarkMode 
+                                    ? "bg-slate-800 border-slate-700 text-white placeholder:text-slate-500 focus:border-blue-500" 
+                                    : "bg-white border-slate-200 text-slate-900 placeholder:text-slate-400 focus:border-blue-500"
+                                )}
+                              />
+                            </div>
                           </div>
 
                           {/* Partner names */}
@@ -962,6 +1033,36 @@ export default function FinancialPlanner() {
                                 value={partnerLastName}
                                 onChange={(e) => setPartnerLastName(e.target.value)}
                                 placeholder="Фамилия на партньора"
+                                className={cn(
+                                  "w-full px-4 py-3 rounded-xl border-2 transition-all duration-200 outline-none",
+                                  isDarkMode 
+                                    ? "bg-slate-800 border-slate-700 text-white placeholder:text-slate-500 focus:border-blue-500" 
+                                    : "bg-white border-slate-200 text-slate-900 placeholder:text-slate-400 focus:border-blue-500"
+                                )}
+                              />
+                            </div>
+                            <div>
+                              <label className={cn("text-sm font-medium mb-2 block", mutedTextClasses)}>Телефонен номер</label>
+                              <input
+                                type="tel"
+                                value={partnerPhone}
+                                onChange={(e) => setPartnerPhone(e.target.value)}
+                                placeholder="Телефон на партньора"
+                                className={cn(
+                                  "w-full px-4 py-3 rounded-xl border-2 transition-all duration-200 outline-none",
+                                  isDarkMode 
+                                    ? "bg-slate-800 border-slate-700 text-white placeholder:text-slate-500 focus:border-blue-500" 
+                                    : "bg-white border-slate-200 text-slate-900 placeholder:text-slate-400 focus:border-blue-500"
+                                )}
+                              />
+                            </div>
+                            <div>
+                              <label className={cn("text-sm font-medium mb-2 block", mutedTextClasses)}>E-mail адрес</label>
+                              <input
+                                type="email"
+                                value={partnerEmail}
+                                onChange={(e) => setPartnerEmail(e.target.value)}
+                                placeholder="Имейл на партньора"
                                 className={cn(
                                   "w-full px-4 py-3 rounded-xl border-2 transition-all duration-200 outline-none",
                                   isDarkMode 
@@ -1046,7 +1147,9 @@ export default function FinancialPlanner() {
                         !familyType || 
                         !clientFirstName.trim() || 
                         !clientLastName.trim() ||
-                        (familyType === 'family' && (!partnerFirstName.trim() || !partnerLastName.trim())) ||
+                        !clientPhone.trim() ||
+                        !clientEmail.trim() ||
+                        (familyType === 'family' && (!partnerFirstName.trim() || !partnerLastName.trim() || !partnerPhone.trim() || !partnerEmail.trim())) ||
                         (childrenCount > 0 && childrenNames.some(name => !name.trim()))
                       }
                       className={cn(primaryButtonClass, "px-16 py-6 text-lg")}
@@ -2434,8 +2537,8 @@ export default function FinancialPlanner() {
                           const clientData = {
                             first_name: clientFirstName,
                             last_name: clientLastName,
-                            email: '', // Ще се попълни в анализа
-                            phone: '', // Ще се попълни в анализа
+                            email: clientEmail,
+                            phone: clientPhone,
                             stage: 'financial_planner',
                             family_type: familyType,
                             children_count: childrenCount,
@@ -2446,6 +2549,7 @@ export default function FinancialPlanner() {
                           if (familyType === 'family') {
                             clientData.partner_first_name = partnerFirstName;
                             clientData.partner_last_name = partnerLastName;
+                            clientData.partner_email = partnerEmail;
                           }
 
                           const client = await base44.entities.Client.create(clientData);
@@ -2456,8 +2560,12 @@ export default function FinancialPlanner() {
                             family_type: familyType,
                             client_first_name: clientFirstName,
                             client_last_name: clientLastName,
+                            client_phone: clientPhone,
+                            client_email: clientEmail,
                             partner_first_name: partnerFirstName,
                             partner_last_name: partnerLastName,
+                            partner_phone: partnerPhone,
+                            partner_email: partnerEmail,
                             children_count: childrenCount,
                             children_names: childrenNames,
                             children_ages: childrenAges,

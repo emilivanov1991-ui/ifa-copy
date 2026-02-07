@@ -1456,39 +1456,51 @@ export default function FinancialPlanner() {
                         <p className={cn("text-base font-medium mb-4", mutedTextClasses)}>КЛИЕНТ</p>
                       )}
                       <div className="grid grid-cols-2 gap-4">
-                        <button
+                        <motion.button
                           onClick={() => setClientInsuranceType('employee')}
+                          whileHover={{ scale: 1.02, y: -4 }}
+                          whileTap={{ scale: 0.98 }}
                           className={cn(
-                            "p-6 rounded-2xl border-2 text-left transition-all duration-300 group",
+                            "p-8 rounded-3xl border-2 text-center transition-all duration-300 group relative overflow-hidden",
                             clientInsuranceType === 'employee'
-                              ? "border-blue-500 bg-blue-600 text-white"
+                              ? "border-blue-500 bg-gradient-to-br from-blue-600 to-blue-700 text-white shadow-2xl shadow-blue-500/50"
                               : isDarkMode 
-                                ? "border-slate-700 hover:border-blue-500 hover:bg-blue-600 hover:text-white" 
-                                : "border-slate-200 hover:border-blue-500 hover:bg-blue-600 hover:text-white"
+                                ? "border-slate-700 hover:border-blue-400 bg-slate-800/50" 
+                                : "border-slate-200 hover:border-blue-400 bg-white hover:shadow-xl hover:shadow-blue-200/50"
                           )}
                         >
-                          <h3 className={cn("font-semibold mb-2 text-lg", clientInsuranceType !== 'employee' && "group-hover:text-white")}>Служител</h3>
-                          <p className={cn("text-sm", clientInsuranceType === 'employee' ? "text-blue-100" : mutedTextClasses, clientInsuranceType !== 'employee' && "group-hover:text-blue-100")}>
-                            Осигуряването съответства на доходите
+                          {clientInsuranceType === 'employee' && (
+                            <motion.div className="absolute inset-0 bg-gradient-to-br from-blue-400/20 to-transparent" initial={{ opacity: 0 }} animate={{ opacity: 1 }} />
+                          )}
+                          <Briefcase className={cn("w-12 h-12 mx-auto mb-3 relative z-10", clientInsuranceType === 'employee' ? "text-white" : "text-blue-600")} />
+                          <h3 className={cn("font-bold mb-2 text-lg relative z-10", clientInsuranceType !== 'employee' && "text-slate-900")}>Служител</h3>
+                          <p className={cn("text-sm relative z-10", clientInsuranceType === 'employee' ? "text-blue-100" : "text-slate-600")}>
+                            Осигуряване съответства на доходите
                           </p>
-                        </button>
-                        
-                        <button
+                        </motion.button>
+
+                        <motion.button
                           onClick={() => setClientInsuranceType('entrepreneur')}
+                          whileHover={{ scale: 1.02, y: -4 }}
+                          whileTap={{ scale: 0.98 }}
                           className={cn(
-                            "p-6 rounded-2xl border-2 text-left transition-all duration-300 group",
+                            "p-8 rounded-3xl border-2 text-center transition-all duration-300 group relative overflow-hidden",
                             clientInsuranceType === 'entrepreneur'
-                              ? "border-blue-500 bg-blue-600 text-white"
+                              ? "border-blue-500 bg-gradient-to-br from-blue-600 to-blue-700 text-white shadow-2xl shadow-blue-500/50"
                               : isDarkMode 
-                                ? "border-slate-700 hover:border-blue-500 hover:bg-blue-600 hover:text-white" 
-                                : "border-slate-200 hover:border-blue-500 hover:bg-blue-600 hover:text-white"
+                                ? "border-slate-700 hover:border-blue-400 bg-slate-800/50" 
+                                : "border-slate-200 hover:border-blue-400 bg-white hover:shadow-xl hover:shadow-blue-200/50"
                           )}
                         >
-                          <h3 className={cn("font-semibold mb-2 text-lg", clientInsuranceType !== 'entrepreneur' && "group-hover:text-white")}>Предприемач</h3>
-                          <p className={cn("text-sm", clientInsuranceType === 'entrepreneur' ? "text-blue-100" : mutedTextClasses, clientInsuranceType !== 'entrepreneur' && "group-hover:text-blue-100")}>
-                            Осигуряването е по-ниско от доходите
+                          {clientInsuranceType === 'entrepreneur' && (
+                            <motion.div className="absolute inset-0 bg-gradient-to-br from-blue-400/20 to-transparent" initial={{ opacity: 0 }} animate={{ opacity: 1 }} />
+                          )}
+                          <TrendingUp className={cn("w-12 h-12 mx-auto mb-3 relative z-10", clientInsuranceType === 'entrepreneur' ? "text-white" : "text-blue-600")} />
+                          <h3 className={cn("font-bold mb-2 text-lg relative z-10", clientInsuranceType !== 'entrepreneur' && "text-slate-900")}>Предприемач</h3>
+                          <p className={cn("text-sm relative z-10", clientInsuranceType === 'entrepreneur' ? "text-blue-100" : "text-slate-600")}>
+                            Осигуряване по-ниско от доходите
                           </p>
-                        </button>
+                        </motion.button>
                       </div>
                     </div>
 
@@ -1497,39 +1509,51 @@ export default function FinancialPlanner() {
                       <div>
                         <p className={cn("text-base font-medium mb-4", mutedTextClasses)}>ПАРТНЬОР</p>
                         <div className="grid grid-cols-2 gap-4">
-                          <button
+                          <motion.button
                             onClick={() => setPartnerInsuranceType('employee')}
+                            whileHover={{ scale: 1.02, y: -4 }}
+                            whileTap={{ scale: 0.98 }}
                             className={cn(
-                              "p-6 rounded-2xl border-2 text-left transition-all duration-300 group",
+                              "p-8 rounded-3xl border-2 text-center transition-all duration-300 group relative overflow-hidden",
                               partnerInsuranceType === 'employee'
-                                ? "border-blue-500 bg-blue-600 text-white"
+                                ? "border-blue-500 bg-gradient-to-br from-blue-600 to-blue-700 text-white shadow-2xl shadow-blue-500/50"
                                 : isDarkMode 
-                                  ? "border-slate-700 hover:border-blue-500 hover:bg-blue-600 hover:text-white" 
-                                  : "border-slate-200 hover:border-blue-500 hover:bg-blue-600 hover:text-white"
+                                  ? "border-slate-700 hover:border-blue-400 bg-slate-800/50" 
+                                  : "border-slate-200 hover:border-blue-400 bg-white hover:shadow-xl hover:shadow-blue-200/50"
                             )}
                           >
-                            <h3 className={cn("font-semibold mb-2 text-lg", partnerInsuranceType !== 'employee' && "group-hover:text-white")}>Служител</h3>
-                            <p className={cn("text-sm", partnerInsuranceType === 'employee' ? "text-blue-100" : mutedTextClasses, partnerInsuranceType !== 'employee' && "group-hover:text-blue-100")}>
-                              Осигуряването съответства на доходите
+                            {partnerInsuranceType === 'employee' && (
+                              <motion.div className="absolute inset-0 bg-gradient-to-br from-blue-400/20 to-transparent" initial={{ opacity: 0 }} animate={{ opacity: 1 }} />
+                            )}
+                            <Briefcase className={cn("w-12 h-12 mx-auto mb-3 relative z-10", partnerInsuranceType === 'employee' ? "text-white" : "text-blue-600")} />
+                            <h3 className={cn("font-bold mb-2 text-lg relative z-10", partnerInsuranceType !== 'employee' && "text-slate-900")}>Служител</h3>
+                            <p className={cn("text-sm relative z-10", partnerInsuranceType === 'employee' ? "text-blue-100" : "text-slate-600")}>
+                              Осигуряване съответства на доходите
                             </p>
-                          </button>
+                          </motion.button>
                           
-                          <button
+                          <motion.button
                             onClick={() => setPartnerInsuranceType('entrepreneur')}
+                            whileHover={{ scale: 1.02, y: -4 }}
+                            whileTap={{ scale: 0.98 }}
                             className={cn(
-                              "p-6 rounded-2xl border-2 text-left transition-all duration-300 group",
+                              "p-8 rounded-3xl border-2 text-center transition-all duration-300 group relative overflow-hidden",
                               partnerInsuranceType === 'entrepreneur'
-                                ? "border-blue-500 bg-blue-600 text-white"
+                                ? "border-blue-500 bg-gradient-to-br from-blue-600 to-blue-700 text-white shadow-2xl shadow-blue-500/50"
                                 : isDarkMode 
-                                  ? "border-slate-700 hover:border-blue-500 hover:bg-blue-600 hover:text-white" 
-                                  : "border-slate-200 hover:border-blue-500 hover:bg-blue-600 hover:text-white"
+                                  ? "border-slate-700 hover:border-blue-400 bg-slate-800/50" 
+                                  : "border-slate-200 hover:border-blue-400 bg-white hover:shadow-xl hover:shadow-blue-200/50"
                             )}
                           >
-                            <h3 className={cn("font-semibold mb-2 text-lg", partnerInsuranceType !== 'entrepreneur' && "group-hover:text-white")}>Предприемач</h3>
-                            <p className={cn("text-sm", partnerInsuranceType === 'entrepreneur' ? "text-blue-100" : mutedTextClasses, partnerInsuranceType !== 'entrepreneur' && "group-hover:text-blue-100")}>
-                              Осигуряването е по-ниско от доходите
+                            {partnerInsuranceType === 'entrepreneur' && (
+                              <motion.div className="absolute inset-0 bg-gradient-to-br from-blue-400/20 to-transparent" initial={{ opacity: 0 }} animate={{ opacity: 1 }} />
+                            )}
+                            <TrendingUp className={cn("w-12 h-12 mx-auto mb-3 relative z-10", partnerInsuranceType === 'entrepreneur' ? "text-white" : "text-blue-600")} />
+                            <h3 className={cn("font-bold mb-2 text-lg relative z-10", partnerInsuranceType !== 'entrepreneur' && "text-slate-900")}>Предприемач</h3>
+                            <p className={cn("text-sm relative z-10", partnerInsuranceType === 'entrepreneur' ? "text-blue-100" : "text-slate-600")}>
+                              Осигуряване по-ниско от доходите
                             </p>
-                          </button>
+                          </motion.button>
                         </div>
                       </div>
                     )}
@@ -2041,118 +2065,153 @@ export default function FinancialPlanner() {
                       </p>
                     </motion.button>
                     
-                    <button
+                    <motion.button
                       onClick={() => togglePriority('investments')}
+                      whileHover={{ scale: 1.05, y: -4 }}
+                      whileTap={{ scale: 0.95 }}
                       className={cn(
-                        "p-3 rounded-xl border-2 transition-all duration-300 flex flex-col items-center justify-center h-full group",
+                        "p-4 rounded-2xl border-2 transition-all duration-300 flex flex-col items-center justify-center h-full group relative overflow-hidden",
                         selectedPriorities.includes('investments')
-                          ? "border-blue-500 bg-blue-600 text-white"
-                          : isDarkMode ? "border-slate-700 hover:border-blue-500 hover:bg-blue-600" : "border-slate-200 hover:border-blue-500 hover:bg-blue-600"
+                          ? "border-blue-500 bg-gradient-to-br from-blue-600 to-blue-700 text-white shadow-xl shadow-blue-500/50"
+                          : isDarkMode ? "border-slate-700 hover:border-blue-400 bg-slate-800/50" : "border-slate-200 hover:border-blue-400 bg-white hover:shadow-lg"
                       )}
                     >
-                      <TrendingUp className={cn("w-8 h-8 mb-1", selectedPriorities.includes('investments') ? "text-white" : "text-emerald-500 group-hover:text-white")} />
-                      <h3 className={cn("font-semibold text-sm text-center", !selectedPriorities.includes('investments') && "group-hover:text-white")}>Инвестиции</h3>
-                      <p className={cn("text-xs text-center", selectedPriorities.includes('investments') ? "text-blue-100" : mutedTextClasses, !selectedPriorities.includes('investments') && "group-hover:text-blue-100")}>
+                      {selectedPriorities.includes('investments') && (
+                        <motion.div className="absolute inset-0 bg-gradient-to-br from-blue-400/20 to-transparent" layoutId="investments-bg" />
+                      )}
+                      <TrendingUp className={cn("w-10 h-10 mb-2 relative z-10", selectedPriorities.includes('investments') ? "text-white" : "text-blue-600 group-hover:text-blue-700")} />
+                      <h3 className={cn("font-bold text-sm text-center relative z-10", !selectedPriorities.includes('investments') && "text-slate-900")}>Инвестиции</h3>
+                      <p className={cn("text-xs text-center relative z-10 mt-1", selectedPriorities.includes('investments') ? "text-blue-100" : "text-slate-500")}>
                         Растеж на капитала
                       </p>
-                    </button>
+                    </motion.button>
                     
-                    <button
+                    <motion.button
                       onClick={() => togglePriority('pension')}
+                      whileHover={{ scale: 1.05, y: -4 }}
+                      whileTap={{ scale: 0.95 }}
                       className={cn(
-                        "p-3 rounded-xl border-2 transition-all duration-300 flex flex-col items-center justify-center h-full group",
+                        "p-4 rounded-2xl border-2 transition-all duration-300 flex flex-col items-center justify-center h-full group relative overflow-hidden",
                         selectedPriorities.includes('pension')
-                          ? "border-blue-500 bg-blue-600 text-white"
-                          : isDarkMode ? "border-slate-700 hover:border-blue-500 hover:bg-blue-600" : "border-slate-200 hover:border-blue-500 hover:bg-blue-600"
+                          ? "border-blue-500 bg-gradient-to-br from-blue-600 to-blue-700 text-white shadow-xl shadow-blue-500/50"
+                          : isDarkMode ? "border-slate-700 hover:border-blue-400 bg-slate-800/50" : "border-slate-200 hover:border-blue-400 bg-white hover:shadow-lg"
                       )}
                     >
-                      <PiggyBank className={cn("w-8 h-8 mb-1", selectedPriorities.includes('pension') ? "text-white" : "text-amber-500 group-hover:text-white")} />
-                      <h3 className={cn("font-semibold text-sm text-center", !selectedPriorities.includes('pension') && "group-hover:text-white")}>Пенсия</h3>
-                      <p className={cn("text-xs text-center", selectedPriorities.includes('pension') ? "text-blue-100" : mutedTextClasses, !selectedPriorities.includes('pension') && "group-hover:text-blue-100")}>
+                      {selectedPriorities.includes('pension') && (
+                        <motion.div className="absolute inset-0 bg-gradient-to-br from-blue-400/20 to-transparent" layoutId="pension-bg" />
+                      )}
+                      <PiggyBank className={cn("w-10 h-10 mb-2 relative z-10", selectedPriorities.includes('pension') ? "text-white" : "text-blue-600 group-hover:text-blue-700")} />
+                      <h3 className={cn("font-bold text-sm text-center relative z-10", !selectedPriorities.includes('pension') && "text-slate-900")}>Пенсия</h3>
+                      <p className={cn("text-xs text-center relative z-10 mt-1", selectedPriorities.includes('pension') ? "text-blue-100" : "text-slate-500")}>
                         Спокойна старост
                       </p>
-                    </button>
+                    </motion.button>
                     
-                    <button
+                    <motion.button
                       onClick={() => togglePriority('housing')}
+                      whileHover={{ scale: 1.05, y: -4 }}
+                      whileTap={{ scale: 0.95 }}
                       className={cn(
-                        "p-3 rounded-xl border-2 transition-all duration-300 flex flex-col items-center justify-center h-full group",
+                        "p-4 rounded-2xl border-2 transition-all duration-300 flex flex-col items-center justify-center h-full group relative overflow-hidden",
                         selectedPriorities.includes('housing')
-                          ? "border-blue-500 bg-blue-600 text-white"
-                          : isDarkMode ? "border-slate-700 hover:border-blue-500 hover:bg-blue-600" : "border-slate-200 hover:border-blue-500 hover:bg-blue-600"
+                          ? "border-blue-500 bg-gradient-to-br from-blue-600 to-blue-700 text-white shadow-xl shadow-blue-500/50"
+                          : isDarkMode ? "border-slate-700 hover:border-blue-400 bg-slate-800/50" : "border-slate-200 hover:border-blue-400 bg-white hover:shadow-lg"
                       )}
                     >
-                      <Home className={cn("w-8 h-8 mb-1", selectedPriorities.includes('housing') ? "text-white" : "text-violet-500 group-hover:text-white")} />
-                      <h3 className={cn("font-semibold text-sm text-center", !selectedPriorities.includes('housing') && "group-hover:text-white")}>Ново жилище</h3>
-                      <p className={cn("text-xs text-center", selectedPriorities.includes('housing') ? "text-blue-100" : mutedTextClasses, !selectedPriorities.includes('housing') && "group-hover:text-blue-100")}>
+                      {selectedPriorities.includes('housing') && (
+                        <motion.div className="absolute inset-0 bg-gradient-to-br from-blue-400/20 to-transparent" layoutId="housing-bg" />
+                      )}
+                      <Home className={cn("w-10 h-10 mb-2 relative z-10", selectedPriorities.includes('housing') ? "text-white" : "text-blue-600 group-hover:text-blue-700")} />
+                      <h3 className={cn("font-bold text-sm text-center relative z-10", !selectedPriorities.includes('housing') && "text-slate-900")}>Ново жилище</h3>
+                      <p className={cn("text-xs text-center relative z-10 mt-1", selectedPriorities.includes('housing') ? "text-blue-100" : "text-slate-500")}>
                         Собствен дом
                       </p>
-                    </button>
+                    </motion.button>
                     
                     {/* Row 2 */}
-                    <button
+                    <motion.button
                       onClick={() => togglePriority('children')}
+                      whileHover={{ scale: 1.05, y: -4 }}
+                      whileTap={{ scale: 0.95 }}
                       className={cn(
-                        "p-3 rounded-xl border-2 transition-all duration-300 flex flex-col items-center justify-center h-full group",
+                        "p-4 rounded-2xl border-2 transition-all duration-300 flex flex-col items-center justify-center h-full group relative overflow-hidden",
                         selectedPriorities.includes('children')
-                          ? "border-blue-500 bg-blue-600 text-white"
-                          : isDarkMode ? "border-slate-700 hover:border-blue-500 hover:bg-blue-600" : "border-slate-200 hover:border-blue-500 hover:bg-blue-600"
+                          ? "border-blue-500 bg-gradient-to-br from-blue-600 to-blue-700 text-white shadow-xl shadow-blue-500/50"
+                          : isDarkMode ? "border-slate-700 hover:border-blue-400 bg-slate-800/50" : "border-slate-200 hover:border-blue-400 bg-white hover:shadow-lg"
                       )}
                     >
-                      <Baby className={cn("w-8 h-8 mb-1", selectedPriorities.includes('children') ? "text-white" : "text-pink-500 group-hover:text-white")} />
-                      <h3 className={cn("font-semibold text-sm text-center", !selectedPriorities.includes('children') && "group-hover:text-white")}>Бъдеще на децата</h3>
-                      <p className={cn("text-xs text-center", selectedPriorities.includes('children') ? "text-blue-100" : mutedTextClasses, !selectedPriorities.includes('children') && "group-hover:text-blue-100")}>
+                      {selectedPriorities.includes('children') && (
+                        <motion.div className="absolute inset-0 bg-gradient-to-br from-blue-400/20 to-transparent" layoutId="children-bg" />
+                      )}
+                      <Baby className={cn("w-10 h-10 mb-2 relative z-10", selectedPriorities.includes('children') ? "text-white" : "text-blue-600 group-hover:text-blue-700")} />
+                      <h3 className={cn("font-bold text-sm text-center relative z-10", !selectedPriorities.includes('children') && "text-slate-900")}>Бъдеще на децата</h3>
+                      <p className={cn("text-xs text-center relative z-10 mt-1", selectedPriorities.includes('children') ? "text-blue-100" : "text-slate-500")}>
                         Образование и старт
                       </p>
-                    </button>
+                    </motion.button>
                     
-                    <button
+                    <motion.button
                       onClick={() => togglePriority('travel')}
+                      whileHover={{ scale: 1.05, y: -4 }}
+                      whileTap={{ scale: 0.95 }}
                       className={cn(
-                        "p-3 rounded-xl border-2 transition-all duration-300 flex flex-col items-center justify-center h-full group",
+                        "p-4 rounded-2xl border-2 transition-all duration-300 flex flex-col items-center justify-center h-full group relative overflow-hidden",
                         selectedPriorities.includes('travel')
-                          ? "border-blue-500 bg-blue-600 text-white"
-                          : isDarkMode ? "border-slate-700 hover:border-blue-500 hover:bg-blue-600" : "border-slate-200 hover:border-blue-500 hover:bg-blue-600"
+                          ? "border-blue-500 bg-gradient-to-br from-blue-600 to-blue-700 text-white shadow-xl shadow-blue-500/50"
+                          : isDarkMode ? "border-slate-700 hover:border-blue-400 bg-slate-800/50" : "border-slate-200 hover:border-blue-400 bg-white hover:shadow-lg"
                       )}
                     >
-                      <Plane className={cn("w-8 h-8 mb-1", selectedPriorities.includes('travel') ? "text-white" : "text-cyan-500 group-hover:text-white")} />
-                      <h3 className={cn("font-semibold text-sm text-center", !selectedPriorities.includes('travel') && "group-hover:text-white")}>Пътувания</h3>
-                      <p className={cn("text-xs text-center", selectedPriorities.includes('travel') ? "text-blue-100" : mutedTextClasses, !selectedPriorities.includes('travel') && "group-hover:text-blue-100")}>
+                      {selectedPriorities.includes('travel') && (
+                        <motion.div className="absolute inset-0 bg-gradient-to-br from-blue-400/20 to-transparent" layoutId="travel-bg" />
+                      )}
+                      <Plane className={cn("w-10 h-10 mb-2 relative z-10", selectedPriorities.includes('travel') ? "text-white" : "text-blue-600 group-hover:text-blue-700")} />
+                      <h3 className={cn("font-bold text-sm text-center relative z-10", !selectedPriorities.includes('travel') && "text-slate-900")}>Пътувания</h3>
+                      <p className={cn("text-xs text-center relative z-10 mt-1", selectedPriorities.includes('travel') ? "text-blue-100" : "text-slate-500")}>
                         Преживявания
                       </p>
-                    </button>
+                    </motion.button>
                     
-                    <button
+                    <motion.button
                       onClick={() => togglePriority('health')}
+                      whileHover={{ scale: 1.05, y: -4 }}
+                      whileTap={{ scale: 0.95 }}
                       className={cn(
-                        "p-3 rounded-xl border-2 transition-all duration-300 flex flex-col items-center justify-center h-full group",
+                        "p-4 rounded-2xl border-2 transition-all duration-300 flex flex-col items-center justify-center h-full group relative overflow-hidden",
                         selectedPriorities.includes('health')
-                          ? "border-blue-500 bg-blue-600 text-white"
-                          : isDarkMode ? "border-slate-700 hover:border-blue-500 hover:bg-blue-600" : "border-slate-200 hover:border-blue-500 hover:bg-blue-600"
+                          ? "border-blue-500 bg-gradient-to-br from-blue-600 to-blue-700 text-white shadow-xl shadow-blue-500/50"
+                          : isDarkMode ? "border-slate-700 hover:border-blue-400 bg-slate-800/50" : "border-slate-200 hover:border-blue-400 bg-white hover:shadow-lg"
                       )}
                     >
-                      <Heart className={cn("w-8 h-8 mb-1", selectedPriorities.includes('health') ? "text-white" : "text-red-500 group-hover:text-white")} />
-                      <h3 className={cn("font-semibold text-sm text-center", !selectedPriorities.includes('health') && "group-hover:text-white")}>Здраве</h3>
-                      <p className={cn("text-xs text-center", selectedPriorities.includes('health') ? "text-blue-100" : mutedTextClasses, !selectedPriorities.includes('health') && "group-hover:text-blue-100")}>
+                      {selectedPriorities.includes('health') && (
+                        <motion.div className="absolute inset-0 bg-gradient-to-br from-blue-400/20 to-transparent" layoutId="health-bg" />
+                      )}
+                      <Heart className={cn("w-10 h-10 mb-2 relative z-10", selectedPriorities.includes('health') ? "text-white" : "text-blue-600 group-hover:text-blue-700")} />
+                      <h3 className={cn("font-bold text-sm text-center relative z-10", !selectedPriorities.includes('health') && "text-slate-900")}>Здраве</h3>
+                      <p className={cn("text-xs text-center relative z-10 mt-1", selectedPriorities.includes('health') ? "text-blue-100" : "text-slate-500")}>
                         Застраховки и грижа
                       </p>
-                    </button>
+                    </motion.button>
                     
-                    <button
+                    <motion.button
                       onClick={() => togglePriority('business')}
+                      whileHover={{ scale: 1.05, y: -4 }}
+                      whileTap={{ scale: 0.95 }}
                       className={cn(
-                        "p-3 rounded-xl border-2 transition-all duration-300 flex flex-col items-center justify-center h-full group",
+                        "p-4 rounded-2xl border-2 transition-all duration-300 flex flex-col items-center justify-center h-full group relative overflow-hidden",
                         selectedPriorities.includes('business')
-                          ? "border-blue-500 bg-blue-600 text-white"
-                          : isDarkMode ? "border-slate-700 hover:border-blue-500 hover:bg-blue-600" : "border-slate-200 hover:border-blue-500 hover:bg-blue-600"
+                          ? "border-blue-500 bg-gradient-to-br from-blue-600 to-blue-700 text-white shadow-xl shadow-blue-500/50"
+                          : isDarkMode ? "border-slate-700 hover:border-blue-400 bg-slate-800/50" : "border-slate-200 hover:border-blue-400 bg-white hover:shadow-lg"
                       )}
                     >
-                      <Briefcase className={cn("w-8 h-8 mb-1", selectedPriorities.includes('business') ? "text-white" : "text-orange-500 group-hover:text-white")} />
-                      <h3 className={cn("font-semibold text-sm text-center", !selectedPriorities.includes('business') && "group-hover:text-white")}>Бизнес</h3>
-                      <p className={cn("text-xs text-center", selectedPriorities.includes('business') ? "text-blue-100" : mutedTextClasses, !selectedPriorities.includes('business') && "group-hover:text-blue-100")}>
+                      {selectedPriorities.includes('business') && (
+                        <motion.div className="absolute inset-0 bg-gradient-to-br from-blue-400/20 to-transparent" layoutId="business-bg" />
+                      )}
+                      <Briefcase className={cn("w-10 h-10 mb-2 relative z-10", selectedPriorities.includes('business') ? "text-white" : "text-blue-600 group-hover:text-blue-700")} />
+                      <h3 className={cn("font-bold text-sm text-center relative z-10", !selectedPriorities.includes('business') && "text-slate-900")}>Бизнес</h3>
+                      <p className={cn("text-xs text-center relative z-10 mt-1", selectedPriorities.includes('business') ? "text-blue-100" : "text-slate-500")}>
                         Собствен бизнес
                       </p>
-                    </button>
+                    </motion.button>
                   </div>
 
                   {selectedPriorities.length > 0 && (
@@ -2182,29 +2241,29 @@ export default function FinancialPlanner() {
               </motion.div>
             )}
 
-                  {/* Generating Animation - Fullscreen */}
+                  {/* Generating Animation - Enhanced with blue theme */}
             {isGenerating && (
               <motion.div
                 key="generating"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
-                className="fixed inset-0 z-[100] flex flex-col items-center justify-center bg-gradient-to-br from-slate-900 via-blue-900 to-indigo-900"
+                className="fixed inset-0 z-[100] flex flex-col items-center justify-center bg-gradient-to-br from-blue-900 via-indigo-900 to-blue-950"
               >
                 {/* Animated background elements */}
                 <div className="absolute inset-0 overflow-hidden">
                   <motion.div 
-                    className="absolute -top-40 -right-40 w-96 h-96 bg-blue-500/20 rounded-full blur-3xl"
-                    animate={{ scale: [1, 1.2, 1], opacity: [0.3, 0.5, 0.3] }}
+                    className="absolute -top-40 -right-40 w-96 h-96 bg-blue-500/30 rounded-full blur-3xl"
+                    animate={{ scale: [1, 1.3, 1], opacity: [0.3, 0.6, 0.3] }}
                     transition={{ duration: 4, repeat: Infinity }}
                   />
                   <motion.div 
-                    className="absolute -bottom-40 -left-40 w-96 h-96 bg-indigo-500/20 rounded-full blur-3xl"
-                    animate={{ scale: [1.2, 1, 1.2], opacity: [0.5, 0.3, 0.5] }}
+                    className="absolute -bottom-40 -left-40 w-96 h-96 bg-indigo-500/30 rounded-full blur-3xl"
+                    animate={{ scale: [1.2, 1, 1.2], opacity: [0.6, 0.3, 0.6] }}
                     transition={{ duration: 4, repeat: Infinity }}
                   />
                   <motion.div 
-                    className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-purple-500/10 rounded-full blur-3xl"
+                    className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-blue-500/15 rounded-full blur-3xl"
                     animate={{ scale: [1, 1.3, 1], rotate: [0, 180, 360] }}
                     transition={{ duration: 8, repeat: Infinity }}
                   />
@@ -2219,59 +2278,56 @@ export default function FinancialPlanner() {
                     transition={{ type: "spring", bounce: 0.5, delay: 0.2 }}
                   >
                     <motion.div
-                      className="w-32 h-32 rounded-full bg-gradient-to-br from-blue-500/30 to-indigo-500/30 flex items-center justify-center"
+                      className="w-40 h-40 rounded-full bg-gradient-to-br from-blue-500/40 to-indigo-500/40 flex items-center justify-center shadow-2xl shadow-blue-500/50"
                       animate={{ rotate: 360 }}
                       transition={{ duration: 8, repeat: Infinity, ease: "linear" }}
                     >
                       <motion.div
-                        className="w-24 h-24 rounded-full bg-gradient-to-br from-blue-500/40 to-indigo-500/40 flex items-center justify-center"
+                        className="w-32 h-32 rounded-full bg-gradient-to-br from-blue-400/50 to-indigo-400/50 flex items-center justify-center"
                         animate={{ rotate: -360 }}
                         transition={{ duration: 6, repeat: Infinity, ease: "linear" }}
                       >
-                        <motion.div
-                          animate={{ rotate: 360 }}
-                          transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
-                        >
-                          <Loader2 className="w-12 h-12 text-white" />
-                        </motion.div>
+                        <div className="w-24 h-24 rounded-full bg-white/10 backdrop-blur-sm flex items-center justify-center">
+                          <Sparkles className="w-10 h-10 text-white" />
+                        </div>
                       </motion.div>
                     </motion.div>
                   </motion.div>
 
                   {/* Title */}
                   <motion.h2 
-                    className="text-3xl md:text-4xl font-bold mb-4 text-white"
+                    className="text-3xl md:text-5xl font-bold mb-4 text-white"
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.4 }}
                   >
-                    Генериране на финансов план
+                    Генериране на Вашия План
                   </motion.h2>
 
                   {/* Subtitle */}
                   <motion.p 
-                    className="text-blue-200 text-lg mb-8 max-w-md"
+                    className="text-blue-200 text-lg mb-8 max-w-md font-light leading-relaxed"
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.6 }}
                   >
-                    Анализираме вашите данни и създаваме персонализиран план
+                    Анализираме Вашите данни и създаваме персонализиран финансов план
                   </motion.p>
 
                   {/* Progress dots */}
                   <motion.div 
-                    className="flex items-center gap-2"
+                    className="flex items-center gap-3"
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     transition={{ delay: 0.8 }}
                   >
                     {[0, 1, 2, 3, 4].map((i) => (
-                      <motion.span
+                      <motion.div
                         key={i}
-                        className="w-3 h-3 bg-blue-400 rounded-full"
+                        className="w-3 h-3 rounded-full bg-blue-400"
                         animate={{ 
-                          scale: [1, 1.5, 1],
-                          opacity: [0.3, 1, 0.3] 
+                          scale: [1, 1.8, 1],
+                          opacity: [0.4, 1, 0.4] 
                         }}
                         transition={{ 
                           duration: 1.5, 
@@ -2330,47 +2386,62 @@ export default function FinancialPlanner() {
 
                 {/* Goals Grid - 4 columns like the image */}
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-2 mb-2 flex-1">
-                  {/* Security */}
+                  {/* Security - Enhanced */}
                   <motion.div 
-                    className={cn("rounded-2xl border p-4 text-center relative transition-all duration-300 group hover:border-blue-500 hover:bg-blue-600", cardClasses)}
-                    animate={recentlyChanged === 'security' ? { scale: [1, 1.02, 1], borderColor: ['', '#3b82f6', ''] } : {}}
+                    className={cn(
+                      "rounded-3xl border-2 p-6 text-center relative transition-all duration-300 group overflow-hidden",
+                      cardClasses,
+                      "hover:border-blue-400 hover:shadow-2xl hover:shadow-blue-200/50"
+                    )}
+                    animate={recentlyChanged === 'security' ? { scale: [1, 1.03, 1] } : {}}
                     transition={{ duration: 0.3 }}
+                    whileHover={{ y: -4 }}
                   >
-                    <div className="absolute top-2 right-2">
+                    <motion.div 
+                      className="absolute inset-0 bg-gradient-to-br from-blue-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"
+                    />
+                    <div className="absolute top-3 right-3 z-10">
                       <Tooltip>
                         <TooltipTrigger asChild>
-                          <button 
+                          <motion.button 
                             onClick={() => toggleLock('security')}
+                            whileHover={{ scale: 1.1 }}
+                            whileTap={{ scale: 0.9 }}
                             className={cn(
-                              "p-1 rounded-lg transition-colors",
+                              "p-2 rounded-lg transition-all shadow-lg",
                               lockedGoals.security 
-                                ? "bg-blue-100 text-blue-600 group-hover:bg-white group-hover:text-blue-600" 
-                                : isDarkMode ? "hover:bg-slate-800 text-slate-500" : "hover:bg-slate-100 text-slate-400 group-hover:text-white group-hover:hover:bg-blue-500"
+                                ? "bg-blue-600 text-white" 
+                                : "bg-slate-100 text-slate-400 hover:bg-blue-50 hover:text-blue-600"
                             )}
                           >
-                            {lockedGoals.security ? <Lock className="w-3 h-3" /> : <Unlock className="w-3 h-3" />}
-                          </button>
+                            {lockedGoals.security ? <Lock className="w-4 h-4" /> : <Unlock className="w-4 h-4" />}
+                          </motion.button>
                         </TooltipTrigger>
-                        <TooltipContent side="top">
-                          <p>{tooltips.lock}</p>
+                        <TooltipContent side="top" className="bg-slate-900 text-white">
+                          <p>{lockedGoals.security ? 'Отключи за авто-корекция' : 'Заключи текущата стойност'}</p>
                         </TooltipContent>
                       </Tooltip>
                     </div>
-                    <p className={cn("text-[10px] tracking-widest mb-2 group-hover:text-blue-100", mutedTextClasses)}>ФИНАНСОВА СИГУРНОСТ</p>
+                    <p className={cn("text-xs tracking-widest mb-3 font-bold relative z-10", accentColor)}>ФИНАНСОВА СИГУРНОСТ</p>
                     
-                    {/* Security Icon based on percentage */}
-                    <div className="flex justify-center mb-2">
+                    <div className="flex justify-center mb-4 relative z-10">
                       {allocations.security <= 3 ? (
-                        <ShieldAlert className={cn("w-12 h-12 md:w-14 md:h-14 text-red-400 group-hover:text-red-200")} />
+                        <div className="w-20 h-20 rounded-full bg-red-100 flex items-center justify-center">
+                          <ShieldAlert className="w-10 h-10 text-red-600" />
+                        </div>
                       ) : allocations.security <= 20 ? (
-                        <Shield className={cn("w-12 h-12 md:w-14 md:h-14 text-emerald-500 group-hover:text-emerald-200")} />
+                        <div className="w-20 h-20 rounded-full bg-blue-100 flex items-center justify-center">
+                          <Shield className="w-10 h-10 text-blue-600" />
+                        </div>
                       ) : (
-                        <ShieldCheck className={cn("w-12 h-12 md:w-14 md:h-14 text-blue-500 group-hover:text-blue-200")} />
+                        <div className="w-20 h-20 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center">
+                          <ShieldCheck className="w-10 h-10 text-white" />
+                        </div>
                       )}
                     </div>
                     
                     <motion.p 
-                      className="text-2xl md:text-3xl font-bold mb-1 group-hover:text-white"
+                      className="text-3xl md:text-4xl font-bold mb-2 bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent relative z-10"
                       key={calculateGoals.security}
                       initial={{ scale: 1.1 }}
                       animate={{ scale: 1 }}
@@ -2378,59 +2449,79 @@ export default function FinancialPlanner() {
                     >
                       {formatNumber(calculateGoals.security)} €
                     </motion.p>
-                    <p className={cn("text-xs mb-3 group-hover:text-blue-200", accentColor)}>{allocations.security}%</p>
+                    <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-100 mb-4 relative z-10">
+                      <span className="text-sm font-bold text-blue-700">{allocations.security}%</span>
+                      <span className="text-xs text-blue-600">от дохода</span>
+                    </div>
                     <Slider
                       value={[allocations.security]}
                       onValueChange={(v) => handleAllocationChange('security', v[0])}
                       min={0}
                       max={50}
                       step={1}
-                      className="mb-2"
+                      className="mb-3 relative z-10"
                     />
-                    <p className={cn("text-[10px] mt-1 group-hover:text-blue-100", mutedTextClasses)}>Резерв за {Math.round((allocations.security / 10) * 6)} месеца</p>
+                    <p className={cn("text-xs mt-2 font-medium relative z-10", mutedTextClasses)}>
+                      Резерв за {Math.round((allocations.security / 10) * 6)} месеца разходи
+                    </p>
                   </motion.div>
 
-                  {/* Pension */}
+                  {/* Pension - Enhanced */}
                   <motion.div 
-                    className={cn("rounded-2xl border p-4 text-center relative transition-all duration-300 group hover:border-blue-500 hover:bg-blue-600", cardClasses)}
-                    animate={recentlyChanged === 'pension' ? { scale: [1, 1.02, 1], borderColor: ['', '#3b82f6', ''] } : {}}
+                    className={cn(
+                      "rounded-3xl border-2 p-6 text-center relative transition-all duration-300 group overflow-hidden",
+                      cardClasses,
+                      "hover:border-blue-400 hover:shadow-2xl hover:shadow-blue-200/50"
+                    )}
+                    animate={recentlyChanged === 'pension' ? { scale: [1, 1.03, 1] } : {}}
                     transition={{ duration: 0.3 }}
+                    whileHover={{ y: -4 }}
                   >
-                    <div className="absolute top-2 right-2">
+                    <motion.div 
+                      className="absolute inset-0 bg-gradient-to-br from-blue-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"
+                    />
+                    <div className="absolute top-3 right-3 z-10">
                       <Tooltip>
                         <TooltipTrigger asChild>
-                          <button 
+                          <motion.button 
                             onClick={() => toggleLock('pension')}
+                            whileHover={{ scale: 1.1 }}
+                            whileTap={{ scale: 0.9 }}
                             className={cn(
-                              "p-1 rounded-lg transition-colors",
+                              "p-2 rounded-lg transition-all shadow-lg",
                               lockedGoals.pension 
-                                ? "bg-blue-100 text-blue-600 group-hover:bg-white group-hover:text-blue-600" 
-                                : isDarkMode ? "hover:bg-slate-800 text-slate-500" : "hover:bg-slate-100 text-slate-400 group-hover:text-white group-hover:hover:bg-blue-500"
+                                ? "bg-blue-600 text-white" 
+                                : "bg-slate-100 text-slate-400 hover:bg-blue-50 hover:text-blue-600"
                             )}
                           >
-                            {lockedGoals.pension ? <Lock className="w-3 h-3" /> : <Unlock className="w-3 h-3" />}
-                          </button>
+                            {lockedGoals.pension ? <Lock className="w-4 h-4" /> : <Unlock className="w-4 h-4" />}
+                          </motion.button>
                         </TooltipTrigger>
-                        <TooltipContent side="top">
-                          <p>{tooltips.lock}</p>
+                        <TooltipContent side="top" className="bg-slate-900 text-white">
+                          <p>{lockedGoals.pension ? 'Отключи за авто-корекция' : 'Заключи текущата стойност'}</p>
                         </TooltipContent>
                       </Tooltip>
                     </div>
-                    <p className={cn("text-[10px] tracking-widest mb-2 group-hover:text-blue-100", mutedTextClasses)}>ПЕНСИЯ</p>
+                    <p className={cn("text-xs tracking-widest mb-3 font-bold relative z-10", accentColor)}>ПЕНСИЯ</p>
                     
-                    {/* Pension Icon based on percentage */}
-                    <div className="flex justify-center mb-2">
+                    <div className="flex justify-center mb-4 relative z-10">
                       {allocations.pension <= 2 ? (
-                        <Frown className={cn("w-12 h-12 md:w-14 md:h-14 text-red-400 group-hover:text-red-200")} />
+                        <div className="w-20 h-20 rounded-full bg-red-100 flex items-center justify-center">
+                          <Frown className="w-10 h-10 text-red-600" />
+                        </div>
                       ) : allocations.pension <= 10 ? (
-                        <Smile className={cn("w-12 h-12 md:w-14 md:h-14 text-emerald-500 group-hover:text-emerald-200")} />
+                        <div className="w-20 h-20 rounded-full bg-blue-100 flex items-center justify-center">
+                          <Smile className="w-10 h-10 text-blue-600" />
+                        </div>
                       ) : (
-                        <PartyPopper className={cn("w-12 h-12 md:w-14 md:h-14 text-amber-500 group-hover:text-amber-200")} />
+                        <div className="w-20 h-20 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center">
+                          <PartyPopper className="w-10 h-10 text-white" />
+                        </div>
                       )}
                     </div>
                     
                     <motion.p 
-                      className="text-2xl md:text-3xl font-bold mb-1 group-hover:text-white"
+                      className="text-3xl md:text-4xl font-bold mb-2 bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent relative z-10"
                       key={calculateGoals.pension}
                       initial={{ scale: 1.1 }}
                       animate={{ scale: 1 }}
@@ -2438,64 +2529,82 @@ export default function FinancialPlanner() {
                     >
                       {formatNumber(calculateGoals.pension)} €
                     </motion.p>
-                    <p className={cn("text-xs mb-3 group-hover:text-blue-200", accentColor)}>{allocations.pension}%</p>
+                    <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-100 mb-4 relative z-10">
+                      <span className="text-sm font-bold text-blue-700">{allocations.pension}%</span>
+                      <span className="text-xs text-blue-600">от дохода</span>
+                    </div>
                     <Slider
                       value={[allocations.pension]}
                       onValueChange={(v) => handleAllocationChange('pension', v[0])}
                       min={0}
                       max={25}
                       step={1}
-                      className="mb-2"
+                      className="mb-3 relative z-10"
                     />
-                    <p className={cn("text-[10px] mt-1 group-hover:text-blue-100", mutedTextClasses)}>€/месец при пенсия</p>
+                    <p className={cn("text-xs mt-2 font-medium relative z-10", mutedTextClasses)}>
+                      Месечна пенсия (държавна + лична)
+                    </p>
                   </motion.div>
 
-                  {/* Housing */}
+                  {/* Housing - Enhanced */}
                   <motion.div 
-                    className={cn("rounded-2xl border p-4 text-center relative transition-all duration-300 group hover:border-blue-500 hover:bg-blue-600", cardClasses)}
-                    animate={recentlyChanged === 'housing' ? { scale: [1, 1.02, 1], borderColor: ['', '#3b82f6', ''] } : {}}
+                    className={cn(
+                      "rounded-3xl border-2 p-6 text-center relative transition-all duration-300 group overflow-hidden",
+                      cardClasses,
+                      "hover:border-blue-400 hover:shadow-2xl hover:shadow-blue-200/50"
+                    )}
+                    animate={recentlyChanged === 'housing' ? { scale: [1, 1.03, 1] } : {}}
                     transition={{ duration: 0.3 }}
+                    whileHover={{ y: -4 }}
                   >
-                    <div className="absolute top-2 right-2">
+                    <motion.div 
+                      className="absolute inset-0 bg-gradient-to-br from-blue-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"
+                    />
+                    <div className="absolute top-3 right-3 z-10">
                       <Tooltip>
                         <TooltipTrigger asChild>
-                          <button 
+                          <motion.button 
                             onClick={() => toggleLock('housing')}
+                            whileHover={{ scale: 1.1 }}
+                            whileTap={{ scale: 0.9 }}
                             className={cn(
-                              "p-1 rounded-lg transition-colors",
+                              "p-2 rounded-lg transition-all shadow-lg",
                               lockedGoals.housing 
-                                ? "bg-blue-100 text-blue-600 group-hover:bg-white group-hover:text-blue-600" 
-                                : isDarkMode ? "hover:bg-slate-800 text-slate-500" : "hover:bg-slate-100 text-slate-400 group-hover:text-white group-hover:hover:bg-blue-500"
+                                ? "bg-blue-600 text-white" 
+                                : "bg-slate-100 text-slate-400 hover:bg-blue-50 hover:text-blue-600"
                             )}
                           >
-                            {lockedGoals.housing ? <Lock className="w-3 h-3" /> : <Unlock className="w-3 h-3" />}
-                          </button>
+                            {lockedGoals.housing ? <Lock className="w-4 h-4" /> : <Unlock className="w-4 h-4" />}
+                          </motion.button>
                         </TooltipTrigger>
-                        <TooltipContent side="top">
-                          <p>{tooltips.lock}</p>
+                        <TooltipContent side="top" className="bg-slate-900 text-white">
+                          <p>{lockedGoals.housing ? 'Отключи за авто-корекция' : 'Заключи текущата стойност'}</p>
                         </TooltipContent>
                       </Tooltip>
                     </div>
-                    <p className={cn("text-[10px] tracking-widest mb-2 group-hover:text-blue-100", mutedTextClasses)}>ЖИЛИЩЕ</p>
+                    <p className={cn("text-xs tracking-widest mb-3 font-bold relative z-10", accentColor)}>ЖИЛИЩЕ</p>
                     
-                    {/* Housing Icon based on value */}
-                    <div className="flex justify-center mb-2">
+                    <div className="flex justify-center mb-4 relative z-10">
                       {allocations.housing === 0 ? (
-                        <div className="relative">
-                          <Home className={cn("w-12 h-12 md:w-14 md:h-14 text-red-400 group-hover:text-red-200")} />
+                        <div className="w-20 h-20 rounded-full bg-red-100 flex items-center justify-center relative">
+                          <Home className="w-10 h-10 text-red-600" />
                           <div className="absolute inset-0 flex items-center justify-center">
-                            <div className="w-16 h-0.5 bg-red-400 group-hover:bg-red-200 rotate-45 transform origin-center"></div>
+                            <div className="w-24 h-0.5 bg-red-600 rotate-45"></div>
                           </div>
                         </div>
                       ) : calculateGoals.housing >= 100000 ? (
-                        <Home className={cn("w-12 h-12 md:w-14 md:h-14 text-emerald-500 group-hover:text-emerald-200")} />
+                        <div className="w-20 h-20 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center">
+                          <Home className="w-10 h-10 text-white" />
+                        </div>
                       ) : (
-                        <HomeIcon className={cn("w-12 h-12 md:w-14 md:h-14 text-slate-400 group-hover:text-slate-200")} />
+                        <div className="w-20 h-20 rounded-full bg-blue-100 flex items-center justify-center">
+                          <HomeIcon className="w-10 h-10 text-blue-600" />
+                        </div>
                       )}
                     </div>
                     
                     <motion.p 
-                      className="text-2xl md:text-3xl font-bold mb-1 group-hover:text-white"
+                      className="text-3xl md:text-4xl font-bold mb-2 bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent relative z-10"
                       key={calculateGoals.housing}
                       initial={{ scale: 1.1 }}
                       animate={{ scale: 1 }}
@@ -2503,64 +2612,82 @@ export default function FinancialPlanner() {
                     >
                       {formatNumber(calculateGoals.housing)} €
                     </motion.p>
-                    <p className={cn("text-xs mb-3 group-hover:text-blue-200", accentColor)}>{allocations.housing}%</p>
+                    <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-100 mb-4 relative z-10">
+                      <span className="text-sm font-bold text-blue-700">{allocations.housing}%</span>
+                      <span className="text-xs text-blue-600">от дохода</span>
+                    </div>
                     <Slider
                       value={[allocations.housing]}
                       onValueChange={(v) => handleAllocationChange('housing', v[0])}
                       min={0}
                       max={50}
                       step={1}
-                      className="mb-2"
+                      className="mb-3 relative z-10"
                     />
-                    <p className={cn("text-[10px] mt-1 group-hover:text-blue-100", mutedTextClasses)}>Кредит {calculateGoals.loanTerm}г. @ 3%</p>
+                    <p className={cn("text-xs mt-2 font-medium relative z-10", mutedTextClasses)}>
+                      Ипотека {calculateGoals.loanTerm} год. при 3% лихва
+                    </p>
                   </motion.div>
 
-                  {/* Other Goals */}
+                  {/* Other Goals - Enhanced */}
                   <motion.div 
-                    className={cn("rounded-2xl border p-4 text-center relative transition-all duration-300 group hover:border-blue-500 hover:bg-blue-600", cardClasses)}
-                    animate={recentlyChanged === 'cash' ? { scale: [1, 1.02, 1], borderColor: ['', '#3b82f6', ''] } : {}}
+                    className={cn(
+                      "rounded-3xl border-2 p-6 text-center relative transition-all duration-300 group overflow-hidden",
+                      cardClasses,
+                      "hover:border-blue-400 hover:shadow-2xl hover:shadow-blue-200/50"
+                    )}
+                    animate={recentlyChanged === 'cash' ? { scale: [1, 1.03, 1] } : {}}
                     transition={{ duration: 0.3 }}
+                    whileHover={{ y: -4 }}
                   >
-                    <div className="absolute top-2 right-2">
+                    <motion.div 
+                      className="absolute inset-0 bg-gradient-to-br from-blue-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"
+                    />
+                    <div className="absolute top-3 right-3 z-10">
                       <Tooltip>
                         <TooltipTrigger asChild>
-                          <button 
+                          <motion.button 
                             onClick={() => toggleLock('cash')}
+                            whileHover={{ scale: 1.1 }}
+                            whileTap={{ scale: 0.9 }}
                             className={cn(
-                              "p-1 rounded-lg transition-colors",
+                              "p-2 rounded-lg transition-all shadow-lg",
                               lockedGoals.cash 
-                                ? "bg-blue-100 text-blue-600 group-hover:bg-white group-hover:text-blue-600" 
-                                : isDarkMode ? "hover:bg-slate-800 text-slate-500" : "hover:bg-slate-100 text-slate-400 group-hover:text-white group-hover:hover:bg-blue-500"
+                                ? "bg-blue-600 text-white" 
+                                : "bg-slate-100 text-slate-400 hover:bg-blue-50 hover:text-blue-600"
                             )}
                           >
-                            {lockedGoals.cash ? <Lock className="w-3 h-3" /> : <Unlock className="w-3 h-3" />}
-                          </button>
+                            {lockedGoals.cash ? <Lock className="w-4 h-4" /> : <Unlock className="w-4 h-4" />}
+                          </motion.button>
                         </TooltipTrigger>
-                        <TooltipContent side="top">
-                          <p>{tooltips.lock}</p>
+                        <TooltipContent side="top" className="bg-slate-900 text-white">
+                          <p>{lockedGoals.cash ? 'Отключи за авто-корекция' : 'Заключи текущата стойност'}</p>
                         </TooltipContent>
                       </Tooltip>
                     </div>
-                    <p className={cn("text-[10px] tracking-widest mb-2 group-hover:text-blue-100", mutedTextClasses)}>ДРУГИ ЦЕЛИ</p>
+                    <p className={cn("text-xs tracking-widest mb-3 font-bold relative z-10", accentColor)}>ДРУГИ ЦЕЛИ</p>
                     
-                    {/* Other Goals Icon - Car icon with slash when 0 */}
-                    <div className="flex justify-center mb-2">
+                    <div className="flex justify-center mb-4 relative z-10">
                       {allocations.cash === 0 ? (
-                        <div className="relative">
-                          <Car className={cn("w-12 h-12 md:w-14 md:h-14 text-red-400 group-hover:text-red-200")} />
+                        <div className="w-20 h-20 rounded-full bg-red-100 flex items-center justify-center relative">
+                          <Car className="w-10 h-10 text-red-600" />
                           <div className="absolute inset-0 flex items-center justify-center">
-                            <div className="w-16 h-0.5 bg-red-400 group-hover:bg-red-200 rotate-45 transform origin-center"></div>
+                            <div className="w-24 h-0.5 bg-red-600 rotate-45"></div>
                           </div>
                         </div>
                       ) : allocations.cash <= 2 ? (
-                        <Car className={cn("w-12 h-12 md:w-14 md:h-14 text-blue-500 group-hover:text-blue-200")} />
+                        <div className="w-20 h-20 rounded-full bg-blue-100 flex items-center justify-center">
+                          <Car className="w-10 h-10 text-blue-600" />
+                        </div>
                       ) : (
-                        <GraduationCap className={cn("w-12 h-12 md:w-14 md:h-14 text-violet-500 group-hover:text-violet-200")} />
+                        <div className="w-20 h-20 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center">
+                          <Wallet className="w-10 h-10 text-white" />
+                        </div>
                       )}
                     </div>
                     
                     <motion.p 
-                      className="text-2xl md:text-3xl font-bold mb-1 group-hover:text-white"
+                      className="text-3xl md:text-4xl font-bold mb-2 bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent relative z-10"
                       key={calculateGoals.cash}
                       initial={{ scale: 1.1 }}
                       animate={{ scale: 1 }}
@@ -2568,52 +2695,70 @@ export default function FinancialPlanner() {
                     >
                       {formatNumber(calculateGoals.cash)} €
                     </motion.p>
-                    <p className={cn("text-xs mb-3 group-hover:text-blue-200", accentColor)}>{allocations.cash}%</p>
+                    <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-100 mb-4 relative z-10">
+                      <span className="text-sm font-bold text-blue-700">{allocations.cash}%</span>
+                      <span className="text-xs text-blue-600">от дохода</span>
+                    </div>
                     <Slider
                       value={[allocations.cash]}
                       onValueChange={(v) => handleAllocationChange('cash', v[0])}
                       min={0}
                       max={25}
                       step={1}
-                      className="mb-2"
+                      className="mb-3 relative z-10"
                     />
-                    <p className={cn("text-[10px] mt-1 group-hover:text-blue-100", mutedTextClasses)}>Пари за важните цели</p>
+                    <p className={cn("text-xs mt-2 font-medium relative z-10", mutedTextClasses)}>
+                      Автомобил, пътувания и др.
+                    </p>
                   </motion.div>
                 </div>
 
-                {/* Detailed Info Section */}
-                <div className={cn("rounded-xl border p-2 mb-2", cardClasses)}>
-                  <div className="grid md:grid-cols-4 gap-2 text-xs">
-                    <div className="flex items-start gap-1">
-                      <Info className="w-3 h-3 text-blue-500 mt-0.5 flex-shrink-0" />
+                {/* Detailed Info Section - Enhanced */}
+                <motion.div 
+                  className={cn("rounded-2xl border-2 border-blue-200 p-4 mb-3 bg-gradient-to-r from-blue-50/50 to-indigo-50/50")}
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.2 }}
+                >
+                  <div className="grid md:grid-cols-4 gap-3 text-xs">
+                    <div className="flex items-start gap-2 p-2 rounded-lg hover:bg-white/80 transition-colors">
+                      <div className="w-6 h-6 rounded-full bg-blue-100 flex items-center justify-center flex-shrink-0 mt-0.5">
+                        <Info className="w-3 h-3 text-blue-600" />
+                      </div>
                       <div>
-                        <p className="font-medium">Финансова сигурност</p>
-                        <p className={mutedTextClasses}>Резерв от {Math.round((allocations.security / 10) * 6)} месеца доходи.</p>
+                        <p className="font-bold text-blue-900">Финансова сигурност</p>
+                        <p className="text-slate-600 leading-relaxed">Резерв от {Math.round((allocations.security / 10) * 6)} месеца разходи</p>
                       </div>
                     </div>
-                    <div className="flex items-start gap-1">
-                      <Info className="w-3 h-3 text-blue-500 mt-0.5 flex-shrink-0" />
+                    <div className="flex items-start gap-2 p-2 rounded-lg hover:bg-white/80 transition-colors">
+                      <div className="w-6 h-6 rounded-full bg-blue-100 flex items-center justify-center flex-shrink-0 mt-0.5">
+                        <Info className="w-3 h-3 text-blue-600" />
+                      </div>
                       <div>
-                        <p className="font-medium">Пенсия</p>
-                        <p className={mutedTextClasses}>Държавна пенсия + лични инвестиции при 8% доходност.</p>
+                        <p className="font-bold text-blue-900">Пенсия</p>
+                        <p className="text-slate-600 leading-relaxed">Държавна + инвестиции при 8% доходност</p>
                       </div>
                     </div>
-                    <div className="flex items-start gap-1">
-                      <Info className="w-3 h-3 text-blue-500 mt-0.5 flex-shrink-0" />
+                    <div className="flex items-start gap-2 p-2 rounded-lg hover:bg-white/80 transition-colors">
+                      <div className="w-6 h-6 rounded-full bg-blue-100 flex items-center justify-center flex-shrink-0 mt-0.5">
+                        <Info className="w-3 h-3 text-blue-600" />
+                      </div>
                       <div>
-                        <p className="font-medium">Жилище</p>
-                        <p className={mutedTextClasses}>Ипотечен кредит {calculateGoals.loanTerm}г. при 3% лихва.</p>
+                        <p className="font-bold text-blue-900">Жилище</p>
+                        <p className="text-slate-600 leading-relaxed">Кредит {calculateGoals.loanTerm}г. при 3% лихва</p>
                       </div>
                     </div>
-                    <div className="flex items-start gap-1">
-                      <Info className="w-3 h-3 text-blue-500 mt-0.5 flex-shrink-0" />
+                    <div className="flex items-start gap-2 p-2 rounded-lg hover:bg-white/80 transition-colors">
+                      <div className="w-6 h-6 rounded-full bg-blue-100 flex items-center justify-center flex-shrink-0 mt-0.5">
+                        <Info className="w-3 h-3 text-blue-600" />
+                      </div>
                       <div>
-                        <p className="font-medium">Други цели</p>
-                        <p className={mutedTextClasses}>Автомобил, образование за децата и др.</p>
+                        <p className="font-bold text-blue-900">Други цели</p>
+                        <p className="text-slate-600 leading-relaxed">Автомобил, образование и др.</p>
                       </div>
                     </div>
                   </div>
-                </div>
+                </motion.div>
 
                 {/* Total Wealth - Bottom Center - Enhanced */}
                 <motion.div 

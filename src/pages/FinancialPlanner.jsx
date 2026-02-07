@@ -2881,8 +2881,8 @@ export default function FinancialPlanner() {
                     </div>
                   </div>
 
-                  <h2 className="text-3xl font-bold mb-3">Система на работа</h2>
-                  <p className={cn("text-base mb-6", mutedTextClasses)}>
+                  <h2 className="text-4xl font-bold mb-4">Система на работа</h2>
+                  <p className={cn("text-lg mb-6", mutedTextClasses)}>
                     Нашият структуриран подход гарантира ясно и прозрачно финансово планиране.
                   </p>
 

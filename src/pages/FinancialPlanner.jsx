@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Slider } from "@/components/ui/slider";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { RotateCcw, Loader2, Lock, Unlock, HelpCircle, ArrowLeft, ShieldAlert, Shield, ShieldCheck, Frown, Smile, PartyPopper, Home, HomeIcon, Car, GraduationCap, Wallet, TrendingUp, Briefcase, Baby, PiggyBank, Plane, Heart, Target, CheckCircle2, Calendar, Users, FileText, Info } from 'lucide-react';
 import {
   Tooltip,
@@ -131,6 +132,8 @@ export default function FinancialPlanner() {
   const [clientLastName, setClientLastName] = useState('');
   const [partnerFirstName, setPartnerFirstName] = useState('');
   const [partnerLastName, setPartnerLastName] = useState('');
+  const [childrenCount, setChildrenCount] = useState(0);
+  const [childrenNames, setChildrenNames] = useState([]);
   const [clientInsuranceType, setClientInsuranceType] = useState(null); // 'employee' | 'entrepreneur'
   const [partnerInsuranceType, setPartnerInsuranceType] = useState(null); // 'employee' | 'entrepreneur'
   const [clientAge, setClientAge] = useState(35);
@@ -412,6 +415,8 @@ export default function FinancialPlanner() {
     setClientLastName('');
     setPartnerFirstName('');
     setPartnerLastName('');
+    setChildrenCount(0);
+    setChildrenNames([]);
     setClientInsuranceType(null);
     setPartnerInsuranceType(null);
     setClientAge(35);
@@ -786,58 +791,16 @@ export default function FinancialPlanner() {
                       <motion.div
                         initial={{ opacity: 0, y: -10 }}
                         animate={{ opacity: 1, y: 0 }}
-                        className="grid grid-cols-2 gap-4"
+                        className="space-y-4"
                       >
-                        <div>
-                          <label className={cn("text-sm font-medium mb-2 block", mutedTextClasses)}>Име</label>
-                          <input
-                            type="text"
-                            value={clientFirstName}
-                            onChange={(e) => setClientFirstName(e.target.value)}
-                            placeholder="Вашето име"
-                            className={cn(
-                              "w-full px-4 py-3 rounded-xl border-2 transition-all duration-200 outline-none",
-                              isDarkMode 
-                                ? "bg-slate-800 border-slate-700 text-white placeholder:text-slate-500 focus:border-blue-500" 
-                                : "bg-white border-slate-200 text-slate-900 placeholder:text-slate-400 focus:border-blue-500"
-                            )}
-                          />
-                        </div>
-                        <div>
-                          <label className={cn("text-sm font-medium mb-2 block", mutedTextClasses)}>Фамилия</label>
-                          <input
-                            type="text"
-                            value={clientLastName}
-                            onChange={(e) => setClientLastName(e.target.value)}
-                            placeholder="Вашата фамилия"
-                            className={cn(
-                              "w-full px-4 py-3 rounded-xl border-2 transition-all duration-200 outline-none",
-                              isDarkMode 
-                                ? "bg-slate-800 border-slate-700 text-white placeholder:text-slate-500 focus:border-blue-500" 
-                                : "bg-white border-slate-200 text-slate-900 placeholder:text-slate-400 focus:border-blue-500"
-                            )}
-                          />
-                        </div>
-                      </motion.div>
-                    )}
-
-                    {/* Name fields for family */}
-                    {familyType === 'family' && (
-                      <motion.div
-                        initial={{ opacity: 0, y: -10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        className="grid grid-cols-2 gap-6"
-                      >
-                        {/* Client names */}
-                        <div className="space-y-4">
-                          <p className={cn("text-sm font-semibold", mutedTextClasses)}>КЛИЕНТ</p>
+                        <div className="grid grid-cols-2 gap-4">
                           <div>
                             <label className={cn("text-sm font-medium mb-2 block", mutedTextClasses)}>Име</label>
                             <input
                               type="text"
                               value={clientFirstName}
                               onChange={(e) => setClientFirstName(e.target.value)}
-                              placeholder="Име на клиента"
+                              placeholder="Вашето име"
                               className={cn(
                                 "w-full px-4 py-3 rounded-xl border-2 transition-all duration-200 outline-none",
                                 isDarkMode 
@@ -852,7 +815,7 @@ export default function FinancialPlanner() {
                               type="text"
                               value={clientLastName}
                               onChange={(e) => setClientLastName(e.target.value)}
-                              placeholder="Фамилия на клиента"
+                              placeholder="Вашата фамилия"
                               className={cn(
                                 "w-full px-4 py-3 rounded-xl border-2 transition-all duration-200 outline-none",
                                 isDarkMode 
@@ -863,40 +826,212 @@ export default function FinancialPlanner() {
                           </div>
                         </div>
 
-                        {/* Partner names */}
-                        <div className="space-y-4">
-                          <p className={cn("text-sm font-semibold", mutedTextClasses)}>ПАРТНЬОР</p>
-                          <div>
-                            <label className={cn("text-sm font-medium mb-2 block", mutedTextClasses)}>Име</label>
-                            <input
-                              type="text"
-                              value={partnerFirstName}
-                              onChange={(e) => setPartnerFirstName(e.target.value)}
-                              placeholder="Име на партньора"
-                              className={cn(
-                                "w-full px-4 py-3 rounded-xl border-2 transition-all duration-200 outline-none",
-                                isDarkMode 
-                                  ? "bg-slate-800 border-slate-700 text-white placeholder:text-slate-500 focus:border-blue-500" 
-                                  : "bg-white border-slate-200 text-slate-900 placeholder:text-slate-400 focus:border-blue-500"
-                              )}
-                            />
+                        {/* Children count */}
+                        <div>
+                          <label className={cn("text-sm font-medium mb-2 block", mutedTextClasses)}>Брой деца</label>
+                          <Select
+                            value={childrenCount.toString()}
+                            onValueChange={(value) => {
+                              const count = parseInt(value);
+                              setChildrenCount(count);
+                              setChildrenNames(Array(count).fill(''));
+                            }}
+                          >
+                            <SelectTrigger className={cn(
+                              "w-full px-4 py-3 rounded-xl border-2",
+                              isDarkMode 
+                                ? "bg-slate-800 border-slate-700 text-white" 
+                                : "bg-white border-slate-200 text-slate-900"
+                            )}>
+                              <SelectValue placeholder="Изберете" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="0">Няма</SelectItem>
+                              <SelectItem value="1">1</SelectItem>
+                              <SelectItem value="2">2</SelectItem>
+                              <SelectItem value="3">3</SelectItem>
+                              <SelectItem value="4">4</SelectItem>
+                              <SelectItem value="5">5</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
+
+                        {/* Children names */}
+                        {childrenCount > 0 && (
+                          <motion.div
+                            initial={{ opacity: 0, height: 0 }}
+                            animate={{ opacity: 1, height: 'auto' }}
+                            className="space-y-3"
+                          >
+                            {Array.from({ length: childrenCount }).map((_, idx) => (
+                              <div key={idx}>
+                                <label className={cn("text-sm font-medium mb-2 block", mutedTextClasses)}>
+                                  Име на дете {idx + 1}
+                                </label>
+                                <input
+                                  type="text"
+                                  value={childrenNames[idx] || ''}
+                                  onChange={(e) => {
+                                    const newNames = [...childrenNames];
+                                    newNames[idx] = e.target.value;
+                                    setChildrenNames(newNames);
+                                  }}
+                                  placeholder={`Име на дете ${idx + 1}`}
+                                  className={cn(
+                                    "w-full px-4 py-3 rounded-xl border-2 transition-all duration-200 outline-none",
+                                    isDarkMode 
+                                      ? "bg-slate-800 border-slate-700 text-white placeholder:text-slate-500 focus:border-blue-500" 
+                                      : "bg-white border-slate-200 text-slate-900 placeholder:text-slate-400 focus:border-blue-500"
+                                  )}
+                                />
+                              </div>
+                            ))}
+                          </motion.div>
+                        )}
+                      </motion.div>
+                    )}
+
+                    {/* Name fields for family */}
+                    {familyType === 'family' && (
+                      <motion.div
+                        initial={{ opacity: 0, y: -10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        className="space-y-6"
+                      >
+                        <div className="grid grid-cols-2 gap-6">
+                          {/* Client names */}
+                          <div className="space-y-4">
+                            <p className={cn("text-sm font-semibold", mutedTextClasses)}>КЛИЕНТ</p>
+                            <div>
+                              <label className={cn("text-sm font-medium mb-2 block", mutedTextClasses)}>Име</label>
+                              <input
+                                type="text"
+                                value={clientFirstName}
+                                onChange={(e) => setClientFirstName(e.target.value)}
+                                placeholder="Име на клиента"
+                                className={cn(
+                                  "w-full px-4 py-3 rounded-xl border-2 transition-all duration-200 outline-none",
+                                  isDarkMode 
+                                    ? "bg-slate-800 border-slate-700 text-white placeholder:text-slate-500 focus:border-blue-500" 
+                                    : "bg-white border-slate-200 text-slate-900 placeholder:text-slate-400 focus:border-blue-500"
+                                )}
+                              />
+                            </div>
+                            <div>
+                              <label className={cn("text-sm font-medium mb-2 block", mutedTextClasses)}>Фамилия</label>
+                              <input
+                                type="text"
+                                value={clientLastName}
+                                onChange={(e) => setClientLastName(e.target.value)}
+                                placeholder="Фамилия на клиента"
+                                className={cn(
+                                  "w-full px-4 py-3 rounded-xl border-2 transition-all duration-200 outline-none",
+                                  isDarkMode 
+                                    ? "bg-slate-800 border-slate-700 text-white placeholder:text-slate-500 focus:border-blue-500" 
+                                    : "bg-white border-slate-200 text-slate-900 placeholder:text-slate-400 focus:border-blue-500"
+                                )}
+                              />
+                            </div>
                           </div>
-                          <div>
-                            <label className={cn("text-sm font-medium mb-2 block", mutedTextClasses)}>Фамилия</label>
-                            <input
-                              type="text"
-                              value={partnerLastName}
-                              onChange={(e) => setPartnerLastName(e.target.value)}
-                              placeholder="Фамилия на партньора"
-                              className={cn(
-                                "w-full px-4 py-3 rounded-xl border-2 transition-all duration-200 outline-none",
-                                isDarkMode 
-                                  ? "bg-slate-800 border-slate-700 text-white placeholder:text-slate-500 focus:border-blue-500" 
-                                  : "bg-white border-slate-200 text-slate-900 placeholder:text-slate-400 focus:border-blue-500"
-                              )}
-                            />
+
+                          {/* Partner names */}
+                          <div className="space-y-4">
+                            <p className={cn("text-sm font-semibold", mutedTextClasses)}>ПАРТНЬОР</p>
+                            <div>
+                              <label className={cn("text-sm font-medium mb-2 block", mutedTextClasses)}>Име</label>
+                              <input
+                                type="text"
+                                value={partnerFirstName}
+                                onChange={(e) => setPartnerFirstName(e.target.value)}
+                                placeholder="Име на партньора"
+                                className={cn(
+                                  "w-full px-4 py-3 rounded-xl border-2 transition-all duration-200 outline-none",
+                                  isDarkMode 
+                                    ? "bg-slate-800 border-slate-700 text-white placeholder:text-slate-500 focus:border-blue-500" 
+                                    : "bg-white border-slate-200 text-slate-900 placeholder:text-slate-400 focus:border-blue-500"
+                                )}
+                              />
+                            </div>
+                            <div>
+                              <label className={cn("text-sm font-medium mb-2 block", mutedTextClasses)}>Фамилия</label>
+                              <input
+                                type="text"
+                                value={partnerLastName}
+                                onChange={(e) => setPartnerLastName(e.target.value)}
+                                placeholder="Фамилия на партньора"
+                                className={cn(
+                                  "w-full px-4 py-3 rounded-xl border-2 transition-all duration-200 outline-none",
+                                  isDarkMode 
+                                    ? "bg-slate-800 border-slate-700 text-white placeholder:text-slate-500 focus:border-blue-500" 
+                                    : "bg-white border-slate-200 text-slate-900 placeholder:text-slate-400 focus:border-blue-500"
+                                )}
+                              />
+                            </div>
                           </div>
                         </div>
+
+                        {/* Children count */}
+                        <div>
+                          <label className={cn("text-sm font-medium mb-2 block", mutedTextClasses)}>Брой деца</label>
+                          <Select
+                            value={childrenCount.toString()}
+                            onValueChange={(value) => {
+                              const count = parseInt(value);
+                              setChildrenCount(count);
+                              setChildrenNames(Array(count).fill(''));
+                            }}
+                          >
+                            <SelectTrigger className={cn(
+                              "w-full px-4 py-3 rounded-xl border-2",
+                              isDarkMode 
+                                ? "bg-slate-800 border-slate-700 text-white" 
+                                : "bg-white border-slate-200 text-slate-900"
+                            )}>
+                              <SelectValue placeholder="Изберете" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="0">Няма</SelectItem>
+                              <SelectItem value="1">1</SelectItem>
+                              <SelectItem value="2">2</SelectItem>
+                              <SelectItem value="3">3</SelectItem>
+                              <SelectItem value="4">4</SelectItem>
+                              <SelectItem value="5">5</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
+
+                        {/* Children names */}
+                        {childrenCount > 0 && (
+                          <motion.div
+                            initial={{ opacity: 0, height: 0 }}
+                            animate={{ opacity: 1, height: 'auto' }}
+                            className="space-y-3"
+                          >
+                            {Array.from({ length: childrenCount }).map((_, idx) => (
+                              <div key={idx}>
+                                <label className={cn("text-sm font-medium mb-2 block", mutedTextClasses)}>
+                                  Име на дете {idx + 1}
+                                </label>
+                                <input
+                                  type="text"
+                                  value={childrenNames[idx] || ''}
+                                  onChange={(e) => {
+                                    const newNames = [...childrenNames];
+                                    newNames[idx] = e.target.value;
+                                    setChildrenNames(newNames);
+                                  }}
+                                  placeholder={`Име на дете ${idx + 1}`}
+                                  className={cn(
+                                    "w-full px-4 py-3 rounded-xl border-2 transition-all duration-200 outline-none",
+                                    isDarkMode 
+                                      ? "bg-slate-800 border-slate-700 text-white placeholder:text-slate-500 focus:border-blue-500" 
+                                      : "bg-white border-slate-200 text-slate-900 placeholder:text-slate-400 focus:border-blue-500"
+                                  )}
+                                />
+                              </div>
+                            ))}
+                          </motion.div>
+                        )}
                       </motion.div>
                     )}
                   </div>
@@ -908,7 +1043,8 @@ export default function FinancialPlanner() {
                         !familyType || 
                         !clientFirstName.trim() || 
                         !clientLastName.trim() ||
-                        (familyType === 'family' && (!partnerFirstName.trim() || !partnerLastName.trim()))
+                        (familyType === 'family' && (!partnerFirstName.trim() || !partnerLastName.trim())) ||
+                        (childrenCount > 0 && childrenNames.some(name => !name.trim()))
                       }
                       className={cn(primaryButtonClass, "px-16 py-6 text-lg")}
                     >

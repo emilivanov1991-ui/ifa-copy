@@ -1006,14 +1006,14 @@ export default function FinancialAnalysis() {
               transition={{ duration: 0.3 }}
             >
               {currentStep === 1 && <ConsentStep data={formData} onChange={handleChange} showErrors={showValidationErrors} />}
-              {currentStep === 2 && <PersonalDataStep data={formData} onChange={handleChange} showErrors={showValidationErrors} />}
-              {currentStep === 3 && <HousingStep data={formData} onChange={handleChange} showErrors={showValidationErrors} />}
-              {currentStep === 4 && <ReserveStep data={formData} onChange={handleChange} showErrors={showValidationErrors} />}
-              {currentStep === 5 && <PensionStep data={formData} onChange={handleChange} showErrors={showValidationErrors} />}
-              {currentStep === 6 && <ChildrenGoalsStep data={formData} onChange={handleChange} showErrors={showValidationErrors} />}
-              {currentStep === 7 && <ProtectionStep data={formData} onChange={handleChange} showErrors={showValidationErrors} />}
-              {currentStep === 8 && <FinancialFlowStep data={formData} onChange={handleChange} showErrors={showValidationErrors} />}
-              {currentStep === 9 && <PrioritiesStep data={formData} onChange={handleChange} showErrors={showValidationErrors} />}
+              {currentStep === 2 && <PersonalDataStep data={formData} onChange={handleChange} showErrors={showValidationErrors} plannerData={plannerData} />}
+              {currentStep === 3 && <HousingStep data={formData} onChange={handleChange} showErrors={showValidationErrors} plannerData={plannerData} />}
+              {currentStep === 4 && <ReserveStep data={formData} onChange={handleChange} showErrors={showValidationErrors} plannerData={plannerData} />}
+              {currentStep === 5 && <PensionStep data={formData} onChange={handleChange} showErrors={showValidationErrors} plannerData={plannerData} />}
+              {currentStep === 6 && <ChildrenGoalsStep data={formData} onChange={handleChange} showErrors={showValidationErrors} plannerData={plannerData} />}
+              {currentStep === 7 && <ProtectionStep data={formData} onChange={handleChange} showErrors={showValidationErrors} plannerData={plannerData} />}
+              {currentStep === 8 && <FinancialFlowStep data={formData} onChange={handleChange} showErrors={showValidationErrors} plannerData={plannerData} />}
+              {currentStep === 9 && <PrioritiesStep data={formData} onChange={handleChange} showErrors={showValidationErrors} plannerData={plannerData} />}
             </motion.div>
           </AnimatePresence>
 

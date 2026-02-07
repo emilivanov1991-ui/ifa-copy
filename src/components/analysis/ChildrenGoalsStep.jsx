@@ -86,18 +86,38 @@ export default function ChildrenGoalsStep({ data, onChange, showErrors, plannerD
   const currentSavings = data.children_current_savings || 0;
   const missingAmount = Math.max(0, totalChildrenCosts - currentSavings);
   
-  // Use Financial Planner ages if available, otherwise calculate from form
-  const averageChildAge = (() => {
+  // Calculate average child age - prioritize Financial Planner data, then form data
+  const getAverageChildAge = () => {
+    // First try Financial Planner ages
     if (plannerChildrenAges && plannerChildrenAges.length > 0) {
-      const validAges = plannerChildrenAges.filter(age => age !== undefined && age !== '');
+      const validAges = plannerChildrenAges.filter(age => age !== undefined && age !== '' && age !== null);
       if (validAges.length > 0) {
-        const sum = validAges.reduce((a, b) => a + b, 0);
+        const sum = validAges.reduce((a, b) => a + Number(b), 0);
         return sum / validAges.length;
       }
     }
+    
+    // Then try form ages (child_1_age, child_2_age, etc.)
+    if (data.children_count > 0) {
+      let totalAge = 0;
+      let validCount = 0;
+      for (let i = 1; i <= data.children_count; i++) {
+        const age = data[`child_${i}_age`];
+        if (age !== undefined && age !== '' && age !== null) {
+          totalAge += Number(age);
+          validCount++;
+        }
+      }
+      if (validCount > 0) {
+        return totalAge / validCount;
+      }
+    }
+    
+    // Finally try birthdate calculation
     return calculateAverageChildAge();
-  })();
+  };
   
+  const averageChildAge = getAverageChildAge();
   const investmentHorizon = Math.max(1, 20 - Math.round(averageChildAge));
   const monthlyInvestment = calculateMonthlyInvestment(missingAmount, investmentHorizon, 0.08);
 
@@ -525,14 +545,22 @@ export default function ChildrenGoalsStep({ data, onChange, showErrors, plannerD
           </div>
 
           {/* Investment calculation message */}
-          {(currentSavings >= 0 && data.children_current_savings !== undefined && data.children_current_savings !== '') && missingAmount > 0 && averageChildAge > 0 && (
+          {totalChildrenCosts > 0 && data.children_current_savings !== undefined && data.children_current_savings !== '' && (
             <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg mt-4">
-              <p className="text-blue-800">
-                За осигуряване на подобни суми са ви необходими инвестиции в размер на около <span className="font-bold">{monthlyInvestment.toLocaleString()} €</span> месечно. Във финансовия план ще откриете по-подробни предложения и проекции.
-              </p>
-              <p className="text-xs text-blue-600 mt-2">
-                (Изчислено при {investmentHorizon} години хоризонт и 8% средна годишна доходност)
-              </p>
+              {missingAmount > 0 && averageChildAge >= 0 ? (
+                <>
+                  <p className="text-blue-800">
+                    За постигане на тези цели ще са нужни <span className="font-bold">{monthlyInvestment.toLocaleString()} €</span> месечна инвестиция. Във финансовия план ще откриете по-подробни предложения и проекции.
+                  </p>
+                  <p className="text-xs text-blue-600 mt-2">
+                    (Изчислено при {investmentHorizon} години инвестиционен хоризонт и 8% средна годишна доходност)
+                  </p>
+                </>
+              ) : missingAmount === 0 ? (
+                <p className="text-green-800 font-medium">
+                  Имате достатъчно спестявания за покриване на целите си! 🎉
+                </p>
+              ) : null}
             </div>
           )}
         </div>

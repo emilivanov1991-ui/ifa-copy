@@ -72,11 +72,6 @@ export default function ReserveStep({ data, onChange, showErrors, plannerData })
   const monthlyExpenses = totalMonthlyIncome - monthlySavings;
 
   // Calculate total savings
-  // Get names from Financial Planner
-  const clientName = plannerData?.client_first_name || 'Клиент';
-  const partnerName = plannerData?.partner_first_name || 'Партньор';
-  const includePartner = plannerData?.family_type === 'family' || data.include_partner;
-  
   const clientTotal = (data.client_checking_account || 0) + (data.client_term_deposit || 0) + 
     (data.client_mutual_funds || 0) + (data.client_savings_account || 0) + (data.client_cash || 0) +
     (data.client_crypto || 0) + (data.client_gold || 0);

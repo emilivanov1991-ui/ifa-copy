@@ -5,7 +5,8 @@ import { Input } from "@/components/ui/input";
 import { Slider } from "@/components/ui/slider";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { RotateCcw, Loader2, Lock, Unlock, HelpCircle, ArrowLeft, ShieldAlert, Shield, ShieldCheck, Frown, Smile, PartyPopper, Home, HomeIcon, Car, GraduationCap, Wallet, TrendingUp, Briefcase, Baby, PiggyBank, Plane, Heart, Target, CheckCircle2, Calendar, Users, FileText, Info } from 'lucide-react';
+import { RotateCcw, Loader2, Lock, Unlock, HelpCircle, ArrowLeft, ShieldAlert, Shield, ShieldCheck, Frown, Smile, PartyPopper, Home, HomeIcon, Car, GraduationCap, Wallet, TrendingUp, Briefcase, Baby, PiggyBank, Plane, Heart, Target, CheckCircle2, Calendar, Users, FileText, Info, User, XCircle, ArrowRight, Sparkles } from 'lucide-react';
+import confetti from 'canvas-confetti';
 import { base44 } from '@/api/base44Client';
 import {
   Tooltip,
@@ -468,21 +469,21 @@ export default function FinancialPlanner() {
     });
   };
 
-  // Theme classes
+  // Theme classes - Enhanced blue palette
   const themeClasses = isDarkMode 
     ? 'bg-slate-950 text-white' 
-    : 'bg-gradient-to-br from-slate-50 to-blue-50 text-slate-900';
+    : 'bg-gradient-to-br from-blue-50 via-slate-50 to-indigo-50 text-slate-900';
 
   const cardClasses = isDarkMode
     ? 'bg-slate-900/80 border-slate-800'
-    : 'bg-white border-slate-200';
+    : 'bg-white/80 backdrop-blur-sm border-slate-200/60 shadow-xl shadow-blue-100/50';
 
-  const mutedTextClasses = isDarkMode ? 'text-slate-400' : 'text-slate-500';
-  const accentColor = 'text-blue-400';
+  const mutedTextClasses = isDarkMode ? 'text-slate-400' : 'text-slate-600';
+  const accentColor = 'text-blue-600';
 
-  // Common button styles
-  const primaryButtonClass = "rounded-full px-6 bg-blue-600 hover:bg-blue-700 text-white font-medium transition-all duration-200 hover:shadow-lg hover:shadow-blue-500/25";
-  const outlineButtonClass = cn("rounded-full px-6 font-medium transition-all duration-200", isDarkMode ? "border-slate-700 hover:bg-slate-800" : "border-slate-300 hover:bg-slate-50");
+  // Common button styles - Enhanced
+  const primaryButtonClass = "rounded-full px-8 py-4 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-semibold transition-all duration-300 hover:shadow-2xl hover:shadow-blue-500/40 hover:scale-105 active:scale-95";
+  const outlineButtonClass = cn("rounded-full px-6 font-medium transition-all duration-200 border-2", isDarkMode ? "border-slate-700 hover:bg-slate-800" : "border-blue-200 text-blue-700 hover:bg-blue-50 hover:border-blue-300");
 
   // Load from URL params if resuming
   useEffect(() => {
@@ -715,19 +716,21 @@ export default function FinancialPlanner() {
           </motion.div>
         )}
       </AnimatePresence>
-      {/* Global Back Button */}
+      {/* Global Back Button - Enhanced */}
       {currentStep > 1 && !isGenerating && (
-        <button
+        <motion.button
           onClick={goBack}
+          whileHover={{ scale: 1.05, x: -2 }}
+          whileTap={{ scale: 0.95 }}
           className={cn(
-            "fixed top-6 left-6 z-50 w-12 h-12 rounded-full flex items-center justify-center transition-all duration-300 shadow-lg",
+            "fixed top-6 left-6 z-50 w-12 h-12 rounded-full flex items-center justify-center transition-all duration-300 shadow-xl group",
             isDarkMode 
-              ? "bg-slate-800 hover:bg-slate-700 text-white" 
-              : "bg-white hover:bg-slate-50 text-slate-700 border border-slate-200"
+              ? "bg-slate-800 hover:bg-slate-700 text-white shadow-slate-900/50" 
+              : "bg-white hover:bg-blue-50 text-slate-700 border-2 border-slate-200 hover:border-blue-400 shadow-blue-200/50"
           )}
         >
-          <ArrowLeft className="w-5 h-5" />
-        </button>
+          <ArrowLeft className="w-5 h-5 group-hover:text-blue-600 transition-colors" />
+        </motion.button>
       )}
 
       {/* Main Content */}
@@ -745,180 +748,283 @@ export default function FinancialPlanner() {
             className="grid lg:grid-cols-4 gap-8 items-center h-full"
             >
             {/* Left side - description (25%) */}
-            <div className="lg:col-span-1">
-              <p className={cn("text-base tracking-widest mb-4", accentColor)}>СТЪПКА 1</p>
-              <h1 className="text-4xl md:text-5xl font-bold mb-4">С кого планираме?</h1>
-              <p className={cn("text-lg mb-6", mutedTextClasses)}>
-                Изберете дали работим с един клиент или с домакинство.
-              </p>
+            <div className="lg:col-span-1 flex flex-col justify-center">
+              <motion.div
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: 0.2 }}
+              >
+                <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-blue-100 text-blue-700 text-xs font-semibold mb-6">
+                  <Sparkles className="w-4 h-4" />
+                  СТЪПКА 1 ОТ 9
+                </div>
+                <h1 className="text-4xl md:text-5xl font-bold mb-4 bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
+                  Започнете Вашия Персонален Финансов План
+                </h1>
+                <p className={cn("text-lg mb-6 leading-relaxed", mutedTextClasses)}>
+                  Попълнете няколко кратки въпроса, за да създадем индивидуален анализ за Вас. 
+                  Това ще отнеме само няколко минути.
+                </p>
+              </motion.div>
             </div>
 
             {/* Right side - card (75%) */}
             <div className={cn("lg:col-span-3 rounded-3xl border p-8 min-h-[500px] flex flex-col", cardClasses)}>
-              {/* Inline Step Tracker */}
-              <div className="mb-6 pb-4 border-b border-slate-100">
-                    <div className="flex justify-between items-start">
-                      {VISUAL_STEPS.map((step, index) => {
-                        const isActive = currentStep >= (index + 1);
-                        const isCurrent = index === 0;
-                        return (
+              {/* Inline Step Tracker - Enhanced */}
+              <div className="mb-6 pb-4 border-b border-blue-100">
+                <div className="flex justify-between items-start gap-1">
+                  {VISUAL_STEPS.map((step, index) => {
+                    const isActive = currentStep >= (index + 1);
+                    const isCurrent = index === 0;
+                    const isCompleted = currentStep > (index + 1);
+                    return (
+                      <Tooltip key={step.id}>
+                        <TooltipTrigger asChild>
                           <div 
-                            key={step.id}
                             className={cn(
-                              "flex flex-col items-center text-center flex-1 transition-all duration-300",
+                              "flex flex-col items-center text-center flex-1 transition-all duration-300 cursor-pointer",
                               isActive ? "opacity-100" : "opacity-40"
                             )}
                           >
-                            <div className={cn(
-                              "w-full h-1 mb-2 rounded-full transition-all duration-300",
-                              isCurrent 
-                                ? "bg-blue-500" 
-                                : isActive 
-                                  ? "bg-blue-500" 
-                                  : isDarkMode ? "bg-slate-700" : "bg-slate-200"
-                            )} />
+                            <motion.div 
+                              className={cn(
+                                "w-full h-1.5 mb-2 rounded-full transition-all duration-300",
+                                isCurrent 
+                                  ? "bg-gradient-to-r from-blue-500 to-blue-600 shadow-lg shadow-blue-500/50" 
+                                  : isCompleted
+                                    ? "bg-blue-600"
+                                    : isDarkMode ? "bg-slate-700" : "bg-slate-200"
+                              )}
+                              animate={isCurrent ? { scale: [1, 1.05, 1] } : {}}
+                              transition={{ duration: 2, repeat: Infinity }}
+                            />
                             <span className={cn(
-                              "text-[9px] font-semibold tracking-wider leading-tight uppercase",
-                              isCurrent ? "text-slate-900" : isDarkMode ? "text-slate-400" : "text-slate-400"
+                              "text-[9px] font-bold tracking-wider leading-tight uppercase",
+                              isCurrent ? "text-blue-600" : isCompleted ? "text-blue-500" : "text-slate-400"
                             )}>
                               {step.label}
                             </span>
                             <span className={cn(
-                              "text-[9px] font-semibold tracking-wider leading-tight uppercase",
-                              isCurrent ? "text-slate-900" : isDarkMode ? "text-slate-400" : "text-slate-400"
+                              "text-[9px] font-bold tracking-wider leading-tight uppercase",
+                              isCurrent ? "text-blue-600" : isCompleted ? "text-blue-500" : "text-slate-400"
                             )}>
                               {step.subLabel}
                             </span>
                           </div>
-                        );
-                      })}
-                    </div>
-                  </div>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          <p className="text-xs">Стъпка {index + 1}: {step.label} {step.subLabel}</p>
+                        </TooltipContent>
+                      </Tooltip>
+                    );
+                  })}
+                </div>
+              </div>
                   
                   <div className="flex items-center justify-between mb-6">
-                    <p className={cn("text-base tracking-widest", mutedTextClasses)}>СТЪПКА 1</p>
-                    <button onClick={restart} className={cn("p-2 rounded-full text-slate-400 hover:text-blue-500 hover:bg-slate-100 transition-colors")}>
-                      <RotateCcw className="w-5 h-5" />
-                    </button>
+                    <div className="flex items-center gap-2">
+                      <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center text-white text-sm font-bold shadow-lg shadow-blue-500/30">
+                        1
+                      </div>
+                      <span className="text-sm font-semibold text-blue-600">ОСНОВНА ИНФОРМАЦИЯ</span>
+                    </div>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <button onClick={restart} className="p-2 rounded-full text-slate-400 hover:text-blue-600 hover:bg-blue-50 transition-all duration-200">
+                          <RotateCcw className="w-5 h-5" />
+                        </button>
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <p>Започни отначало</p>
+                      </TooltipContent>
+                    </Tooltip>
                   </div>
                   
-                  <h2 className="text-3xl font-bold mb-3">С кого планираме?</h2>
-                  <p className={cn("text-base mb-8", mutedTextClasses)}>
+                  <h2 className="text-2xl font-bold mb-2">С кого планираме?</h2>
+                  <p className={cn("text-sm mb-8", mutedTextClasses)}>
                     Изберете дали работим с един клиент или с домакинство.
                   </p>
 
                   <div className="space-y-6 mb-8 flex-1">
                     <div className="grid grid-cols-2 gap-6">
-                      <button
+                      <motion.button
                         onClick={() => setFamilyType('individual')}
+                        whileHover={{ scale: 1.02, y: -4 }}
+                        whileTap={{ scale: 0.98 }}
                         className={cn(
-                          "p-8 rounded-2xl border-2 text-left transition-all duration-300 group flex flex-col justify-center",
+                          "p-8 rounded-3xl border-2 transition-all duration-300 group flex flex-col items-center justify-center text-center relative overflow-hidden",
                           familyType === 'individual'
-                            ? "border-blue-500 bg-blue-600 text-white"
+                            ? "border-blue-500 bg-gradient-to-br from-blue-600 to-blue-700 text-white shadow-2xl shadow-blue-500/50"
                             : isDarkMode 
-                              ? "border-slate-700 hover:border-blue-500 hover:bg-blue-600 hover:text-white" 
-                              : "border-slate-200 hover:border-blue-500 hover:bg-blue-600 hover:text-white"
+                              ? "border-slate-700 hover:border-blue-400 bg-slate-800/50" 
+                              : "border-slate-200 hover:border-blue-400 bg-white hover:shadow-xl hover:shadow-blue-200/50"
                         )}
                       >
-                        <h3 className={cn("font-semibold text-xl mb-2", familyType !== 'individual' && "group-hover:text-white")}>Отделен индивид</h3>
-                        <p className={cn("text-base", familyType === 'individual' ? "text-blue-100" : mutedTextClasses, familyType !== 'individual' && "group-hover:text-blue-100")}>
+                        {familyType === 'individual' && (
+                          <motion.div
+                            className="absolute inset-0 bg-gradient-to-br from-blue-400/20 to-transparent"
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            transition={{ duration: 0.3 }}
+                          />
+                        )}
+                        <User className={cn("w-16 h-16 mb-4", familyType === 'individual' ? "text-white" : "text-blue-500 group-hover:text-blue-600")} />
+                        <h3 className={cn("font-bold text-xl mb-2", familyType !== 'individual' && "text-slate-900 group-hover:text-blue-700")}>Индивидуално</h3>
+                        <p className={cn("text-sm", familyType === 'individual' ? "text-blue-100" : mutedTextClasses)}>
                           Фокус върху Вашите лични цели
                         </p>
-                      </button>
+                      </motion.button>
                       
-                      <button
+                      <motion.button
                         onClick={() => setFamilyType('family')}
+                        whileHover={{ scale: 1.02, y: -4 }}
+                        whileTap={{ scale: 0.98 }}
                         className={cn(
-                          "p-8 rounded-2xl border-2 text-left transition-all duration-300 group flex flex-col justify-center",
+                          "p-8 rounded-3xl border-2 transition-all duration-300 group flex flex-col items-center justify-center text-center relative overflow-hidden",
                           familyType === 'family'
-                            ? "border-blue-500 bg-blue-600 text-white"
+                            ? "border-blue-500 bg-gradient-to-br from-blue-600 to-blue-700 text-white shadow-2xl shadow-blue-500/50"
                             : isDarkMode 
-                              ? "border-slate-700 hover:border-blue-500 hover:bg-blue-600 hover:text-white" 
-                              : "border-slate-200 hover:border-blue-500 hover:bg-blue-600 hover:text-white"
+                              ? "border-slate-700 hover:border-blue-400 bg-slate-800/50" 
+                              : "border-slate-200 hover:border-blue-400 bg-white hover:shadow-xl hover:shadow-blue-200/50"
                         )}
                       >
-                        <h3 className={cn("font-semibold text-xl mb-2", familyType !== 'family' && "group-hover:text-white")}>Семейство</h3>
-                        <p className={cn("text-base", familyType === 'family' ? "text-blue-100" : mutedTextClasses, familyType !== 'family' && "group-hover:text-blue-100")}>
-                          Да планираме Вашия общ семеен бюджет!
+                        {familyType === 'family' && (
+                          <motion.div
+                            className="absolute inset-0 bg-gradient-to-br from-blue-400/20 to-transparent"
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            transition={{ duration: 0.3 }}
+                          />
+                        )}
+                        <Users className={cn("w-16 h-16 mb-4", familyType === 'family' ? "text-white" : "text-blue-500 group-hover:text-blue-600")} />
+                        <h3 className={cn("font-bold text-xl mb-2", familyType !== 'family' && "text-slate-900 group-hover:text-blue-700")}>Семейство</h3>
+                        <p className={cn("text-sm", familyType === 'family' ? "text-blue-100" : mutedTextClasses)}>
+                          Планиране на общ семеен бюджет
                         </p>
-                      </button>
+                      </motion.button>
                     </div>
 
                     {/* Name fields for individual */}
                     {familyType === 'individual' && (
                       <motion.div
-                        initial={{ opacity: 0, y: -10 }}
-                        animate={{ opacity: 1, y: 0 }}
+                        initial={{ opacity: 0, height: 0 }}
+                        animate={{ opacity: 1, height: 'auto' }}
+                        transition={{ duration: 0.4 }}
                         className="space-y-4"
                       >
                         <div className="grid grid-cols-2 gap-4">
-                          <div>
-                            <label className={cn("text-sm font-medium mb-2 block", mutedTextClasses)}>Име</label>
+                          <div className="relative">
                             <input
                               type="text"
                               value={clientFirstName}
                               onChange={(e) => setClientFirstName(e.target.value)}
-                              placeholder="Вашето име"
+                              placeholder=" "
                               className={cn(
-                                "w-full px-4 py-3 rounded-xl border-2 transition-all duration-200 outline-none",
+                                "peer w-full px-4 pt-6 pb-2 rounded-xl border-2 transition-all duration-200 outline-none",
                                 isDarkMode 
-                                  ? "bg-slate-800 border-slate-700 text-white placeholder:text-slate-500 focus:border-blue-500" 
-                                  : "bg-white border-slate-200 text-slate-900 placeholder:text-slate-400 focus:border-blue-500"
+                                  ? "bg-slate-800 border-slate-700 text-white focus:border-blue-500" 
+                                  : "bg-white border-slate-200 text-slate-900 focus:border-blue-500 focus:shadow-lg focus:shadow-blue-100/50"
                               )}
                             />
+                            <label className={cn(
+                              "absolute left-4 top-4 text-sm font-medium transition-all duration-200 pointer-events-none",
+                              "peer-focus:top-2 peer-focus:text-xs peer-focus:text-blue-600",
+                              "peer-[:not(:placeholder-shown)]:top-2 peer-[:not(:placeholder-shown)]:text-xs",
+                              mutedTextClasses
+                            )}>
+                              Вашето име
+                            </label>
                           </div>
-                          <div>
-                            <label className={cn("text-sm font-medium mb-2 block", mutedTextClasses)}>Фамилия</label>
+                          <div className="relative">
                             <input
                               type="text"
                               value={clientLastName}
                               onChange={(e) => setClientLastName(e.target.value)}
-                              placeholder="Вашата фамилия"
+                              placeholder=" "
                               className={cn(
-                                "w-full px-4 py-3 rounded-xl border-2 transition-all duration-200 outline-none",
+                                "peer w-full px-4 pt-6 pb-2 rounded-xl border-2 transition-all duration-200 outline-none",
                                 isDarkMode 
-                                  ? "bg-slate-800 border-slate-700 text-white placeholder:text-slate-500 focus:border-blue-500" 
-                                  : "bg-white border-slate-200 text-slate-900 placeholder:text-slate-400 focus:border-blue-500"
+                                  ? "bg-slate-800 border-slate-700 text-white focus:border-blue-500" 
+                                  : "bg-white border-slate-200 text-slate-900 focus:border-blue-500 focus:shadow-lg focus:shadow-blue-100/50"
                               )}
                             />
+                            <label className={cn(
+                              "absolute left-4 top-4 text-sm font-medium transition-all duration-200 pointer-events-none",
+                              "peer-focus:top-2 peer-focus:text-xs peer-focus:text-blue-600",
+                              "peer-[:not(:placeholder-shown)]:top-2 peer-[:not(:placeholder-shown)]:text-xs",
+                              mutedTextClasses
+                            )}>
+                              Вашата фамилия
+                            </label>
                           </div>
                         </div>
 
                         <div className="grid grid-cols-2 gap-4">
-                          <div>
-                            <label className={cn("text-sm font-medium mb-2 block", mutedTextClasses)}>Телефонен номер</label>
+                          <div className="relative">
                             <input
                               type="tel"
                               value={clientPhone}
                               onChange={(e) => setClientPhone(e.target.value)}
-                              placeholder="Вашият телефон"
+                              placeholder=" "
                               className={cn(
-                                "w-full px-4 py-3 rounded-xl border-2 transition-all duration-200 outline-none",
+                                "peer w-full px-4 pt-6 pb-2 rounded-xl border-2 transition-all duration-200 outline-none",
                                 isDarkMode 
-                                  ? "bg-slate-800 border-slate-700 text-white placeholder:text-slate-500 focus:border-blue-500" 
-                                  : "bg-white border-slate-200 text-slate-900 placeholder:text-slate-400 focus:border-blue-500"
+                                  ? "bg-slate-800 border-slate-700 text-white focus:border-blue-500" 
+                                  : "bg-white border-slate-200 text-slate-900 focus:border-blue-500 focus:shadow-lg focus:shadow-blue-100/50"
                               )}
                             />
+                            <label className={cn(
+                              "absolute left-4 top-4 text-sm font-medium transition-all duration-200 pointer-events-none",
+                              "peer-focus:top-2 peer-focus:text-xs peer-focus:text-blue-600",
+                              "peer-[:not(:placeholder-shown)]:top-2 peer-[:not(:placeholder-shown)]:text-xs",
+                              mutedTextClasses
+                            )}>
+                              Телефонен номер
+                            </label>
                           </div>
-                          <div>
-                            <label className={cn("text-sm font-medium mb-2 block", mutedTextClasses)}>E-mail адрес</label>
+                          <div className="relative">
                             <input
                               type="email"
                               value={clientEmail}
                               onChange={(e) => setClientEmail(e.target.value)}
                               onBlur={() => setClientEmailTouched(true)}
-                              placeholder="Вашият имейл"
+                              placeholder=" "
                               className={cn(
-                                "w-full px-4 py-3 rounded-xl border-2 transition-all duration-200 outline-none",
+                                "peer w-full px-4 pt-6 pb-2 rounded-xl border-2 transition-all duration-200 outline-none",
                                 clientEmailTouched && clientEmail && !isValidEmail(clientEmail)
-                                  ? "border-red-500 focus:border-red-500"
+                                  ? "border-red-500 focus:border-red-500 bg-red-50"
                                   : isDarkMode 
-                                    ? "bg-slate-800 border-slate-700 text-white placeholder:text-slate-500 focus:border-blue-500" 
-                                    : "bg-white border-slate-200 text-slate-900 placeholder:text-slate-400 focus:border-blue-500"
+                                    ? "bg-slate-800 border-slate-700 text-white focus:border-blue-500" 
+                                    : "bg-white border-slate-200 text-slate-900 focus:border-blue-500 focus:shadow-lg focus:shadow-blue-100/50"
                               )}
                             />
+                            <label className={cn(
+                              "absolute left-4 top-4 text-sm font-medium transition-all duration-200 pointer-events-none",
+                              "peer-focus:top-2 peer-focus:text-xs",
+                              "peer-[:not(:placeholder-shown)]:top-2 peer-[:not(:placeholder-shown)]:text-xs",
+                              clientEmailTouched && clientEmail && !isValidEmail(clientEmail) ? "text-red-500" : "peer-focus:text-blue-600",
+                              mutedTextClasses
+                            )}>
+                              E-mail адрес
+                            </label>
                             {clientEmailTouched && clientEmail && !isValidEmail(clientEmail) && (
-                              <p className="text-red-500 text-xs mt-1">Моля въведете валиден имейл адрес</p>
+                              <motion.div
+                                initial={{ opacity: 0, y: -10 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center gap-1"
+                              >
+                                <XCircle className="w-4 h-4 text-red-500" />
+                              </motion.div>
+                            )}
+                            {clientEmailTouched && clientEmail && !isValidEmail(clientEmail) && (
+                              <motion.p 
+                                initial={{ opacity: 0, y: -5 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                className="text-red-500 text-xs mt-1 flex items-center gap-1"
+                              >
+                                <XCircle className="w-3 h-3" />
+                                Моля въведете валиден имейл адрес
+                              </motion.p>
                             )}
                           </div>
                         </div>
@@ -1199,7 +1305,7 @@ export default function FinancialPlanner() {
                     )}
                   </div>
 
-                  <div className="flex justify-center">
+                  <div className="flex justify-center pt-4">
                     <Button 
                       onClick={goNext}
                       disabled={
@@ -1212,9 +1318,10 @@ export default function FinancialPlanner() {
                         (familyType === 'family' && (!partnerFirstName.trim() || !partnerLastName.trim() || !partnerPhone.trim() || !partnerEmail.trim() || !isValidEmail(partnerEmail))) ||
                         (childrenCount > 0 && childrenNames.some(name => !name.trim()))
                       }
-                      className={cn(primaryButtonClass, "px-16 py-6 text-lg")}
+                      className={cn(primaryButtonClass, "text-lg group")}
                     >
-                      СЛЕДВАЩА СТЪПКА
+                      Следваща стъпка
+                      <ArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" />
                     </Button>
                   </div>
                 </div>
@@ -1230,15 +1337,26 @@ export default function FinancialPlanner() {
                 exit={{ opacity: 0, y: -20 }}
                 className="grid lg:grid-cols-4 gap-8 items-center h-full"
               >
-                <div className="lg:col-span-1">
-                  <p className={cn("text-base tracking-widest mb-4", accentColor)}>СТЪПКА 2</p>
-                  <h1 className="text-4xl md:text-5xl font-bold mb-4">Начин на осигуряване</h1>
-                  <p className={cn("text-lg mb-6", mutedTextClasses)}>
-                    {familyType === 'family' 
-                      ? 'Изберете начина на осигуряване за клиента и партньора.'
-                      : 'Изберете вашия начин на осигуряване.'
-                    }
-                  </p>
+                <div className="lg:col-span-1 flex flex-col justify-center">
+                  <motion.div
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: 0.2 }}
+                  >
+                    <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-blue-100 text-blue-700 text-xs font-semibold mb-6">
+                      <Sparkles className="w-4 h-4" />
+                      СТЪПКА 2 ОТ 9
+                    </div>
+                    <h1 className="text-4xl md:text-5xl font-bold mb-4 bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
+                      Начин на осигуряване
+                    </h1>
+                    <p className={cn("text-lg mb-6 leading-relaxed", mutedTextClasses)}>
+                      {familyType === 'family' 
+                        ? 'Това влияе на прогнозната ви пенсия.'
+                        : 'Това влияе на прогнозната ви пенсия.'
+                      }
+                    </p>
+                  </motion.div>
                 </div>
 
                 <div className={cn("lg:col-span-3 rounded-3xl border p-8 min-h-[500px] flex flex-col", cardClasses)}>
@@ -1260,8 +1378,13 @@ export default function FinancialPlanner() {
                   </div>
                   
                   <div className="flex items-center justify-between mb-6">
-                    <p className={cn("text-base tracking-widest", mutedTextClasses)}>СТЪПКА 2</p>
-                    <button onClick={restart} className="p-2 rounded-full text-slate-400 hover:text-blue-500 hover:bg-slate-100 transition-colors">
+                    <div className="flex items-center gap-2">
+                      <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center text-white text-sm font-bold shadow-lg shadow-blue-500/30">
+                        2
+                      </div>
+                      <span className="text-sm font-semibold text-blue-600">НАЧИН НА ОСИГУРЯВАНЕ</span>
+                    </div>
+                    <button onClick={restart} className="p-2 rounded-full text-slate-400 hover:text-blue-600 hover:bg-blue-50 transition-all duration-200">
                       <RotateCcw className="w-5 h-5" />
                     </button>
                   </div>
@@ -1359,9 +1482,10 @@ export default function FinancialPlanner() {
                     <Button 
                       onClick={goNext}
                       disabled={!clientInsuranceType || (familyType === 'family' && !partnerInsuranceType)}
-                      className={cn(primaryButtonClass, "px-16 py-6 text-lg")}
+                      className={cn(primaryButtonClass, "text-lg group")}
                     >
-                      СЛЕДВАЩА СТЪПКА
+                      Следваща стъпка
+                      <ArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" />
                     </Button>
                   </div>
                 </div>
@@ -1377,15 +1501,26 @@ export default function FinancialPlanner() {
                 exit={{ opacity: 0, y: -20 }}
                 className="grid lg:grid-cols-4 gap-8 items-center h-full"
               >
-                <div className="lg:col-span-1">
-                  <p className={cn("text-base tracking-widest mb-4", accentColor)}>СТЪПКА 3</p>
-                  <h1 className="text-4xl md:text-5xl font-bold mb-4">Възраст</h1>
-                  <p className={cn("text-lg mb-6", mutedTextClasses)}>
-                    {familyType === 'family' 
-                      ? 'Въведете възрастта на клиента и партньора.'
-                      : 'Въведете вашата възраст.'
-                    }
-                  </p>
+                <div className="lg:col-span-1 flex flex-col justify-center">
+                  <motion.div
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: 0.2 }}
+                  >
+                    <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-blue-100 text-blue-700 text-xs font-semibold mb-6">
+                      <Sparkles className="w-4 h-4" />
+                      СТЪПКА 3 ОТ 9
+                    </div>
+                    <h1 className="text-4xl md:text-5xl font-bold mb-4 bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
+                      Възраст
+                    </h1>
+                    <p className={cn("text-lg mb-6 leading-relaxed", mutedTextClasses)}>
+                      {familyType === 'family' 
+                        ? 'Необходимо за изчисляване на оптималния план до пенсия.'
+                        : 'Необходимо за изчисляване на оптималния план до пенсия.'
+                      }
+                    </p>
+                  </motion.div>
                 </div>
 
                 <div className={cn("lg:col-span-3 rounded-3xl border p-8 min-h-[500px] flex flex-col", cardClasses)}>
@@ -1407,8 +1542,13 @@ export default function FinancialPlanner() {
                   </div>
                   
                   <div className="flex items-center justify-between mb-6">
-                    <p className={cn("text-base tracking-widest", mutedTextClasses)}>СТЪПКА 3</p>
-                    <button onClick={restart} className="p-2 rounded-full text-slate-400 hover:text-blue-500 hover:bg-slate-100 transition-colors">
+                    <div className="flex items-center gap-2">
+                      <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center text-white text-sm font-bold shadow-lg shadow-blue-500/30">
+                        3
+                      </div>
+                      <span className="text-sm font-semibold text-blue-600">ВЪЗРАСТ</span>
+                    </div>
+                    <button onClick={restart} className="p-2 rounded-full text-slate-400 hover:text-blue-600 hover:bg-blue-50 transition-all duration-200">
                       <RotateCcw className="w-5 h-5" />
                     </button>
                   </div>
@@ -1569,8 +1709,9 @@ export default function FinancialPlanner() {
                   </div>
 
                   <div className="flex justify-center">
-                    <Button onClick={goNext} className={cn(primaryButtonClass, "px-16 py-6 text-lg")}>
-                      СЛЕДВАЩА СТЪПКА
+                    <Button onClick={goNext} className={cn(primaryButtonClass, "text-lg group")}>
+                      Следваща стъпка
+                      <ArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" />
                     </Button>
                   </div>
 
@@ -1587,15 +1728,26 @@ export default function FinancialPlanner() {
                 exit={{ opacity: 0, y: -20 }}
                 className="grid lg:grid-cols-4 gap-8 items-center h-full"
               >
-                <div className="lg:col-span-1">
-                  <p className={cn("text-base tracking-widest mb-4", accentColor)}>СТЪПКА 4</p>
-                  <h1 className="text-4xl md:text-5xl font-bold mb-4">Месечен доход</h1>
-                  <p className={cn("text-lg mb-6", mutedTextClasses)}>
-                    {familyType === 'family' 
-                      ? 'Въведете месечния доход на клиента и партньора.'
-                      : 'Въведете вашия месечен доход.'
-                    }
-                  </p>
+                <div className="lg:col-span-1 flex flex-col justify-center">
+                  <motion.div
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: 0.2 }}
+                  >
+                    <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-blue-100 text-blue-700 text-xs font-semibold mb-6">
+                      <Sparkles className="w-4 h-4" />
+                      СТЪПКА 4 ОТ 9
+                    </div>
+                    <h1 className="text-4xl md:text-5xl font-bold mb-4 bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
+                      Месечен Доход
+                    </h1>
+                    <p className={cn("text-lg mb-6 leading-relaxed", mutedTextClasses)}>
+                      {familyType === 'family' 
+                        ? 'Нетните доходи след удръжки и данъци.'
+                        : 'Нетният доход след удръжки и данъци.'
+                      }
+                    </p>
+                  </motion.div>
                 </div>
 
                 <div className={cn("lg:col-span-3 rounded-3xl border p-8 min-h-[500px] flex flex-col", cardClasses)}>
@@ -1617,8 +1769,13 @@ export default function FinancialPlanner() {
                   </div>
                   
                   <div className="flex items-center justify-between mb-6">
-                    <p className={cn("text-base tracking-widest", mutedTextClasses)}>СТЪПКА 4</p>
-                    <button onClick={restart} className="p-2 rounded-full text-slate-400 hover:text-blue-500 hover:bg-slate-100 transition-colors">
+                    <div className="flex items-center gap-2">
+                      <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center text-white text-sm font-bold shadow-lg shadow-blue-500/30">
+                        4
+                      </div>
+                      <span className="text-sm font-semibold text-blue-600">МЕСЕЧЕН ДОХОД</span>
+                    </div>
+                    <button onClick={restart} className="p-2 rounded-full text-slate-400 hover:text-blue-600 hover:bg-blue-50 transition-all duration-200">
                       <RotateCcw className="w-5 h-5" />
                     </button>
                   </div>
@@ -1714,19 +1871,26 @@ export default function FinancialPlanner() {
                     )}
                   </div>
 
-                  {/* Total (for family) */}
+                  {/* Total (for family) - Enhanced */}
                   {familyType === 'family' && (
-                    <div className={cn("p-4 rounded-xl mb-6", isDarkMode ? "bg-slate-800" : "bg-slate-100")}>
+                    <motion.div 
+                      className={cn("p-6 rounded-2xl mb-6 border-2 border-blue-200", isDarkMode ? "bg-slate-800" : "bg-gradient-to-r from-blue-50 to-indigo-50")}
+                      initial={{ opacity: 0, scale: 0.95 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                    >
                       <div className="flex justify-between items-center">
-                        <span className={cn("text-base", mutedTextClasses)}>Общо месечен доход:</span>
-                        <span className="text-2xl font-bold text-blue-500">{formatNumber((typeof monthlyIncome === 'number' ? monthlyIncome : 0) + (typeof partnerIncome === 'number' ? partnerIncome : 0))} €</span>
+                        <span className="text-base font-semibold text-blue-900">Общо месечен доход:</span>
+                        <span className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
+                          {formatNumber((typeof monthlyIncome === 'number' ? monthlyIncome : 0) + (typeof partnerIncome === 'number' ? partnerIncome : 0))} €
+                        </span>
                       </div>
-                    </div>
+                    </motion.div>
                   )}
 
                   <div className="flex justify-center">
-                    <Button onClick={goNext} className={cn(primaryButtonClass, "px-16 py-6 text-lg")}>
-                      СЛЕДВАЩА СТЪПКА
+                    <Button onClick={goNext} className={cn(primaryButtonClass, "text-lg group")}>
+                      Следваща стъпка
+                      <ArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" />
                     </Button>
                   </div>
                 </div>
@@ -1743,11 +1907,22 @@ export default function FinancialPlanner() {
                 className="grid lg:grid-cols-4 gap-4 items-stretch h-[calc(100vh-48px)]"
               >
                 <div className="lg:col-span-1 flex flex-col justify-center">
-                  <p className={cn("text-sm tracking-widest mb-2", accentColor)}>СТЪПКА 5</p>
-                  <h1 className="text-3xl md:text-4xl font-bold mb-2">Приоритети</h1>
-                  <p className={cn("text-base", mutedTextClasses)}>
-                    Изберете една или повече посоки, които резонират с Вашите мечти и финансови цели.
-                  </p>
+                  <motion.div
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: 0.2 }}
+                  >
+                    <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-blue-100 text-blue-700 text-xs font-semibold mb-4">
+                      <Sparkles className="w-4 h-4" />
+                      СТЪПКА 5 ОТ 9
+                    </div>
+                    <h1 className="text-3xl md:text-4xl font-bold mb-3 bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
+                      Вашите Финансови Приоритети
+                    </h1>
+                    <p className={cn("text-base leading-relaxed", mutedTextClasses)}>
+                      Изберете всички области, които са важни за Вас.
+                    </p>
+                  </motion.div>
                 </div>
 
                 <div className={cn("lg:col-span-3 rounded-3xl border p-4 flex flex-col", cardClasses)}>
@@ -1769,8 +1944,13 @@ export default function FinancialPlanner() {
                   </div>
                   
                   <div className="flex items-center justify-between mb-2">
-                    <p className={cn("text-sm tracking-widest", mutedTextClasses)}>СТЪПКА 5</p>
-                    <button onClick={restart} className="p-1 rounded-full text-slate-400 hover:text-blue-500 hover:bg-slate-100 transition-colors">
+                    <div className="flex items-center gap-2">
+                      <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center text-white text-xs font-bold shadow-lg shadow-blue-500/30">
+                        5
+                      </div>
+                      <span className="text-xs font-semibold text-blue-600">ПРИОРИТЕТИ</span>
+                    </div>
+                    <button onClick={restart} className="p-1 rounded-full text-slate-400 hover:text-blue-600 hover:bg-blue-50 transition-all duration-200">
                       <RotateCcw className="w-4 h-4" />
                     </button>
                   </div>
@@ -1783,21 +1963,26 @@ export default function FinancialPlanner() {
                   {/* Priority Grid - 4 columns, 2 rows */}
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-2 mb-2 flex-1">
                     {/* Row 1 */}
-                    <button
+                    <motion.button
                       onClick={() => togglePriority('stability')}
+                      whileHover={{ scale: 1.05, y: -4 }}
+                      whileTap={{ scale: 0.95 }}
                       className={cn(
-                        "p-3 rounded-xl border-2 transition-all duration-300 flex flex-col items-center justify-center h-full group",
+                        "p-4 rounded-2xl border-2 transition-all duration-300 flex flex-col items-center justify-center h-full group relative overflow-hidden",
                         selectedPriorities.includes('stability')
-                          ? "border-blue-500 bg-blue-600 text-white"
-                          : isDarkMode ? "border-slate-700 hover:border-blue-500 hover:bg-blue-600" : "border-slate-200 hover:border-blue-500 hover:bg-blue-600"
+                          ? "border-blue-500 bg-gradient-to-br from-blue-600 to-blue-700 text-white shadow-xl shadow-blue-500/50"
+                          : isDarkMode ? "border-slate-700 hover:border-blue-400 bg-slate-800/50" : "border-slate-200 hover:border-blue-400 bg-white hover:shadow-lg"
                       )}
                     >
-                      <Shield className={cn("w-8 h-8 mb-1", selectedPriorities.includes('stability') ? "text-white" : "text-blue-500 group-hover:text-white")} />
-                      <h3 className={cn("font-semibold text-sm text-center", !selectedPriorities.includes('stability') && "group-hover:text-white")}>Финансова сигурност</h3>
-                      <p className={cn("text-xs text-center", selectedPriorities.includes('stability') ? "text-blue-100" : mutedTextClasses, !selectedPriorities.includes('stability') && "group-hover:text-blue-100")}>
+                      {selectedPriorities.includes('stability') && (
+                        <motion.div className="absolute inset-0 bg-gradient-to-br from-blue-400/20 to-transparent" layoutId="stability-bg" />
+                      )}
+                      <Shield className={cn("w-10 h-10 mb-2 relative z-10", selectedPriorities.includes('stability') ? "text-white" : "text-blue-600 group-hover:text-blue-700")} />
+                      <h3 className={cn("font-bold text-sm text-center relative z-10", !selectedPriorities.includes('stability') && "text-slate-900")}>Финансова сигурност</h3>
+                      <p className={cn("text-xs text-center relative z-10 mt-1", selectedPriorities.includes('stability') ? "text-blue-100" : "text-slate-500")}>
                         Резерв и защита
                       </p>
-                    </button>
+                    </motion.button>
                     
                     <button
                       onClick={() => togglePriority('investments')}
@@ -1914,21 +2099,26 @@ export default function FinancialPlanner() {
                   </div>
 
                   {selectedPriorities.length > 0 && (
-                    <div className={cn("p-2 rounded-lg mb-2 flex items-center gap-2", isDarkMode ? "bg-slate-800" : "bg-blue-50")}>
-                      <CheckCircle2 className="w-4 h-4 text-blue-500" />
-                      <p className={cn("text-sm", accentColor)}>
+                    <motion.div 
+                      initial={{ opacity: 0, y: -10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      className={cn("p-3 rounded-xl mb-2 flex items-center gap-2 border-2 border-blue-200", isDarkMode ? "bg-slate-800" : "bg-gradient-to-r from-blue-50 to-indigo-50")}
+                    >
+                      <CheckCircle2 className="w-5 h-5 text-blue-600" />
+                      <p className="text-sm font-semibold text-blue-700">
                         Избрани: {selectedPriorities.length} {selectedPriorities.length === 1 ? 'приоритет' : 'приоритета'}
                       </p>
-                    </div>
+                    </motion.div>
                   )}
 
                   <div className="flex justify-center">
                     <Button 
                       onClick={goNext}
                       disabled={selectedPriorities.length === 0}
-                      className={cn(primaryButtonClass, "px-12 py-4")}
+                      className={cn(primaryButtonClass, "group")}
                     >
-                      СЛЕДВАЩА СТЪПКА
+                      Следваща стъпка
+                      <ArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" />
                     </Button>
                   </div>
                 </div>
@@ -2064,9 +2254,22 @@ export default function FinancialPlanner() {
                   </div>
                 </div>
 
-                <div className="text-center mb-2">
-                  <h2 className="text-2xl md:text-3xl font-bold">Вашият оптимален финансов план</h2>
-                </div>
+                <motion.div 
+                  className="text-center mb-4"
+                  initial={{ opacity: 0, y: -10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                >
+                  <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gradient-to-r from-blue-100 to-indigo-100 text-blue-700 text-xs font-semibold mb-4">
+                    <Sparkles className="w-4 h-4" />
+                    ПЕРСОНАЛИЗИРАН ЗА ВАС
+                  </div>
+                  <h2 className="text-2xl md:text-3xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
+                    Вашият Оптимален Финансов План
+                  </h2>
+                  <p className={cn("text-sm mt-2", mutedTextClasses)}>
+                    Регулирайте разпределението според Вашите приоритети
+                  </p>
+                </motion.div>
 
                 {/* Goals Grid - 4 columns like the image */}
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-2 mb-2 flex-1">
@@ -2355,27 +2558,40 @@ export default function FinancialPlanner() {
                   </div>
                 </div>
 
-                {/* Total Wealth - Bottom Center */}
-                <div className={cn("rounded-xl border p-3 text-center max-w-md mx-auto mb-2 relative group transition-all duration-300 hover:border-blue-500 hover:bg-blue-600", cardClasses)}>
-                  <p className={cn("text-[10px] tracking-widest mb-1 group-hover:text-blue-100", mutedTextClasses)}>ОБЩО ИМУЩЕСТВО</p>
+                {/* Total Wealth - Bottom Center - Enhanced */}
+                <motion.div 
+                  whileHover={{ scale: 1.02 }}
+                  className={cn(
+                    "rounded-2xl border-2 p-6 text-center max-w-lg mx-auto mb-2 relative overflow-hidden",
+                    "bg-gradient-to-br from-blue-600 to-indigo-600 border-blue-500 shadow-2xl shadow-blue-500/50"
+                  )}
+                >
+                  <motion.div
+                    className="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent"
+                    animate={{ opacity: [0.5, 0.8, 0.5] }}
+                    transition={{ duration: 3, repeat: Infinity }}
+                  />
+                  <p className="text-xs tracking-widest mb-2 text-blue-100 font-semibold relative z-10">ОБЩО ПРОГНОЗНО ИМУЩЕСТВО</p>
                   <motion.p 
-                    className="text-3xl md:text-4xl font-bold group-hover:text-white"
+                    className="text-4xl md:text-5xl font-bold text-white relative z-10"
                     key={calculateGoals.totalWealth}
-                    initial={{ scale: 1.05 }}
+                    initial={{ scale: 1.1 }}
                     animate={{ scale: 1 }}
-                    transition={{ duration: 0.2 }}
+                    transition={{ duration: 0.3 }}
                   >
                     {formatNumber(calculateGoals.totalWealth)} €
                   </motion.p>
-                </div>
+                  <p className="text-xs text-blue-200 mt-2 relative z-10">при пенсиониране на {Math.round(avgAge)} + {yearsToRetirement} = {Math.round(avgAge) + yearsToRetirement} години</p>
+                </motion.div>
 
                 {/* Continue button */}
                 <div className="text-center">
                   <Button 
                     onClick={goNext}
-                    className={primaryButtonClass}
+                    className={cn(primaryButtonClass, "group")}
                   >
-                    Искам да продължа
+                    Продължи към следващата стъпка
+                    <ArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" />
                   </Button>
                 </div>
               </motion.div>
@@ -2454,9 +2670,10 @@ export default function FinancialPlanner() {
                   <div className="flex justify-center mt-3">
                     <Button 
                       onClick={goNext}
-                      className={cn(primaryButtonClass, "px-12")}
+                      className={cn(primaryButtonClass, "group")}
                     >
                       Напред
+                      <ArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" />
                     </Button>
                   </div>
                 </div>
@@ -2540,9 +2757,10 @@ export default function FinancialPlanner() {
                   <div className="flex justify-center">
                     <Button 
                       onClick={goNext}
-                      className={cn(primaryButtonClass, "px-12")}
+                      className={cn(primaryButtonClass, "group")}
                     >
                       Напред
+                      <ArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" />
                     </Button>
                   </div>
                 </div>
@@ -2577,76 +2795,162 @@ export default function FinancialPlanner() {
 
                 <div className="max-w-4xl mx-auto">
                   {/* Success Header */}
-                  <div className="text-center mb-8">
-                    <div className="w-20 h-20 mx-auto mb-4 rounded-full bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center">
-                      <CheckCircle2 className="w-10 h-10 text-white" />
+                  <motion.div 
+                    className="text-center mb-8"
+                    initial={{ opacity: 0, scale: 0.9 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{ duration: 0.5 }}
+                  >
+                    <motion.div 
+                      className="w-24 h-24 mx-auto mb-6 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center shadow-2xl shadow-blue-500/50"
+                      initial={{ scale: 0, rotate: -180 }}
+                      animate={{ scale: 1, rotate: 0 }}
+                      transition={{ type: "spring", bounce: 0.5, delay: 0.2 }}
+                      onAnimationComplete={() => {
+                        confetti({
+                          particleCount: 100,
+                          spread: 70,
+                          origin: { y: 0.6 },
+                          colors: ['#3b82f6', '#6366f1', '#8b5cf6', '#60a5fa']
+                        });
+                      }}
+                    >
+                      <CheckCircle2 className="w-12 h-12 text-white" />
+                    </motion.div>
+                    <motion.h2 
+                      className="text-3xl md:text-4xl font-bold mb-3 bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent"
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: 0.4 }}
+                    >
+                      Поздравления! Вашият План е Готов
+                    </motion.h2>
+                    <motion.p 
+                      className="text-lg text-slate-600 mb-2"
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      transition={{ delay: 0.6 }}
+                    >
+                      Нека преминем към детайлния финансов анализ
+                    </motion.p>
+                    <motion.div
+                      className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-blue-50 text-blue-600 text-sm"
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      transition={{ delay: 0.8 }}
+                    >
+                      <Calendar className="w-4 h-4" />
+                      Приблизително време: 20 минути
+                    </motion.div>
+                  </motion.div>
+
+                  {/* GDPR Consents - Enhanced Cards */}
+                  <motion.div 
+                    className={cn("rounded-2xl border-2 border-blue-200 p-6 mb-8", isDarkMode ? "bg-slate-800" : "bg-blue-50/50")}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 1 }}
+                  >
+                    <div className="flex items-center gap-3 mb-4">
+                      <div className="w-10 h-10 rounded-full bg-blue-600 flex items-center justify-center">
+                        <Shield className="w-5 h-5 text-white" />
+                      </div>
+                      <h3 className="text-lg font-bold text-blue-900">Защита на личните данни</h3>
                     </div>
-                    <h2 className="text-3xl font-bold mb-2">Да преминем към анализа!</h2>
-                    <p className="text-xl text-blue-500 font-medium">(20 минути)</p>
-                  </div>
+                    <p className="text-sm text-slate-700 mb-6">
+                      APEX Financial гарантира пълна конфиденциалност и защита на Вашите лични данни съгласно GDPR и европейското законодателство.
+                    </p>
+                    
+                    <div className="space-y-3">
+                      <motion.label 
+                        whileHover={{ x: 4 }}
+                        className={cn(
+                          "flex items-start gap-4 p-5 rounded-xl border-2 cursor-pointer transition-all duration-200",
+                          gdprConsentA 
+                            ? "border-blue-500 bg-white shadow-lg shadow-blue-200/50" 
+                            : "border-slate-200 hover:border-blue-300 bg-white"
+                        )}
+                      >
+                        <Checkbox
+                          checked={gdprConsentA}
+                          onCheckedChange={(checked) => setGdprConsentA(checked)}
+                          className="mt-1"
+                        />
+                        <div>
+                          <p className="font-semibold text-slate-900 flex items-center gap-2">
+                            а) Финансов анализ и посредничество 
+                            <span className="text-red-500 text-sm">*задължително</span>
+                          </p>
+                          <p className="text-sm text-slate-600 mt-2 leading-relaxed">
+                            Съгласие за анализиране на личните ми финанси, финансово посредничество, 
+                            предлагане и посредничество при избора на финансови продукти.
+                          </p>
+                        </div>
+                      </motion.label>
 
-                  {/* GDPR Consents */}
-                  <div className="space-y-4 mb-8">
-                    <label 
-                      className={cn(
-                        "flex items-start gap-4 p-4 rounded-xl border-2 cursor-pointer transition-colors",
-                        "border-slate-200 hover:border-blue-300"
-                      )}
-                    >
-                      <Checkbox
-                        checked={gdprConsentA}
-                        onCheckedChange={(checked) => setGdprConsentA(checked)}
-                        className="mt-1"
-                      />
-                      <div>
-                        <p className="font-medium text-slate-900">а) Финансов анализ и посредничество <span className="text-red-500">*</span></p>
-                        <p className="text-sm text-slate-600 mt-1">
-                          Съгласие за анализиране на личните ми финанси, финансово посредничество, 
-                          предлагане и посредничество при избора на финансови продукти.
-                        </p>
-                      </div>
-                    </label>
+                      <motion.label 
+                        whileHover={{ x: 4 }}
+                        className={cn(
+                          "flex items-start gap-4 p-5 rounded-xl border-2 cursor-pointer transition-all duration-200",
+                          gdprConsentC 
+                            ? "border-blue-500 bg-white shadow-lg shadow-blue-200/50" 
+                            : "border-slate-200 hover:border-blue-300 bg-white"
+                        )}
+                      >
+                        <Checkbox
+                          checked={gdprConsentC}
+                          onCheckedChange={(checked) => setGdprConsentC(checked)}
+                          className="mt-1"
+                        />
+                        <div>
+                          <p className="font-semibold text-slate-900 flex items-center gap-2">
+                            б) Предоставяне на трети лица 
+                            <span className="text-red-500 text-sm">*задължително</span>
+                          </p>
+                          <p className="text-sm text-slate-600 mt-2 leading-relaxed">
+                            Съгласие за предоставяне на личните ми данни на застраховател, кредитна институция, 
+                            пенсионноосигурително дружество или инвестиционен посредник.
+                          </p>
+                        </div>
+                      </motion.label>
 
-                    <label 
-                      className={cn(
-                        "flex items-start gap-4 p-4 rounded-xl border-2 cursor-pointer transition-colors",
-                        "border-slate-200 hover:border-blue-300"
-                      )}
-                    >
-                      <Checkbox
-                        checked={gdprConsentC}
-                        onCheckedChange={(checked) => setGdprConsentC(checked)}
-                        className="mt-1"
-                      />
-                      <div>
-                        <p className="font-medium text-slate-900">б) Предоставяне на трети лица <span className="text-red-500">*</span></p>
-                        <p className="text-sm text-slate-600 mt-1">
-                          Съгласие за предоставяне на личните ми данни на застраховател, кредитна институция, 
-                          пенсионноосигурително дружество или инвестиционен посредник.
-                        </p>
-                      </div>
-                    </label>
-
-                    <label className="flex items-start gap-4 p-4 rounded-xl border-2 border-slate-200 hover:border-blue-300 cursor-pointer transition-colors">
-                      <Checkbox
-                        checked={gdprConsentB}
-                        onCheckedChange={(checked) => setGdprConsentB(checked)}
-                        className="mt-1"
-                      />
-                      <div>
-                        <p className="font-medium text-slate-900">в) Маркетинг и информация</p>
-                        <p className="text-sm text-slate-600 mt-1">
-                          Съгласие за информиране относно условия по предоставяни услуги, други услуги и продукти, 
-                          информация от финансовите пазари и директен маркетинг.
-                        </p>
-                      </div>
-                    </label>
-                  </div>
+                      <motion.label 
+                        whileHover={{ x: 4 }}
+                        className={cn(
+                          "flex items-start gap-4 p-5 rounded-xl border-2 cursor-pointer transition-all duration-200",
+                          gdprConsentB 
+                            ? "border-blue-500 bg-white shadow-lg shadow-blue-200/50" 
+                            : "border-slate-200 hover:border-blue-300 bg-white"
+                        )}
+                      >
+                        <Checkbox
+                          checked={gdprConsentB}
+                          onCheckedChange={(checked) => setGdprConsentB(checked)}
+                          className="mt-1"
+                        />
+                        <div>
+                          <p className="font-semibold text-slate-900">в) Маркетинг и информация</p>
+                          <p className="text-sm text-slate-600 mt-2 leading-relaxed">
+                            Съгласие за информиране относно условия по предоставяни услуги, други услуги и продукти, 
+                            информация от финансовите пазари и директен маркетинг.
+                          </p>
+                        </div>
+                      </motion.label>
+                    </div>
+                  </motion.div>
 
                   {/* Action Buttons */}
-                  <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                  <motion.div 
+                    className="flex flex-col sm:flex-row gap-4 justify-center"
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 1.2 }}
+                  >
                     <Button 
-                      className="w-full sm:w-auto rounded-full px-8 py-6 text-lg bg-blue-600 hover:bg-blue-700"
+                      className={cn(
+                        "w-full sm:w-auto text-lg group shadow-2xl",
+                        primaryButtonClass
+                      )}
                       disabled={!gdprConsentA || !gdprConsentC}
                       onClick={async () => {
                         // Създаване/актуализиране на досие при завършване на Financial Planner
@@ -2721,9 +3025,10 @@ export default function FinancialPlanner() {
                       }}
                     >
                       <FileText className="w-5 h-5 mr-2" />
-                      Към детайлния анализ
+                      Започни Детайлния Анализ
+                      <ArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" />
                     </Button>
-                  </div>
+                  </motion.div>
                 </div>
               </motion.div>
             )}

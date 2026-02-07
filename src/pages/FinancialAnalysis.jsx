@@ -710,7 +710,9 @@ export default function FinancialAnalysis() {
         return;
       }
       setShowValidationErrors(false);
-      setCurrentStep(prev => prev + 1);
+      // Skip step 2 (archived Personal Data step)
+      const nextStepNum = currentStep === 1 ? 3 : currentStep + 1;
+      setCurrentStep(nextStepNum);
       window.scrollTo({ top: 0, behavior: 'smooth' });
     } else if (!validateStep(currentStep)) {
       scrollToFirstInvalidField();
@@ -720,7 +722,9 @@ export default function FinancialAnalysis() {
   const prevStep = () => {
     if (currentStep > 1) {
       setShowValidationErrors(false);
-      setCurrentStep(prev => prev - 1);
+      // Skip step 2 (archived Personal Data step) when going back
+      const prevStepNum = currentStep === 3 ? 1 : currentStep - 1;
+      setCurrentStep(prevStepNum);
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
   };

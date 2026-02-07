@@ -1111,7 +1111,7 @@ export default function FinancialPlanner() {
                         animate={{ opacity: 1, y: 0 }}
                         className="space-y-6"
                       >
-                        <div className="grid grid-cols-2 gap-6 items-start">
+                        <div className="grid grid-cols-2 gap-6">
                           {/* Client names */}
                           <div className="space-y-4">
                             <p className={cn("text-sm font-semibold uppercase tracking-wide", mutedTextClasses)}>КЛИЕНТ</p>
@@ -1177,7 +1177,7 @@ export default function FinancialPlanner() {
                             </div>
                           </div>
 
-                          {/* Partner names - with floating labels */}
+                          {/* Partner names */}
                           <div className="space-y-4">
                             <p className={cn("text-sm font-semibold uppercase tracking-wide", mutedTextClasses)}>ПАРТНЬОР</p>
                             <div className="relative">
@@ -1294,7 +1294,7 @@ export default function FinancialPlanner() {
                           </div>
                         </div>
 
-                        {/* Children count - Second instance for family */}
+                        {/* Children count - Outside the grid to appear below both columns */}
                         <div className="relative">
                           <label className={cn("text-sm font-medium mb-2 block", mutedTextClasses)}>Брой деца</label>
                           <Select

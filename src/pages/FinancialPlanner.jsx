@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Slider } from "@/components/ui/slider";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { RotateCcw, Loader2, Lock, Unlock, HelpCircle, ArrowLeft, ShieldAlert, Shield, ShieldCheck, Frown, Smile, PartyPopper, Home, HomeIcon, Car, GraduationCap, Wallet, TrendingUp, Briefcase, Baby, PiggyBank, Plane, Heart, Target, CheckCircle2, Calendar, Users, FileText, Info } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
@@ -166,6 +167,14 @@ export default function FinancialPlanner() {
 
   const [isGenerating, setIsGenerating] = useState(false);
   const [recentlyChanged, setRecentlyChanged] = useState(null);
+  
+  // Consent states for step 9
+  const [gdprConsentA, setGdprConsentA] = useState(false);
+  const [gdprConsentB, setGdprConsentB] = useState(false);
+  const [gdprConsentC, setGdprConsentC] = useState(false);
+  
+  // Client ID for resuming
+  const [clientId, setClientId] = useState(null);
 
   // Derived values (handle empty string values)
   const clientIncomeNum = typeof monthlyIncome === 'number' ? monthlyIncome : 400;
@@ -464,6 +473,34 @@ export default function FinancialPlanner() {
   // Common button styles
   const primaryButtonClass = "rounded-full px-6 bg-blue-600 hover:bg-blue-700 text-white font-medium transition-all duration-200 hover:shadow-lg hover:shadow-blue-500/25";
   const outlineButtonClass = cn("rounded-full px-6 font-medium transition-all duration-200", isDarkMode ? "border-slate-700 hover:bg-slate-800" : "border-slate-300 hover:bg-slate-50");
+
+  // Load from URL params if resuming
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const resumeClientId = urlParams.get('client_id');
+    
+    if (resumeClientId) {
+      // Load client data and jump to step 9
+      base44.entities.Client.filter({ id: resumeClientId }).then(clients => {
+        if (clients.length > 0) {
+          const client = clients[0];
+          setClientId(client.id);
+          setFamilyType(client.family_type);
+          setClientFirstName(client.first_name);
+          setClientLastName(client.last_name);
+          setClientPhone(client.phone || '');
+          setClientEmail(client.email || '');
+          setPartnerFirstName(client.partner_first_name || '');
+          setPartnerLastName(client.partner_last_name || '');
+          setPartnerEmail(client.partner_email || '');
+          setChildrenCount(client.children_count || 0);
+          setChildrenNames(client.children_names || []);
+          setChildrenAges(client.children_ages || []);
+          setCurrentStep(9);
+        }
+      });
+    }
+  }, []);
 
   // Hide header/footer when in Financial Planner
   useEffect(() => {
@@ -2517,22 +2554,79 @@ export default function FinancialPlanner() {
 
                 <div className="max-w-4xl mx-auto">
                   {/* Success Header */}
-                  <div className="text-center mb-6">
+                  <div className="text-center mb-8">
                     <div className="w-20 h-20 mx-auto mb-4 rounded-full bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center">
                       <CheckCircle2 className="w-10 h-10 text-white" />
                     </div>
-                    <h2 className="text-3xl font-bold mb-4">Поздравления!</h2>
-                    <p className={cn("text-lg max-w-2xl mx-auto", mutedTextClasses)}>
-                      Вие успешно завършихте Financial Planner. Следващата стъпка е да попълните детайлния финансов анализ, за да създадем Вашия персонализиран финансов план.
-                    </p>
+                    <h2 className="text-3xl font-bold mb-2">Да преминем към анализа!</h2>
+                    <p className="text-xl text-blue-500 font-medium">(20 минути)</p>
+                  </div>
+
+                  {/* GDPR Consents */}
+                  <div className="space-y-4 mb-8">
+                    <label 
+                      className={cn(
+                        "flex items-start gap-4 p-4 rounded-xl border-2 cursor-pointer transition-colors",
+                        "border-slate-200 hover:border-blue-300"
+                      )}
+                    >
+                      <Checkbox
+                        checked={gdprConsentA}
+                        onCheckedChange={(checked) => setGdprConsentA(checked)}
+                        className="mt-1"
+                      />
+                      <div>
+                        <p className="font-medium text-slate-900">а) Финансов анализ и посредничество <span className="text-red-500">*</span></p>
+                        <p className="text-sm text-slate-600 mt-1">
+                          Съгласие за анализиране на личните ми финанси, финансово посредничество, 
+                          предлагане и посредничество при избора на финансови продукти.
+                        </p>
+                      </div>
+                    </label>
+
+                    <label 
+                      className={cn(
+                        "flex items-start gap-4 p-4 rounded-xl border-2 cursor-pointer transition-colors",
+                        "border-slate-200 hover:border-blue-300"
+                      )}
+                    >
+                      <Checkbox
+                        checked={gdprConsentC}
+                        onCheckedChange={(checked) => setGdprConsentC(checked)}
+                        className="mt-1"
+                      />
+                      <div>
+                        <p className="font-medium text-slate-900">б) Предоставяне на трети лица <span className="text-red-500">*</span></p>
+                        <p className="text-sm text-slate-600 mt-1">
+                          Съгласие за предоставяне на личните ми данни на застраховател, кредитна институция, 
+                          пенсионноосигурително дружество или инвестиционен посредник.
+                        </p>
+                      </div>
+                    </label>
+
+                    <label className="flex items-start gap-4 p-4 rounded-xl border-2 border-slate-200 hover:border-blue-300 cursor-pointer transition-colors">
+                      <Checkbox
+                        checked={gdprConsentB}
+                        onCheckedChange={(checked) => setGdprConsentB(checked)}
+                        className="mt-1"
+                      />
+                      <div>
+                        <p className="font-medium text-slate-900">в) Маркетинг и информация</p>
+                        <p className="text-sm text-slate-600 mt-1">
+                          Съгласие за информиране относно условия по предоставяни услуги, други услуги и продукти, 
+                          информация от финансовите пазари и директен маркетинг.
+                        </p>
+                      </div>
+                    </label>
                   </div>
 
                   {/* Action Buttons */}
                   <div className="flex flex-col sm:flex-row gap-4 justify-center">
                     <Button 
                       className="w-full sm:w-auto rounded-full px-8 py-6 text-lg bg-blue-600 hover:bg-blue-700"
+                      disabled={!gdprConsentA || !gdprConsentC}
                       onClick={async () => {
-                        // Създаване на досие при завършване на Financial Planner
+                        // Създаване/актуализиране на досие при завършване на Financial Planner
                         try {
                           const clientData = {
                             first_name: clientFirstName,
@@ -2540,6 +2634,7 @@ export default function FinancialPlanner() {
                             email: clientEmail,
                             phone: clientPhone,
                             stage: 'financial_planner',
+                            status: 'active',
                             family_type: familyType,
                             children_count: childrenCount,
                             children_names: childrenNames,
@@ -2552,7 +2647,15 @@ export default function FinancialPlanner() {
                             clientData.partner_email = partnerEmail;
                           }
 
-                          const client = await base44.entities.Client.create(clientData);
+                          let client;
+                          if (clientId) {
+                            // Update existing client
+                            await base44.entities.Client.update(clientId, clientData);
+                            client = { id: clientId, ...clientData };
+                          } else {
+                            // Create new client
+                            client = await base44.entities.Client.create(clientData);
+                          }
 
                           // Предаване на данните към анализа
                           const plannerData = {
@@ -2574,7 +2677,10 @@ export default function FinancialPlanner() {
                             client_age: clientAge,
                             partner_age: partnerAge,
                             monthly_income: monthlyIncome,
-                            partner_income: partnerIncome
+                            partner_income: partnerIncome,
+                            gdpr_consent_a: gdprConsentA,
+                            gdpr_consent_b: gdprConsentB,
+                            gdpr_consent_c: gdprConsentC
                           };
 
                           // Запазване в localStorage за използване в анализа
@@ -2589,15 +2695,6 @@ export default function FinancialPlanner() {
                     >
                       <FileText className="w-5 h-5 mr-2" />
                       Към детайлния анализ
-                    </Button>
-                    
-                    <Button 
-                      variant="outline" 
-                      onClick={restart}
-                      className={cn("w-full sm:w-auto py-6", outlineButtonClass)}
-                    >
-                      <RotateCcw className="mr-2 h-4 w-4" />
-                      Започни отначало
                     </Button>
                   </div>
                 </div>

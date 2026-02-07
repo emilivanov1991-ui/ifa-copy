@@ -60,12 +60,38 @@ export default function FinancialAnalysis() {
   const [showValidationErrors, setShowValidationErrors] = useState(false);
   const [showSavingsDiscrepancyModal, setShowSavingsDiscrepancyModal] = useState(false);
   const [showReferralsStep, setShowReferralsStep] = useState(false);
+  const [plannerData, setPlannerData] = useState(null);
   const [formData, setFormData] = useState({
     gdpr_consent_a: false,
     gdpr_consent_b: false,
     gdpr_consent_c: false,
     status: 'new'
   });
+
+  // Зареждане на данни от Financial Planner
+  useEffect(() => {
+    const storedData = localStorage.getItem('financialPlannerData');
+    if (storedData) {
+      const parsed = JSON.parse(storedData);
+      setPlannerData(parsed);
+      
+      // Попълване на формата с данни от планера
+      setFormData(prev => ({
+        ...prev,
+        include_partner: parsed.family_type === 'family',
+        client_first_name: parsed.client_first_name,
+        client_last_name: parsed.client_last_name,
+        partner_first_name: parsed.partner_first_name,
+        partner_last_name: parsed.partner_last_name,
+        children_count: parsed.children_count,
+        client_age: parsed.client_age,
+        partner_age: parsed.partner_age
+      }));
+      
+      // Изчистване на данните след зареждане
+      localStorage.removeItem('financialPlannerData');
+    }
+  }, []);
 
   // Calculate if savings discrepancy exists
   const checkSavingsDiscrepancy = () => {
@@ -748,6 +774,21 @@ export default function FinancialAnalysis() {
     await base44.entities.FinancialAnalysisSubmission.update(analysisSubmission.id, {
       client_id: clientRecord.id
     });
+
+    // Ако има досие от Financial Planner, актуализираме етапа
+    if (plannerData?.client_id) {
+      await base44.entities.Client.update(plannerData.client_id, {
+        stage: 'analysis',
+        email: formData.client_email,
+        phone: formData.client_phone,
+        portal_password: clientPassword
+      });
+    } else {
+      // Актуализираме новосъздадения клиент
+      await base44.entities.Client.update(clientRecord.id, {
+        stage: 'analysis'
+      });
+    }
 
     // Send emails to client and partner
     const clientName = `${formData.client_first_name} ${formData.client_last_name}`;

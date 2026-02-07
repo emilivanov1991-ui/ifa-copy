@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Slider } from "@/components/ui/slider";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { RotateCcw, Loader2, Lock, Unlock, HelpCircle, ArrowLeft, ShieldAlert, Shield, ShieldCheck, Frown, Smile, PartyPopper, Home, HomeIcon, Car, GraduationCap, Wallet, TrendingUp, Briefcase, Baby, PiggyBank, Plane, Heart, Target, CheckCircle2, Calendar, Users, FileText, Info } from 'lucide-react';
+import { base44 } from '@/api/base44Client';
 import {
   Tooltip,
   TooltipContent,
@@ -2425,12 +2426,60 @@ export default function FinancialPlanner() {
 
                   {/* Action Buttons */}
                   <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                    <Link to={createPageUrl('FinancialAnalysis')}>
-                      <Button className="w-full sm:w-auto rounded-full px-8 py-6 text-lg bg-blue-600 hover:bg-blue-700">
-                        <FileText className="w-5 h-5 mr-2" />
-                        Към детайлния анализ
-                      </Button>
-                    </Link>
+                    <Button 
+                      className="w-full sm:w-auto rounded-full px-8 py-6 text-lg bg-blue-600 hover:bg-blue-700"
+                      onClick={async () => {
+                        // Създаване на досие при завършване на Financial Planner
+                        try {
+                          const clientData = {
+                            first_name: clientFirstName,
+                            last_name: clientLastName,
+                            email: '', // Ще се попълни в анализа
+                            phone: '', // Ще се попълни в анализа
+                            stage: 'financial_planner',
+                            family_type: familyType,
+                            children_count: childrenCount,
+                            children_names: childrenNames,
+                            children_ages: childrenAges
+                          };
+
+                          if (familyType === 'family') {
+                            clientData.partner_first_name = partnerFirstName;
+                            clientData.partner_last_name = partnerLastName;
+                          }
+
+                          const client = await base44.entities.Client.create(clientData);
+
+                          // Предаване на данните към анализа
+                          const plannerData = {
+                            client_id: client.id,
+                            family_type: familyType,
+                            client_first_name: clientFirstName,
+                            client_last_name: clientLastName,
+                            partner_first_name: partnerFirstName,
+                            partner_last_name: partnerLastName,
+                            children_count: childrenCount,
+                            children_names: childrenNames,
+                            children_ages: childrenAges,
+                            client_insurance_type: clientInsuranceType,
+                            partner_insurance_type: partnerInsuranceType,
+                            client_age: clientAge,
+                            partner_age: partnerAge
+                          };
+
+                          // Запазване в localStorage за използване в анализа
+                          localStorage.setItem('financialPlannerData', JSON.stringify(plannerData));
+
+                          // Навигация към анализа
+                          window.location.href = createPageUrl('FinancialAnalysis');
+                        } catch (error) {
+                          console.error('Error creating client:', error);
+                        }
+                      }}
+                    >
+                      <FileText className="w-5 h-5 mr-2" />
+                      Към детайлния анализ
+                    </Button>
                     
                     <Button 
                       variant="outline" 

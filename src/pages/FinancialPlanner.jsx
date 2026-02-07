@@ -5,7 +5,8 @@ import { Input } from "@/components/ui/input";
 import { Slider } from "@/components/ui/slider";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { RotateCcw, Loader2, Lock, Unlock, HelpCircle, ArrowLeft, ShieldAlert, Shield, ShieldCheck, Frown, Smile, PartyPopper, Home, HomeIcon, Car, GraduationCap, Wallet, TrendingUp, Briefcase, Baby, PiggyBank, Plane, Heart, Target, CheckCircle2, Calendar, Users, FileText, Info, User, XCircle, ArrowRight, Sparkles } from 'lucide-react';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
+import { RotateCcw, Loader2, Lock, Unlock, HelpCircle, ArrowLeft, ShieldAlert, Shield, ShieldCheck, Frown, Smile, PartyPopper, Home, HomeIcon, Car, GraduationCap, Wallet, TrendingUp, Briefcase, Baby, PiggyBank, Plane, Heart, Target, CheckCircle2, Calendar, Users, FileText, Info, User, XCircle, ArrowRight, Sparkles, ChevronDown } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import { base44 } from '@/api/base44Client';
 import {
@@ -180,6 +181,9 @@ export default function FinancialPlanner() {
   // Email validation and touched state
   const [clientEmailTouched, setClientEmailTouched] = useState(false);
   const [partnerEmailTouched, setPartnerEmailTouched] = useState(false);
+  
+  // GDPR text open state
+  const [gdprTextOpen, setGdprTextOpen] = useState(false);
   
   const isValidEmail = (email) => {
     if (!email) return false;
@@ -3025,24 +3029,16 @@ export default function FinancialPlanner() {
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: 0.4 }}
                     >
-                      Поздравления! Вашият План е Готов
+                      Поздравления! Сега да преминем към анализа!
                     </motion.h2>
-                    <motion.p 
-                      className="text-lg text-slate-600 mb-2"
+                    <motion.div
+                      className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-blue-50 text-blue-600 text-sm mt-2"
                       initial={{ opacity: 0 }}
                       animate={{ opacity: 1 }}
                       transition={{ delay: 0.6 }}
                     >
-                      Нека преминем към детайлния финансов анализ
-                    </motion.p>
-                    <motion.div
-                      className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-blue-50 text-blue-600 text-sm"
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      transition={{ delay: 0.8 }}
-                    >
                       <Calendar className="w-4 h-4" />
-                      Приблизително време: 20 минути
+                      Приблизително време: 30 минути
                     </motion.div>
                   </motion.div>
 
@@ -3079,9 +3075,8 @@ export default function FinancialPlanner() {
                           className="mt-1"
                         />
                         <div>
-                          <p className="font-semibold text-slate-900 flex items-center gap-2">
-                            а) Финансов анализ и посредничество 
-                            <span className="text-red-500 text-sm">*задължително</span>
+                          <p className="font-semibold text-slate-900">
+                            а) Финансов анализ и посредничество <span className="text-red-500">*</span>
                           </p>
                           <p className="text-sm text-slate-600 mt-2 leading-relaxed">
                             Съгласие за анализиране на личните ми финанси, финансово посредничество, 
@@ -3105,9 +3100,8 @@ export default function FinancialPlanner() {
                           className="mt-1"
                         />
                         <div>
-                          <p className="font-semibold text-slate-900 flex items-center gap-2">
-                            б) Предоставяне на трети лица 
-                            <span className="text-red-500 text-sm">*задължително</span>
+                          <p className="font-semibold text-slate-900">
+                            б) Предоставяне на трети лица <span className="text-red-500">*</span>
                           </p>
                           <p className="text-sm text-slate-600 mt-2 leading-relaxed">
                             Съгласие за предоставяне на личните ми данни на застраховател, кредитна институция, 

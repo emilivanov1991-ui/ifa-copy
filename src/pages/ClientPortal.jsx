@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { base44 } from '@/api/base44Client';
 import { useQuery } from '@tanstack/react-query';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Wallet, 
   TrendingUp, 
@@ -21,7 +21,9 @@ import {
   Loader2,
   Lock,
   Eye,
-  EyeOff
+  EyeOff,
+  Sparkles,
+  Activity
 } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -39,6 +41,7 @@ import DocumentsManager from '../components/portal/DocumentsManager';
 import NotificationsPanel from '../components/portal/NotificationsPanel';
 import CalendarIntegration from '../components/portal/CalendarIntegration';
 import ClientDossier from '../components/portal/ClientDossier';
+import DarkModeToggle from '../components/portal/DarkModeToggle';
 
 export default function ClientPortal() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -151,35 +154,51 @@ export default function ClientPortal() {
   // Not authenticated - show login form
   if (!isAuthenticated) {
     return (
-      <div className="pt-20 min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-indigo-900 relative overflow-hidden">
-        {/* Animated background elements */}
+      <div className="min-h-screen bg-[#F5F7FA] dark:bg-gradient-to-br dark:from-[#0D1442] dark:via-[#1A237E] dark:to-[#283593] relative overflow-hidden">
+        {/* Premium background pattern */}
         <div className="absolute inset-0 overflow-hidden">
-          <div className="absolute -top-40 -right-40 w-80 h-80 bg-blue-500/20 rounded-full blur-3xl animate-pulse" />
-          <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-indigo-500/20 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }} />
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-purple-500/10 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '2s' }} />
+          <div className="absolute top-0 left-0 w-full h-full opacity-10 dark:opacity-20" style={{
+            backgroundImage: 'radial-gradient(circle at 1px 1px, rgba(0, 191, 165, 0.15) 1px, transparent 0)',
+            backgroundSize: '40px 40px'
+          }} />
+          <div className="absolute -top-40 -right-40 w-80 h-80 bg-[#00BFA5]/20 dark:bg-[#00BFA5]/10 rounded-full blur-3xl animate-pulse" />
+          <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-[#1A237E]/20 dark:bg-[#1A237E]/30 rounded-full blur-3xl" style={{ animationDelay: '1s' }} />
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-[#FFD700]/10 dark:bg-[#FFD700]/5 rounded-full blur-3xl" style={{ animation: 'pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite', animationDelay: '2s' }} />
         </div>
         
         <div className="max-w-md mx-auto px-6 py-16 relative z-10">
+          {/* Dark Mode Toggle */}
+          <div className="absolute top-6 right-6">
+            <DarkModeToggle />
+          </div>
+
           <motion.div
             initial={{ opacity: 0, y: 30, scale: 0.95 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             transition={{ duration: 0.5 }}
-            className="bg-white/10 backdrop-blur-xl rounded-3xl shadow-2xl p-10 border border-white/20"
+            className="glass dark:glass-dark rounded-3xl shadow-2xl p-10 border border-white/20 dark:border-white/10"
           >
+            {/* Premium Logo */}
             <div className="text-center mb-8">
               <motion.div 
-                initial={{ scale: 0 }}
-                animate={{ scale: 1 }}
+                initial={{ scale: 0, rotate: -180 }}
+                animate={{ scale: 1, rotate: 0 }}
                 transition={{ type: "spring", bounce: 0.5, delay: 0.2 }}
-                className="w-20 h-20 rounded-2xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center mx-auto mb-6 shadow-lg shadow-blue-500/30"
+                className="w-24 h-24 rounded-3xl premium-gradient-navy flex items-center justify-center mx-auto mb-6 shadow-2xl shadow-[#1A237E]/40 relative overflow-hidden"
               >
-                <Lock className="h-10 w-10 text-white" />
+                <div className="absolute inset-0 bg-gradient-to-tr from-[#00BFA5]/20 to-transparent" />
+                <Lock className="h-12 w-12 text-white relative z-10" />
+                <motion.div
+                  className="absolute inset-0 bg-gradient-to-r from-[#FFD700]/0 via-[#FFD700]/20 to-[#FFD700]/0"
+                  animate={{ x: [-100, 200] }}
+                  transition={{ duration: 3, repeat: Infinity, ease: 'linear' }}
+                />
               </motion.div>
               <motion.h1 
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.3 }}
-                className="text-3xl font-bold text-white mb-2"
+                className="text-4xl font-bold bg-gradient-to-r from-[#1A237E] to-[#00BFA5] dark:from-white dark:to-[#00BFA5] bg-clip-text text-transparent mb-2"
               >
                 Клиентски портал
               </motion.h1>
@@ -187,27 +206,27 @@ export default function ClientPortal() {
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ delay: 0.4 }}
-                className="text-blue-200"
+                className="text-slate-600 dark:text-slate-300 font-medium"
               >
-                Влезте за достъп до вашия финансов план
+                Сигурен достъп до вашите финанси
               </motion.p>
             </div>
 
-            <form onSubmit={handleLogin} className="space-y-5">
+            <form onSubmit={handleLogin} className="space-y-6">
               <motion.div 
                 initial={{ opacity: 0, x: -20 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: 0.5 }}
                 className="space-y-2"
               >
-                <Label htmlFor="username" className="text-blue-100">Имейл</Label>
+                <Label htmlFor="username" className="text-slate-700 dark:text-slate-300 font-semibold">Имейл адрес</Label>
                 <Input
                   id="username"
                   type="email"
                   placeholder="example@mail.com"
                   value={loginForm.username}
                   onChange={(e) => setLoginForm({ ...loginForm, username: e.target.value })}
-                  className="rounded-xl bg-white/10 border-white/20 text-white placeholder:text-blue-300/50 focus:border-blue-400 focus:ring-blue-400/20 h-12"
+                  className="rounded-xl bg-white dark:bg-white/10 border-2 border-slate-200 dark:border-white/20 text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:border-[#00BFA5] focus:ring-[#00BFA5]/20 h-14 text-base transition-all"
                   required
                 />
               </motion.div>
@@ -218,7 +237,7 @@ export default function ClientPortal() {
                 transition={{ delay: 0.6 }}
                 className="space-y-2"
               >
-                <Label htmlFor="password" className="text-blue-100">Парола</Label>
+                <Label htmlFor="password" className="text-slate-700 dark:text-slate-300 font-semibold">Парола</Label>
                 <div className="relative">
                   <Input
                     id="password"
@@ -226,13 +245,13 @@ export default function ClientPortal() {
                     placeholder="••••••••"
                     value={loginForm.password}
                     onChange={(e) => setLoginForm({ ...loginForm, password: e.target.value })}
-                    className="rounded-xl bg-white/10 border-white/20 text-white placeholder:text-blue-300/50 focus:border-blue-400 pr-12 h-12"
+                    className="rounded-xl bg-white dark:bg-white/10 border-2 border-slate-200 dark:border-white/20 text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:border-[#00BFA5] pr-14 h-14 text-base transition-all"
                     required
                   />
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-4 top-1/2 -translate-y-1/2 text-blue-300 hover:text-white transition-colors"
+                    className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500 hover:text-[#00BFA5] dark:hover:text-[#00BFA5] transition-colors"
                   >
                     {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
                   </button>
@@ -257,28 +276,44 @@ export default function ClientPortal() {
                 <Button 
                   type="submit"
                   disabled={isLoggingIn}
-                  className="w-full bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 rounded-xl py-6 text-lg font-semibold shadow-lg shadow-blue-500/25 transition-all hover:shadow-xl hover:shadow-blue-500/30 hover:scale-[1.02]"
+                  className="w-full premium-gradient-teal hover:opacity-90 rounded-xl h-14 text-lg font-bold shadow-xl shadow-[#00BFA5]/30 transition-all hover:shadow-2xl hover:shadow-[#00BFA5]/40 hover:scale-[1.02] text-white border-0 relative overflow-hidden group"
                 >
+                  <motion.div
+                    className="absolute inset-0 bg-gradient-to-r from-[#FFD700]/0 via-[#FFD700]/20 to-[#FFD700]/0"
+                    animate={{ x: [-200, 400] }}
+                    transition={{ duration: 2, repeat: Infinity, ease: 'linear' }}
+                  />
                   {isLoggingIn ? (
                     <>
-                      <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-                      Влизане...
+                      <Loader2 className="mr-2 h-5 w-5 animate-spin relative z-10" />
+                      <span className="relative z-10">Влизане...</span>
                     </>
                   ) : (
-                    'Вход в портала'
+                    <>
+                      <Lock className="mr-2 h-5 w-5 relative z-10" />
+                      <span className="relative z-10">Сигурен вход</span>
+                      <ChevronRight className="ml-2 h-5 w-5 relative z-10 group-hover:translate-x-1 transition-transform" />
+                    </>
                   )}
                 </Button>
               </motion.div>
             </form>
 
-            <motion.p 
+            <motion.div 
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.8 }}
-              className="text-sm text-blue-300/70 mt-6 text-center"
+              className="mt-8 text-center space-y-3"
             >
-              Данните за вход са изпратени на вашия имейл след финансовия анализ
-            </motion.p>
+              <p className="text-sm text-slate-600 dark:text-slate-400 font-medium flex items-center justify-center gap-2">
+                <Shield className="h-4 w-4 text-[#00BFA5]" />
+                Данните за вход са изпратени на вашия имейл
+              </p>
+              <div className="flex items-center justify-center gap-2 text-xs text-slate-500 dark:text-slate-500">
+                <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
+                <span>Защитена връзка SSL</span>
+              </div>
+            </motion.div>
           </motion.div>
         </div>
       </div>
@@ -351,60 +386,79 @@ export default function ClientPortal() {
   });
 
   return (
-    <div className="pt-20 min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
+    <div className="min-h-screen bg-[#F5F7FA] dark:bg-gradient-to-br dark:from-[#0D1442] dark:via-[#1A237E] dark:to-[#1A237E]">
       <div className="max-w-7xl mx-auto px-6 py-8">
-        {/* Header */}
+        {/* Premium Header */}
         <motion.div 
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           className="flex flex-col md:flex-row md:items-center justify-between mb-8 gap-4"
         >
           <div>
-            <h1 className="text-2xl md:text-3xl font-bold bg-gradient-to-r from-slate-900 to-slate-700 bg-clip-text text-transparent">
-              Здравейте, {clientData.first_name}! 👋
-            </h1>
-            <p className="text-slate-500 mt-1">
-              Вашият личен финансов портал • {new Date().toLocaleDateString('bg-BG', { weekday: 'long', day: 'numeric', month: 'long' })}
-            </p>
+            <motion.div 
+              className="flex items-center gap-3 mb-2"
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+            >
+              <div className="w-12 h-12 rounded-2xl premium-gradient-navy dark:premium-gradient-teal flex items-center justify-center shadow-lg">
+                <Sparkles className="h-6 w-6 text-white" />
+              </div>
+              <div>
+                <h1 className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-[#1A237E] to-[#00BFA5] dark:from-white dark:to-[#00BFA5] bg-clip-text text-transparent">
+                  Здравейте, {clientData.first_name}!
+                </h1>
+                <p className="text-slate-600 dark:text-slate-400 font-medium flex items-center gap-2">
+                  <Activity className="h-4 w-4 text-[#00BFA5]" />
+                  {new Date().toLocaleDateString('bg-BG', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}
+                </p>
+              </div>
+            </motion.div>
           </div>
           <div className="flex items-center gap-3">
+            <DarkModeToggle />
             <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-              <Button variant="outline" className="rounded-xl bg-white/50 backdrop-blur-sm border-slate-200/50 hover:bg-white hover:shadow-lg transition-all">
-                <Bell className="h-4 w-4 mr-2" />
-                Известия
+              <Button variant="outline" className="rounded-xl glass dark:glass-dark border-slate-200 dark:border-white/10 hover:bg-white dark:hover:bg-white/20 hover:shadow-xl transition-all">
+                <Bell className="h-4 w-4 mr-2 text-[#1A237E] dark:text-[#00BFA5]" />
+                <span className="text-[#1A237E] dark:text-white font-semibold">Известия</span>
                 {pendingPayments.length > 0 && (
-                  <Badge className="ml-2 bg-gradient-to-r from-red-500 to-rose-500 border-0">{pendingPayments.length}</Badge>
+                  <Badge className="ml-2 premium-gradient-gold text-[#1A237E] border-0 font-bold">{pendingPayments.length}</Badge>
                 )}
               </Button>
             </motion.div>
             <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-              <Button variant="outline" onClick={handleLogout} className="rounded-xl bg-white/50 backdrop-blur-sm border-slate-200/50 hover:bg-red-50 hover:text-red-600 hover:border-red-200 transition-all">
+              <Button variant="outline" onClick={handleLogout} className="rounded-xl glass dark:glass-dark border-slate-200 dark:border-white/10 hover:bg-red-50 dark:hover:bg-red-900/20 hover:text-red-600 dark:hover:text-red-400 hover:border-red-200 dark:hover:border-red-500/50 transition-all">
                 <LogOut className="h-4 w-4 mr-2" />
-                Изход
+                <span className="font-semibold">Изход</span>
               </Button>
             </motion.div>
           </div>
         </motion.div>
 
-        {/* Stats Cards */}
-        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+        {/* Premium Stats Cards */}
+        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1 }}
-            whileHover={{ y: -4, transition: { duration: 0.2 } }}
+            whileHover={{ y: -6, transition: { duration: 0.2 } }}
           >
-            <Card className="bg-white/70 backdrop-blur-sm border-0 shadow-xl shadow-blue-500/5 overflow-hidden group">
-              <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 to-indigo-500/5 opacity-0 group-hover:opacity-100 transition-opacity" />
-              <CardContent className="pt-6 relative">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm text-slate-500 font-medium">Стойност на портфолио</p>
-                    <p className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">{totalValue.toLocaleString('bg-BG')} €</p>
-                  </div>
-                  <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center shadow-lg shadow-blue-500/30 group-hover:scale-110 transition-transform">
+            <Card className="glass dark:glass-dark border-0 shadow-2xl shadow-[#1A237E]/10 dark:shadow-black/20 overflow-hidden group relative">
+              <div className="absolute inset-0 bg-gradient-to-br from-[#1A237E]/5 to-[#00BFA5]/5 dark:from-[#00BFA5]/10 dark:to-[#1A237E]/10 opacity-0 group-hover:opacity-100 transition-opacity" />
+              <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-[#00BFA5]/10 to-transparent rounded-bl-full" />
+              <CardContent className="pt-6 relative z-10">
+                <div className="flex items-start justify-between mb-4">
+                  <div className="w-14 h-14 rounded-2xl premium-gradient-navy dark:premium-gradient-teal flex items-center justify-center shadow-xl shadow-[#1A237E]/30 dark:shadow-[#00BFA5]/30 group-hover:scale-110 group-hover:rotate-6 transition-all">
                     <Wallet className="h-7 w-7 text-white" />
                   </div>
+                  <Badge className="premium-gradient-gold text-[#1A237E] border-0 font-bold px-3 shadow-lg">
+                    ПОРТФОЛИО
+                  </Badge>
+                </div>
+                <p className="text-sm text-slate-600 dark:text-slate-400 font-semibold mb-1 uppercase tracking-wide">Обща стойност</p>
+                <p className="text-3xl font-black bg-gradient-to-r from-[#1A237E] to-[#00BFA5] dark:from-white dark:to-[#00BFA5] bg-clip-text text-transparent">{totalValue.toLocaleString('bg-BG')} €</p>
+                <div className="mt-3 flex items-center gap-1 text-xs text-green-600 dark:text-green-400 font-semibold">
+                  <ArrowUpRight className="h-3 w-3" />
+                  <span>+12.5% тази година</span>
                 </div>
               </CardContent>
             </Card>
@@ -414,19 +468,25 @@ export default function ClientPortal() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2 }}
-            whileHover={{ y: -4, transition: { duration: 0.2 } }}
+            whileHover={{ y: -6, transition: { duration: 0.2 } }}
           >
-            <Card className="bg-white/70 backdrop-blur-sm border-0 shadow-xl shadow-green-500/5 overflow-hidden group">
-              <div className="absolute inset-0 bg-gradient-to-br from-green-500/5 to-emerald-500/5 opacity-0 group-hover:opacity-100 transition-opacity" />
-              <CardContent className="pt-6 relative">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm text-slate-500 font-medium">Месечни вноски</p>
-                    <p className="text-2xl font-bold bg-gradient-to-r from-green-600 to-emerald-600 bg-clip-text text-transparent">{totalMonthlyPremium.toLocaleString('bg-BG')} €</p>
-                  </div>
-                  <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-green-500 to-emerald-600 flex items-center justify-center shadow-lg shadow-green-500/30 group-hover:scale-110 transition-transform">
+            <Card className="glass dark:glass-dark border-0 shadow-2xl shadow-[#00BFA5]/10 dark:shadow-black/20 overflow-hidden group relative">
+              <div className="absolute inset-0 bg-gradient-to-br from-[#00BFA5]/5 to-[#1DE9B6]/5 dark:from-[#00BFA5]/10 dark:to-[#1DE9B6]/10 opacity-0 group-hover:opacity-100 transition-opacity" />
+              <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-[#1DE9B6]/10 to-transparent rounded-bl-full" />
+              <CardContent className="pt-6 relative z-10">
+                <div className="flex items-start justify-between mb-4">
+                  <div className="w-14 h-14 rounded-2xl premium-gradient-teal flex items-center justify-center shadow-xl shadow-[#00BFA5]/30 group-hover:scale-110 group-hover:rotate-6 transition-all">
                     <TrendingUp className="h-7 w-7 text-white" />
                   </div>
+                  <Badge className="bg-green-500 text-white border-0 font-bold px-3 shadow-lg">
+                    АКТИВНО
+                  </Badge>
+                </div>
+                <p className="text-sm text-slate-600 dark:text-slate-400 font-semibold mb-1 uppercase tracking-wide">Месечни вноски</p>
+                <p className="text-3xl font-black bg-gradient-to-r from-[#00BFA5] to-[#1DE9B6] dark:from-white dark:to-[#00BFA5] bg-clip-text text-transparent">{totalMonthlyPremium.toLocaleString('bg-BG')} €</p>
+                <div className="mt-3 flex items-center gap-1 text-xs text-[#00BFA5] dark:text-[#1DE9B6] font-semibold">
+                  <CheckCircle className="h-3 w-3" />
+                  <span>Всички плащания актуални</span>
                 </div>
               </CardContent>
             </Card>
@@ -436,19 +496,25 @@ export default function ClientPortal() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.3 }}
-            whileHover={{ y: -4, transition: { duration: 0.2 } }}
+            whileHover={{ y: -6, transition: { duration: 0.2 } }}
           >
-            <Card className="bg-white/70 backdrop-blur-sm border-0 shadow-xl shadow-purple-500/5 overflow-hidden group">
-              <div className="absolute inset-0 bg-gradient-to-br from-purple-500/5 to-violet-500/5 opacity-0 group-hover:opacity-100 transition-opacity" />
-              <CardContent className="pt-6 relative">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm text-slate-500 font-medium">Активни продукти</p>
-                    <p className="text-2xl font-bold bg-gradient-to-r from-purple-600 to-violet-600 bg-clip-text text-transparent">{activeProducts.length}</p>
-                  </div>
-                  <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-purple-500 to-violet-600 flex items-center justify-center shadow-lg shadow-purple-500/30 group-hover:scale-110 transition-transform">
+            <Card className="glass dark:glass-dark border-0 shadow-2xl shadow-[#1A237E]/10 dark:shadow-black/20 overflow-hidden group relative">
+              <div className="absolute inset-0 bg-gradient-to-br from-[#1A237E]/5 to-[#283593]/5 dark:from-[#1A237E]/10 dark:to-[#283593]/10 opacity-0 group-hover:opacity-100 transition-opacity" />
+              <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-[#FFD700]/10 to-transparent rounded-bl-full" />
+              <CardContent className="pt-6 relative z-10">
+                <div className="flex items-start justify-between mb-4">
+                  <div className="w-14 h-14 rounded-2xl premium-gradient-navy flex items-center justify-center shadow-xl shadow-[#1A237E]/30 group-hover:scale-110 group-hover:rotate-6 transition-all">
                     <Shield className="h-7 w-7 text-white" />
                   </div>
+                  <Badge className="bg-[#1A237E] dark:bg-[#00BFA5] text-white dark:text-[#1A237E] border-0 font-bold px-3 shadow-lg">
+                    ЗАЩИТА
+                  </Badge>
+                </div>
+                <p className="text-sm text-slate-600 dark:text-slate-400 font-semibold mb-1 uppercase tracking-wide">Активни продукти</p>
+                <p className="text-3xl font-black bg-gradient-to-r from-[#1A237E] to-[#283593] dark:from-white dark:to-[#00BFA5] bg-clip-text text-transparent">{activeProducts.length}</p>
+                <div className="mt-3 flex items-center gap-1 text-xs text-[#00BFA5] dark:text-[#1DE9B6] font-semibold">
+                  <Shield className="h-3 w-3" />
+                  <span>Пълна защита</span>
                 </div>
               </CardContent>
             </Card>
@@ -458,44 +524,52 @@ export default function ClientPortal() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.4 }}
-            whileHover={{ y: -4, transition: { duration: 0.2 } }}
+            whileHover={{ y: -6, transition: { duration: 0.2 } }}
           >
-            <Card className="bg-white/70 backdrop-blur-sm border-0 shadow-xl shadow-amber-500/5 overflow-hidden group">
-              <div className="absolute inset-0 bg-gradient-to-br from-amber-500/5 to-orange-500/5 opacity-0 group-hover:opacity-100 transition-opacity" />
-              <CardContent className="pt-6 relative">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm text-slate-500 font-medium">Предстоящи падежи</p>
-                    <p className="text-2xl font-bold bg-gradient-to-r from-amber-600 to-orange-600 bg-clip-text text-transparent">{upcomingMaturity.length}</p>
+            <Card className="glass dark:glass-dark border-0 shadow-2xl shadow-[#FFD700]/10 dark:shadow-black/20 overflow-hidden group relative">
+              <div className="absolute inset-0 bg-gradient-to-br from-[#FFD700]/5 to-[#FFC107]/5 dark:from-[#FFD700]/10 dark:to-[#FFC107]/10 opacity-0 group-hover:opacity-100 transition-opacity" />
+              <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-[#1A237E]/10 to-transparent rounded-bl-full" />
+              <CardContent className="pt-6 relative z-10">
+                <div className="flex items-start justify-between mb-4">
+                  <div className="w-14 h-14 rounded-2xl premium-gradient-gold flex items-center justify-center shadow-xl shadow-[#FFD700]/30 group-hover:scale-110 group-hover:rotate-6 transition-all">
+                    <Calendar className="h-7 w-7 text-[#1A237E]" />
                   </div>
-                  <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-amber-500 to-orange-600 flex items-center justify-center shadow-lg shadow-amber-500/30 group-hover:scale-110 transition-transform">
-                    <Calendar className="h-7 w-7 text-white" />
-                  </div>
+                  {upcomingMaturity.length > 0 && (
+                    <Badge className="bg-amber-500 text-white border-0 font-bold px-3 shadow-lg">
+                      ВАЖНО
+                    </Badge>
+                  )}
+                </div>
+                <p className="text-sm text-slate-600 dark:text-slate-400 font-semibold mb-1 uppercase tracking-wide">Предстоящи падежи</p>
+                <p className="text-3xl font-black bg-gradient-to-r from-[#FFD700] to-[#FFC107] dark:from-white dark:to-[#FFD700] bg-clip-text text-transparent">{upcomingMaturity.length}</p>
+                <div className="mt-3 flex items-center gap-1 text-xs text-amber-600 dark:text-amber-400 font-semibold">
+                  <Clock className="h-3 w-3" />
+                  <span>Следващи 90 дни</span>
                 </div>
               </CardContent>
             </Card>
           </motion.div>
         </div>
 
-        {/* Main Content */}
-        <Tabs defaultValue="overview" className="space-y-6">
-          <TabsList className="bg-white/70 backdrop-blur-sm p-1.5 rounded-2xl flex-wrap shadow-lg shadow-slate-200/50 border-0">
-            <TabsTrigger value="overview" className="rounded-xl data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-500 data-[state=active]:to-indigo-600 data-[state=active]:text-white data-[state=active]:shadow-lg data-[state=active]:shadow-blue-500/25 transition-all px-4">Преглед</TabsTrigger>
-            <TabsTrigger value="dossier" className="rounded-xl data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-500 data-[state=active]:to-indigo-600 data-[state=active]:text-white data-[state=active]:shadow-lg data-[state=active]:shadow-blue-500/25 transition-all px-4">
+        {/* Premium Navigation Tabs */}
+        <Tabs defaultValue="overview" className="space-y-8">
+          <TabsList className="glass dark:glass-dark p-2 rounded-2xl flex-wrap shadow-2xl shadow-[#1A237E]/10 dark:shadow-black/30 border border-white/20 dark:border-white/10">
+            <TabsTrigger value="overview" className="rounded-xl data-[state=active]:premium-gradient-navy dark:data-[state=active]:premium-gradient-teal data-[state=active]:text-white data-[state=active]:shadow-xl data-[state=active]:shadow-[#1A237E]/30 dark:data-[state=active]:shadow-[#00BFA5]/30 transition-all px-6 py-3 font-bold text-sm">Преглед</TabsTrigger>
+            <TabsTrigger value="dossier" className="rounded-xl data-[state=active]:premium-gradient-navy dark:data-[state=active]:premium-gradient-teal data-[state=active]:text-white data-[state=active]:shadow-xl data-[state=active]:shadow-[#1A237E]/30 dark:data-[state=active]:shadow-[#00BFA5]/30 transition-all px-6 py-3 font-bold text-sm">
               <FileText className="h-4 w-4 mr-2" />
               Досие
             </TabsTrigger>
-            <TabsTrigger value="products" className="rounded-xl data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-500 data-[state=active]:to-indigo-600 data-[state=active]:text-white data-[state=active]:shadow-lg data-[state=active]:shadow-blue-500/25 transition-all px-4">Продукти</TabsTrigger>
-            <TabsTrigger value="payments" className="rounded-xl data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-500 data-[state=active]:to-indigo-600 data-[state=active]:text-white data-[state=active]:shadow-lg data-[state=active]:shadow-blue-500/25 transition-all px-4">Вноски</TabsTrigger>
-            <TabsTrigger value="proposed" className="rounded-xl data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-500 data-[state=active]:to-indigo-600 data-[state=active]:text-white data-[state=active]:shadow-lg data-[state=active]:shadow-blue-500/25 transition-all px-4">
+            <TabsTrigger value="products" className="rounded-xl data-[state=active]:premium-gradient-navy dark:data-[state=active]:premium-gradient-teal data-[state=active]:text-white data-[state=active]:shadow-xl data-[state=active]:shadow-[#1A237E]/30 dark:data-[state=active]:shadow-[#00BFA5]/30 transition-all px-6 py-3 font-bold text-sm">Продукти</TabsTrigger>
+            <TabsTrigger value="payments" className="rounded-xl data-[state=active]:premium-gradient-navy dark:data-[state=active]:premium-gradient-teal data-[state=active]:text-white data-[state=active]:shadow-xl data-[state=active]:shadow-[#1A237E]/30 dark:data-[state=active]:shadow-[#00BFA5]/30 transition-all px-6 py-3 font-bold text-sm">Вноски</TabsTrigger>
+            <TabsTrigger value="proposed" className="rounded-xl data-[state=active]:premium-gradient-navy dark:data-[state=active]:premium-gradient-teal data-[state=active]:text-white data-[state=active]:shadow-xl data-[state=active]:shadow-[#1A237E]/30 dark:data-[state=active]:shadow-[#00BFA5]/30 transition-all px-6 py-3 font-bold text-sm relative">
               Предложени
               {proposedProducts.length > 0 && (
-                <Badge className="ml-2 bg-gradient-to-r from-purple-500 to-pink-500 border-0">{proposedProducts.length}</Badge>
+                <Badge className="ml-2 premium-gradient-gold text-[#1A237E] border-0 font-bold">{proposedProducts.length}</Badge>
               )}
             </TabsTrigger>
-            <TabsTrigger value="calendar" className="rounded-xl data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-500 data-[state=active]:to-indigo-600 data-[state=active]:text-white data-[state=active]:shadow-lg data-[state=active]:shadow-blue-500/25 transition-all px-4">Календар</TabsTrigger>
-            <TabsTrigger value="notifications" className="rounded-xl data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-500 data-[state=active]:to-indigo-600 data-[state=active]:text-white data-[state=active]:shadow-lg data-[state=active]:shadow-blue-500/25 transition-all px-4">Известия</TabsTrigger>
-            <TabsTrigger value="documents" className="rounded-xl data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-500 data-[state=active]:to-indigo-600 data-[state=active]:text-white data-[state=active]:shadow-lg data-[state=active]:shadow-blue-500/25 transition-all px-4">Документи</TabsTrigger>
+            <TabsTrigger value="calendar" className="rounded-xl data-[state=active]:premium-gradient-navy dark:data-[state=active]:premium-gradient-teal data-[state=active]:text-white data-[state=active]:shadow-xl data-[state=active]:shadow-[#1A237E]/30 dark:data-[state=active]:shadow-[#00BFA5]/30 transition-all px-6 py-3 font-bold text-sm">Календар</TabsTrigger>
+            <TabsTrigger value="notifications" className="rounded-xl data-[state=active]:premium-gradient-navy dark:data-[state=active]:premium-gradient-teal data-[state=active]:text-white data-[state=active]:shadow-xl data-[state=active]:shadow-[#1A237E]/30 dark:data-[state=active]:shadow-[#00BFA5]/30 transition-all px-6 py-3 font-bold text-sm">Известия</TabsTrigger>
+            <TabsTrigger value="documents" className="rounded-xl data-[state=active]:premium-gradient-navy dark:data-[state=active]:premium-gradient-teal data-[state=active]:text-white data-[state=active]:shadow-xl data-[state=active]:shadow-[#1A237E]/30 dark:data-[state=active]:shadow-[#00BFA5]/30 transition-all px-6 py-3 font-bold text-sm">Документи</TabsTrigger>
           </TabsList>
 
           <TabsContent value="dossier" className="space-y-6">

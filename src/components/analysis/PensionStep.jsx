@@ -65,6 +65,24 @@ const calculateMonthlyInvestment = (targetAmount, years, annualRate) => {
   return Math.round(payment);
 };
 
+// Convert net income to gross income
+const netToBruto = (netEUR) => {
+  const pragNeto = 1638.6;     // Нетен праг до който 1.28869
+  const faktorPodPrag = 1.28869;
+  const pragBruto = 2111.64;   // Брутен праг
+  
+  // До прага: НЕТО × 1.28869
+  const brutoPodPrag = netEUR * faktorPodPrag;
+  
+  if (brutoPodPrag <= pragBruto) {
+    return parseFloat(brutoPodPrag.toFixed(2));
+  } 
+  // Над прага: НЕТО ÷ 0.9 + 291
+  else {
+    return parseFloat((netEUR / 0.9 + 291).toFixed(2));
+  }
+};
+
 export default function PensionStep({ data, onChange, showErrors, plannerData }) {
   // Helper to check if a field is invalid - only when showErrors is true
   const isFieldInvalid = (value) => showErrors && (value === undefined || value === '' || value === null);
@@ -73,6 +91,21 @@ export default function PensionStep({ data, onChange, showErrors, plannerData })
   const clientName = plannerData?.client_first_name || 'Клиент';
   const partnerName = plannerData?.partner_first_name || 'Партньор';
   const includePartner = plannerData?.family_type === 'family' || data.include_partner;
+
+  // Auto-populate gross income from net income (from Reserve step)
+  useEffect(() => {
+    if (data.client_monthly_net_income && !data.client_gross_income_pension) {
+      const grossIncome = Math.round(netToBruto(data.client_monthly_net_income));
+      onChange('client_gross_income_pension', grossIncome);
+    }
+  }, [data.client_monthly_net_income]);
+
+  useEffect(() => {
+    if (includePartner && data.partner_monthly_net_income && !data.partner_gross_income_pension) {
+      const grossIncome = Math.round(netToBruto(data.partner_monthly_net_income));
+      onChange('partner_gross_income_pension', grossIncome);
+    }
+  }, [data.partner_monthly_net_income, includePartner]);
 
   // Auto-calculate client expected pension
   useEffect(() => {

@@ -43,7 +43,7 @@ import ReferralsStep from '../components/analysis/ReferralsStep';
 
 const steps = [
   { id: 1, title: 'Съгласие', icon: Shield },
-  { id: 2, title: 'Лични данни', icon: User },
+  // { id: 2, title: 'Лични данни', icon: User }, // ARCHIVED
   { id: 3, title: 'Ново жилище', icon: Home },
   { id: 4, title: 'Резерв', icon: PiggyBank },
   { id: 5, title: 'Пенсия', icon: Umbrella },
@@ -1009,7 +1009,7 @@ export default function FinancialAnalysis() {
               transition={{ duration: 0.3 }}
             >
               {currentStep === 1 && <ConsentStep data={formData} onChange={handleChange} showErrors={showValidationErrors} />}
-              {currentStep === 2 && <PersonalDataStep data={formData} onChange={handleChange} showErrors={showValidationErrors} plannerData={plannerData} />}
+              {/* Step 2 (Personal Data) is archived */}
               {currentStep === 3 && <HousingStep data={formData} onChange={handleChange} showErrors={showValidationErrors} plannerData={plannerData} />}
               {currentStep === 4 && <ReserveStep data={formData} onChange={handleChange} showErrors={showValidationErrors} plannerData={plannerData} />}
               {currentStep === 5 && <PensionStep data={formData} onChange={handleChange} showErrors={showValidationErrors} plannerData={plannerData} />}

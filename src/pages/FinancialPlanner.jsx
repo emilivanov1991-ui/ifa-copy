@@ -176,7 +176,10 @@ export default function FinancialPlanner() {
   // Client ID for resuming
   const [clientId, setClientId] = useState(null);
   
-  // Email validation
+  // Email validation and touched state
+  const [clientEmailTouched, setClientEmailTouched] = useState(false);
+  const [partnerEmailTouched, setPartnerEmailTouched] = useState(false);
+  
   const isValidEmail = (email) => {
     if (!email) return false;
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -903,17 +906,18 @@ export default function FinancialPlanner() {
                               type="email"
                               value={clientEmail}
                               onChange={(e) => setClientEmail(e.target.value)}
+                              onBlur={() => setClientEmailTouched(true)}
                               placeholder="Вашият имейл"
                               className={cn(
                                 "w-full px-4 py-3 rounded-xl border-2 transition-all duration-200 outline-none",
-                                clientEmail && !isValidEmail(clientEmail)
+                                clientEmailTouched && clientEmail && !isValidEmail(clientEmail)
                                   ? "border-red-500 focus:border-red-500"
                                   : isDarkMode 
                                     ? "bg-slate-800 border-slate-700 text-white placeholder:text-slate-500 focus:border-blue-500" 
                                     : "bg-white border-slate-200 text-slate-900 placeholder:text-slate-400 focus:border-blue-500"
                               )}
                             />
-                            {clientEmail && !isValidEmail(clientEmail) && (
+                            {clientEmailTouched && clientEmail && !isValidEmail(clientEmail) && (
                               <p className="text-red-500 text-xs mt-1">Моля въведете валиден имейл адрес</p>
                             )}
                           </div>
@@ -1111,17 +1115,18 @@ export default function FinancialPlanner() {
                                 type="email"
                                 value={partnerEmail}
                                 onChange={(e) => setPartnerEmail(e.target.value)}
+                                onBlur={() => setPartnerEmailTouched(true)}
                                 placeholder="Имейл на партньора"
                                 className={cn(
                                   "w-full px-4 py-3 rounded-xl border-2 transition-all duration-200 outline-none",
-                                  partnerEmail && !isValidEmail(partnerEmail)
+                                  partnerEmailTouched && partnerEmail && !isValidEmail(partnerEmail)
                                     ? "border-red-500 focus:border-red-500"
                                     : isDarkMode 
                                       ? "bg-slate-800 border-slate-700 text-white placeholder:text-slate-500 focus:border-blue-500" 
                                       : "bg-white border-slate-200 text-slate-900 placeholder:text-slate-400 focus:border-blue-500"
                                 )}
                               />
-                              {partnerEmail && !isValidEmail(partnerEmail) && (
+                              {partnerEmailTouched && partnerEmail && !isValidEmail(partnerEmail) && (
                                 <p className="text-red-500 text-xs mt-1">Моля въведете валиден имейл адрес</p>
                               )}
                             </div>

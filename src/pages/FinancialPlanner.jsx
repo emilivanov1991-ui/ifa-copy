@@ -1467,7 +1467,7 @@ export default function FinancialPlanner() {
                     {/* Client Income */}
                     <div className="flex flex-col justify-center">
                       <p className={cn("text-base font-medium mb-4", mutedTextClasses)}>
-                        {familyType === 'family' ? 'КЛИЕНТ' : 'ВАШИЯТ ДОХОД'}
+                        {familyType === 'family' ? (clientFirstName || 'КЛИЕНТ') : 'ВАШИЯТ ДОХОД'}
                       </p>
                       <div className="text-center mb-4">
                         <input
@@ -1510,7 +1510,7 @@ export default function FinancialPlanner() {
                     {/* Partner Income (only for family) */}
                     {familyType === 'family' && (
                       <div className="flex flex-col justify-center">
-                        <p className={cn("text-base font-medium mb-4", mutedTextClasses)}>ПАРТНЬОР</p>
+                        <p className={cn("text-base font-medium mb-4", mutedTextClasses)}>{partnerFirstName || 'ПАРТНЬОР'}</p>
                         <div className="text-center mb-4">
                           <input
                             type="text"

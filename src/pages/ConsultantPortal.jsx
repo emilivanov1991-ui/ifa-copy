@@ -92,23 +92,22 @@ export default function ConsultantPortal() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-emerald-50/20 flex pt-0">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-slate-100 to-blue-50 flex pt-0">
       {/* Sidebar */}
       <motion.aside 
         initial={false}
         animate={{ width: sidebarCollapsed ? 80 : 280 }}
         transition={{ duration: 0.3, ease: 'easeInOut' }}
-        className="glass-card border-r border-white/30 fixed left-0 top-0 bottom-0 z-40 flex flex-col shadow-2xl"
+        className="bg-white/80 backdrop-blur-xl border-r border-slate-200/50 fixed left-0 top-0 bottom-0 z-40 flex flex-col shadow-xl shadow-slate-200/20"
       >
         {/* Logo */}
-        <div className="p-4 border-b border-white/30">
+        <div className="p-4 border-b border-slate-200/50">
           <div className="flex items-center gap-3">
             <motion.div 
-              whileHover={{ scale: 1.08, rotate: 5 }}
-              whileTap={{ scale: 0.95 }}
-              className="w-11 h-11 rounded-2xl gradient-navy-emerald flex items-center justify-center shadow-xl"
+              whileHover={{ scale: 1.05, rotate: 5 }}
+              className="w-11 h-11 rounded-2xl bg-gradient-to-br from-blue-600 to-indigo-600 flex items-center justify-center shadow-lg shadow-blue-600/30"
             >
-              <TrendingUp className="h-6 w-6 text-white" />
+              <TrendingUp className="h-5 w-5 text-white" />
             </motion.div>
             <AnimatePresence>
               {!sidebarCollapsed && (
@@ -117,8 +116,8 @@ export default function ConsultantPortal() {
                   animate={{ opacity: 1, x: 0 }}
                   exit={{ opacity: 0, x: -10 }}
                 >
-                  <h1 className="font-bold text-lg gradient-navy-emerald bg-clip-text text-transparent">APEX</h1>
-                  <p className="text-xs text-slate-600 font-medium">Consultant Portal</p>
+                  <h1 className="font-bold text-lg bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">APEX</h1>
+                  <p className="text-xs text-slate-500 font-medium">Консултант Портал</p>
                 </motion.div>
               )}
             </AnimatePresence>
@@ -126,14 +125,12 @@ export default function ConsultantPortal() {
         </div>
 
         {/* Collapse Button */}
-        <motion.button
+        <button
           onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
-          whileHover={{ scale: 1.1 }}
-          whileTap={{ scale: 0.9 }}
-          className="absolute -right-3 top-20 w-7 h-7 glass-card shadow-xl flex items-center justify-center hover:shadow-2xl transition-all z-50"
+          className="absolute -right-3 top-20 w-6 h-6 bg-white rounded-full border border-slate-200 shadow-md flex items-center justify-center hover:bg-slate-50 transition-colors z-50"
         >
-          {sidebarCollapsed ? <ChevronRight className="h-3.5 w-3.5 text-slate-700" /> : <ChevronLeft className="h-3.5 w-3.5 text-slate-700" />}
-        </motion.button>
+          {sidebarCollapsed ? <ChevronRight className="h-3 w-3" /> : <ChevronLeft className="h-3 w-3" />}
+        </button>
 
         {/* Navigation */}
         <nav className="flex-1 p-3 overflow-y-auto scrollbar-thin">
@@ -145,13 +142,13 @@ export default function ConsultantPortal() {
                 <motion.button
                   key={item.id}
                   onClick={() => setActiveTab(item.id)}
-                  whileHover={{ x: 6, scale: 1.02 }}
-                  whileTap={{ scale: 0.97 }}
+                  whileHover={{ x: 4 }}
+                  whileTap={{ scale: 0.98 }}
                   className={cn(
-                    "w-full flex items-center gap-3 px-3 py-3 rounded-2xl font-medium text-sm transition-all relative overflow-hidden group",
+                    "w-full flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium text-sm transition-all relative overflow-hidden group",
                     isActive
-                      ? 'text-white shadow-2xl'
-                      : 'text-slate-700 hover:bg-white/50 hover:shadow-md'
+                      ? 'text-white shadow-lg'
+                      : 'text-slate-600 hover:bg-slate-100/80'
                   )}
                 >
                   {isActive && (
@@ -197,12 +194,11 @@ export default function ConsultantPortal() {
         </nav>
 
         {/* User */}
-        <div className="p-4 border-t border-white/30 glass">
+        <div className="p-4 border-t border-slate-200/50 bg-gradient-to-r from-slate-50 to-blue-50/50">
           <div className="flex items-center gap-3 mb-3">
             <motion.div 
-              whileHover={{ scale: 1.15, rotate: 5 }}
-              whileTap={{ scale: 0.95 }}
-              className="w-11 h-11 rounded-2xl gradient-navy-emerald flex items-center justify-center shadow-xl"
+              whileHover={{ scale: 1.1 }}
+              className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500 to-indigo-500 flex items-center justify-center shadow-lg shadow-blue-500/25"
             >
               <span className="text-sm font-bold text-white">ИП</span>
             </motion.div>
@@ -214,20 +210,18 @@ export default function ConsultantPortal() {
                   exit={{ opacity: 0, x: -10 }}
                   className="flex-1 min-w-0"
                 >
-                  <p className="text-sm font-bold text-slate-900 truncate">Иван Петров</p>
-                  <Badge className="text-[10px] bg-emerald-100 text-emerald-700 border-0 px-2 py-0">Senior Advisor</Badge>
+                  <p className="text-sm font-semibold text-slate-900 truncate">Иван Петров</p>
+                  <p className="text-xs text-slate-500">Старши консултант</p>
                 </motion.div>
               )}
             </AnimatePresence>
           </div>
           {!sidebarCollapsed && (
             <Link to={createPageUrl('Home')}>
-              <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
-                <Button variant="outline" className="w-full text-slate-700 hover:text-red-600 hover:border-red-300 hover:bg-red-50/80 rounded-2xl transition-all border-slate-200">
-                  <LogOut className="h-4 w-4 mr-2" />
-                  Изход
-                </Button>
-              </motion.div>
+              <Button variant="outline" className="w-full text-slate-600 hover:text-red-600 hover:border-red-300 hover:bg-red-50 rounded-xl transition-all">
+                <LogOut className="h-4 w-4 mr-2" />
+                Изход
+              </Button>
             </Link>
           )}
         </div>
@@ -240,48 +234,40 @@ export default function ConsultantPortal() {
         transition={{ duration: 0.3, ease: 'easeInOut' }}
       >
         {/* Top Header */}
-        <header className="glass-card border-b border-white/30 sticky top-0 z-30 px-6 h-16 flex items-center justify-between shadow-xl">
+        <header className="bg-white/70 backdrop-blur-xl border-b border-slate-200/50 sticky top-0 z-30 px-6 h-16 flex items-center justify-between shadow-sm">
           <div>
             <motion.h2 
               key={activeTab}
               initial={{ opacity: 0, y: -10 }}
               animate={{ opacity: 1, y: 0 }}
-              className="font-bold text-slate-900 text-xl"
+              className="font-semibold text-slate-900 text-lg"
             >
               {menuItems.find(m => m.id === activeTab)?.label || 'Табло'}
             </motion.h2>
-            <p className="text-xs text-slate-600 font-medium">{getGreeting()}, Иван! • {currentTime.toLocaleDateString('bg-BG', { weekday: 'long', day: 'numeric', month: 'long' })}</p>
+            <p className="text-xs text-slate-500">{getGreeting()}, Иван! • {currentTime.toLocaleDateString('bg-BG', { weekday: 'long', day: 'numeric', month: 'long' })}</p>
           </div>
           <div className="flex items-center gap-2">
-            <motion.div whileHover={{ scale: 1.08 }} whileTap={{ scale: 0.92 }}>
-              <Button variant="ghost" size="icon" className="relative rounded-2xl hover:bg-white/60 hover:shadow-lg transition-all" onClick={() => setActiveTab('notifications')}>
-                <Bell className="h-5 w-5 text-slate-700" />
-                <motion.span 
-                  initial={{ scale: 0 }}
-                  animate={{ scale: 1 }}
-                  className="absolute -top-1 -right-1 w-5 h-5 gradient-navy-emerald rounded-full text-[10px] text-white flex items-center justify-center font-bold shadow-xl"
-                >5</motion.span>
+            <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+              <Button variant="ghost" size="icon" className="relative rounded-xl hover:bg-slate-100" onClick={() => setActiveTab('notifications')}>
+                <Bell className="h-5 w-5 text-slate-600" />
+                <span className="absolute -top-0.5 -right-0.5 w-5 h-5 bg-gradient-to-r from-red-500 to-rose-500 rounded-full text-[10px] text-white flex items-center justify-center font-bold shadow-lg shadow-red-500/30">5</span>
               </Button>
             </motion.div>
-            <motion.div whileHover={{ scale: 1.08 }} whileTap={{ scale: 0.92 }}>
-              <Button variant="ghost" size="icon" className="relative rounded-2xl hover:bg-white/60 hover:shadow-lg transition-all" onClick={() => setActiveTab('mail')}>
-                <Mail className="h-5 w-5 text-slate-700" />
-                <motion.span 
-                  initial={{ scale: 0 }}
-                  animate={{ scale: 1 }}
-                  className="absolute -top-1 -right-1 w-5 h-5 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-full text-[10px] text-white flex items-center justify-center font-bold shadow-xl"
-                >3</motion.span>
+            <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+              <Button variant="ghost" size="icon" className="relative rounded-xl hover:bg-slate-100" onClick={() => setActiveTab('mail')}>
+                <Mail className="h-5 w-5 text-slate-600" />
+                <span className="absolute -top-0.5 -right-0.5 w-5 h-5 bg-gradient-to-r from-blue-500 to-indigo-500 rounded-full text-[10px] text-white flex items-center justify-center font-bold shadow-lg shadow-blue-500/30">3</span>
               </Button>
             </motion.div>
-            <motion.div whileHover={{ scale: 1.08 }} whileTap={{ scale: 0.92 }}>
-              <Button variant="ghost" size="icon" className="rounded-2xl hover:bg-white/60 hover:shadow-lg transition-all" onClick={() => setActiveTab('calendar')}>
-                <Calendar className="h-5 w-5 text-slate-700" />
+            <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+              <Button variant="ghost" size="icon" className="rounded-xl hover:bg-slate-100" onClick={() => setActiveTab('calendar')}>
+                <Calendar className="h-5 w-5 text-slate-600" />
               </Button>
             </motion.div>
-            <div className="w-px h-8 bg-slate-300 mx-2" />
-            <motion.div whileHover={{ scale: 1.08 }} whileTap={{ scale: 0.92 }}>
-              <Button variant="ghost" size="icon" className="rounded-2xl hover:bg-white/60 hover:shadow-lg transition-all">
-                <Settings className="h-5 w-5 text-slate-700" />
+            <div className="w-px h-8 bg-slate-200 mx-2" />
+            <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+              <Button variant="ghost" size="icon" className="rounded-xl hover:bg-slate-100">
+                <Settings className="h-5 w-5 text-slate-600" />
               </Button>
             </motion.div>
           </div>
@@ -306,36 +292,32 @@ export default function ConsultantPortal() {
                   initial={{ opacity: 0, scale: 0.95 }}
                   animate={{ opacity: 1, scale: 1 }}
                 >
-                  <Card className="glass-card border-0 shadow-2xl overflow-hidden hover-lift">
-                    <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/10 to-blue-500/10" />
-                    <CardHeader className="relative pb-4">
-                      <CardTitle className="flex items-center gap-4">
-                        <motion.div 
-                          whileHover={{ rotate: 360 }}
-                          transition={{ duration: 0.6 }}
-                          className="w-12 h-12 rounded-2xl bg-gradient-to-br from-emerald-500 to-emerald-600 flex items-center justify-center shadow-xl"
-                        >
-                          <FileText className="h-6 w-6 text-white" />
-                        </motion.div>
+                  <Card className="bg-white/70 backdrop-blur-sm border-0 shadow-xl shadow-slate-200/50 overflow-hidden">
+                    <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/5 to-blue-500/5" />
+                    <CardHeader className="relative">
+                      <CardTitle className="flex items-center gap-3">
+                        <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-500 to-emerald-600 flex items-center justify-center shadow-lg shadow-emerald-500/30">
+                          <FileText className="h-5 w-5 text-white" />
+                        </div>
                         <div>
-                          <span className="text-2xl font-bold text-slate-900">Финансов анализ</span>
-                          <p className="text-sm font-normal text-slate-600 mt-0.5">Създайте персонализирани финансови планове</p>
+                          <span className="text-xl">Финансов анализ</span>
+                          <p className="text-sm font-normal text-slate-500">Създайте персонализирани финансови планове</p>
                         </div>
                       </CardTitle>
                     </CardHeader>
                     <CardContent className="relative">
                       <div className="flex gap-3">
                         <Link to={createPageUrl('FinancialAnalysis')}>
-                          <motion.div whileHover={{ scale: 1.03, y: -2 }} whileTap={{ scale: 0.97 }}>
-                            <Button className="gradient-navy-emerald hover:shadow-2xl shadow-lg rounded-2xl px-6 py-6 text-white font-semibold">
-                              <Plus className="h-5 w-5 mr-2" />
+                          <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+                            <Button className="bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 shadow-lg shadow-emerald-500/25 rounded-xl">
+                              <Plus className="h-4 w-4 mr-2" />
                               Нов анализ
                             </Button>
                           </motion.div>
                         </Link>
-                        <motion.div whileHover={{ scale: 1.03, y: -2 }} whileTap={{ scale: 0.97 }}>
-                          <Button variant="outline" className="rounded-2xl hover:bg-white hover:shadow-lg transition-all px-6 py-6 border-slate-300">
-                            <Eye className="h-5 w-5 mr-2" />
+                        <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+                          <Button variant="outline" className="rounded-xl hover:bg-slate-50">
+                            <Eye className="h-4 w-4 mr-2" />
                             Преглед на анализи
                           </Button>
                         </motion.div>

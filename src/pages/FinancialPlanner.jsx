@@ -2887,42 +2887,42 @@ export default function FinancialPlanner() {
                   </p>
 
                   <div className="grid md:grid-cols-2 gap-4 flex-1">
-                    <div className={cn("rounded-xl border-2 p-6 transition-all duration-300 group hover:border-blue-500 hover:bg-blue-600 flex flex-col justify-center", isDarkMode ? "border-slate-800" : "border-slate-200")}>
-                      <Search className={cn("w-10 h-10 mb-3 transition-colors", "text-blue-600 group-hover:text-white")} />
-                      <p className={cn("text-xs tracking-widest mb-2 group-hover:text-blue-100", mutedTextClasses)}>ФАЗА 1</p>
-                      <h3 className="text-xl font-semibold mb-2 group-hover:text-white">Анализ</h3>
-                      <p className="text-blue-500 text-base mb-3 font-medium group-hover:text-blue-200">Нужди, цели, желания</p>
-                      <p className={cn("text-sm leading-relaxed group-hover:text-blue-100", mutedTextClasses)}>
+                    <div className={cn("rounded-xl border-2 p-6 transition-all duration-300 group hover:border-blue-500 hover:bg-blue-600 flex flex-col justify-center relative", isDarkMode ? "border-slate-800" : "border-slate-200")}>
+                      <Search className={cn("w-20 h-20 absolute top-4 right-4 transition-colors", "text-blue-600/20 group-hover:text-white/30")} />
+                      <p className={cn("text-xs tracking-widest mb-2 group-hover:text-blue-100 relative z-10", mutedTextClasses)}>ФАЗА 1</p>
+                      <h3 className="text-xl font-semibold mb-2 group-hover:text-white relative z-10">Анализ</h3>
+                      <p className="text-blue-500 text-base mb-3 font-medium group-hover:text-blue-200 relative z-10">Нужди, цели, желания</p>
+                      <p className={cn("text-sm leading-relaxed group-hover:text-blue-100 relative z-10", mutedTextClasses)}>
                         Анализираме целите на клиента за най-подходящите финансови решения.
                       </p>
                     </div>
 
-                    <div className={cn("rounded-xl border-2 p-6 transition-all duration-300 group hover:border-blue-500 hover:bg-blue-600 flex flex-col justify-center", isDarkMode ? "border-slate-800" : "border-slate-200")}>
-                      <Settings className={cn("w-10 h-10 mb-3 transition-colors", "text-blue-600 group-hover:text-white")} />
-                      <p className={cn("text-xs tracking-widest mb-2 group-hover:text-blue-100", mutedTextClasses)}>ФАЗА 2</p>
-                      <h3 className="text-xl font-semibold mb-2 group-hover:text-white">Оптимизация</h3>
-                      <p className="text-blue-500 text-base mb-3 font-medium group-hover:text-blue-200">Подготовка на финансовия план</p>
-                      <p className={cn("text-sm leading-relaxed group-hover:text-blue-100", mutedTextClasses)}>
+                    <div className={cn("rounded-xl border-2 p-6 transition-all duration-300 group hover:border-blue-500 hover:bg-blue-600 flex flex-col justify-center relative", isDarkMode ? "border-slate-800" : "border-slate-200")}>
+                      <Settings className={cn("w-20 h-20 absolute top-4 right-4 transition-colors", "text-blue-600/20 group-hover:text-white/30")} />
+                      <p className={cn("text-xs tracking-widest mb-2 group-hover:text-blue-100 relative z-10", mutedTextClasses)}>ФАЗА 2</p>
+                      <h3 className="text-xl font-semibold mb-2 group-hover:text-white relative z-10">Оптимизация</h3>
+                      <p className="text-blue-500 text-base mb-3 font-medium group-hover:text-blue-200 relative z-10">Подготовка на финансовия план</p>
+                      <p className={cn("text-sm leading-relaxed group-hover:text-blue-100 relative z-10", mutedTextClasses)}>
                         Разглеждаме съществуващи продукти за оптимизация и спестяване.
                       </p>
                     </div>
 
-                    <div className={cn("rounded-xl border-2 p-6 transition-all duration-300 group hover:border-blue-500 hover:bg-blue-600 flex flex-col justify-center", isDarkMode ? "border-slate-800" : "border-slate-200")}>
-                      <Presentation className={cn("w-10 h-10 mb-3 transition-colors", "text-blue-600 group-hover:text-white")} />
-                      <p className={cn("text-xs tracking-widest mb-2 group-hover:text-blue-100", mutedTextClasses)}>ФАЗА 3</p>
-                      <h3 className="text-xl font-semibold mb-2 group-hover:text-white">Представяне</h3>
-                      <p className="text-blue-500 text-base mb-3 font-medium group-hover:text-blue-200">Финансовият план и реализацията</p>
-                      <p className={cn("text-sm leading-relaxed group-hover:text-blue-100", mutedTextClasses)}>
+                    <div className={cn("rounded-xl border-2 p-6 transition-all duration-300 group hover:border-blue-500 hover:bg-blue-600 flex flex-col justify-center relative", isDarkMode ? "border-slate-800" : "border-slate-200")}>
+                      <Presentation className={cn("w-20 h-20 absolute top-4 right-4 transition-colors", "text-blue-600/20 group-hover:text-white/30")} />
+                      <p className={cn("text-xs tracking-widest mb-2 group-hover:text-blue-100 relative z-10", mutedTextClasses)}>ФАЗА 3</p>
+                      <h3 className="text-xl font-semibold mb-2 group-hover:text-white relative z-10">Представяне</h3>
+                      <p className="text-blue-500 text-base mb-3 font-medium group-hover:text-blue-200 relative z-10">Финансовият план и реализацията</p>
+                      <p className={cn("text-sm leading-relaxed group-hover:text-blue-100 relative z-10", mutedTextClasses)}>
                         Представяме плана и привеждаме в действие решенията.
                       </p>
                     </div>
 
-                    <div className={cn("rounded-xl border-2 p-6 transition-all duration-300 group hover:border-blue-500 hover:bg-blue-600 flex flex-col justify-center", isDarkMode ? "border-slate-800" : "border-slate-200")}>
-                      <Handshake className={cn("w-10 h-10 mb-3 transition-colors", "text-blue-600 group-hover:text-white")} />
-                      <p className={cn("text-xs tracking-widest mb-2 group-hover:text-blue-100", mutedTextClasses)}>ФАЗА 4</p>
-                      <h3 className="text-xl font-semibold mb-2 group-hover:text-white">Дългосрочно обслужване</h3>
-                      <p className="text-blue-500 text-base mb-3 font-medium group-hover:text-blue-200">Дългосрочно и редовно</p>
-                      <p className={cn("text-sm leading-relaxed group-hover:text-blue-100", mutedTextClasses)}>
+                    <div className={cn("rounded-xl border-2 p-6 transition-all duration-300 group hover:border-blue-500 hover:bg-blue-600 flex flex-col justify-center relative", isDarkMode ? "border-slate-800" : "border-slate-200")}>
+                      <Handshake className={cn("w-20 h-20 absolute top-4 right-4 transition-colors", "text-blue-600/20 group-hover:text-white/30")} />
+                      <p className={cn("text-xs tracking-widest mb-2 group-hover:text-blue-100 relative z-10", mutedTextClasses)}>ФАЗА 4</p>
+                      <h3 className="text-xl font-semibold mb-2 group-hover:text-white relative z-10">Дългосрочно обслужване</h3>
+                      <p className="text-blue-500 text-base mb-3 font-medium group-hover:text-blue-200 relative z-10">Дългосрочно и редовно</p>
+                      <p className={cn("text-sm leading-relaxed group-hover:text-blue-100 relative z-10", mutedTextClasses)}>
                         Постоянна подкрепа с редовни срещи и актуализации.
                       </p>
                     </div>
@@ -2973,48 +2973,44 @@ export default function FinancialPlanner() {
                     Нашите принципи на работа гарантират професионализъм и доверие във всяка стъпка от процеса.
                   </p>
 
-                  <div className="grid md:grid-cols-2 gap-4 mb-6">
-                    <div className={cn("rounded-2xl border-2 p-6 transition-all duration-300 group hover:border-blue-500 hover:bg-blue-600", isDarkMode ? "border-slate-800" : "border-slate-200")}>
-                      <Lock className={cn("w-10 h-10 mb-3 transition-colors", "text-blue-600 group-hover:text-white")} />
-                      <p className={cn("text-xs tracking-widest mb-2 group-hover:text-blue-100", mutedTextClasses)}>ПРАВИЛО 1</p>
-                      <h3 className="text-xl font-semibold mb-2 group-hover:text-white">Дискретност</h3>
-                      <p className="text-blue-500 text-base mb-3 font-medium group-hover:text-blue-200">Пълна конфиденциалност</p>
-                      <p className={cn("text-sm leading-relaxed group-hover:text-blue-100", mutedTextClasses)}>
-                        Вашите лични и финансови данни са напълно защитени. 
-                        Никога не споделяме информация с трети страни без вашето изрично съгласие.
+                  <div className="grid md:grid-cols-2 gap-4 flex-1">
+                    <div className={cn("rounded-xl border-2 p-6 transition-all duration-300 group hover:border-blue-500 hover:bg-blue-600 flex flex-col justify-center relative", isDarkMode ? "border-slate-800" : "border-slate-200")}>
+                      <Search className={cn("w-20 h-20 absolute top-4 right-4 transition-colors", "text-blue-600/20 group-hover:text-white/30")} />
+                      <p className={cn("text-xs tracking-widest mb-2 group-hover:text-blue-100 relative z-10", mutedTextClasses)}>ФАЗА 1</p>
+                      <h3 className="text-xl font-semibold mb-2 group-hover:text-white relative z-10">Анализ</h3>
+                      <p className="text-blue-500 text-base mb-3 font-medium group-hover:text-blue-200 relative z-10">Нужди, цели, желания</p>
+                      <p className={cn("text-sm leading-relaxed group-hover:text-blue-100 relative z-10", mutedTextClasses)}>
+                        Анализираме целите на клиента за най-подходящите финансови решения.
                       </p>
                     </div>
 
-                    <div className={cn("rounded-2xl border-2 p-6 transition-all duration-300 group hover:border-blue-500 hover:bg-blue-600", isDarkMode ? "border-slate-800" : "border-slate-200")}>
-                      <Handshake className={cn("w-10 h-10 mb-3 transition-colors", "text-blue-600 group-hover:text-white")} />
-                      <p className={cn("text-xs tracking-widest mb-2 group-hover:text-blue-100", mutedTextClasses)}>ПРАВИЛО 2</p>
-                      <h3 className="text-xl font-semibold mb-2 group-hover:text-white">Коректност</h3>
-                      <p className="text-blue-500 text-base mb-3 font-medium group-hover:text-blue-200">Честни взаимоотношения</p>
-                      <p className={cn("text-sm leading-relaxed group-hover:text-blue-100", mutedTextClasses)}>
-                        Работим с ясни правила и спазваме всички договорености. 
-                        Вашият интерес е винаги на първо място в нашите препоръки.
+                    <div className={cn("rounded-xl border-2 p-6 transition-all duration-300 group hover:border-blue-500 hover:bg-blue-600 flex flex-col justify-center relative", isDarkMode ? "border-slate-800" : "border-slate-200")}>
+                      <Settings className={cn("w-20 h-20 absolute top-4 right-4 transition-colors", "text-blue-600/20 group-hover:text-white/30")} />
+                      <p className={cn("text-xs tracking-widest mb-2 group-hover:text-blue-100 relative z-10", mutedTextClasses)}>ФАЗА 2</p>
+                      <h3 className="text-xl font-semibold mb-2 group-hover:text-white relative z-10">Оптимизация</h3>
+                      <p className="text-blue-500 text-base mb-3 font-medium group-hover:text-blue-200 relative z-10">Подготовка на финансовия план</p>
+                      <p className={cn("text-sm leading-relaxed group-hover:text-blue-100 relative z-10", mutedTextClasses)}>
+                        Разглеждаме съществуващи продукти за оптимизация и спестяване.
                       </p>
                     </div>
 
-                    <div className={cn("rounded-2xl border-2 p-6 transition-all duration-300 group hover:border-blue-500 hover:bg-blue-600", isDarkMode ? "border-slate-800" : "border-slate-200")}>
-                      <Eye className={cn("w-10 h-10 mb-3 transition-colors", "text-blue-600 group-hover:text-white")} />
-                      <p className={cn("text-xs tracking-widest mb-2 group-hover:text-blue-100", mutedTextClasses)}>ПРАВИЛО 3</p>
-                      <h3 className="text-xl font-semibold mb-2 group-hover:text-white">Прозрачност</h3>
-                      <p className="text-blue-500 text-base mb-3 font-medium group-hover:text-blue-200">Открита комуникация</p>
-                      <p className={cn("text-sm leading-relaxed group-hover:text-blue-100", mutedTextClasses)}>
-                        Обясняваме всяка стъпка и решение. Няма скрити условия или 
-                        неясни такси - всичко е ясно от самото начало.
+                    <div className={cn("rounded-xl border-2 p-6 transition-all duration-300 group hover:border-blue-500 hover:bg-blue-600 flex flex-col justify-center relative", isDarkMode ? "border-slate-800" : "border-slate-200")}>
+                      <Presentation className={cn("w-20 h-20 absolute top-4 right-4 transition-colors", "text-blue-600/20 group-hover:text-white/30")} />
+                      <p className={cn("text-xs tracking-widest mb-2 group-hover:text-blue-100 relative z-10", mutedTextClasses)}>ФАЗА 3</p>
+                      <h3 className="text-xl font-semibold mb-2 group-hover:text-white relative z-10">Представяне</h3>
+                      <p className="text-blue-500 text-base mb-3 font-medium group-hover:text-blue-200 relative z-10">Финансовият план и реализацията</p>
+                      <p className={cn("text-sm leading-relaxed group-hover:text-blue-100 relative z-10", mutedTextClasses)}>
+                        Представяме плана и привеждаме в действие решенията.
                       </p>
                     </div>
 
-                    <div className={cn("rounded-2xl border-2 p-6 transition-all duration-300 group hover:border-blue-500 hover:bg-blue-600", isDarkMode ? "border-slate-800" : "border-slate-200")}>
-                      <Coins className={cn("w-10 h-10 mb-3 transition-colors", "text-blue-600 group-hover:text-white")} />
-                      <p className={cn("text-xs tracking-widest mb-2 group-hover:text-blue-100", mutedTextClasses)}>ПРАВИЛО 4</p>
-                      <h3 className="text-xl font-semibold mb-2 group-hover:text-white">Възнаграждение</h3>
-                      <p className="text-blue-500 text-base mb-3 font-medium group-hover:text-blue-200">Без директни такси от клиенти</p>
-                      <p className={cn("text-sm leading-relaxed group-hover:text-blue-100", mutedTextClasses)}>
-                        Не получаваме директно заплащане от вас. Възнаграждението ни идва от 
-                        финансовите институции под формата на комисионна за посредничество.
+                    <div className={cn("rounded-xl border-2 p-6 transition-all duration-300 group hover:border-blue-500 hover:bg-blue-600 flex flex-col justify-center relative", isDarkMode ? "border-slate-800" : "border-slate-200")}>
+                      <Handshake className={cn("w-20 h-20 absolute top-4 right-4 transition-colors", "text-blue-600/20 group-hover:text-white/30")} />
+                      <p className={cn("text-xs tracking-widest mb-2 group-hover:text-blue-100 relative z-10", mutedTextClasses)}>ФАЗА 4</p>
+                      <h3 className="text-xl font-semibold mb-2 group-hover:text-white relative z-10">Дългосрочно обслужване</h3>
+                      <p className="text-blue-500 text-base mb-3 font-medium group-hover:text-blue-200 relative z-10">Дългосрочно и редовно</p>
+                      <p className={cn("text-sm leading-relaxed group-hover:text-blue-100 relative z-10", mutedTextClasses)}>
+                        Постоянна подкрепа с редовни срещи и актуализации.
                       </p>
                     </div>
                   </div>

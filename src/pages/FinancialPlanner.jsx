@@ -2977,12 +2977,26 @@ export default function FinancialPlanner() {
                     <div className={cn("rounded-xl border-2 p-6", isDarkMode ? "border-slate-800 bg-slate-900/50" : "border-slate-200 bg-white")}>
                       <div className="flex items-start gap-4">
                         <div className="w-12 h-12 rounded-xl bg-blue-100 flex items-center justify-center flex-shrink-0">
+                          <Eye className="w-6 h-6 text-blue-600" />
+                        </div>
+                        <div>
+                          <h3 className="text-lg font-bold mb-2">Дискретност</h3>
+                          <p className={cn("text-sm leading-relaxed", mutedTextClasses)}>
+                            Вашите данни и финансова информация са строго поверителни.
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className={cn("rounded-xl border-2 p-6", isDarkMode ? "border-slate-800 bg-slate-900/50" : "border-slate-200 bg-white")}>
+                      <div className="flex items-start gap-4">
+                        <div className="w-12 h-12 rounded-xl bg-blue-100 flex items-center justify-center flex-shrink-0">
                           <FileText className="w-6 h-6 text-blue-600" />
                         </div>
                         <div>
-                          <h3 className="text-lg font-bold mb-2">Професионализъм</h3>
+                          <h3 className="text-lg font-bold mb-2">Прозрачност</h3>
                           <p className={cn("text-sm leading-relaxed", mutedTextClasses)}>
-                            Винаги работим с най-високи стандарти за качество и прозрачност във всяка услуга.
+                            Пълна яснота относно условията, таксите и процесите.
                           </p>
                         </div>
                       </div>
@@ -2991,12 +3005,12 @@ export default function FinancialPlanner() {
                     <div className={cn("rounded-xl border-2 p-6", isDarkMode ? "border-slate-800 bg-slate-900/50" : "border-slate-200 bg-white")}>
                       <div className="flex items-start gap-4">
                         <div className="w-12 h-12 rounded-xl bg-blue-100 flex items-center justify-center flex-shrink-0">
-                          <Shield className="w-6 h-6 text-blue-600" />
+                          <ShieldCheck className="w-6 h-6 text-blue-600" />
                         </div>
                         <div>
-                          <h3 className="text-lg font-bold mb-2">Конфиденциалност</h3>
+                          <h3 className="text-lg font-bold mb-2">Коректност</h3>
                           <p className={cn("text-sm leading-relaxed", mutedTextClasses)}>
-                            Вашите данни са защитени и никога не се споделят без Ваше съгласие.
+                            Честен и етичен подход при всяка препоръка и решение.
                           </p>
                         </div>
                       </div>
@@ -3005,26 +3019,12 @@ export default function FinancialPlanner() {
                     <div className={cn("rounded-xl border-2 p-6", isDarkMode ? "border-slate-800 bg-slate-900/50" : "border-slate-200 bg-white")}>
                       <div className="flex items-start gap-4">
                         <div className="w-12 h-12 rounded-xl bg-blue-100 flex items-center justify-center flex-shrink-0">
-                          <Target className="w-6 h-6 text-blue-600" />
+                          <Coins className="w-6 h-6 text-blue-600" />
                         </div>
                         <div>
-                          <h3 className="text-lg font-bold mb-2">Персонализиран подход</h3>
+                          <h3 className="text-lg font-bold mb-2">Възнаграждение</h3>
                           <p className={cn("text-sm leading-relaxed", mutedTextClasses)}>
-                            Всеки план е изработен специално за Вашите уникални нужди и цели.
-                          </p>
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className={cn("rounded-xl border-2 p-6", isDarkMode ? "border-slate-800 bg-slate-900/50" : "border-slate-200 bg-white")}>
-                      <div className="flex items-start gap-4">
-                        <div className="w-12 h-12 rounded-xl bg-blue-100 flex items-center justify-center flex-shrink-0">
-                          <Handshake className="w-6 h-6 text-blue-600" />
-                        </div>
-                        <div>
-                          <h3 className="text-lg font-bold mb-2">Дългосрочно партньорство</h3>
-                          <p className={cn("text-sm leading-relaxed", mutedTextClasses)}>
-                            Не просто консултация, а траен съюз за постигане на Вашите финансови цели.
+                            Работим срещу комисионна от финансовите институции.
                           </p>
                         </div>
                       </div>

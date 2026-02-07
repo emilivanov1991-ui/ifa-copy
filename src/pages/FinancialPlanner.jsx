@@ -1115,65 +1115,116 @@ export default function FinancialPlanner() {
                           {/* Client names */}
                           <div className="space-y-4">
                             <p className={cn("text-sm font-semibold uppercase tracking-wide", mutedTextClasses)}>КЛИЕНТ</p>
-                            <div>
-                              <label className={cn("text-sm font-medium mb-2 block", mutedTextClasses)}>Име</label>
+                            <div className="relative">
                               <input
                                 type="text"
                                 value={clientFirstName}
                                 onChange={(e) => setClientFirstName(e.target.value)}
-                                placeholder="Име на клиента"
+                                placeholder=" "
                                 className={cn(
-                                  "w-full px-4 py-3 rounded-xl border-2 transition-all duration-200 outline-none",
+                                  "peer w-full px-4 pt-6 pb-2 rounded-xl border-2 transition-all duration-200 outline-none",
                                   isDarkMode 
-                                    ? "bg-slate-800 border-slate-700 text-white placeholder:text-slate-500 focus:border-blue-500" 
-                                    : "bg-white border-slate-200 text-slate-900 placeholder:text-slate-400 focus:border-blue-500"
+                                    ? "bg-slate-800 border-slate-700 text-white focus:border-blue-500" 
+                                    : "bg-white border-slate-200 text-slate-900 focus:border-blue-500 focus:shadow-lg focus:shadow-blue-100/50"
                                 )}
                               />
+                              <label className={cn(
+                                "absolute left-4 top-4 text-sm font-medium transition-all duration-200 pointer-events-none",
+                                "peer-focus:top-2 peer-focus:text-xs peer-focus:text-blue-600",
+                                "peer-[:not(:placeholder-shown)]:top-2 peer-[:not(:placeholder-shown)]:text-xs",
+                                mutedTextClasses
+                              )}>
+                                Име на клиента
+                              </label>
                             </div>
-                            <div>
-                              <label className={cn("text-sm font-medium mb-2 block", mutedTextClasses)}>Фамилия</label>
+                            <div className="relative">
                               <input
                                 type="text"
                                 value={clientLastName}
                                 onChange={(e) => setClientLastName(e.target.value)}
-                                placeholder="Фамилия на клиента"
+                                placeholder=" "
                                 className={cn(
-                                  "w-full px-4 py-3 rounded-xl border-2 transition-all duration-200 outline-none",
+                                  "peer w-full px-4 pt-6 pb-2 rounded-xl border-2 transition-all duration-200 outline-none",
                                   isDarkMode 
-                                    ? "bg-slate-800 border-slate-700 text-white placeholder:text-slate-500 focus:border-blue-500" 
-                                    : "bg-white border-slate-200 text-slate-900 placeholder:text-slate-400 focus:border-blue-500"
+                                    ? "bg-slate-800 border-slate-700 text-white focus:border-blue-500" 
+                                    : "bg-white border-slate-200 text-slate-900 focus:border-blue-500 focus:shadow-lg focus:shadow-blue-100/50"
                                 )}
                               />
+                              <label className={cn(
+                                "absolute left-4 top-4 text-sm font-medium transition-all duration-200 pointer-events-none",
+                                "peer-focus:top-2 peer-focus:text-xs peer-focus:text-blue-600",
+                                "peer-[:not(:placeholder-shown)]:top-2 peer-[:not(:placeholder-shown)]:text-xs",
+                                mutedTextClasses
+                              )}>
+                                Фамилия на клиента
+                              </label>
                             </div>
-                            <div>
-                              <label className={cn("text-sm font-medium mb-2 block", mutedTextClasses)}>Телефонен номер</label>
+                            <div className="relative">
                               <input
                                 type="tel"
                                 value={clientPhone}
                                 onChange={(e) => setClientPhone(e.target.value)}
-                                placeholder="Телефон на клиента"
+                                placeholder=" "
                                 className={cn(
-                                  "w-full px-4 py-3 rounded-xl border-2 transition-all duration-200 outline-none",
+                                  "peer w-full px-4 pt-6 pb-2 rounded-xl border-2 transition-all duration-200 outline-none",
                                   isDarkMode 
-                                    ? "bg-slate-800 border-slate-700 text-white placeholder:text-slate-500 focus:border-blue-500" 
-                                    : "bg-white border-slate-200 text-slate-900 placeholder:text-slate-400 focus:border-blue-500"
+                                    ? "bg-slate-800 border-slate-700 text-white focus:border-blue-500" 
+                                    : "bg-white border-slate-200 text-slate-900 focus:border-blue-500 focus:shadow-lg focus:shadow-blue-100/50"
                                 )}
                               />
+                              <label className={cn(
+                                "absolute left-4 top-4 text-sm font-medium transition-all duration-200 pointer-events-none",
+                                "peer-focus:top-2 peer-focus:text-xs peer-focus:text-blue-600",
+                                "peer-[:not(:placeholder-shown)]:top-2 peer-[:not(:placeholder-shown)]:text-xs",
+                                mutedTextClasses
+                              )}>
+                                Телефон на клиента
+                              </label>
                             </div>
-                            <div>
-                              <label className={cn("text-sm font-medium mb-2 block", mutedTextClasses)}>E-mail адрес</label>
+                            <div className="relative">
                               <input
                                 type="email"
                                 value={clientEmail}
                                 onChange={(e) => setClientEmail(e.target.value)}
-                                placeholder="Имейл на клиента"
+                                onBlur={() => setClientEmailTouched(true)}
+                                placeholder=" "
                                 className={cn(
-                                  "w-full px-4 py-3 rounded-xl border-2 transition-all duration-200 outline-none",
-                                  isDarkMode 
-                                    ? "bg-slate-800 border-slate-700 text-white placeholder:text-slate-500 focus:border-blue-500" 
-                                    : "bg-white border-slate-200 text-slate-900 placeholder:text-slate-400 focus:border-blue-500"
+                                  "peer w-full px-4 pt-6 pb-2 rounded-xl border-2 transition-all duration-200 outline-none",
+                                  clientEmailTouched && clientEmail && !isValidEmail(clientEmail)
+                                    ? "border-red-500 focus:border-red-500 bg-red-50"
+                                    : isDarkMode 
+                                      ? "bg-slate-800 border-slate-700 text-white focus:border-blue-500" 
+                                      : "bg-white border-slate-200 text-slate-900 focus:border-blue-500 focus:shadow-lg focus:shadow-blue-100/50"
                                 )}
                               />
+                              <label className={cn(
+                                "absolute left-4 top-4 text-sm font-medium transition-all duration-200 pointer-events-none",
+                                "peer-focus:top-2 peer-focus:text-xs",
+                                "peer-[:not(:placeholder-shown)]:top-2 peer-[:not(:placeholder-shown)]:text-xs",
+                                clientEmailTouched && clientEmail && !isValidEmail(clientEmail) ? "text-red-500" : "peer-focus:text-blue-600",
+                                mutedTextClasses
+                              )}>
+                                Имейл на клиента
+                              </label>
+                              {clientEmailTouched && clientEmail && !isValidEmail(clientEmail) && (
+                                <motion.div
+                                  initial={{ opacity: 0, y: -10 }}
+                                  animate={{ opacity: 1, y: 0 }}
+                                  className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center gap-1"
+                                >
+                                  <XCircle className="w-4 h-4 text-red-500" />
+                                </motion.div>
+                              )}
+                              {clientEmailTouched && clientEmail && !isValidEmail(clientEmail) && (
+                                <motion.p 
+                                  initial={{ opacity: 0, y: -5 }}
+                                  animate={{ opacity: 1, y: 0 }}
+                                  className="text-red-500 text-xs mt-1 flex items-center gap-1"
+                                >
+                                  <XCircle className="w-3 h-3" />
+                                  Моля въведете валиден имейл адрес
+                                </motion.p>
+                              )}
                             </div>
                           </div>
 

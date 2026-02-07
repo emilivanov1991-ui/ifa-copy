@@ -88,8 +88,16 @@ export default function FinancialAnalysis() {
         partner_age: parsed.partner_age,
         client_monthly_net_income: parsed.monthly_income,
         partner_monthly_net_income: parsed.partner_income,
-        total_monthly_income: (parsed.monthly_income || 0) + (parsed.partner_income || 0)
+        total_monthly_income: (parsed.monthly_income || 0) + (parsed.partner_income || 0),
+        gdpr_consent_a: parsed.gdpr_consent_a || false,
+        gdpr_consent_b: parsed.gdpr_consent_b || false,
+        gdpr_consent_c: parsed.gdpr_consent_c || false
       }));
+      
+      // Ако има дадени съгласия, прескачаме стъпка 1 (Съгласие)
+      if (parsed.gdpr_consent_a && parsed.gdpr_consent_c) {
+        setCurrentStep(3); // Директно към "Ново жилище"
+      }
       
       // Изчистване на данните след зареждане
       localStorage.removeItem('financialPlannerData');
@@ -710,8 +718,11 @@ export default function FinancialAnalysis() {
         return;
       }
       setShowValidationErrors(false);
-      // Skip step 2 (archived Personal Data step)
-      const nextStepNum = currentStep === 1 ? 3 : currentStep + 1;
+      // Skip step 2 (archived Personal Data step) and step 1 if consents already given
+      let nextStepNum = currentStep + 1;
+      if (currentStep === 1) {
+        nextStepNum = 3; // Always skip Personal Data
+      }
       setCurrentStep(nextStepNum);
       window.scrollTo({ top: 0, behavior: 'smooth' });
     } else if (!validateStep(currentStep)) {
@@ -722,8 +733,17 @@ export default function FinancialAnalysis() {
   const prevStep = () => {
     if (currentStep > 1) {
       setShowValidationErrors(false);
-      // Skip step 2 (archived Personal Data step) when going back
-      const prevStepNum = currentStep === 3 ? 1 : currentStep - 1;
+      // Skip step 2 (archived Personal Data step) and step 1 if consents given from planner
+      let prevStepNum = currentStep - 1;
+      if (currentStep === 3) {
+        // Check if we have consents from planner
+        if (plannerData?.gdpr_consent_a && plannerData?.gdpr_consent_c) {
+          // Don't go back to consent step, stay at step 3
+          return;
+        } else {
+          prevStepNum = 1; // Go to consent step
+        }
+      }
       setCurrentStep(prevStepNum);
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
@@ -788,12 +808,20 @@ export default function FinancialAnalysis() {
         stage: 'analysis',
         email: formData.client_email,
         phone: formData.client_phone,
-        portal_password: clientPassword
+        portal_password: clientPassword,
+        gdpr_consent_a: formData.gdpr_consent_a,
+        gdpr_consent_b: formData.gdpr_consent_b,
+        gdpr_consent_c: formData.gdpr_consent_c,
+        gdpr_consent_date: new Date().toISOString()
       });
     } else {
       // Актуализираме новосъздадения клиент
       await base44.entities.Client.update(clientRecord.id, {
-        stage: 'analysis'
+        stage: 'analysis',
+        gdpr_consent_a: formData.gdpr_consent_a,
+        gdpr_consent_b: formData.gdpr_consent_b,
+        gdpr_consent_c: formData.gdpr_consent_c,
+        gdpr_consent_date: new Date().toISOString()
       });
     }
 

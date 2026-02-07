@@ -2638,7 +2638,11 @@ export default function FinancialPlanner() {
                             family_type: familyType,
                             children_count: childrenCount,
                             children_names: childrenNames,
-                            children_ages: childrenAges
+                            children_ages: childrenAges,
+                            gdpr_consent_a: gdprConsentA,
+                            gdpr_consent_b: gdprConsentB,
+                            gdpr_consent_c: gdprConsentC,
+                            gdpr_consent_date: new Date().toISOString()
                           };
 
                           if (familyType === 'family') {

@@ -1059,18 +1059,16 @@ export default function FinancialPlanner() {
                           </Select>
                         </div>
 
-                        {/* Children names */}
+                        {/* Children names - Enhanced */}
                         {childrenCount > 0 && (
                           <motion.div
                             initial={{ opacity: 0, height: 0 }}
                             animate={{ opacity: 1, height: 'auto' }}
+                            transition={{ duration: 0.4 }}
                             className="space-y-3"
                           >
                             {Array.from({ length: childrenCount }).map((_, idx) => (
-                              <div key={idx}>
-                                <label className={cn("text-sm font-medium mb-2 block", mutedTextClasses)}>
-                                  Име на дете {idx + 1}
-                                </label>
+                              <div key={idx} className="relative">
                                 <input
                                   type="text"
                                   value={childrenNames[idx] || ''}
@@ -1079,14 +1077,22 @@ export default function FinancialPlanner() {
                                     newNames[idx] = e.target.value;
                                     setChildrenNames(newNames);
                                   }}
-                                  placeholder={`Име на дете ${idx + 1}`}
+                                  placeholder=" "
                                   className={cn(
-                                    "w-full px-4 py-3 rounded-xl border-2 transition-all duration-200 outline-none",
+                                    "peer w-full px-4 pt-6 pb-2 rounded-xl border-2 transition-all duration-200 outline-none",
                                     isDarkMode 
-                                      ? "bg-slate-800 border-slate-700 text-white placeholder:text-slate-500 focus:border-blue-500" 
-                                      : "bg-white border-slate-200 text-slate-900 placeholder:text-slate-400 focus:border-blue-500"
+                                      ? "bg-slate-800 border-slate-700 text-white focus:border-blue-500" 
+                                      : "bg-white border-slate-200 text-slate-900 focus:border-blue-500 focus:shadow-lg focus:shadow-blue-100/50"
                                   )}
                                 />
+                                <label className={cn(
+                                  "absolute left-4 top-4 text-sm font-medium transition-all duration-200 pointer-events-none",
+                                  "peer-focus:top-2 peer-focus:text-xs peer-focus:text-blue-600",
+                                  "peer-[:not(:placeholder-shown)]:top-2 peer-[:not(:placeholder-shown)]:text-xs",
+                                  mutedTextClasses
+                                )}>
+                                  Име на дете {idx + 1}
+                                </label>
                               </div>
                             ))}
                           </motion.div>
@@ -1167,80 +1173,125 @@ export default function FinancialPlanner() {
                             </div>
                           </div>
 
-                          {/* Partner names */}
+                          {/* Partner names - with floating labels */}
                           <div className="space-y-4">
                             <p className={cn("text-sm font-semibold", mutedTextClasses)}>ПАРТНЬОР</p>
-                            <div>
-                              <label className={cn("text-sm font-medium mb-2 block", mutedTextClasses)}>Име</label>
+                            <div className="relative">
                               <input
                                 type="text"
                                 value={partnerFirstName}
                                 onChange={(e) => setPartnerFirstName(e.target.value)}
-                                placeholder="Име на партньора"
+                                placeholder=" "
                                 className={cn(
-                                  "w-full px-4 py-3 rounded-xl border-2 transition-all duration-200 outline-none",
+                                  "peer w-full px-4 pt-6 pb-2 rounded-xl border-2 transition-all duration-200 outline-none",
                                   isDarkMode 
-                                    ? "bg-slate-800 border-slate-700 text-white placeholder:text-slate-500 focus:border-blue-500" 
-                                    : "bg-white border-slate-200 text-slate-900 placeholder:text-slate-400 focus:border-blue-500"
+                                    ? "bg-slate-800 border-slate-700 text-white focus:border-blue-500" 
+                                    : "bg-white border-slate-200 text-slate-900 focus:border-blue-500 focus:shadow-lg focus:shadow-blue-100/50"
                                 )}
                               />
+                              <label className={cn(
+                                "absolute left-4 top-4 text-sm font-medium transition-all duration-200 pointer-events-none",
+                                "peer-focus:top-2 peer-focus:text-xs peer-focus:text-blue-600",
+                                "peer-[:not(:placeholder-shown)]:top-2 peer-[:not(:placeholder-shown)]:text-xs",
+                                mutedTextClasses
+                              )}>
+                                Име на партньора
+                              </label>
                             </div>
-                            <div>
-                              <label className={cn("text-sm font-medium mb-2 block", mutedTextClasses)}>Фамилия</label>
+                            <div className="relative">
                               <input
                                 type="text"
                                 value={partnerLastName}
                                 onChange={(e) => setPartnerLastName(e.target.value)}
-                                placeholder="Фамилия на партньора"
+                                placeholder=" "
                                 className={cn(
-                                  "w-full px-4 py-3 rounded-xl border-2 transition-all duration-200 outline-none",
+                                  "peer w-full px-4 pt-6 pb-2 rounded-xl border-2 transition-all duration-200 outline-none",
                                   isDarkMode 
-                                    ? "bg-slate-800 border-slate-700 text-white placeholder:text-slate-500 focus:border-blue-500" 
-                                    : "bg-white border-slate-200 text-slate-900 placeholder:text-slate-400 focus:border-blue-500"
+                                    ? "bg-slate-800 border-slate-700 text-white focus:border-blue-500" 
+                                    : "bg-white border-slate-200 text-slate-900 focus:border-blue-500 focus:shadow-lg focus:shadow-blue-100/50"
                                 )}
                               />
+                              <label className={cn(
+                                "absolute left-4 top-4 text-sm font-medium transition-all duration-200 pointer-events-none",
+                                "peer-focus:top-2 peer-focus:text-xs peer-focus:text-blue-600",
+                                "peer-[:not(:placeholder-shown)]:top-2 peer-[:not(:placeholder-shown)]:text-xs",
+                                mutedTextClasses
+                              )}>
+                                Фамилия на партньора
+                              </label>
                             </div>
-                            <div>
-                              <label className={cn("text-sm font-medium mb-2 block", mutedTextClasses)}>Телефонен номер</label>
+                            <div className="relative">
                               <input
                                 type="tel"
                                 value={partnerPhone}
                                 onChange={(e) => setPartnerPhone(e.target.value)}
-                                placeholder="Телефон на партньора"
+                                placeholder=" "
                                 className={cn(
-                                  "w-full px-4 py-3 rounded-xl border-2 transition-all duration-200 outline-none",
+                                  "peer w-full px-4 pt-6 pb-2 rounded-xl border-2 transition-all duration-200 outline-none",
                                   isDarkMode 
-                                    ? "bg-slate-800 border-slate-700 text-white placeholder:text-slate-500 focus:border-blue-500" 
-                                    : "bg-white border-slate-200 text-slate-900 placeholder:text-slate-400 focus:border-blue-500"
+                                    ? "bg-slate-800 border-slate-700 text-white focus:border-blue-500" 
+                                    : "bg-white border-slate-200 text-slate-900 focus:border-blue-500 focus:shadow-lg focus:shadow-blue-100/50"
                                 )}
                               />
+                              <label className={cn(
+                                "absolute left-4 top-4 text-sm font-medium transition-all duration-200 pointer-events-none",
+                                "peer-focus:top-2 peer-focus:text-xs peer-focus:text-blue-600",
+                                "peer-[:not(:placeholder-shown)]:top-2 peer-[:not(:placeholder-shown)]:text-xs",
+                                mutedTextClasses
+                              )}>
+                                Телефонен номер
+                              </label>
                             </div>
-                            <div>
-                              <label className={cn("text-sm font-medium mb-2 block", mutedTextClasses)}>E-mail адрес</label>
+                            <div className="relative">
                               <input
                                 type="email"
                                 value={partnerEmail}
                                 onChange={(e) => setPartnerEmail(e.target.value)}
                                 onBlur={() => setPartnerEmailTouched(true)}
-                                placeholder="Имейл на партньора"
+                                placeholder=" "
                                 className={cn(
-                                  "w-full px-4 py-3 rounded-xl border-2 transition-all duration-200 outline-none",
+                                  "peer w-full px-4 pt-6 pb-2 rounded-xl border-2 transition-all duration-200 outline-none",
                                   partnerEmailTouched && partnerEmail && !isValidEmail(partnerEmail)
-                                    ? "border-red-500 focus:border-red-500"
+                                    ? "border-red-500 focus:border-red-500 bg-red-50"
                                     : isDarkMode 
-                                      ? "bg-slate-800 border-slate-700 text-white placeholder:text-slate-500 focus:border-blue-500" 
-                                      : "bg-white border-slate-200 text-slate-900 placeholder:text-slate-400 focus:border-blue-500"
+                                      ? "bg-slate-800 border-slate-700 text-white focus:border-blue-500" 
+                                      : "bg-white border-slate-200 text-slate-900 focus:border-blue-500 focus:shadow-lg focus:shadow-blue-100/50"
                                 )}
                               />
+                              <label className={cn(
+                                "absolute left-4 top-4 text-sm font-medium transition-all duration-200 pointer-events-none",
+                                "peer-focus:top-2 peer-focus:text-xs",
+                                "peer-[:not(:placeholder-shown)]:top-2 peer-[:not(:placeholder-shown)]:text-xs",
+                                partnerEmailTouched && partnerEmail && !isValidEmail(partnerEmail) ? "text-red-500" : "peer-focus:text-blue-600",
+                                mutedTextClasses
+                              )}>
+                                E-mail адрес
+                              </label>
                               {partnerEmailTouched && partnerEmail && !isValidEmail(partnerEmail) && (
-                                <p className="text-red-500 text-xs mt-1">Моля въведете валиден имейл адрес</p>
+                                <motion.div
+                                  initial={{ opacity: 0, y: -10 }}
+                                  animate={{ opacity: 1, y: 0 }}
+                                  className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center gap-1"
+                                >
+                                  <XCircle className="w-4 h-4 text-red-500" />
+                                </motion.div>
+                              )}
+                              {partnerEmailTouched && partnerEmail && !isValidEmail(partnerEmail) && (
+                                <motion.p 
+                                  initial={{ opacity: 0, y: -5 }}
+                                  animate={{ opacity: 1, y: 0 }}
+                                  className="text-red-500 text-xs mt-1 flex items-center gap-1"
+                                >
+                                  <XCircle className="w-3 h-3" />
+                                  Моля въведете валиден имейл адрес
+                                </motion.p>
                               )}
                             </div>
                           </div>
                         </div>
 
-                        {/* Children count */}
-                        <div>
+                        {/* Children count - Second instance for family */}
+                        <div className="relative">
                           <label className={cn("text-sm font-medium mb-2 block", mutedTextClasses)}>Брой деца</label>
                           <Select
                             value={childrenCount.toString()}
@@ -1251,36 +1302,34 @@ export default function FinancialPlanner() {
                             }}
                           >
                             <SelectTrigger className={cn(
-                              "w-full px-4 py-3 rounded-xl border-2",
+                              "w-full px-4 py-3 rounded-xl border-2 transition-all focus:shadow-lg",
                               isDarkMode 
                                 ? "bg-slate-800 border-slate-700 text-white" 
-                                : "bg-white border-slate-200 text-slate-900"
+                                : "bg-white border-slate-200 text-slate-900 focus:border-blue-500 focus:shadow-blue-100/50"
                             )}>
                               <SelectValue placeholder="Изберете" />
                             </SelectTrigger>
                             <SelectContent>
-                              <SelectItem value="0">Няма</SelectItem>
-                              <SelectItem value="1">1</SelectItem>
-                              <SelectItem value="2">2</SelectItem>
-                              <SelectItem value="3">3</SelectItem>
-                              <SelectItem value="4">4</SelectItem>
-                              <SelectItem value="5">5</SelectItem>
+                              <SelectItem value="0">Няма деца</SelectItem>
+                              <SelectItem value="1">1 дете</SelectItem>
+                              <SelectItem value="2">2 деца</SelectItem>
+                              <SelectItem value="3">3 деца</SelectItem>
+                              <SelectItem value="4">4 деца</SelectItem>
+                              <SelectItem value="5">5 деца</SelectItem>
                             </SelectContent>
                           </Select>
                         </div>
 
-                        {/* Children names */}
+                        {/* Children names - Enhanced with floating labels */}
                         {childrenCount > 0 && (
                           <motion.div
                             initial={{ opacity: 0, height: 0 }}
                             animate={{ opacity: 1, height: 'auto' }}
+                            transition={{ duration: 0.4 }}
                             className="space-y-3"
                           >
                             {Array.from({ length: childrenCount }).map((_, idx) => (
-                              <div key={idx}>
-                                <label className={cn("text-sm font-medium mb-2 block", mutedTextClasses)}>
-                                  Име на дете {idx + 1}
-                                </label>
+                              <div key={idx} className="relative">
                                 <input
                                   type="text"
                                   value={childrenNames[idx] || ''}
@@ -1289,14 +1338,22 @@ export default function FinancialPlanner() {
                                     newNames[idx] = e.target.value;
                                     setChildrenNames(newNames);
                                   }}
-                                  placeholder={`Име на дете ${idx + 1}`}
+                                  placeholder=" "
                                   className={cn(
-                                    "w-full px-4 py-3 rounded-xl border-2 transition-all duration-200 outline-none",
+                                    "peer w-full px-4 pt-6 pb-2 rounded-xl border-2 transition-all duration-200 outline-none",
                                     isDarkMode 
-                                      ? "bg-slate-800 border-slate-700 text-white placeholder:text-slate-500 focus:border-blue-500" 
-                                      : "bg-white border-slate-200 text-slate-900 placeholder:text-slate-400 focus:border-blue-500"
+                                      ? "bg-slate-800 border-slate-700 text-white focus:border-blue-500" 
+                                      : "bg-white border-slate-200 text-slate-900 focus:border-blue-500 focus:shadow-lg focus:shadow-blue-100/50"
                                   )}
                                 />
+                                <label className={cn(
+                                  "absolute left-4 top-4 text-sm font-medium transition-all duration-200 pointer-events-none",
+                                  "peer-focus:top-2 peer-focus:text-xs peer-focus:text-blue-600",
+                                  "peer-[:not(:placeholder-shown)]:top-2 peer-[:not(:placeholder-shown)]:text-xs",
+                                  mutedTextClasses
+                                )}>
+                                  Име на дете {idx + 1}
+                                </label>
                               </div>
                             ))}
                           </motion.div>

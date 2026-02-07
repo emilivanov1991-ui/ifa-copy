@@ -31,13 +31,11 @@ import {
   Settings,
   Sparkles,
   Zap,
-  Bell,
-  Briefcase
+  Bell
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
 import { cn } from "@/lib/utils";
-import DarkModeToggle from '@/components/portal/DarkModeToggle';
 
 import ConsultantDashboard from '@/components/consultant/ConsultantDashboard';
 import ConsultantCRMAdvanced from '@/components/consultant/ConsultantCRMAdvanced';
@@ -94,24 +92,22 @@ export default function ConsultantPortal() {
   };
 
   return (
-    <div className="min-h-screen bg-[#F5F7FA] dark:bg-gradient-to-br dark:from-[#0D1442] dark:via-[#1A237E] dark:to-[#1A237E] flex pt-0">
-      {/* Premium Sidebar */}
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-slate-100 to-blue-50 flex pt-0">
+      {/* Sidebar */}
       <motion.aside 
         initial={false}
-        animate={{ width: sidebarCollapsed ? 80 : 300 }}
+        animate={{ width: sidebarCollapsed ? 80 : 280 }}
         transition={{ duration: 0.3, ease: 'easeInOut' }}
-        className="glass dark:glass-dark border-r border-white/20 dark:border-white/10 fixed left-0 top-0 bottom-0 z-40 flex flex-col shadow-2xl premium-scrollbar overflow-y-auto"
+        className="bg-white/80 backdrop-blur-xl border-r border-slate-200/50 fixed left-0 top-0 bottom-0 z-40 flex flex-col shadow-xl shadow-slate-200/20"
       >
-        {/* Premium Logo */}
-        <div className="p-6 border-b border-white/20 dark:border-white/10">
-          <div className="flex items-center gap-4">
+        {/* Logo */}
+        <div className="p-4 border-b border-slate-200/50">
+          <div className="flex items-center gap-3">
             <motion.div 
-              whileHover={{ scale: 1.1, rotate: 360 }}
-              transition={{ duration: 0.6 }}
-              className="w-12 h-12 rounded-2xl premium-gradient-navy dark:premium-gradient-teal flex items-center justify-center shadow-xl shadow-[#1A237E]/40 dark:shadow-[#00BFA5]/40 relative overflow-hidden"
+              whileHover={{ scale: 1.05, rotate: 5 }}
+              className="w-11 h-11 rounded-2xl bg-gradient-to-br from-blue-600 to-indigo-600 flex items-center justify-center shadow-lg shadow-blue-600/30"
             >
-              <div className="absolute inset-0 bg-gradient-to-tr from-[#00BFA5]/20 to-transparent" />
-              <Briefcase className="h-6 w-6 text-white relative z-10" />
+              <TrendingUp className="h-5 w-5 text-white" />
             </motion.div>
             <AnimatePresence>
               {!sidebarCollapsed && (
@@ -120,8 +116,8 @@ export default function ConsultantPortal() {
                   animate={{ opacity: 1, x: 0 }}
                   exit={{ opacity: 0, x: -10 }}
                 >
-                  <h1 className="font-black text-xl bg-gradient-to-r from-[#1A237E] to-[#00BFA5] dark:from-white dark:to-[#00BFA5] bg-clip-text text-transparent">APEX</h1>
-                  <p className="text-xs text-slate-600 dark:text-slate-400 font-bold uppercase tracking-wider">Pro Console</p>
+                  <h1 className="font-bold text-lg bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">APEX</h1>
+                  <p className="text-xs text-slate-500 font-medium">Консултант Портал</p>
                 </motion.div>
               )}
             </AnimatePresence>
@@ -146,27 +142,27 @@ export default function ConsultantPortal() {
                 <motion.button
                   key={item.id}
                   onClick={() => setActiveTab(item.id)}
-                  whileHover={{ x: 6, scale: 1.02 }}
+                  whileHover={{ x: 4 }}
                   whileTap={{ scale: 0.98 }}
                   className={cn(
-                    "w-full flex items-center gap-4 px-4 py-3.5 rounded-2xl font-bold text-sm transition-all relative overflow-hidden group",
+                    "w-full flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium text-sm transition-all relative overflow-hidden group",
                     isActive
-                      ? 'text-white shadow-2xl'
-                      : 'text-slate-700 dark:text-slate-300 hover:bg-white/50 dark:hover:bg-white/10'
+                      ? 'text-white shadow-lg'
+                      : 'text-slate-600 hover:bg-slate-100/80'
                   )}
                 >
                   {isActive && (
                     <motion.div
                       layoutId="activeTab"
-                      className={cn("absolute inset-0 rounded-2xl", isActive && "premium-gradient-navy dark:premium-gradient-teal")}
+                      className={cn("absolute inset-0 bg-gradient-to-r rounded-xl", item.color)}
                       transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
                     />
                   )}
                   <span className={cn(
-                    "relative z-10 w-10 h-10 rounded-xl flex items-center justify-center transition-all shadow-lg",
-                    isActive ? 'bg-white/20 shadow-white/20' : 'bg-gradient-to-br from-slate-100 to-slate-200 dark:from-white/10 dark:to-white/5 group-hover:from-[#00BFA5]/20 group-hover:to-[#1DE9B6]/20 dark:group-hover:from-[#00BFA5]/30 dark:group-hover:to-[#1DE9B6]/30'
+                    "relative z-10 w-8 h-8 rounded-lg flex items-center justify-center transition-all",
+                    isActive ? 'bg-white/20' : 'bg-slate-100 group-hover:bg-slate-200'
                   )}>
-                    <Icon className={cn("h-5 w-5", isActive ? "text-white" : "text-[#1A237E] dark:text-[#00BFA5]")} />
+                    <Icon className="h-4 w-4" />
                   </span>
                   <AnimatePresence>
                     {!sidebarCollapsed && (
@@ -197,19 +193,14 @@ export default function ConsultantPortal() {
           </div>
         </nav>
 
-        {/* Premium User Section */}
-        <div className="p-6 border-t border-white/20 dark:border-white/10 bg-gradient-to-br from-[#1A237E]/5 to-[#00BFA5]/5 dark:from-[#00BFA5]/5 dark:to-[#1A237E]/10">
-          <div className="flex items-center gap-4 mb-4">
+        {/* User */}
+        <div className="p-4 border-t border-slate-200/50 bg-gradient-to-r from-slate-50 to-blue-50/50">
+          <div className="flex items-center gap-3 mb-3">
             <motion.div 
-              whileHover={{ scale: 1.1, rotate: 10 }}
-              className="w-12 h-12 rounded-2xl premium-gradient-gold flex items-center justify-center shadow-xl shadow-[#FFD700]/40 relative overflow-hidden"
+              whileHover={{ scale: 1.1 }}
+              className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500 to-indigo-500 flex items-center justify-center shadow-lg shadow-blue-500/25"
             >
-              <motion.div
-                className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/30 to-white/0"
-                animate={{ x: [-100, 100] }}
-                transition={{ duration: 2, repeat: Infinity, ease: 'linear' }}
-              />
-              <span className="text-base font-black text-[#1A237E] relative z-10">ИП</span>
+              <span className="text-sm font-bold text-white">ИП</span>
             </motion.div>
             <AnimatePresence>
               {!sidebarCollapsed && (
@@ -219,15 +210,15 @@ export default function ConsultantPortal() {
                   exit={{ opacity: 0, x: -10 }}
                   className="flex-1 min-w-0"
                 >
-                  <p className="text-sm font-black text-slate-900 dark:text-white truncate">Иван Петров</p>
-                  <p className="text-xs text-[#00BFA5] dark:text-[#1DE9B6] font-bold">Старши консултант</p>
+                  <p className="text-sm font-semibold text-slate-900 truncate">Иван Петров</p>
+                  <p className="text-xs text-slate-500">Старши консултант</p>
                 </motion.div>
               )}
             </AnimatePresence>
           </div>
           {!sidebarCollapsed && (
             <Link to={createPageUrl('Home')}>
-              <Button className="w-full premium-gradient-navy dark:bg-red-600 dark:hover:bg-red-700 text-white hover:opacity-90 rounded-xl transition-all shadow-lg font-bold">
+              <Button variant="outline" className="w-full text-slate-600 hover:text-red-600 hover:border-red-300 hover:bg-red-50 rounded-xl transition-all">
                 <LogOut className="h-4 w-4 mr-2" />
                 Изход
               </Button>
@@ -236,52 +227,47 @@ export default function ConsultantPortal() {
         </div>
       </motion.aside>
 
-      {/* Premium Main Content */}
+      {/* Main Content */}
       <motion.div 
         className="flex-1"
-        animate={{ marginLeft: sidebarCollapsed ? 80 : 300 }}
+        animate={{ marginLeft: sidebarCollapsed ? 80 : 280 }}
         transition={{ duration: 0.3, ease: 'easeInOut' }}
       >
-        {/* Premium Top Header */}
-        <header className="glass dark:glass-dark border-b border-white/20 dark:border-white/10 sticky top-0 z-30 px-8 h-20 flex items-center justify-between shadow-2xl">
+        {/* Top Header */}
+        <header className="bg-white/70 backdrop-blur-xl border-b border-slate-200/50 sticky top-0 z-30 px-6 h-16 flex items-center justify-between shadow-sm">
           <div>
             <motion.h2 
               key={activeTab}
               initial={{ opacity: 0, y: -10 }}
               animate={{ opacity: 1, y: 0 }}
-              className="font-black text-2xl bg-gradient-to-r from-[#1A237E] to-[#00BFA5] dark:from-white dark:to-[#00BFA5] bg-clip-text text-transparent"
+              className="font-semibold text-slate-900 text-lg"
             >
               {menuItems.find(m => m.id === activeTab)?.label || 'Табло'}
             </motion.h2>
-            <p className="text-sm text-slate-600 dark:text-slate-400 font-semibold flex items-center gap-2">
-              <span>{getGreeting()}, Иван!</span>
-              <span className="text-[#00BFA5]">•</span>
-              <span>{currentTime.toLocaleDateString('bg-BG', { weekday: 'long', day: 'numeric', month: 'long' })}</span>
-            </p>
+            <p className="text-xs text-slate-500">{getGreeting()}, Иван! • {currentTime.toLocaleDateString('bg-BG', { weekday: 'long', day: 'numeric', month: 'long' })}</p>
           </div>
-          <div className="flex items-center gap-3">
-            <DarkModeToggle />
+          <div className="flex items-center gap-2">
             <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-              <Button variant="ghost" size="icon" className="relative rounded-xl hover:bg-white/50 dark:hover:bg-white/10 transition-all" onClick={() => setActiveTab('notifications')}>
-                <Bell className="h-5 w-5 text-[#1A237E] dark:text-[#00BFA5]" />
-                <span className="absolute -top-1 -right-1 w-6 h-6 premium-gradient-gold rounded-full text-[10px] text-[#1A237E] flex items-center justify-center font-black shadow-xl shadow-[#FFD700]/40">5</span>
+              <Button variant="ghost" size="icon" className="relative rounded-xl hover:bg-slate-100" onClick={() => setActiveTab('notifications')}>
+                <Bell className="h-5 w-5 text-slate-600" />
+                <span className="absolute -top-0.5 -right-0.5 w-5 h-5 bg-gradient-to-r from-red-500 to-rose-500 rounded-full text-[10px] text-white flex items-center justify-center font-bold shadow-lg shadow-red-500/30">5</span>
               </Button>
             </motion.div>
             <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-              <Button variant="ghost" size="icon" className="relative rounded-xl hover:bg-white/50 dark:hover:bg-white/10 transition-all" onClick={() => setActiveTab('mail')}>
-                <Mail className="h-5 w-5 text-[#1A237E] dark:text-[#00BFA5]" />
-                <span className="absolute -top-1 -right-1 w-6 h-6 premium-gradient-teal rounded-full text-[10px] text-white flex items-center justify-center font-black shadow-xl shadow-[#00BFA5]/40">3</span>
+              <Button variant="ghost" size="icon" className="relative rounded-xl hover:bg-slate-100" onClick={() => setActiveTab('mail')}>
+                <Mail className="h-5 w-5 text-slate-600" />
+                <span className="absolute -top-0.5 -right-0.5 w-5 h-5 bg-gradient-to-r from-blue-500 to-indigo-500 rounded-full text-[10px] text-white flex items-center justify-center font-bold shadow-lg shadow-blue-500/30">3</span>
               </Button>
             </motion.div>
             <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-              <Button variant="ghost" size="icon" className="rounded-xl hover:bg-white/50 dark:hover:bg-white/10 transition-all" onClick={() => setActiveTab('calendar')}>
-                <Calendar className="h-5 w-5 text-[#1A237E] dark:text-[#00BFA5]" />
+              <Button variant="ghost" size="icon" className="rounded-xl hover:bg-slate-100" onClick={() => setActiveTab('calendar')}>
+                <Calendar className="h-5 w-5 text-slate-600" />
               </Button>
             </motion.div>
-            <div className="w-px h-10 bg-white/20 dark:bg-white/10 mx-2" />
+            <div className="w-px h-8 bg-slate-200 mx-2" />
             <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-              <Button variant="ghost" size="icon" className="rounded-xl hover:bg-white/50 dark:hover:bg-white/10 transition-all">
-                <Settings className="h-5 w-5 text-[#1A237E] dark:text-[#00BFA5]" />
+              <Button variant="ghost" size="icon" className="rounded-xl hover:bg-slate-100">
+                <Settings className="h-5 w-5 text-slate-600" />
               </Button>
             </motion.div>
           </div>

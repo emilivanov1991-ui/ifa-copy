@@ -186,7 +186,7 @@ export default function PensionStep({ data, onChange, showErrors, plannerData })
           <div>
             <div className="flex items-center gap-2 mb-4">
               <User className="h-4 w-4 text-slate-500" />
-              <span className="font-medium text-slate-700">Клиент</span>
+              <span className="font-medium text-slate-700">{clientName}</span>
             </div>
             <div className="space-y-4">
               {/* Work Category */}
@@ -278,7 +278,7 @@ export default function PensionStep({ data, onChange, showErrors, plannerData })
             <div>
               <div className="flex items-center gap-2 mb-4">
                 <Users className="h-4 w-4 text-slate-500" />
-                <span className="font-medium text-slate-700">Партньор</span>
+                <span className="font-medium text-slate-700">{partnerName}</span>
               </div>
               <div className="space-y-4">
                 {/* Work Category */}
@@ -389,7 +389,7 @@ export default function PensionStep({ data, onChange, showErrors, plannerData })
           <div>
             <div className="flex items-center gap-2 mb-4">
               <User className="h-4 w-4 text-slate-500" />
-              <span className="font-medium text-slate-700">Клиент</span>
+              <span className="font-medium text-slate-700">{clientName}</span>
             </div>
             <div className="space-y-4">
               {/* I. Pillar */}
@@ -534,7 +534,7 @@ export default function PensionStep({ data, onChange, showErrors, plannerData })
             <div>
               <div className="flex items-center gap-2 mb-4">
                 <Users className="h-4 w-4 text-slate-500" />
-                <span className="font-medium text-slate-700">Партньор</span>
+                <span className="font-medium text-slate-700">{partnerName}</span>
               </div>
               <div className="space-y-4">
                 {/* I. Pillar */}

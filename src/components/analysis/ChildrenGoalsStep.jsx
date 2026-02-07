@@ -3,20 +3,51 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
+import { 
+  Select, 
+  SelectContent, 
+  SelectItem, 
+  SelectTrigger, 
+  SelectValue 
+} from "@/components/ui/select";
 import { Baby, Car, Palmtree, SkipForward, Power } from 'lucide-react';
 import { cn } from "@/lib/utils";
 
-export default function ChildrenGoalsStep({ data, onChange, showErrors }) {
+export default function ChildrenGoalsStep({ data, onChange, showErrors, plannerData }) {
   // Helper to check if a field is invalid
   const isInvalid = (value) => showErrors && (value === undefined || value === '' || value === null);
+  
+  // Get children data from Financial Planner
+  const plannerChildrenCount = plannerData?.children_count || 0;
+  const plannerChildrenNames = plannerData?.children_names || [];
+  const plannerChildrenAges = plannerData?.children_ages || [];
+  
   // Initialize other goals as skipped by default
   useEffect(() => {
     if (data.skip_other_goals_section === undefined) {
       onChange('skip_other_goals_section', true);
     }
   }, []);
-  // Calculate average children age
+  
+  // Auto-skip children section if no children in Financial Planner
+  useEffect(() => {
+    if (plannerChildrenCount === 0 && data.skip_children_section === undefined) {
+      onChange('skip_children_section', true);
+    }
+  }, [plannerChildrenCount]);
+  
+  // Calculate average children age - use Financial Planner data if available
   const calculateAverageChildAge = () => {
+    // If we have ages from Financial Planner, use them
+    if (plannerChildrenAges && plannerChildrenAges.length > 0) {
+      const validAges = plannerChildrenAges.filter(age => age !== undefined && age !== '');
+      if (validAges.length > 0) {
+        const sum = validAges.reduce((a, b) => a + b, 0);
+        return sum / validAges.length;
+      }
+    }
+    
+    // Otherwise, calculate from birthdates in the analysis form
     const childrenCount = data.children_count || 0;
     if (childrenCount === 0) return 0;
     
@@ -54,7 +85,19 @@ export default function ChildrenGoalsStep({ data, onChange, showErrors }) {
 
   const currentSavings = data.children_current_savings || 0;
   const missingAmount = Math.max(0, totalChildrenCosts - currentSavings);
-  const averageChildAge = calculateAverageChildAge();
+  
+  // Use Financial Planner ages if available, otherwise calculate from form
+  const averageChildAge = (() => {
+    if (plannerChildrenAges && plannerChildrenAges.length > 0) {
+      const validAges = plannerChildrenAges.filter(age => age !== undefined && age !== '');
+      if (validAges.length > 0) {
+        const sum = validAges.reduce((a, b) => a + b, 0);
+        return sum / validAges.length;
+      }
+    }
+    return calculateAverageChildAge();
+  })();
+  
   const investmentHorizon = Math.max(1, 20 - Math.round(averageChildAge));
   const monthlyInvestment = calculateMonthlyInvestment(missingAmount, investmentHorizon, 0.08);
 
@@ -222,7 +265,12 @@ export default function ChildrenGoalsStep({ data, onChange, showErrors }) {
         <div className="bg-slate-50 rounded-xl p-6 text-center">
           <Baby className="h-12 w-12 text-slate-300 mx-auto mb-4" />
           <h3 className="font-semibold text-slate-900 mb-2">Тази секция е пропусната</h3>
-          <p className="text-slate-600 mb-4">Избрали сте да не попълвате секцията за финансово осигуряване на децата.</p>
+          <p className="text-slate-600 mb-4">
+            {plannerChildrenCount === 0 
+              ? 'Отбелязали сте, че нямате деца и затова темата не е активна'
+              : 'Избрали сте да не попълвате секцията за финансово осигуряване на децата.'
+            }
+          </p>
           <Button 
             variant="outline" 
             onClick={() => onChange('skip_children_section', false)}
@@ -230,6 +278,75 @@ export default function ChildrenGoalsStep({ data, onChange, showErrors }) {
           >
             Върни се към секцията
           </Button>
+        </div>
+
+        {/* Referrals - always visible */}
+        <div className="bg-slate-50 rounded-xl p-6">
+          <h3 className="font-semibold text-slate-900 mb-4">Кой от Вашите приятели и познати:</h3>
+          
+          <div className="grid md:grid-cols-2 gap-6">
+            {/* Has children */}
+            <div className="space-y-3">
+              <Label className="text-slate-700">Има деца?</Label>
+              {(data.children_referrals_has_kids || ['']).map((name, index) => {
+                const isDuplicate = isDuplicateName(name);
+                
+                return (
+                  <div key={`has_kids_${index}`}>
+                    <Input
+                      placeholder="Име на познат"
+                      value={name}
+                      onChange={(e) => {
+                        const newList = [...(data.children_referrals_has_kids || [''])];
+                        newList[index] = e.target.value;
+                        if (index === newList.length - 1 && e.target.value) {
+                          newList.push('');
+                        }
+                        onChange('children_referrals_has_kids', newList);
+                      }}
+                      className={cn("rounded-lg", isDuplicate && "border-amber-500")}
+                    />
+                    {isDuplicate && (
+                      <p className="text-amber-600 text-sm mt-1">
+                        Това име бе предоставено на предходните теми. С кого бихме могли да го заменим?
+                      </p>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+
+            {/* Recent wedding */}
+            <div className="space-y-3">
+              <Label className="text-slate-700">Е имал сватба през последните три години?</Label>
+              {(data.children_referrals_recent_wedding || ['']).map((name, index) => {
+                const isDuplicate = isDuplicateName(name);
+                
+                return (
+                  <div key={`wedding_${index}`}>
+                    <Input
+                      placeholder="Име на познат"
+                      value={name}
+                      onChange={(e) => {
+                        const newList = [...(data.children_referrals_recent_wedding || [''])];
+                        newList[index] = e.target.value;
+                        if (index === newList.length - 1 && e.target.value) {
+                          newList.push('');
+                        }
+                        onChange('children_referrals_recent_wedding', newList);
+                      }}
+                      className={cn("rounded-lg", isDuplicate && "border-amber-500")}
+                    />
+                    {isDuplicate && (
+                      <p className="text-amber-600 text-sm mt-1">
+                        Това име бе предоставено на предходните теми. С кого бихме могли да го заменим?
+                      </p>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          </div>
         </div>
 
         {renderOtherGoalsSection()}
@@ -256,6 +373,73 @@ export default function ChildrenGoalsStep({ data, onChange, showErrors }) {
             Пропусни темата
           </Button>
         </div>
+
+        {/* If no children in Financial Planner and returning to section, ask for children info */}
+        {plannerChildrenCount === 0 && (
+          <div className="space-y-6 mb-6 p-6 bg-white rounded-xl border border-blue-200">
+            <div>
+              <Label>Брой деца <span className="text-red-500">*</span></Label>
+              <Input
+                type="number"
+                min="0"
+                max="10"
+                placeholder="0"
+                value={data.children_count ?? ''}
+                onChange={(e) => {
+                  const count = parseInt(e.target.value) || 0;
+                  onChange('children_count', count);
+                }}
+                className="rounded-lg mt-2"
+              />
+            </div>
+
+            {(data.children_count > 0) && (
+              <>
+                {Array.from({ length: data.children_count }).map((_, idx) => (
+                  <div key={idx} className="space-y-3">
+                    <div>
+                      <Label>Име на дете {idx + 1} <span className="text-red-500">*</span></Label>
+                      <Input
+                        type="text"
+                        placeholder={`Име на дете ${idx + 1}`}
+                        value={data[`child_${idx + 1}_name`] || ''}
+                        onChange={(e) => onChange(`child_${idx + 1}_name`, e.target.value)}
+                        className="rounded-lg mt-2"
+                      />
+                    </div>
+                    <div>
+                      <Label>Възраст на дете {idx + 1} <span className="text-red-500">*</span></Label>
+                      <Input
+                        type="number"
+                        min="0"
+                        max="18"
+                        placeholder="0"
+                        value={data[`child_${idx + 1}_age`] ?? ''}
+                        onChange={(e) => onChange(`child_${idx + 1}_age`, parseInt(e.target.value) || '')}
+                        className="rounded-lg mt-2"
+                      />
+                    </div>
+                  </div>
+                ))}
+              </>
+            )}
+          </div>
+        )}
+
+        {/* Show children info from Financial Planner if available */}
+        {plannerChildrenCount > 0 && (
+          <div className="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+            <p className="text-sm text-blue-800 font-medium mb-2">Деца от Financial Planner:</p>
+            <div className="space-y-1">
+              {plannerChildrenNames.map((name, idx) => (
+                <p key={idx} className="text-sm text-blue-700">
+                  {name} ({plannerChildrenAges[idx]} години)
+                </p>
+              ))}
+            </div>
+          </div>
+        )}
+
         <p className="text-sm text-slate-600 mb-6">
           Нуждите на децата растат заедно с тяхната възраст. Разходи, за които трябва да се подготвите:
         </p>
@@ -354,7 +538,7 @@ export default function ChildrenGoalsStep({ data, onChange, showErrors }) {
         </div>
       </div>
 
-      {/* Children Referrals */}
+      {/* Referrals - always visible */}
       <div className="bg-slate-50 rounded-xl p-6">
         <h3 className="font-semibold text-slate-900 mb-4">Кой от Вашите приятели и познати:</h3>
         

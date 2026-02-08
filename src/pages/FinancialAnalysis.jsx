@@ -62,6 +62,7 @@ export default function FinancialAnalysis() {
   const [showSavingsDiscrepancyModal, setShowSavingsDiscrepancyModal] = useState(false);
   const [showReferralsStep, setShowReferralsStep] = useState(false);
   const [plannerData, setPlannerData] = useState(null);
+  const [analysisRecordId, setAnalysisRecordId] = useState(null);
   const [formData, setFormData] = useState({
     gdpr_consent_a: false,
     gdpr_consent_b: false,
@@ -69,8 +70,38 @@ export default function FinancialAnalysis() {
     status: 'new'
   });
 
-  // Зареждане на данни от Financial Planner
+  // Зареждане на данни от Financial Planner или resume на анализ
   useEffect(() => {
+    const resumeId = localStorage.getItem('resumeAnalysisId');
+    
+    if (resumeId) {
+      // Resume existing analysis
+      base44.entities.FinancialAnalysisSubmission.filter({ id: resumeId }).then(results => {
+        if (results.length > 0) {
+          const analysis = results[0];
+          setAnalysisRecordId(analysis.id);
+          setFormData(analysis);
+          setCurrentStep(analysis.current_step || 1);
+          
+          // Load client data for planner integration
+          if (analysis.client_id) {
+            base44.entities.Client.filter({ id: analysis.client_id }).then(clients => {
+              if (clients.length > 0) {
+                setPlannerData({
+                  client_id: clients[0].id,
+                  family_type: clients[0].family_type,
+                  gdpr_consent_a: analysis.gdpr_consent_a,
+                  gdpr_consent_c: analysis.gdpr_consent_c
+                });
+              }
+            });
+          }
+        }
+        localStorage.removeItem('resumeAnalysisId');
+      });
+      return;
+    }
+    
     const storedData = localStorage.getItem('financialPlannerData');
     if (storedData) {
       const parsed = JSON.parse(storedData);
@@ -181,11 +212,26 @@ export default function FinancialAnalysis() {
     return hasAnyReason;
   };
 
-  const handleChange = (field, value) => {
+  const handleChange = async (field, value) => {
     setFormData(prev => ({ ...prev, [field]: value }));
     // Clear validation errors when user starts filling
     if (showValidationErrors) {
       setShowValidationErrors(false);
+    }
+    
+    // Auto-save after a delay (debounced)
+    if (analysisRecordId) {
+      clearTimeout(window.autoSaveTimeout);
+      window.autoSaveTimeout = setTimeout(async () => {
+        try {
+          await base44.entities.FinancialAnalysisSubmission.update(analysisRecordId, {
+            [field]: value,
+            last_updated_step: new Date().toISOString()
+          });
+        } catch (error) {
+          console.error('Auto-save error:', error);
+        }
+      }, 2000);
     }
   };
 
@@ -711,7 +757,7 @@ export default function FinancialAnalysis() {
   const uniqueNames = collectUniqueNames();
   const needsMoreReferrals = uniqueNames.length < 18;
 
-  const nextStep = () => {
+  const nextStep = async () => {
     if (validateStep(currentStep) && currentStep < 9) {
       // Check for savings discrepancy when leaving step 8 (Financial Flow)
       if (currentStep === 8 && checkSavingsDiscrepancy() && !isSavingsDiscrepancyReasonValid()) {
@@ -724,6 +770,10 @@ export default function FinancialAnalysis() {
       if (currentStep === 1) {
         nextStepNum = 3; // Always skip Personal Data
       }
+      
+      // Save progress to database
+      await saveProgress(nextStepNum);
+      
       setCurrentStep(nextStepNum);
       window.scrollTo({ top: 0, behavior: 'smooth' });
     } else if (!validateStep(currentStep)) {
@@ -731,7 +781,7 @@ export default function FinancialAnalysis() {
     }
   };
 
-  const prevStep = () => {
+  const prevStep = async () => {
     if (currentStep > 1) {
       setShowValidationErrors(false);
       // Skip step 2 (archived Personal Data step) and step 1 if consents given from planner
@@ -745,8 +795,39 @@ export default function FinancialAnalysis() {
           prevStepNum = 1; // Go to consent step
         }
       }
+      
+      // Save progress
+      await saveProgress(prevStepNum);
+      
       setCurrentStep(prevStepNum);
       window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  };
+
+  // Save progress to database
+  const saveProgress = async (step) => {
+    try {
+      const cleanData = { ...formData };
+      Object.keys(cleanData).forEach(key => {
+        if (cleanData[key] === '' || cleanData[key] === null) {
+          delete cleanData[key];
+        }
+      });
+
+      cleanData.current_step = step;
+      cleanData.last_updated_step = new Date().toISOString();
+
+      if (analysisRecordId) {
+        // Update existing analysis
+        await base44.entities.FinancialAnalysisSubmission.update(analysisRecordId, cleanData);
+      } else if (plannerData?.client_id) {
+        // Create new analysis with client_id
+        cleanData.client_id = plannerData.client_id;
+        const newAnalysis = await base44.entities.FinancialAnalysisSubmission.create(cleanData);
+        setAnalysisRecordId(newAnalysis.id);
+      }
+    } catch (error) {
+      console.error('Error saving progress:', error);
     }
   };
 

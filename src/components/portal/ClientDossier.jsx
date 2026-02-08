@@ -15,9 +15,11 @@ import {
   CheckCircle2,
   Clock,
   XCircle,
-  Package
+  Package,
+  ArrowRight
 } from 'lucide-react';
 import { Button } from "@/components/ui/button";
+import { createPageUrl } from '@/utils';
 
 const statusConfig = {
   draft: { label: 'Чернова', color: 'bg-slate-100 text-slate-700', icon: Clock },
@@ -29,6 +31,14 @@ const statusConfig = {
 };
 
 export default function ClientDossier({ clientId, analysisId = null, showAllClients = false }) {
+  // Fetch client data
+  const { data: client } = useQuery({
+    queryKey: ['client', clientId],
+    queryFn: () => base44.entities.Client.filter({ id: clientId }),
+    enabled: !!clientId,
+    select: (data) => data[0]
+  });
+
   // Fetch financial analyses
   const { data: analyses = [] } = useQuery({
     queryKey: ['financial-analyses', clientId, analysisId],
@@ -39,7 +49,7 @@ export default function ClientDossier({ clientId, analysisId = null, showAllClie
       }
       if (clientId) {
         return await base44.entities.FinancialAnalysisSubmission.filter({ 
-          client_email: clientId 
+          client_id: clientId 
         }, '-created_date');
       }
       return [];
@@ -171,7 +181,40 @@ export default function ClientDossier({ clientId, analysisId = null, showAllClie
               </CardTitle>
             </CardHeader>
             <CardContent>
-              {analyses.length === 0 ? (
+              {analyses.length === 0 && client?.stage === 'financial_planner' ? (
+                <div className="text-center py-12">
+                  <FileText className="h-12 w-12 mx-auto mb-3 text-slate-300" />
+                  <p className="text-slate-500 mb-4">Няма започнат финансов анализ</p>
+                  <Button 
+                    onClick={() => {
+                      // Запазваме client_id и отваряме анализа
+                      const plannerData = {
+                        client_id: client.id,
+                        family_type: client.family_type,
+                        client_first_name: client.first_name,
+                        client_last_name: client.last_name,
+                        client_phone: client.phone,
+                        client_email: client.email,
+                        partner_first_name: client.partner_first_name,
+                        partner_last_name: client.partner_last_name,
+                        partner_email: client.partner_email,
+                        children_count: client.children_count,
+                        children_names: client.children_names,
+                        children_ages: client.children_ages,
+                        gdpr_consent_a: client.gdpr_consent_a,
+                        gdpr_consent_b: client.gdpr_consent_b,
+                        gdpr_consent_c: client.gdpr_consent_c
+                      };
+                      localStorage.setItem('financialPlannerData', JSON.stringify(plannerData));
+                      window.location.href = createPageUrl('FinancialAnalysis');
+                    }}
+                    className="bg-blue-600 hover:bg-blue-700"
+                  >
+                    <ArrowRight className="h-4 w-4 mr-2" />
+                    Премини към финансов анализ
+                  </Button>
+                </div>
+              ) : analyses.length === 0 ? (
                 <div className="text-center py-12 text-slate-500">
                   <FileText className="h-12 w-12 mx-auto mb-3 text-slate-300" />
                   <p>Няма налични финансови анализи</p>
@@ -226,14 +269,29 @@ export default function ClientDossier({ clientId, analysisId = null, showAllClie
                             </div>
                           </div>
                           <div className="flex gap-2 ml-4">
-                            <Button variant="outline" size="sm">
-                              <Eye className="h-4 w-4 mr-2" />
-                              Преглед
+                            <Button 
+                              variant="outline" 
+                              size="sm"
+                              onClick={() => {
+                                // Load analysis and continue from where left off
+                                localStorage.setItem('resumeAnalysisId', analysis.id);
+                                window.location.href = createPageUrl('FinancialAnalysis');
+                              }}
+                            >
+                              <ArrowRight className="h-4 w-4 mr-2" />
+                              {analysis.current_step >= 9 ? 'Прегледай' : 'Довърши'} анализ
                             </Button>
-                            <Button size="sm" className="bg-purple-600 hover:bg-purple-700">
-                              <TrendingUp className="h-4 w-4 mr-2" />
-                              Създай план
-                            </Button>
+                            {hasPlan ? (
+                              <Button variant="outline" size="sm">
+                                <Eye className="h-4 w-4 mr-2" />
+                                Виж план
+                              </Button>
+                            ) : (
+                              <Button size="sm" className="bg-purple-600 hover:bg-purple-700">
+                                <TrendingUp className="h-4 w-4 mr-2" />
+                                Създай план
+                              </Button>
+                            )}
                           </div>
                         </div>
                       </motion.div>

@@ -4,9 +4,10 @@ import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, R
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Slider } from '@/components/ui/slider';
-import { ChevronLeft, ChevronRight, Download, X, CheckCircle, TrendingUp, Shield, Home, Wallet, Euro, AlertTriangle, Edit, Check } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Download, X, CheckCircle, TrendingUp, Shield, Home, Wallet, Euro, AlertTriangle, Edit, Check, Briefcase } from 'lucide-react';
 import { downloadFinancialPlanPDF } from './FinancialPlanPDFGenerator';
 import { toast } from 'sonner';
+import { createPageUrl } from '@/utils';
 
 
 
@@ -1878,6 +1879,14 @@ export default function FinancialPlanPresentation({ planData, clientData, analys
               </p>
             </div>
             <div className="flex items-center gap-3">
+              <Button 
+                variant="outline" 
+                onClick={() => window.location.href = createPageUrl('ConsultantPortal')}
+                className="bg-white/10 border-white/20 text-white hover:bg-white/20"
+              >
+                <Briefcase className="w-4 h-4 mr-2" />
+                Консултантски портал
+              </Button>
               <Button 
                 variant="outline" 
                 onClick={handleDownloadPDF}

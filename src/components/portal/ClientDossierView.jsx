@@ -140,7 +140,35 @@ export default function ClientDossierView({ clientId }) {
             <Card>
               <CardContent className="p-12 text-center">
                 <FileText className="w-12 h-12 text-slate-300 mx-auto mb-4" />
-                <p className="text-slate-600">Все още няма анализи</p>
+                <p className="text-slate-600 mb-4">Все още няма анализи</p>
+                <Button 
+                  onClick={() => {
+                    // Запазваме client_id и отваряме анализа
+                    const plannerData = {
+                      client_id: client.id,
+                      family_type: client.family_type,
+                      client_first_name: client.first_name,
+                      client_last_name: client.last_name,
+                      client_phone: client.phone,
+                      client_email: client.email,
+                      partner_first_name: client.partner_first_name,
+                      partner_last_name: client.partner_last_name,
+                      partner_email: client.partner_email,
+                      children_count: client.children_count,
+                      children_names: client.children_names,
+                      children_ages: client.children_ages,
+                      gdpr_consent_a: client.gdpr_consent_a,
+                      gdpr_consent_b: client.gdpr_consent_b,
+                      gdpr_consent_c: client.gdpr_consent_c
+                    };
+                    localStorage.setItem('financialPlannerData', JSON.stringify(plannerData));
+                    window.location.href = createPageUrl('FinancialAnalysis');
+                  }}
+                  className="bg-blue-600 hover:bg-blue-700"
+                >
+                  <ArrowRight className="h-4 w-4 mr-2" />
+                  Започни финансов анализ
+                </Button>
               </CardContent>
             </Card>
           ) : (
@@ -190,13 +218,25 @@ export default function ClientDossierView({ clientId }) {
                             variant="outline" 
                             size="sm"
                             onClick={() => {
+                              // Load analysis and continue from where left off
+                              localStorage.setItem('resumeAnalysisId', analysis.id);
+                              window.location.href = createPageUrl('FinancialAnalysis');
+                            }}
+                          >
+                            <ArrowRight className="h-4 w-4 mr-2" />
+                            {analysis.current_step >= 9 ? 'Прегледай' : 'Довърши'} анализ
+                          </Button>
+                          <Button 
+                            variant="outline" 
+                            size="sm"
+                            onClick={() => {
                               if (window.setViewAnalysisId) {
                                 window.setViewAnalysisId(analysis.id);
                               }
                             }}
                           >
                             <Eye className="w-4 h-4 mr-2" />
-                            Преглед
+                            Детайли
                           </Button>
                         </div>
                       </div>

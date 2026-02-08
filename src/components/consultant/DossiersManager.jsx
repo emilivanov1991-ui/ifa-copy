@@ -50,6 +50,16 @@ export default function DossiersManager() {
   const getClientStage = (client) => {
     const clientAnalyses = analyses.filter(a => a.client_id === client.id);
     
+    // Check if client is signed and paid first (highest priority)
+    if (client.has_active_products) {
+      return 'signed_paid';
+    }
+    
+    // Check if plan is presented (slides viewed)
+    if (client.plan_slides_viewed >= 7) {
+      return 'plan_presented';
+    }
+    
     if (clientAnalyses.length === 0) {
       return 'financial_planner';
     }
@@ -58,26 +68,35 @@ export default function DossiersManager() {
       new Date(b.created_date) - new Date(a.created_date)
     )[0];
     
+    // Check if analysis is completed (step 9)
+    if (latestAnalysis.current_step >= 9 || latestAnalysis.status === 'converted') {
+      return 'analysis_completed';
+    }
+    
     // Check if analysis is started (step 3 or higher) but not completed
     if (latestAnalysis.current_step >= 3 && latestAnalysis.current_step < 9) {
       return 'analysis_started';
     }
     
-    // Check if analysis is completed (step 9)
-    if (latestAnalysis.current_step >= 9 || latestAnalysis.status === 'converted') {
-      // Check if plan is presented (slides viewed)
-      if (client.plan_slides_viewed >= 7) {
-        return 'plan_presented';
-      }
-      return 'analysis_completed';
-    }
-    
-    // Check if client is signed and paid
-    if (client.status === 'active' && client.has_active_products) {
-      return 'signed_paid';
-    }
-    
     return 'financial_planner';
+  };
+
+  // Get stage label and color
+  const getStageInfo = (stage) => {
+    switch (stage) {
+      case 'financial_planner':
+        return { label: 'Financial Planner', color: 'bg-blue-100 text-blue-700 border-blue-200' };
+      case 'analysis_started':
+        return { label: 'Започнат анализ', color: 'bg-amber-100 text-amber-700 border-amber-200' };
+      case 'analysis_completed':
+        return { label: 'Завършен анализ', color: 'bg-green-100 text-green-700 border-green-200' };
+      case 'plan_presented':
+        return { label: 'Презентиран финансов план', color: 'bg-purple-100 text-purple-700 border-purple-200' };
+      case 'signed_paid':
+        return { label: 'Подписан и платен клиент', color: 'bg-indigo-100 text-indigo-700 border-indigo-200' };
+      default:
+        return { label: 'N/A', color: 'bg-slate-100 text-slate-700 border-slate-200' };
+    }
   };
 
   const filteredClients = clients.filter(client => {
@@ -183,30 +202,37 @@ export default function DossiersManager() {
                 <p className="text-xs text-blue-700 mt-1">{groupedClients.financial_planner.length} клиента</p>
               </CardContent>
             </Card>
-            {groupedClients.financial_planner.map((client) => (
-              <Card 
-                key={client.id}
-                className="hover:shadow-lg transition-shadow cursor-pointer border-blue-200"
-                onClick={() => setSelectedClient(client)}
-              >
-                <CardContent className="p-4">
-                  <div className="flex items-center gap-3 mb-2">
-                    <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-indigo-500 flex items-center justify-center text-white font-bold text-sm shadow">
-                      {client.first_name?.[0]}{client.last_name?.[0]}
+            {groupedClients.financial_planner.map((client) => {
+              const stage = getClientStage(client);
+              const stageInfo = getStageInfo(stage);
+              return (
+                <Card 
+                  key={client.id}
+                  className="hover:shadow-lg transition-shadow cursor-pointer border-blue-200"
+                  onClick={() => setSelectedClient(client)}
+                >
+                  <CardContent className="p-4">
+                    <div className="flex items-center gap-3 mb-2">
+                      <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-indigo-500 flex items-center justify-center text-white font-bold text-sm shadow">
+                        {client.first_name?.[0]}{client.last_name?.[0]}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <h4 className="text-sm font-semibold text-slate-900 truncate">
+                          {client.first_name} {client.last_name}
+                        </h4>
+                        <p className="text-xs text-slate-500 truncate">{client.email}</p>
+                      </div>
                     </div>
-                    <div className="flex-1 min-w-0">
-                      <h4 className="text-sm font-semibold text-slate-900 truncate">
-                        {client.first_name} {client.last_name}
-                      </h4>
-                      <p className="text-xs text-slate-500 truncate">{client.email}</p>
+                    <Badge className={`text-xs ${stageInfo.color} mb-2`}>
+                      {stageInfo.label}
+                    </Badge>
+                    <div className="text-xs text-slate-400">
+                      {new Date(client.created_date).toLocaleDateString('bg-BG')}
                     </div>
-                  </div>
-                  <div className="text-xs text-slate-400">
-                    {new Date(client.created_date).toLocaleDateString('bg-BG')}
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
+                  </CardContent>
+                </Card>
+              );
+            })}
           </div>
 
           {/* Analysis Started Column */}
@@ -217,30 +243,37 @@ export default function DossiersManager() {
                 <p className="text-xs text-amber-700 mt-1">{groupedClients.analysis_started.length} клиента</p>
               </CardContent>
             </Card>
-            {groupedClients.analysis_started.map((client) => (
-              <Card 
-                key={client.id}
-                className="hover:shadow-lg transition-shadow cursor-pointer border-amber-200"
-                onClick={() => setSelectedClient(client)}
-              >
-                <CardContent className="p-4">
-                  <div className="flex items-center gap-3 mb-2">
-                    <div className="w-10 h-10 rounded-full bg-gradient-to-br from-amber-500 to-orange-500 flex items-center justify-center text-white font-bold text-sm shadow">
-                      {client.first_name?.[0]}{client.last_name?.[0]}
+            {groupedClients.analysis_started.map((client) => {
+              const stage = getClientStage(client);
+              const stageInfo = getStageInfo(stage);
+              return (
+                <Card 
+                  key={client.id}
+                  className="hover:shadow-lg transition-shadow cursor-pointer border-amber-200"
+                  onClick={() => setSelectedClient(client)}
+                >
+                  <CardContent className="p-4">
+                    <div className="flex items-center gap-3 mb-2">
+                      <div className="w-10 h-10 rounded-full bg-gradient-to-br from-amber-500 to-orange-500 flex items-center justify-center text-white font-bold text-sm shadow">
+                        {client.first_name?.[0]}{client.last_name?.[0]}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <h4 className="text-sm font-semibold text-slate-900 truncate">
+                          {client.first_name} {client.last_name}
+                        </h4>
+                        <p className="text-xs text-slate-500 truncate">{client.email}</p>
+                      </div>
                     </div>
-                    <div className="flex-1 min-w-0">
-                      <h4 className="text-sm font-semibold text-slate-900 truncate">
-                        {client.first_name} {client.last_name}
-                      </h4>
-                      <p className="text-xs text-slate-500 truncate">{client.email}</p>
+                    <Badge className={`text-xs ${stageInfo.color} mb-2`}>
+                      {stageInfo.label}
+                    </Badge>
+                    <div className="text-xs text-slate-400">
+                      {new Date(client.created_date).toLocaleDateString('bg-BG')}
                     </div>
-                  </div>
-                  <div className="text-xs text-slate-400">
-                    {new Date(client.created_date).toLocaleDateString('bg-BG')}
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
+                  </CardContent>
+                </Card>
+              );
+            })}
           </div>
 
           {/* Analysis Completed Column */}
@@ -251,30 +284,37 @@ export default function DossiersManager() {
                 <p className="text-xs text-green-700 mt-1">{groupedClients.analysis_completed.length} клиента</p>
               </CardContent>
             </Card>
-            {groupedClients.analysis_completed.map((client) => (
-              <Card 
-                key={client.id}
-                className="hover:shadow-lg transition-shadow cursor-pointer border-green-200"
-                onClick={() => setSelectedClient(client)}
-              >
-                <CardContent className="p-4">
-                  <div className="flex items-center gap-3 mb-2">
-                    <div className="w-10 h-10 rounded-full bg-gradient-to-br from-green-500 to-emerald-500 flex items-center justify-center text-white font-bold text-sm shadow">
-                      {client.first_name?.[0]}{client.last_name?.[0]}
+            {groupedClients.analysis_completed.map((client) => {
+              const stage = getClientStage(client);
+              const stageInfo = getStageInfo(stage);
+              return (
+                <Card 
+                  key={client.id}
+                  className="hover:shadow-lg transition-shadow cursor-pointer border-green-200"
+                  onClick={() => setSelectedClient(client)}
+                >
+                  <CardContent className="p-4">
+                    <div className="flex items-center gap-3 mb-2">
+                      <div className="w-10 h-10 rounded-full bg-gradient-to-br from-green-500 to-emerald-500 flex items-center justify-center text-white font-bold text-sm shadow">
+                        {client.first_name?.[0]}{client.last_name?.[0]}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <h4 className="text-sm font-semibold text-slate-900 truncate">
+                          {client.first_name} {client.last_name}
+                        </h4>
+                        <p className="text-xs text-slate-500 truncate">{client.email}</p>
+                      </div>
                     </div>
-                    <div className="flex-1 min-w-0">
-                      <h4 className="text-sm font-semibold text-slate-900 truncate">
-                        {client.first_name} {client.last_name}
-                      </h4>
-                      <p className="text-xs text-slate-500 truncate">{client.email}</p>
+                    <Badge className={`text-xs ${stageInfo.color} mb-2`}>
+                      {stageInfo.label}
+                    </Badge>
+                    <div className="text-xs text-slate-400">
+                      {new Date(client.created_date).toLocaleDateString('bg-BG')}
                     </div>
-                  </div>
-                  <div className="text-xs text-slate-400">
-                    {new Date(client.created_date).toLocaleDateString('bg-BG')}
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
+                  </CardContent>
+                </Card>
+              );
+            })}
           </div>
 
           {/* Plan Presented Column */}
@@ -285,30 +325,37 @@ export default function DossiersManager() {
                 <p className="text-xs text-purple-700 mt-1">{groupedClients.plan_presented.length} клиента</p>
               </CardContent>
             </Card>
-            {groupedClients.plan_presented.map((client) => (
-              <Card 
-                key={client.id}
-                className="hover:shadow-lg transition-shadow cursor-pointer border-purple-200"
-                onClick={() => setSelectedClient(client)}
-              >
-                <CardContent className="p-4">
-                  <div className="flex items-center gap-3 mb-2">
-                    <div className="w-10 h-10 rounded-full bg-gradient-to-br from-purple-500 to-violet-500 flex items-center justify-center text-white font-bold text-sm shadow">
-                      {client.first_name?.[0]}{client.last_name?.[0]}
+            {groupedClients.plan_presented.map((client) => {
+              const stage = getClientStage(client);
+              const stageInfo = getStageInfo(stage);
+              return (
+                <Card 
+                  key={client.id}
+                  className="hover:shadow-lg transition-shadow cursor-pointer border-purple-200"
+                  onClick={() => setSelectedClient(client)}
+                >
+                  <CardContent className="p-4">
+                    <div className="flex items-center gap-3 mb-2">
+                      <div className="w-10 h-10 rounded-full bg-gradient-to-br from-purple-500 to-violet-500 flex items-center justify-center text-white font-bold text-sm shadow">
+                        {client.first_name?.[0]}{client.last_name?.[0]}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <h4 className="text-sm font-semibold text-slate-900 truncate">
+                          {client.first_name} {client.last_name}
+                        </h4>
+                        <p className="text-xs text-slate-500 truncate">{client.email}</p>
+                      </div>
                     </div>
-                    <div className="flex-1 min-w-0">
-                      <h4 className="text-sm font-semibold text-slate-900 truncate">
-                        {client.first_name} {client.last_name}
-                      </h4>
-                      <p className="text-xs text-slate-500 truncate">{client.email}</p>
+                    <Badge className={`text-xs ${stageInfo.color} mb-2`}>
+                      {stageInfo.label}
+                    </Badge>
+                    <div className="text-xs text-slate-400">
+                      {new Date(client.created_date).toLocaleDateString('bg-BG')}
                     </div>
-                  </div>
-                  <div className="text-xs text-slate-400">
-                    {new Date(client.created_date).toLocaleDateString('bg-BG')}
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
+                  </CardContent>
+                </Card>
+              );
+            })}
           </div>
 
           {/* Signed & Paid Column */}
@@ -319,30 +366,37 @@ export default function DossiersManager() {
                 <p className="text-xs text-indigo-700 mt-1">{groupedClients.signed_paid.length} клиента</p>
               </CardContent>
             </Card>
-            {groupedClients.signed_paid.map((client) => (
-              <Card 
-                key={client.id}
-                className="hover:shadow-lg transition-shadow cursor-pointer border-indigo-200"
-                onClick={() => setSelectedClient(client)}
-              >
-                <CardContent className="p-4">
-                  <div className="flex items-center gap-3 mb-2">
-                    <div className="w-10 h-10 rounded-full bg-gradient-to-br from-indigo-500 to-blue-600 flex items-center justify-center text-white font-bold text-sm shadow">
-                      {client.first_name?.[0]}{client.last_name?.[0]}
+            {groupedClients.signed_paid.map((client) => {
+              const stage = getClientStage(client);
+              const stageInfo = getStageInfo(stage);
+              return (
+                <Card 
+                  key={client.id}
+                  className="hover:shadow-lg transition-shadow cursor-pointer border-indigo-200"
+                  onClick={() => setSelectedClient(client)}
+                >
+                  <CardContent className="p-4">
+                    <div className="flex items-center gap-3 mb-2">
+                      <div className="w-10 h-10 rounded-full bg-gradient-to-br from-indigo-500 to-blue-600 flex items-center justify-center text-white font-bold text-sm shadow">
+                        {client.first_name?.[0]}{client.last_name?.[0]}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <h4 className="text-sm font-semibold text-slate-900 truncate">
+                          {client.first_name} {client.last_name}
+                        </h4>
+                        <p className="text-xs text-slate-500 truncate">{client.email}</p>
+                      </div>
                     </div>
-                    <div className="flex-1 min-w-0">
-                      <h4 className="text-sm font-semibold text-slate-900 truncate">
-                        {client.first_name} {client.last_name}
-                      </h4>
-                      <p className="text-xs text-slate-500 truncate">{client.email}</p>
+                    <Badge className={`text-xs ${stageInfo.color} mb-2`}>
+                      {stageInfo.label}
+                    </Badge>
+                    <div className="text-xs text-slate-400">
+                      {new Date(client.created_date).toLocaleDateString('bg-BG')}
                     </div>
-                  </div>
-                  <div className="text-xs text-slate-400">
-                    {new Date(client.created_date).toLocaleDateString('bg-BG')}
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
+                  </CardContent>
+                </Card>
+              );
+            })}
           </div>
         </div>
       )}

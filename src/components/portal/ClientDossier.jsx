@@ -181,7 +181,7 @@ export default function ClientDossier({ clientId, analysisId = null, showAllClie
               </CardTitle>
             </CardHeader>
             <CardContent>
-              {analyses.length === 0 && client?.stage === 'financial_planner' ? (
+              {analyses.length === 0 ? (
                 <div className="text-center py-12">
                   <FileText className="h-12 w-12 mx-auto mb-3 text-slate-300" />
                   <p className="text-slate-500 mb-4">Няма започнат финансов анализ</p>
@@ -211,13 +211,8 @@ export default function ClientDossier({ clientId, analysisId = null, showAllClie
                     className="bg-blue-600 hover:bg-blue-700"
                   >
                     <ArrowRight className="h-4 w-4 mr-2" />
-                    Премини към финансов анализ
+                    Започни финансов анализ
                   </Button>
-                </div>
-              ) : analyses.length === 0 ? (
-                <div className="text-center py-12 text-slate-500">
-                  <FileText className="h-12 w-12 mx-auto mb-3 text-slate-300" />
-                  <p>Няма налични финансови анализи</p>
                 </div>
               ) : (
                 <div className="space-y-3">

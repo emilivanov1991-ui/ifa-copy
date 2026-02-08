@@ -17,7 +17,8 @@ import {
   CheckCircle,
   Loader2,
   FileCheck,
-  AlertTriangle
+  AlertTriangle,
+  Briefcase
 } from 'lucide-react';
 import { cn } from "@/lib/utils";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -953,6 +954,16 @@ export default function FinancialAnalysis() {
 
   return (
     <div className="pt-20 min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
+      {/* Return to Consultant Portal Button */}
+      <motion.button
+        onClick={() => window.location.href = createPageUrl('ConsultantPortal')}
+        whileHover={{ scale: 1.05 }}
+        whileTap={{ scale: 0.95 }}
+        className="fixed top-6 right-6 z-50 px-4 py-2 rounded-full flex items-center gap-2 transition-all duration-300 shadow-xl bg-white hover:bg-blue-50 text-slate-700 border-2 border-slate-200 hover:border-blue-400 shadow-blue-200/50 group"
+      >
+        <Briefcase className="w-4 h-4 group-hover:text-blue-600 transition-colors" />
+        <span className="text-sm font-medium group-hover:text-blue-600 transition-colors">Консултантски портал</span>
+      </motion.button>
       <div className="max-w-5xl mx-auto px-6 py-12">
         {/* Header */}
         <motion.div

@@ -2973,7 +2973,7 @@ export default function FinancialPlanner() {
                     Нашите принципи на работа гарантират професионализъм и доверие във всяка стъпка от процеса.
                   </p>
 
-                  <div className="grid md:grid-cols-2 gap-6 mb-8">
+                  <div className="grid md:grid-cols-2 gap-4 flex-1">
                     <div className={cn("rounded-xl border-2 p-6 transition-all duration-300 group hover:border-blue-500 hover:bg-blue-600 flex flex-col justify-center relative", isDarkMode ? "border-slate-800" : "border-slate-200")}>
                       <Eye className={cn("w-20 h-20 absolute top-4 right-4 transition-colors", "text-blue-500 group-hover:text-white")} />
                       <h3 className="text-2xl font-semibold mb-2 group-hover:text-white transition-colors relative z-10">Дискретност</h3>

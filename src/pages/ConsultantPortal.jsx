@@ -57,7 +57,7 @@ import { Package, FolderOpen } from 'lucide-react';
 const menuItems = [
   { id: 'dashboard', label: 'Табло', icon: LayoutDashboard, color: 'from-blue-500 to-blue-600' },
   { id: 'crm', label: 'CRM / Клиенти', icon: Users, color: 'from-violet-500 to-violet-600' },
-  { id: 'dossiers', label: 'Досиета', icon: FolderOpen, color: 'from-blue-500 to-cyan-600' },
+  { id: 'dossiers', label: 'Flow', icon: FolderOpen, color: 'from-blue-500 to-cyan-600' },
   { id: 'analysis', label: 'Финансов анализ', icon: FileText, color: 'from-emerald-500 to-emerald-600' },
   { id: 'commissions', label: 'Комисионни', icon: DollarSign, color: 'from-green-500 to-emerald-600' },
   { id: 'ai-analytics', label: 'AI Аналитика', icon: Brain, badge: 'AI', color: 'from-purple-500 to-pink-500' },

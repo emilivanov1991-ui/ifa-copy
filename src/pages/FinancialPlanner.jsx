@@ -2974,60 +2974,36 @@ export default function FinancialPlanner() {
                   </p>
 
                   <div className="grid md:grid-cols-2 gap-6 mb-8">
-                    <div className={cn("rounded-xl border-2 p-6 transition-all duration-300 group hover:border-blue-500 hover:bg-blue-600", isDarkMode ? "border-slate-800 bg-slate-900/50" : "border-slate-200 bg-white")}>
-                      <div className="flex items-start gap-4">
-                        <div className="w-12 h-12 rounded-xl bg-blue-100 flex items-center justify-center flex-shrink-0 group-hover:bg-blue-500 transition-all">
-                          <Eye className="w-6 h-6 text-blue-600 group-hover:text-white transition-colors" />
-                        </div>
-                        <div>
-                          <h3 className="text-lg font-bold mb-2 group-hover:text-white transition-colors">Дискретност</h3>
-                          <p className={cn("text-sm leading-relaxed group-hover:text-blue-100 transition-colors", mutedTextClasses)}>
-                            Вашите данни и финансова информация са строго поверителни.
-                          </p>
-                        </div>
-                      </div>
+                    <div className={cn("rounded-xl border-2 p-6 transition-all duration-300 group hover:border-blue-500 hover:bg-blue-600 flex flex-col justify-center relative", isDarkMode ? "border-slate-800" : "border-slate-200")}>
+                      <Eye className={cn("w-20 h-20 absolute top-4 right-4 transition-colors", "text-blue-500 group-hover:text-white")} />
+                      <h3 className="text-2xl font-semibold mb-2 group-hover:text-white transition-colors relative z-10">Дискретност</h3>
+                      <p className={cn("text-base leading-relaxed group-hover:text-blue-100 transition-colors relative z-10", mutedTextClasses)}>
+                        Вашите данни и финансова информация са строго поверителни.
+                      </p>
                     </div>
 
-                    <div className={cn("rounded-xl border-2 p-6 transition-all duration-300 group hover:border-blue-500 hover:bg-blue-600", isDarkMode ? "border-slate-800 bg-slate-900/50" : "border-slate-200 bg-white")}>
-                      <div className="flex items-start gap-4">
-                        <div className="w-12 h-12 rounded-xl bg-blue-100 flex items-center justify-center flex-shrink-0 group-hover:bg-blue-500 transition-all">
-                          <FileText className="w-6 h-6 text-blue-600 group-hover:text-white transition-colors" />
-                        </div>
-                        <div>
-                          <h3 className="text-lg font-bold mb-2 group-hover:text-white transition-colors">Прозрачност</h3>
-                          <p className={cn("text-sm leading-relaxed group-hover:text-blue-100 transition-colors", mutedTextClasses)}>
-                            Пълна яснота относно условията, таксите и процесите.
-                          </p>
-                        </div>
-                      </div>
+                    <div className={cn("rounded-xl border-2 p-6 transition-all duration-300 group hover:border-blue-500 hover:bg-blue-600 flex flex-col justify-center relative", isDarkMode ? "border-slate-800" : "border-slate-200")}>
+                      <FileText className={cn("w-20 h-20 absolute top-4 right-4 transition-colors", "text-blue-500 group-hover:text-white")} />
+                      <h3 className="text-2xl font-semibold mb-2 group-hover:text-white transition-colors relative z-10">Прозрачност</h3>
+                      <p className={cn("text-base leading-relaxed group-hover:text-blue-100 transition-colors relative z-10", mutedTextClasses)}>
+                        Пълна яснота относно условията, таксите и процесите.
+                      </p>
                     </div>
 
-                    <div className={cn("rounded-xl border-2 p-6 transition-all duration-300 group hover:border-blue-500 hover:bg-blue-600", isDarkMode ? "border-slate-800 bg-slate-900/50" : "border-slate-200 bg-white")}>
-                      <div className="flex items-start gap-4">
-                        <div className="w-12 h-12 rounded-xl bg-blue-100 flex items-center justify-center flex-shrink-0 group-hover:bg-blue-500 transition-all">
-                          <ShieldCheck className="w-6 h-6 text-blue-600 group-hover:text-white transition-colors" />
-                        </div>
-                        <div>
-                          <h3 className="text-lg font-bold mb-2 group-hover:text-white transition-colors">Коректност</h3>
-                          <p className={cn("text-sm leading-relaxed group-hover:text-blue-100 transition-colors", mutedTextClasses)}>
-                            Честен и етичен подход при всяка препоръка и решение.
-                          </p>
-                        </div>
-                      </div>
+                    <div className={cn("rounded-xl border-2 p-6 transition-all duration-300 group hover:border-blue-500 hover:bg-blue-600 flex flex-col justify-center relative", isDarkMode ? "border-slate-800" : "border-slate-200")}>
+                      <ShieldCheck className={cn("w-20 h-20 absolute top-4 right-4 transition-colors", "text-blue-500 group-hover:text-white")} />
+                      <h3 className="text-2xl font-semibold mb-2 group-hover:text-white transition-colors relative z-10">Коректност</h3>
+                      <p className={cn("text-base leading-relaxed group-hover:text-blue-100 transition-colors relative z-10", mutedTextClasses)}>
+                        Честен и етичен подход при всяка препоръка и решение.
+                      </p>
                     </div>
 
-                    <div className={cn("rounded-xl border-2 p-6 transition-all duration-300 group hover:border-blue-500 hover:bg-blue-600", isDarkMode ? "border-slate-800 bg-slate-900/50" : "border-slate-200 bg-white")}>
-                      <div className="flex items-start gap-4">
-                        <div className="w-12 h-12 rounded-xl bg-blue-100 flex items-center justify-center flex-shrink-0 group-hover:bg-blue-500 transition-all">
-                          <Coins className="w-6 h-6 text-blue-600 group-hover:text-white transition-colors" />
-                        </div>
-                        <div>
-                          <h3 className="text-lg font-bold mb-2 group-hover:text-white transition-colors">Възнаграждение</h3>
-                          <p className={cn("text-sm leading-relaxed group-hover:text-blue-100 transition-colors", mutedTextClasses)}>
-                            Работим срещу комисионна от финансовите институции.
-                          </p>
-                        </div>
-                      </div>
+                    <div className={cn("rounded-xl border-2 p-6 transition-all duration-300 group hover:border-blue-500 hover:bg-blue-600 flex flex-col justify-center relative", isDarkMode ? "border-slate-800" : "border-slate-200")}>
+                      <Coins className={cn("w-20 h-20 absolute top-4 right-4 transition-colors", "text-blue-500 group-hover:text-white")} />
+                      <h3 className="text-2xl font-semibold mb-2 group-hover:text-white transition-colors relative z-10">Възнаграждение</h3>
+                      <p className={cn("text-base leading-relaxed group-hover:text-blue-100 transition-colors relative z-10", mutedTextClasses)}>
+                        Работим срещу комисионна от финансовите институции.
+                      </p>
                     </div>
                   </div>
 

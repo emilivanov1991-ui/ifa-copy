@@ -231,29 +231,36 @@ export default function ConsultantAnalytics() {
                         </text>
                         
                         {/* Tooltip on hover */}
-                        {hoveredStage === index && percentages.length > 0 && (
-                          <g>
-                            <rect
-                              x={x - 220}
-                              y={y - 10}
-                              width="210"
-                              height={tooltipHeight}
-                              fill="white"
-                              stroke="#e2e8f0"
-                              strokeWidth="2"
-                              rx="8"
-                              className="drop-shadow-xl"
-                            />
-                            <text x={x - 212} y={y + 8} className="fill-slate-900 font-bold text-sm">
-                              {stage.value}
-                            </text>
-                            {percentages.map((item, pIndex) => (
-                              <text key={pIndex} x={x - 212} y={y + 28 + pIndex * 20} className="fill-slate-600 text-xs">
-                                {item.percent}% от {item.label}
+                        {hoveredStage === index && percentages.length > 0 && (() => {
+                          // Position tooltip to the right if it would go off-screen on the left
+                          const tooltipWidth = 210;
+                          const tooltipX = x - 220 < 0 ? x + stage.width + 20 : x - 220;
+                          const textX = tooltipX + 8;
+                          
+                          return (
+                            <g>
+                              <rect
+                                x={tooltipX}
+                                y={y - 10}
+                                width={tooltipWidth}
+                                height={tooltipHeight}
+                                fill="white"
+                                stroke="#e2e8f0"
+                                strokeWidth="2"
+                                rx="8"
+                                className="drop-shadow-xl"
+                              />
+                              <text x={textX} y={y + 8} className="fill-slate-900 font-bold text-sm">
+                                {stage.value}
                               </text>
-                            ))}
-                          </g>
-                        )}
+                              {percentages.map((item, pIndex) => (
+                                <text key={pIndex} x={textX} y={y + 28 + pIndex * 20} className="fill-slate-600 text-xs">
+                                  {item.percent}% от {item.label}
+                                </text>
+                              ))}
+                            </g>
+                          );
+                        })()}
                         
                         {/* Tooltip for first stage (no percentages) */}
                         {hoveredStage === index && percentages.length === 0 && (

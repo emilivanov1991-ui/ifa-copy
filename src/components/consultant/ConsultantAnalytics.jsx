@@ -110,16 +110,14 @@ const getFunnelData = (period) => {
   return dataByPeriod[period] || dataByPeriod['3m'];
 };
 
-const calculatePercentages = (value, allStages) => {
+const calculatePercentages = (currentValue, currentIndex, allStages) => {
   const percentages = [];
-  for (let i = allStages.length - 1; i >= 0; i--) {
-    if (allStages[i] > 0) {
-      const percent = ((value / allStages[i]) * 100).toFixed(1);
-      percentages.unshift(percent);
-    } else {
-      percentages.unshift('0.0');
+  // Calculate percentage from all previous stages
+  for (let i = currentIndex - 1; i >= 0; i--) {
+    if (allStages[i].value > 0) {
+      const percent = ((currentValue / allStages[i].value) * 100).toFixed(1);
+      percentages.push({ label: allStages[i].label, percent });
     }
-    if (allStages[i] === value) break;
   }
   return percentages;
 };
@@ -197,7 +195,8 @@ export default function ConsultantAnalytics() {
                     const width = (widthPercent / 100) * 500;
                     const x = 150 + (500 - width) / 2;
                     const height = 70;
-                    const percentages = calculatePercentages(stage.value, allValues.slice(0, index + 1));
+                    const percentages = calculatePercentages(stage.value, index, stages);
+                    const tooltipHeight = index === 0 ? 50 : 30 + percentages.length * 20;
                     
                     return (
                       <g key={index}>
@@ -232,30 +231,50 @@ export default function ConsultantAnalytics() {
                         </text>
                         
                         {/* Tooltip on hover */}
-                        {hoveredStage === index && (
+                        {hoveredStage === index && percentages.length > 0 && (
                           <g>
                             <rect
-                              x={x - 150}
-                              y={y - 40}
-                              width="140"
-                              height={20 + percentages.length * 18}
+                              x={x - 180}
+                              y={y - 10}
+                              width="170"
+                              height={tooltipHeight}
                               fill="white"
                               stroke="#e2e8f0"
-                              strokeWidth="1"
+                              strokeWidth="2"
                               rx="8"
-                              className="drop-shadow-lg"
+                              className="drop-shadow-xl"
                             />
-                            <text x={x - 145} y={y - 25} className="fill-slate-900 font-semibold text-xs">
+                            <text x={x - 172} y={y + 8} className="fill-slate-900 font-bold text-sm">
+                              {stage.value}
+                            </text>
+                            {percentages.map((item, pIndex) => (
+                              <text key={pIndex} x={x - 172} y={y + 28 + pIndex * 20} className="fill-slate-600 text-xs">
+                                {item.percent}% от {item.label}
+                              </text>
+                            ))}
+                          </g>
+                        )}
+                        
+                        {/* Tooltip for first stage (no percentages) */}
+                        {hoveredStage === index && percentages.length === 0 && (
+                          <g>
+                            <rect
+                              x={x - 100}
+                              y={y - 10}
+                              width="90"
+                              height={40}
+                              fill="white"
+                              stroke="#e2e8f0"
+                              strokeWidth="2"
+                              rx="8"
+                              className="drop-shadow-xl"
+                            />
+                            <text x={x - 92} y={y + 8} className="fill-slate-900 font-bold text-sm">
                               {stage.label}
                             </text>
-                            {percentages.map((percent, pIndex) => {
-                              const labels = ['обаждане', 'вдигнали', 'уговорена среща', 'фин. планер', 'анализ', 'презентиран', 'подписан'];
-                              return (
-                                <text key={pIndex} x={x - 145} y={y - 8 + pIndex * 18} className="fill-slate-600 text-xs">
-                                  {percent}% от {labels[index - percentages.length + pIndex + 1]}
-                                </text>
-                              );
-                            })}
+                            <text x={x - 92} y={y + 25} className="fill-slate-600 text-xs">
+                              {stage.value} обаждания
+                            </text>
                           </g>
                         )}
                       </g>

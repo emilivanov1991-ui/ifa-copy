@@ -99,16 +99,55 @@ const demographicsIncome = [
   { range: 'Над 6000€', count: 10, percent: 12 },
 ];
 
+// Sales Funnel Data (mock)
+const getFunnelData = (period) => {
+  const dataByPeriod = {
+    '1m': { calls: 100, answered: 65, scheduled: 45, held: 20, analysis: 12, presented: 9, signed: 4 },
+    '3m': { calls: 300, answered: 190, scheduled: 130, held: 60, analysis: 35, presented: 27, signed: 12 },
+    '6m': { calls: 550, answered: 350, scheduled: 230, held: 105, analysis: 62, presented: 48, signed: 21 },
+    '1y': { calls: 1000, answered: 640, scheduled: 420, held: 190, analysis: 112, presented: 87, signed: 38 },
+  };
+  return dataByPeriod[period] || dataByPeriod['3m'];
+};
+
+const calculatePercentages = (value, allStages) => {
+  const percentages = [];
+  for (let i = allStages.length - 1; i >= 0; i--) {
+    if (allStages[i] > 0) {
+      const percent = ((value / allStages[i]) * 100).toFixed(1);
+      percentages.unshift(percent);
+    } else {
+      percentages.unshift('0.0');
+    }
+    if (allStages[i] === value) break;
+  }
+  return percentages;
+};
+
 export default function ConsultantAnalytics() {
-  const [period, setPeriod] = useState('6m');
+  const [period, setPeriod] = useState('3m');
+  const [hoveredStage, setHoveredStage] = useState(null);
+
+  const funnelData = getFunnelData(period);
+  const stages = [
+    { label: 'Обаждане', value: funnelData.calls, color: '#9333EA' },
+    { label: 'Вдигнали', value: funnelData.answered, color: '#A855F7' },
+    { label: 'Уговорена среща', value: funnelData.scheduled, color: '#C084FC' },
+    { label: 'Осъществена среща (Financial Planner)', value: funnelData.held, color: '#D8B4FE' },
+    { label: 'Финансов анализ', value: funnelData.analysis, color: '#E9D5FF' },
+    { label: 'Финансов план презентиран', value: funnelData.presented, color: '#F3E8FF' },
+    { label: 'Подписан клиент', value: funnelData.signed, color: '#FAF5FF' },
+  ];
+
+  const allValues = stages.map(s => s.value);
 
   return (
     <div className="space-y-6">
       {/* Header */}
       <div className="flex flex-col sm:flex-row gap-4 justify-between">
         <div>
-          <h2 className="text-xl font-semibold text-slate-900">Аналитични модули</h2>
-          <p className="text-slate-500">Задълбочен анализ на продажби, клиенти и ефективност</p>
+          <h2 className="text-xl font-semibold text-slate-900">Performance Formula</h2>
+          <p className="text-slate-500">Анализ на продажбената фуния и ефективност</p>
         </div>
         <Select value={period} onValueChange={setPeriod}>
           <SelectTrigger className="w-40">
@@ -124,12 +163,129 @@ export default function ConsultantAnalytics() {
         </Select>
       </div>
 
-      <Tabs defaultValue="forecast">
+      <Tabs defaultValue="funnel">
         <TabsList>
+          <TabsTrigger value="funnel">Sales Funnel</TabsTrigger>
           <TabsTrigger value="forecast">Прогнози</TabsTrigger>
           <TabsTrigger value="segments">Сегментация</TabsTrigger>
           <TabsTrigger value="performance">Ефективност</TabsTrigger>
         </TabsList>
+
+        {/* Sales Funnel */}
+        <TabsContent value="funnel" className="mt-6">
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <TrendingUp className="h-5 w-5 text-purple-600" />
+                Продажбена фуния
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="relative">
+                {/* Funnel SVG */}
+                <svg viewBox="0 0 800 600" className="w-full h-auto">
+                  <defs>
+                    <linearGradient id="funnelGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+                      <stop offset="0%" stopColor="#9333EA" />
+                      <stop offset="100%" stopColor="#FAF5FF" />
+                    </linearGradient>
+                  </defs>
+                  
+                  {stages.map((stage, index) => {
+                    const y = 50 + index * 80;
+                    const widthPercent = 100 - (index * 12);
+                    const width = (widthPercent / 100) * 500;
+                    const x = 150 + (500 - width) / 2;
+                    const height = 70;
+                    const percentages = calculatePercentages(stage.value, allValues.slice(0, index + 1));
+                    
+                    return (
+                      <g key={index}>
+                        {/* Funnel section */}
+                        <polygon
+                          points={`${x},${y} ${x + width},${y} ${x + width - 30},${y + height} ${x + 30},${y + height}`}
+                          fill={stage.color}
+                          stroke="#ffffff"
+                          strokeWidth="2"
+                          onMouseEnter={() => setHoveredStage(index)}
+                          onMouseLeave={() => setHoveredStage(null)}
+                          className="cursor-pointer transition-opacity hover:opacity-80"
+                        />
+                        
+                        {/* Value label */}
+                        <text
+                          x={x + width / 2}
+                          y={y + height / 2 + 5}
+                          textAnchor="middle"
+                          className="fill-slate-900 font-bold text-2xl"
+                        >
+                          {stage.value}
+                        </text>
+                        
+                        {/* Stage label */}
+                        <text
+                          x={x + width + 20}
+                          y={y + height / 2 + 5}
+                          className="fill-slate-700 text-sm font-medium"
+                        >
+                          {stage.label}
+                        </text>
+                        
+                        {/* Tooltip on hover */}
+                        {hoveredStage === index && (
+                          <g>
+                            <rect
+                              x={x - 150}
+                              y={y - 40}
+                              width="140"
+                              height={20 + percentages.length * 18}
+                              fill="white"
+                              stroke="#e2e8f0"
+                              strokeWidth="1"
+                              rx="8"
+                              className="drop-shadow-lg"
+                            />
+                            <text x={x - 145} y={y - 25} className="fill-slate-900 font-semibold text-xs">
+                              {stage.label}
+                            </text>
+                            {percentages.map((percent, pIndex) => {
+                              const labels = ['обаждане', 'вдигнали', 'уговорена среща', 'фин. планер', 'анализ', 'презентиран', 'подписан'];
+                              return (
+                                <text key={pIndex} x={x - 145} y={y - 8 + pIndex * 18} className="fill-slate-600 text-xs">
+                                  {percent}% от {labels[index - percentages.length + pIndex + 1]}
+                                </text>
+                              );
+                            })}
+                          </g>
+                        )}
+                      </g>
+                    );
+                  })}
+                </svg>
+              </div>
+              
+              {/* Stats Summary */}
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-8 pt-6 border-t">
+                <div className="text-center">
+                  <p className="text-2xl font-bold text-purple-600">{((funnelData.signed / funnelData.calls) * 100).toFixed(1)}%</p>
+                  <p className="text-xs text-slate-500">Обща конверсия</p>
+                </div>
+                <div className="text-center">
+                  <p className="text-2xl font-bold text-blue-600">{((funnelData.answered / funnelData.calls) * 100).toFixed(1)}%</p>
+                  <p className="text-xs text-slate-500">Процент отговорили</p>
+                </div>
+                <div className="text-center">
+                  <p className="text-2xl font-bold text-green-600">{((funnelData.held / funnelData.scheduled) * 100).toFixed(1)}%</p>
+                  <p className="text-xs text-slate-500">Проведени срещи</p>
+                </div>
+                <div className="text-center">
+                  <p className="text-2xl font-bold text-indigo-600">{((funnelData.signed / funnelData.presented) * 100).toFixed(1)}%</p>
+                  <p className="text-xs text-slate-500">Подписани след презентация</p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
 
         {/* Sales Forecast */}
         <TabsContent value="forecast" className="mt-6 space-y-6">

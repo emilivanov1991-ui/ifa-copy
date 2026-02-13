@@ -234,9 +234,9 @@ export default function ConsultantAnalytics() {
                         {hoveredStage === index && percentages.length > 0 && (
                           <g>
                             <rect
-                              x={x - 180}
+                              x={x - 220}
                               y={y - 10}
-                              width="170"
+                              width="210"
                               height={tooltipHeight}
                               fill="white"
                               stroke="#e2e8f0"
@@ -244,14 +244,39 @@ export default function ConsultantAnalytics() {
                               rx="8"
                               className="drop-shadow-xl"
                             />
-                            <text x={x - 172} y={y + 8} className="fill-slate-900 font-bold text-sm">
+                            <text x={x - 212} y={y + 8} className="fill-slate-900 font-bold text-sm">
                               {stage.value}
                             </text>
-                            {percentages.map((item, pIndex) => (
-                              <text key={pIndex} x={x - 172} y={y + 28 + pIndex * 20} className="fill-slate-600 text-xs">
-                                {item.percent}% от {item.label}
-                              </text>
-                            ))}
+                            {percentages.map((item, pIndex) => {
+                              // Split long labels into multiple lines
+                              const words = item.label.split(' ');
+                              const maxCharsPerLine = 25;
+                              const lines = [];
+                              let currentLine = '';
+                              
+                              words.forEach(word => {
+                                if ((currentLine + ' ' + word).length <= maxCharsPerLine) {
+                                  currentLine += (currentLine ? ' ' : '') + word;
+                                } else {
+                                  if (currentLine) lines.push(currentLine);
+                                  currentLine = word;
+                                }
+                              });
+                              if (currentLine) lines.push(currentLine);
+                              
+                              return (
+                                <text key={pIndex} className="fill-slate-600 text-xs">
+                                  <tspan x={x - 212} y={y + 28 + pIndex * 20}>
+                                    {item.percent}% від
+                                  </tspan>
+                                  {lines.map((line, lIdx) => (
+                                    <tspan key={lIdx} x={x - 212} dy={lIdx === 0 ? 0 : 12}>
+                                      {lIdx === 0 ? ' ' : ''}{line}
+                                    </tspan>
+                                  ))}
+                                </text>
+                              );
+                            })}
                           </g>
                         )}
                         

@@ -126,15 +126,54 @@ export default function ConsultantAnalytics() {
   const [period, setPeriod] = useState('3m');
   const [hoveredStage, setHoveredStage] = useState(null);
 
+  // Benchmark percentages (СРЕДНО ЕКИП)
+  const benchmarks = {
+    'Вдигнали': 72,
+    'Уговорена среща': 58,
+    'Осъществена среща (Financial Planner)': 48,
+    'Финансов анализ': 50,
+    'Финансов план презентиран': 85,
+    'Подписан клиент': 35
+  };
+
+  // Calculate color based on performance vs benchmark
+  const getStageColor = (label, value, prevValue) => {
+    const benchmark = benchmarks[label];
+    if (!benchmark || !prevValue || prevValue === 0) {
+      return '#9333EA'; // Default purple for first stage
+    }
+
+    const actualPercent = (value / prevValue) * 100;
+    const deviation = actualPercent - benchmark; // Positive = above benchmark (good), negative = below (bad)
+
+    if (deviation >= 0) {
+      // Above benchmark - green scale (светло до ярко зелено)
+      // 0-5%: light green, 5-15%: medium green, 15+%: bright green
+      const intensity = Math.min(deviation / 15, 1); // Cap at 15% for max intensity
+      const r = Math.round(134 + (34 - 134) * intensity); // 134 -> 34 (from #86efac to #22c55e)
+      const g = Math.round(239 + (197 - 239) * intensity); // 239 -> 197
+      const b = Math.round(172 + (94 - 172) * intensity); // 172 -> 94
+      return `rgb(${r}, ${g}, ${b})`;
+    } else {
+      // Below benchmark - red scale (светло до ярко червено)
+      // 0 to -5%: light red, -5 to -15%: medium red, -15+%: bright red
+      const intensity = Math.min(Math.abs(deviation) / 15, 1);
+      const r = Math.round(254 + (239 - 254) * intensity); // 254 -> 239 (from #fecaca to #ef4444)
+      const g = Math.round(202 + (68 - 202) * intensity); // 202 -> 68
+      const b = Math.round(202 + (68 - 202) * intensity); // 202 -> 68
+      return `rgb(${r}, ${g}, ${b})`;
+    }
+  };
+
   const funnelData = getFunnelData(period);
   const stages = [
     { label: 'Обаждане', value: funnelData.calls, color: '#9333EA' },
-    { label: 'Вдигнали', value: funnelData.answered, color: '#A855F7' },
-    { label: 'Уговорена среща', value: funnelData.scheduled, color: '#C084FC' },
-    { label: 'Осъществена среща (Financial Planner)', value: funnelData.held, color: '#D8B4FE' },
-    { label: 'Финансов анализ', value: funnelData.analysis, color: '#E9D5FF' },
-    { label: 'Финансов план презентиран', value: funnelData.presented, color: '#F3E8FF' },
-    { label: 'Подписан клиент', value: funnelData.signed, color: '#FAF5FF' },
+    { label: 'Вдигнали', value: funnelData.answered, color: getStageColor('Вдигнали', funnelData.answered, funnelData.calls) },
+    { label: 'Уговорена среща', value: funnelData.scheduled, color: getStageColor('Уговорена среща', funnelData.scheduled, funnelData.answered) },
+    { label: 'Осъществена среща (Financial Planner)', value: funnelData.held, color: getStageColor('Осъществена среща (Financial Planner)', funnelData.held, funnelData.scheduled) },
+    { label: 'Финансов анализ', value: funnelData.analysis, color: getStageColor('Финансов анализ', funnelData.analysis, funnelData.held) },
+    { label: 'Финансов план презентиран', value: funnelData.presented, color: getStageColor('Финансов план презентиран', funnelData.presented, funnelData.analysis) },
+    { label: 'Подписан клиент', value: funnelData.signed, color: getStageColor('Подписан клиент', funnelData.signed, funnelData.presented) },
   ];
 
   const allValues = stages.map(s => s.value);

@@ -2746,7 +2746,7 @@ export default function FinancialPlanner() {
                     </div>
                     
                     <motion.p 
-                      className="text-3xl md:text-4xl font-bold mb-2 bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent relative z-10"
+                      className="text-3xl md:text-4xl font-bold mb-6 bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent relative z-10"
                       key={calculateGoals.cash}
                       initial={{ scale: 1.1 }}
                       animate={{ scale: 1 }}
@@ -2754,9 +2754,6 @@ export default function FinancialPlanner() {
                     >
                       {formatNumber(calculateGoals.cash)} €
                     </motion.p>
-                    <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-100 mb-4 relative z-10">
-                      <span className="text-sm font-bold text-blue-700">{allocations.cash}%</span>
-                    </div>
                     <Slider
                       value={[allocations.cash]}
                       onValueChange={(v) => handleAllocationChange('cash', v[0])}

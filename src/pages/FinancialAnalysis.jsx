@@ -948,86 +948,86 @@ export default function FinancialAnalysis() {
         }
       }
 
-      // Send emails to client and partner
-      const clientName = `${plannerData?.client_first_name || 'Клиент'} ${plannerData?.client_last_name || ''}`;
-      const clientEmail = plannerData?.client_email || formData.client_email;
+      // Send emails to client and partner - TEMPORARILY DISABLED
+      // const clientName = `${plannerData?.client_first_name || 'Клиент'} ${plannerData?.client_last_name || ''}`;
+      // const clientEmail = plannerData?.client_email || formData.client_email;
 
-      // Email to client
-      if (clientEmail) {
-        const portalUrl = `${window.location.origin}/ClientPortal`;
-        const clientEmailBody = `
-Уважаеми/а ${clientName},
+      // // Email to client
+      // if (clientEmail) {
+      //   const portalUrl = `${window.location.origin}/ClientPortal`;
+      //   const clientEmailBody = `
+      // Уважаеми/а ${clientName},
+      // 
+      // Благодарим Ви за попълнения персонален финансов анализ!
+      // 
+      // Вашите данни са получени успешно и ще бъдат прегледани от нашия екип. Очаквайте обаждане или имейл в рамките на 24-48 часа за насрочване на Вашата безплатна консултация.
+      // 
+      // 🔐 Данни за вход в клиентския портал:
+      // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+      // Потребител: ${clientEmail}
+      // Парола: ${clientPassword}
+      // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+      // 
+      // 👉 Вход в портала: ${portalUrl}
+      // 
+      // В клиентския портал можете да:
+      // • Преглеждате Вашия финансов анализ
+      // • Видите Вашия персонализиран финансов план (след изготвяне)
+      // • Следите всички активни продукти
+      // • Качвате и съхранявате важни документи
+      // 
+      // Очакваме срещата с Вас${formData.next_meeting_datetime ? ` на ${new Date(formData.next_meeting_datetime).toLocaleString('bg-BG')}` : ''}!
+      // 
+      // С уважение,
+      // Екипът на APEX Financial
+      //   `;
 
-Благодарим Ви за попълнения персонален финансов анализ!
+      //   await base44.integrations.Core.SendEmail({
+      //     to: clientEmail,
+      //     subject: 'Вашият финансов анализ е получен - Данни за вход в портала',
+      //     body: clientEmailBody
+      //   });
+      // }
 
-Вашите данни са получени успешно и ще бъдат прегледани от нашия екип. Очаквайте обаждане или имейл в рамките на 24-48 часа за насрочване на Вашата безплатна консултация.
+      // // Email to partner if included
+      // if (formData.include_partner && plannerData?.partner_email) {
+      //   const partnerName = `${plannerData?.partner_first_name || 'Партньор'} ${plannerData?.partner_last_name || ''}`;
+      //   const partnerEmail = plannerData?.partner_email;
+      //   const portalUrl = `${window.location.origin}/ClientPortal`;
 
-🔐 Данни за вход в клиентския портал:
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-Потребител: ${clientEmail}
-Парола: ${clientPassword}
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+      //   const partnerEmailBody = `
+      // Уважаеми/а ${partnerName},
+      // 
+      // Благодарим Ви за участието в персоналния финансов анализ заедно с ${plannerData?.client_first_name || 'Клиент'} ${plannerData?.client_last_name || ''}!
+      // 
+      // Вашите данни са получени успешно и ще бъдат прегледани от нашия екип. Очаквайте обаждане или имейл в рамките на 24-48 часа за насрочване на Вашата безплатна консултация.
+      // 
+      // 🔐 Данни за вход в клиентския портал:
+      // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+      // Потребител: ${partnerEmail}
+      // Парола: ${partnerPassword}
+      // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+      // 
+      // 👉 Вход в портала: ${portalUrl}
+      // 
+      // В клиентския портал можете да:
+      // • Преглеждате Вашия финансов анализ
+      // • Видите Вашия персонализиран финансов план (след изготвяне)
+      // • Следите всички активни продукти
+      // • Качвате и съхранявате важни документи
+      // 
+      // Очакваме срещата с Вас${formData.next_meeting_datetime ? ` на ${new Date(formData.next_meeting_datetime).toLocaleString('bg-BG')}` : ''}!
+      // 
+      // С уважение,
+      // Екипът на APEX Financial
+      //   `;
 
-👉 Вход в портала: ${portalUrl}
-
-В клиентския портал можете да:
-• Преглеждате Вашия финансов анализ
-• Видите Вашия персонализиран финансов план (след изготвяне)
-• Следите всички активни продукти
-• Качвате и съхранявате важни документи
-
-Очакваме срещата с Вас${formData.next_meeting_datetime ? ` на ${new Date(formData.next_meeting_datetime).toLocaleString('bg-BG')}` : ''}!
-
-С уважение,
-Екипът на APEX Financial
-        `;
-
-        await base44.integrations.Core.SendEmail({
-          to: clientEmail,
-          subject: 'Вашият финансов анализ е получен - Данни за вход в портала',
-          body: clientEmailBody
-        });
-      }
-
-      // Email to partner if included
-      if (formData.include_partner && plannerData?.partner_email) {
-        const partnerName = `${plannerData?.partner_first_name || 'Партньор'} ${plannerData?.partner_last_name || ''}`;
-        const partnerEmail = plannerData?.partner_email;
-        const portalUrl = `${window.location.origin}/ClientPortal`;
-
-        const partnerEmailBody = `
-Уважаеми/а ${partnerName},
-
-Благодарим Ви за участието в персоналния финансов анализ заедно с ${plannerData?.client_first_name || 'Клиент'} ${plannerData?.client_last_name || ''}!
-
-Вашите данни са получени успешно и ще бъдат прегледани от нашия екип. Очаквайте обаждане или имейл в рамките на 24-48 часа за насрочване на Вашата безплатна консултация.
-
-🔐 Данни за вход в клиентския портал:
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-Потребител: ${partnerEmail}
-Парола: ${partnerPassword}
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-👉 Вход в портала: ${portalUrl}
-
-В клиентския портал можете да:
-• Преглеждате Вашия финансов анализ
-• Видите Вашия персонализиран финансов план (след изготвяне)
-• Следите всички активни продукти
-• Качвате и съхранявате важни документи
-
-Очакваме срещата с Вас${formData.next_meeting_datetime ? ` на ${new Date(formData.next_meeting_datetime).toLocaleString('bg-BG')}` : ''}!
-
-С уважение,
-Екипът на APEX Financial
-        `;
-
-        await base44.integrations.Core.SendEmail({
-          to: partnerEmail,
-          subject: 'Вашият финансов анализ е получен - Данни за вход в портала',
-          body: partnerEmailBody
-        });
-      }
+      //   await base44.integrations.Core.SendEmail({
+      //     to: partnerEmail,
+      //     subject: 'Вашият финансов анализ е получен - Данни за вход в портала',
+      //     body: partnerEmailBody
+      //   });
+      // }
 
       setIsSubmitting(false);
       setIsSubmitted(true);

@@ -1524,7 +1524,7 @@ export default function FinancialPlanner() {
                     {/* Client Insurance */}
                     <div>
                       {familyType === 'family' && (
-                        <p className={cn("text-base font-medium mb-4", mutedTextClasses)}>КЛИЕНТ</p>
+                        <p className={cn("text-base font-medium mb-4", mutedTextClasses)}>{clientFirstName || 'КЛИЕНТ'}</p>
                       )}
                       <div className="grid grid-cols-2 gap-4">
                         <motion.button
@@ -1578,7 +1578,7 @@ export default function FinancialPlanner() {
                     {/* Partner Insurance (only for family) */}
                     {familyType === 'family' && (
                       <div>
-                        <p className={cn("text-base font-medium mb-4", mutedTextClasses)}>ПАРТНЬОР</p>
+                        <p className={cn("text-base font-medium mb-4", mutedTextClasses)}>{partnerFirstName || 'ПАРТНЬОР'}</p>
                         <div className="grid grid-cols-2 gap-4">
                           <motion.button
                             onClick={() => setPartnerInsuranceType('employee')}
@@ -2522,7 +2522,6 @@ export default function FinancialPlanner() {
                     </motion.p>
                     <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-100 mb-4 relative z-10">
                       <span className="text-sm font-bold text-blue-700">{allocations.security}%</span>
-                      <span className="text-xs text-blue-600">от дохода</span>
                     </div>
                     <Slider
                       value={[allocations.security]}
@@ -2602,7 +2601,6 @@ export default function FinancialPlanner() {
                     </motion.p>
                     <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-100 mb-4 relative z-10">
                       <span className="text-sm font-bold text-blue-700">{allocations.pension}%</span>
-                      <span className="text-xs text-blue-600">от дохода</span>
                     </div>
                     <Slider
                       value={[allocations.pension]}
@@ -2685,7 +2683,6 @@ export default function FinancialPlanner() {
                     </motion.p>
                     <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-100 mb-4 relative z-10">
                       <span className="text-sm font-bold text-blue-700">{allocations.housing}%</span>
-                      <span className="text-xs text-blue-600">от дохода</span>
                     </div>
                     <Slider
                       value={[allocations.housing]}
@@ -2768,7 +2765,6 @@ export default function FinancialPlanner() {
                     </motion.p>
                     <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-100 mb-4 relative z-10">
                       <span className="text-sm font-bold text-blue-700">{allocations.cash}%</span>
-                      <span className="text-xs text-blue-600">от дохода</span>
                     </div>
                     <Slider
                       value={[allocations.cash]}
@@ -3023,7 +3019,7 @@ export default function FinancialPlanner() {
                     </div>
                   </div>
 
-                  <div className="flex justify-center">
+                  <div className="flex justify-center mt-6">
                     <Button 
                       onClick={goNext}
                       className={cn(primaryButtonClass, "group")}

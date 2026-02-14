@@ -3,11 +3,21 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Banknote, Home, Car, ShoppingBag, PiggyBank, CreditCard, Shield } from 'lucide-react';
 
-export default function FinancialFlowStep({ data, onChange, showErrors }) {
+export default function FinancialFlowStep({ data, onChange, showErrors, plannerData }) {
   const includePartner = data.include_partner || false;
   
   // Helper to check if a field is invalid
   const isFieldInvalid = (value) => showErrors && (value === undefined || value === null || value === '');
+
+  // Auto-populate net income from Reserve step (from Financial Planner monthly income)
+  useEffect(() => {
+    if (plannerData?.monthly_income !== undefined && data.client_net_income === undefined) {
+      onChange('client_net_income', plannerData.monthly_income);
+    }
+    if (includePartner && plannerData?.partner_income !== undefined && data.partner_net_income === undefined) {
+      onChange('partner_net_income', plannerData.partner_income);
+    }
+  }, [plannerData?.monthly_income, plannerData?.partner_income, includePartner]);
 
   // Auto-populate gross income from Pension step
   useEffect(() => {

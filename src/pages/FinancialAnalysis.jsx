@@ -982,38 +982,89 @@ export default function FinancialAnalysis() {
   if (isSubmitted) {
     return (
       <div className="pt-20 min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
-        <div className="max-w-2xl mx-auto px-6 py-24">
+        <div className="max-w-3xl mx-auto px-6 py-24">
           <motion.div
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
-            className="bg-white rounded-2xl shadow-xl p-12 text-center"
+            className="bg-white rounded-2xl shadow-xl p-12"
           >
             <div className="w-20 h-20 rounded-full bg-green-100 flex items-center justify-center mx-auto mb-6">
-              <FileCheck className="h-10 w-10 text-green-600" />
+              <CheckCircle className="h-10 w-10 text-green-600" />
             </div>
-            <h2 className="text-3xl font-semibold text-slate-900 mb-4">
-              Анализът е изпратен успешно!
+            <h2 className="text-3xl font-semibold text-slate-900 mb-4 text-center">
+              Поздравления! 🎉
             </h2>
-            <p className="text-lg text-slate-600 font-light mb-8">
-              Благодарим Ви за попълването на персоналния финансов анализ. 
-              Един от нашите консултанти ще прегледа информацията и ще се свърже с Вас 
-              в рамките на 24-48 часа, за да насрочим Вашата безплатна консултация.
+            <p className="text-lg text-slate-700 mb-2 text-center font-medium">
+              Вашият финансов анализ е завършен успешно!
             </p>
-            <div className="bg-blue-50 rounded-xl p-6 mb-8">
-              <p className="text-blue-700 font-medium">Какво следва?</p>
-              <ul className="text-blue-600 text-sm mt-2 space-y-1 font-light text-left">
-                <li>✓ Вашата информация е защитена и съхранена сигурно</li>
-                <li>✓ Персонален консултант ще бъде назначен към Вашия случай</li>
-                <li>✓ Ще получите обаждане или имейл в рамките на 24-48 часа</li>
-                <li>✓ Ще насрочим безплатна консултация по Ваше удобство</li>
-              </ul>
+            <p className="text-slate-600 mb-8 text-center">
+              Досието Ви е запазено и готово за преглед от Вашия консултант.
+            </p>
+
+            <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl p-6 mb-8 border border-blue-100">
+              <p className="text-slate-700 font-medium mb-4 text-center">Какво предпочитате да направим сега?</p>
+              
+              <div className="grid md:grid-cols-2 gap-4">
+                {/* Option 1: View Financial Plan Presentation */}
+                <motion.div
+                  whileHover={{ scale: 1.02 }}
+                  className="bg-white rounded-xl p-6 border-2 border-blue-300 hover:border-blue-500 transition-all cursor-pointer shadow-sm hover:shadow-md"
+                  onClick={() => {
+                    // Navigate to financial plan presentation
+                    if (analysisRecordId) {
+                      window.location.href = createPageUrl('FinancialPlanView') + `?analysisId=${analysisRecordId}`;
+                    }
+                  }}
+                >
+                  <div className="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center mb-4 mx-auto">
+                    <BarChart3 className="h-6 w-6 text-blue-600" />
+                  </div>
+                  <h3 className="font-semibold text-slate-900 mb-2 text-center">Виж финансовия план</h3>
+                  <p className="text-sm text-slate-600 text-center">
+                    Прегледайте вашия персонализиран финансов план веднага
+                  </p>
+                  <Button className="w-full mt-4 bg-blue-600 hover:bg-blue-700">
+                    Продължи към презентация
+                  </Button>
+                </motion.div>
+
+                {/* Option 2: Schedule Meeting */}
+                <motion.div
+                  whileHover={{ scale: 1.02 }}
+                  className="bg-white rounded-xl p-6 border-2 border-green-300 hover:border-green-500 transition-all cursor-pointer shadow-sm hover:shadow-md"
+                  onClick={() => window.location.href = createPageUrl('Home')}
+                >
+                  <div className="w-12 h-12 rounded-full bg-green-100 flex items-center justify-center mb-4 mx-auto">
+                    <Shield className="h-6 w-6 text-green-600" />
+                  </div>
+                  <h3 className="font-semibold text-slate-900 mb-2 text-center">Виждане на среща</h3>
+                  <p className="text-sm text-slate-600 text-center mb-2">
+                    Ще се видим на насрочената среща
+                  </p>
+                  {formData.next_meeting_datetime && (
+                    <p className="text-xs text-green-600 font-medium text-center">
+                      📅 {new Date(formData.next_meeting_datetime).toLocaleString('bg-BG', {
+                        day: 'numeric',
+                        month: 'long',
+                        year: 'numeric',
+                        hour: '2-digit',
+                        minute: '2-digit'
+                      })}
+                    </p>
+                  )}
+                  <Button variant="outline" className="w-full mt-4 border-green-600 text-green-700 hover:bg-green-50">
+                    Благодаря, довиждане
+                  </Button>
+                </motion.div>
+              </div>
             </div>
-            <Button 
-              onClick={() => window.location.href = '/'}
-              className="bg-blue-600 hover:bg-blue-700 rounded-full px-8"
-            >
-              Към началната страница
-            </Button>
+
+            <div className="bg-slate-50 rounded-xl p-4 border border-slate-200">
+              <p className="text-xs text-slate-600 text-center">
+                💡 <span className="font-medium">Добре е да знаете:</span> Досието Ви е запазено и можете да го прегледате по всяко време от клиентския портал. 
+                Консултантът Ви ще има достъп до пълната информация.
+              </p>
+            </div>
           </motion.div>
         </div>
       </div>

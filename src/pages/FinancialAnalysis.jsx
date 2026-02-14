@@ -81,21 +81,51 @@ export default function FinancialAnalysis() {
         if (results.length > 0) {
           const analysis = results[0];
           setAnalysisRecordId(analysis.id);
-          setFormData(analysis);
-          setCurrentStep(analysis.current_step || 1);
           
-          // Load client data for planner integration
+          // Load client data to fill missing fields
           if (analysis.client_id) {
             base44.entities.Client.filter({ id: analysis.client_id }).then(clients => {
               if (clients.length > 0) {
+                const client = clients[0];
+                
+                // Merge client data with analysis data (analysis data takes priority)
+                const mergedData = {
+                  ...analysis,
+                  include_partner: client.family_type === 'family',
+                  client_first_name: analysis.client_first_name || client.first_name,
+                  client_last_name: analysis.client_last_name || client.last_name,
+                  client_email: analysis.client_email || client.email,
+                  client_phone: analysis.client_phone || client.phone,
+                  partner_first_name: analysis.partner_first_name || client.partner_first_name,
+                  partner_last_name: analysis.partner_last_name || client.partner_last_name,
+                  partner_email: analysis.partner_email || client.partner_email,
+                  children_count: analysis.children_count ?? client.children_count,
+                };
+                
+                setFormData(mergedData);
+                setCurrentStep(analysis.current_step || 1);
+                
                 setPlannerData({
-                  client_id: clients[0].id,
-                  family_type: clients[0].family_type,
+                  client_id: client.id,
+                  family_type: client.family_type,
+                  client_first_name: client.first_name,
+                  client_last_name: client.last_name,
+                  client_email: client.email,
+                  client_phone: client.phone,
+                  partner_first_name: client.partner_first_name,
+                  partner_last_name: client.partner_last_name,
+                  partner_email: client.partner_email,
+                  children_count: client.children_count,
+                  children_names: client.children_names,
+                  children_ages: client.children_ages,
                   gdpr_consent_a: analysis.gdpr_consent_a,
                   gdpr_consent_c: analysis.gdpr_consent_c
                 });
               }
             });
+          } else {
+            setFormData(analysis);
+            setCurrentStep(analysis.current_step || 1);
           }
         }
         localStorage.removeItem('resumeAnalysisId');

@@ -58,12 +58,12 @@ import Contact from './pages/Contact';
 import FinancialAnalysis from './pages/FinancialAnalysis';
 import FinancialPlanCreate from './pages/FinancialPlanCreate';
 import FinancialPlanView from './pages/FinancialPlanView';
-import FinancialPlanner from './pages/FinancialPlanner';
 import Home from './pages/Home';
 import ProductCatalogAdmin from './pages/ProductCatalogAdmin';
 import ProductConfigDemo from './pages/ProductConfigDemo';
 import Services from './pages/Services';
 import app from './pages/_app';
+import FinancialPlanner from './pages/FinancialPlanner';
 import __Layout from './Layout.jsx';
 
 
@@ -79,12 +79,12 @@ export const PAGES = {
     "FinancialAnalysis": FinancialAnalysis,
     "FinancialPlanCreate": FinancialPlanCreate,
     "FinancialPlanView": FinancialPlanView,
-    "FinancialPlanner": FinancialPlanner,
     "Home": Home,
     "ProductCatalogAdmin": ProductCatalogAdmin,
     "ProductConfigDemo": ProductConfigDemo,
     "Services": Services,
     "_app": app,
+    "FinancialPlanner": FinancialPlanner,
 }
 
 export const pagesConfig = {

@@ -244,25 +244,38 @@ export default function FinancialAnalysis() {
   };
 
   const handleChange = async (field, value) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
+    setFormData(prev => {
+      const updated = { ...prev, [field]: value };
+      
+      // Auto-save after a delay (debounced) - save ALL formData to ensure nothing is lost
+      if (analysisRecordId) {
+        clearTimeout(window.autoSaveTimeout);
+        window.autoSaveTimeout = setTimeout(async () => {
+          try {
+            // Don't delete empty strings - keep them to preserve user input
+            const dataToSave = { ...updated };
+            // Only delete null values
+            Object.keys(dataToSave).forEach(key => {
+              if (dataToSave[key] === null) {
+                delete dataToSave[key];
+              }
+            });
+            
+            dataToSave.last_updated_step = new Date().toISOString();
+            
+            await base44.entities.FinancialAnalysisSubmission.update(analysisRecordId, dataToSave);
+          } catch (error) {
+            console.error('Auto-save error:', error);
+          }
+        }, 2000);
+      }
+      
+      return updated;
+    });
+    
     // Clear validation errors when user starts filling
     if (showValidationErrors) {
       setShowValidationErrors(false);
-    }
-    
-    // Auto-save after a delay (debounced)
-    if (analysisRecordId) {
-      clearTimeout(window.autoSaveTimeout);
-      window.autoSaveTimeout = setTimeout(async () => {
-        try {
-          await base44.entities.FinancialAnalysisSubmission.update(analysisRecordId, {
-            [field]: value,
-            last_updated_step: new Date().toISOString()
-          });
-        } catch (error) {
-          console.error('Auto-save error:', error);
-        }
-      }, 2000);
     }
   };
 
@@ -831,8 +844,9 @@ export default function FinancialAnalysis() {
   const saveProgress = async (step) => {
     try {
       const cleanData = { ...formData };
+      // Only delete null values, keep empty strings to preserve user input
       Object.keys(cleanData).forEach(key => {
-        if (cleanData[key] === '' || cleanData[key] === null) {
+        if (cleanData[key] === null) {
           delete cleanData[key];
         }
       });
@@ -868,8 +882,9 @@ export default function FinancialAnalysis() {
     
     try {
       const cleanData = { ...formData };
+      // Only delete null values, keep empty strings
       Object.keys(cleanData).forEach(key => {
-        if (cleanData[key] === '' || cleanData[key] === null) {
+        if (cleanData[key] === null) {
           delete cleanData[key];
         }
       });

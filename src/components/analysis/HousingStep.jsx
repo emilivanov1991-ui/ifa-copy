@@ -238,34 +238,15 @@ export default function HousingStep({ data, onChange, showErrors }) {
                   </div>
                   <div className="space-y-2" data-invalid={isFieldInvalid(data.current_mortgage_bank) ? "true" : undefined}>
                     <Label>Банка <span className="text-red-500">*</span></Label>
-                    <Select 
-                      value={data.current_mortgage_bank || ''} 
+                    <Combobox
+                      options={bankOptions}
+                      value={data.current_mortgage_bank || ''}
                       onValueChange={(value) => onChange('current_mortgage_bank', value)}
-                    >
-                      <SelectTrigger className={`rounded-lg ${isFieldInvalid(data.current_mortgage_bank) ? 'border-red-500 bg-red-50' : ''}`}>
-                        <SelectValue placeholder="Изберете" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="allianz">Алианц Банк България АД</SelectItem>
-                        <SelectItem value="dsk">Банка ДСК АД</SelectItem>
-                        <SelectItem value="bacb">Българо-Американска Кредитна Банка (БАКБ) АД</SelectItem>
-                        <SelectItem value="bbr">Българска Банка за Развитие ЕАД</SelectItem>
-                        <SelectItem value="ccb">Централна Кооперативна Банка (ЦКБ) АД</SelectItem>
-                        <SelectItem value="investbank">Инвестбанк АД</SelectItem>
-                        <SelectItem value="iab">Интернешънъл Асет Банк АД</SelectItem>
-                        <SelectItem value="municipal">Общинска Банка АД</SelectItem>
-                        <SelectItem value="ubb">Обединена Българска Банка (ОББ) АД</SelectItem>
-                        <SelectItem value="fibank">Първа Инвестиционна Банка АД (Fibank)</SelectItem>
-                        <SelectItem value="procredit">ПроКредит Банк (България) ЕАД</SelectItem>
-                        <SelectItem value="postbank">Пощенска Банка Юробанк България АД</SelectItem>
-                        <SelectItem value="texim">Тексим Банк АД</SelectItem>
-                        <SelectItem value="tbi">Ти Би Ай Банк ЕАД</SelectItem>
-                        <SelectItem value="tokuda">Токуда Банк АД</SelectItem>
-                        <SelectItem value="tbank">Търговска Банка Д АД</SelectItem>
-                        <SelectItem value="unicredit">Уникредит Булбанк АД</SelectItem>
-                        <SelectItem value="eurobank">Юробанк България АД (Пощенска Банка)</SelectItem>
-                      </SelectContent>
-                    </Select>
+                      placeholder="Изберете банка"
+                      searchPlaceholder="Търсене на банка..."
+                      emptyText="Няма намерена банка."
+                      triggerClassName={`rounded-lg ${isFieldInvalid(data.current_mortgage_bank) ? 'border-red-500 bg-red-50' : ''}`}
+                    />
                   </div>
                   <div className="space-y-2" data-invalid={isFieldInvalid(data.current_mortgage_remaining_years) ? "true" : undefined}>
                     <Label>Оставащ период (години) <span className="text-red-500">*</span></Label>

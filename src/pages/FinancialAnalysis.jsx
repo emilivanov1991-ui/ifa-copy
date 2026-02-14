@@ -695,7 +695,7 @@ export default function FinancialAnalysis() {
       if (name && name.trim()) allNames.add(name.trim());
     });
     
-    // Birthday party names
+    // Birthday party names (from Housing visualization aid)
     (formData.birthday_family_names || []).forEach(name => {
       if (name && name.trim()) allNames.add(name.trim());
     });
@@ -707,22 +707,28 @@ export default function FinancialAnalysis() {
     });
     
     // Reserve referrals
-    (formData.referrals_no_reserve || []).forEach(name => {
+    (formData.referrals_have_savings || []).forEach(name => {
       if (name && name.trim()) allNames.add(name.trim());
     });
-    (formData.referrals_has_reserve || []).forEach(name => {
-      if (name && name.trim()) allNames.add(name.trim());
-    });
-    
-    // Pension referrals
-    (formData.referrals_pension_planning || []).forEach(name => {
-      if (name && name.trim()) allNames.add(name.trim());
-    });
-    (formData.referrals_already_retired || []).forEach(name => {
+    (formData.referrals_invest_regularly || []).forEach(name => {
       if (name && name.trim()) allNames.add(name.trim());
     });
     
-    // Children referrals
+    // Pension referrals (all 4 questions)
+    (formData.pension_referrals_abroad || []).forEach(name => {
+      if (name && name.trim()) allNames.add(name.trim());
+    });
+    (formData.pension_referrals_high_income || []).forEach(name => {
+      if (name && name.trim()) allNames.add(name.trim());
+    });
+    (formData.pension_referrals_entrepreneur || []).forEach(name => {
+      if (name && name.trim()) allNames.add(name.trim());
+    });
+    (formData.pension_referrals_young || []).forEach(name => {
+      if (name && name.trim()) allNames.add(name.trim());
+    });
+    
+    // Children & Goals referrals
     (formData.referrals_have_children || []).forEach(name => {
       if (name && name.trim()) allNames.add(name.trim());
     });

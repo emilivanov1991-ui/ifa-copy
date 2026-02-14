@@ -671,6 +671,8 @@ export default function FinancialAnalysis() {
   const getIncompleteSteps = () => {
     const incomplete = [];
     for (let i = 1; i <= 9; i++) {
+      // Skip step 2 (archived Personal Data step)
+      if (i === 2) continue;
       if (!validateStep(i)) {
         incomplete.push(i);
       }

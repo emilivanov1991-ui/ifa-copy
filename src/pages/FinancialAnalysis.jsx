@@ -903,14 +903,14 @@ export default function FinancialAnalysis() {
         }
       }
 
-    // Send emails to client and partner
-    const clientName = `${formData.client_first_name} ${formData.client_last_name}`;
-    const clientEmail = formData.client_email;
+      // Send emails to client and partner
+      const clientName = `${plannerData?.client_first_name || 'Клиент'} ${plannerData?.client_last_name || ''}`;
+      const clientEmail = plannerData?.client_email || formData.client_email;
 
-    // Email to client
-    if (clientEmail) {
-      const portalUrl = `${window.location.origin}/ClientPortal`;
-      const clientEmailBody = `
+      // Email to client
+      if (clientEmail) {
+        const portalUrl = `${window.location.origin}/ClientPortal`;
+        const clientEmailBody = `
 Уважаеми/а ${clientName},
 
 Благодарим Ви за попълнения персонален финансов анализ!
@@ -935,25 +935,25 @@ export default function FinancialAnalysis() {
 
 С уважение,
 Екипът на APEX Financial
-      `;
+        `;
 
-      await base44.integrations.Core.SendEmail({
-        to: clientEmail,
-        subject: 'Вашият финансов анализ е получен - Данни за вход в портала',
-        body: clientEmailBody
-      });
-    }
+        await base44.integrations.Core.SendEmail({
+          to: clientEmail,
+          subject: 'Вашият финансов анализ е получен - Данни за вход в портала',
+          body: clientEmailBody
+        });
+      }
 
-    // Email to partner if included
-    if (formData.include_partner && formData.partner_email) {
-      const partnerName = `${formData.partner_first_name} ${formData.partner_last_name}`;
-      const partnerEmail = formData.partner_email;
-      const portalUrl = `${window.location.origin}/ClientPortal`;
+      // Email to partner if included
+      if (formData.include_partner && plannerData?.partner_email) {
+        const partnerName = `${plannerData?.partner_first_name || 'Партньор'} ${plannerData?.partner_last_name || ''}`;
+        const partnerEmail = plannerData?.partner_email;
+        const portalUrl = `${window.location.origin}/ClientPortal`;
 
-      const partnerEmailBody = `
+        const partnerEmailBody = `
 Уважаеми/а ${partnerName},
 
-Благодарим Ви за участието в персоналния финансов анализ заедно с ${formData.client_first_name} ${formData.client_last_name}!
+Благодарим Ви за участието в персоналния финансов анализ заедно с ${plannerData?.client_first_name || 'Клиент'} ${plannerData?.client_last_name || ''}!
 
 Вашите данни са получени успешно и ще бъдат прегледани от нашия екип. Очаквайте обаждане или имейл в рамките на 24-48 часа за насрочване на Вашата безплатна консултация.
 
@@ -975,17 +975,22 @@ export default function FinancialAnalysis() {
 
 С уважение,
 Екипът на APEX Financial
-      `;
+        `;
 
-      await base44.integrations.Core.SendEmail({
-        to: partnerEmail,
-        subject: 'Вашият финансов анализ е получен - Данни за вход в портала',
-        body: partnerEmailBody
-      });
+        await base44.integrations.Core.SendEmail({
+          to: partnerEmail,
+          subject: 'Вашият финансов анализ е получен - Данни за вход в портала',
+          body: partnerEmailBody
+        });
+      }
+
+      setIsSubmitting(false);
+      setIsSubmitted(true);
+    } catch (error) {
+      console.error('Грешка при изпращане на анализа:', error);
+      alert('Възникна грешка при изпращане на анализа. Моля опитайте отново.');
+      setIsSubmitting(false);
     }
-
-    setIsSubmitting(false);
-    setIsSubmitted(true);
   };
 
   if (isSubmitted) {

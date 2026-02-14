@@ -490,10 +490,8 @@ export default function FinancialAnalysis() {
         return true;
       
       case 6: // Children & Goals
-        // If children section is not skipped, education is required (allow 0)
-        if (!formData.skip_children_section) {
-          if (formData.children_education_costs === undefined || formData.children_education_costs === '') return false;
-        }
+        // Education costs required (allow 0)
+        if (formData.children_education_costs === undefined || formData.children_education_costs === '') return false;
         // Other goals section has no required fields (can be skipped)
         return true;
       

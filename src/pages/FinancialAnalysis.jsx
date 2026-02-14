@@ -835,70 +835,73 @@ export default function FinancialAnalysis() {
 
   const handleSubmit = async () => {
     setIsSubmitting(true);
+    
+    try {
+      const cleanData = { ...formData };
+      Object.keys(cleanData).forEach(key => {
+        if (cleanData[key] === '' || cleanData[key] === null) {
+          delete cleanData[key];
+        }
+      });
 
-    const cleanData = { ...formData };
-    Object.keys(cleanData).forEach(key => {
-      if (cleanData[key] === '' || cleanData[key] === null) {
-        delete cleanData[key];
+      let clientRecord;
+      let partnerRecord;
+      
+      // Generate passwords for portal access
+      const clientPassword = generatePassword();
+      const partnerPassword = generatePassword();
+
+      // If coming from Financial Planner with existing client
+      if (plannerData?.client_id) {
+        // Update existing client record
+        await base44.entities.Client.update(plannerData.client_id, {
+          stage: 'analysis',
+          portal_password: clientPassword,
+          gdpr_consent_a: formData.gdpr_consent_a,
+          gdpr_consent_b: formData.gdpr_consent_b,
+          gdpr_consent_c: formData.gdpr_consent_c,
+          gdpr_consent_date: new Date().toISOString()
+        });
+        
+        // Create analysis linked to existing client
+        cleanData.client_id = plannerData.client_id;
+        const analysisSubmission = await base44.entities.FinancialAnalysisSubmission.create(cleanData);
+        setAnalysisRecordId(analysisSubmission.id);
+        
+      } else {
+        // Create new client from planner data
+        clientRecord = await base44.entities.Client.create({
+          first_name: plannerData?.client_first_name || 'Клиент',
+          last_name: plannerData?.client_last_name || '',
+          email: plannerData?.client_email || formData.client_email || '',
+          phone: plannerData?.client_phone || formData.client_phone || '',
+          portal_password: clientPassword,
+          status: 'pending',
+          stage: 'analysis',
+          family_type: plannerData?.family_type || 'individual',
+          gdpr_consent_a: formData.gdpr_consent_a,
+          gdpr_consent_b: formData.gdpr_consent_b,
+          gdpr_consent_c: formData.gdpr_consent_c,
+          gdpr_consent_date: new Date().toISOString()
+        });
+
+        // Create analysis linked to new client
+        cleanData.client_id = clientRecord.id;
+        const analysisSubmission = await base44.entities.FinancialAnalysisSubmission.create(cleanData);
+        setAnalysisRecordId(analysisSubmission.id);
+        
+        // Create partner client if included
+        if (formData.include_partner && plannerData?.partner_email) {
+          partnerRecord = await base44.entities.Client.create({
+            first_name: plannerData?.partner_first_name || 'Партньор',
+            last_name: plannerData?.partner_last_name || '',
+            email: plannerData?.partner_email || '',
+            phone: plannerData?.partner_phone || '',
+            portal_password: partnerPassword,
+            status: 'pending'
+          });
+        }
       }
-    });
-
-    // Създаваме анализа
-    const analysisSubmission = await base44.entities.FinancialAnalysisSubmission.create(cleanData);
-
-    // Generate passwords for portal access
-    const clientPassword = generatePassword();
-    const partnerPassword = generatePassword();
-
-    // Create Client record for client с връзка към анализа
-    const clientRecord = await base44.entities.Client.create({
-      first_name: formData.client_first_name,
-      last_name: formData.client_last_name,
-      email: formData.client_email,
-      phone: formData.client_phone,
-      portal_password: clientPassword,
-      status: 'pending'
-    });
-
-    // Create Client record for partner if included
-    if (formData.include_partner && formData.partner_email) {
-      await base44.entities.Client.create({
-        first_name: formData.partner_first_name,
-        last_name: formData.partner_last_name,
-        email: formData.partner_email,
-        phone: formData.partner_phone,
-        portal_password: partnerPassword,
-        status: 'pending'
-      });
-    }
-
-    // Обновяваме анализа с връзка към клиента
-    await base44.entities.FinancialAnalysisSubmission.update(analysisSubmission.id, {
-      client_id: clientRecord.id
-    });
-
-    // Ако има досие от Financial Planner, актуализираме етапа
-    if (plannerData?.client_id) {
-      await base44.entities.Client.update(plannerData.client_id, {
-        stage: 'analysis',
-        email: formData.client_email,
-        phone: formData.client_phone,
-        portal_password: clientPassword,
-        gdpr_consent_a: formData.gdpr_consent_a,
-        gdpr_consent_b: formData.gdpr_consent_b,
-        gdpr_consent_c: formData.gdpr_consent_c,
-        gdpr_consent_date: new Date().toISOString()
-      });
-    } else {
-      // Актуализираме новосъздадения клиент
-      await base44.entities.Client.update(clientRecord.id, {
-        stage: 'analysis',
-        gdpr_consent_a: formData.gdpr_consent_a,
-        gdpr_consent_b: formData.gdpr_consent_b,
-        gdpr_consent_c: formData.gdpr_consent_c,
-        gdpr_consent_date: new Date().toISOString()
-      });
-    }
 
     // Send emails to client and partner
     const clientName = `${formData.client_first_name} ${formData.client_last_name}`;

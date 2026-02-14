@@ -70,11 +70,11 @@ const calculateLoanAmount = (monthlyPayment, annualRate, years) => {
   return monthlyPayment * ((1 - Math.pow(1 + monthlyRate, -months)) / monthlyRate);
 };
 
-// All calculations in BGN
-// State pension: 60% of income, min 630 BGN, max 3400 BGN per person
+// All calculations now in EUR directly (no BGN conversion needed)
+// State pension: 60% of income, min 320€, max 1740€ per person
 const calculateStatePension = (clientIncome, partnerIncome, clientIsEntrepreneur, partnerIsEntrepreneur, isFamily) => {
-  const minPension = 630; // BGN
-  const maxPension = 3400; // BGN
+  const minPension = 320; // EUR
+  const maxPension = 1740; // EUR
   
   let clientPension;
   if (clientIsEntrepreneur) {
@@ -147,9 +147,9 @@ export default function FinancialPlanner() {
   const [clientAge, setClientAge] = useState(35);
   const [partnerAge, setPartnerAge] = useState(35);
   const [childrenAges, setChildrenAges] = useState([]);
-  const [monthlyIncome, setMonthlyIncome] = useState(1000); // BGN
+  const [monthlyIncome, setMonthlyIncome] = useState(1000); // EUR
   const [selectedPriorities, setSelectedPriorities] = useState([]); // multi-select
-  const [partnerIncome, setPartnerIncome] = useState(1000); // BGN
+  const [partnerIncome, setPartnerIncome] = useState(1000); // EUR
   
   // Percentage allocations (default: 10% reserve, 5% pension, 30% housing, 5% other = 50% total)
   const [allocations, setAllocations] = useState({
@@ -202,7 +202,7 @@ export default function FinancialPlanner() {
   const yearsToRetirement = Math.max(0, 65 - avgAge);
   const numPeople = familyType === 'family' ? 2 : 1;
 
-  // Calculate financial values based on allocations (all in BGN)
+  // Calculate financial values based on allocations (all in EUR)
   const calculateGoals = useMemo(() => {
     const securityPercent = allocations.security;
     const pensionPercent = allocations.pension;
@@ -216,7 +216,7 @@ export default function FinancialPlanner() {
     const reserveMonths = (securityPercent / 10) * 6;
     const securityValue = roundTo100(totalIncome * reserveMonths);
 
-    // 2. Pension calculation (all in BGN)
+    // 2. Pension calculation (all in EUR)
     // pensionPercent% of income invested monthly at 8% until retirement
     // Then moved to 3% fund and withdrawn over 20 years
     const monthlyPensionInvestment = totalIncome * (pensionPercent / 100);
@@ -229,10 +229,10 @@ export default function FinancialPlanner() {
       partnerInsuranceType === 'entrepreneur',
       familyType === 'family'
     );
-    // Both values in BGN
+    // Both values now in EUR
     const totalMonthlyPension = roundTo10(monthlyPensionFromFund + statePension);
 
-    // 3. Housing calculation (all in BGN)
+    // 3. Housing calculation (all in EUR)
     // housingPercent% of income goes to mortgage payment
     // 3% interest, max 30 year term (adjusted if age + term > 70)
     const maxLoanTerm = Math.min(30, Math.max(5, 70 - avgAge));
@@ -241,18 +241,18 @@ export default function FinancialPlanner() {
     // Loan is 85% of property value, so property = loan / 0.85 = loan * 1.176
     const housingValue = roundTo100(loanAmount * 1.176);
 
-    // 4. Other goals calculation (all in BGN)
+    // 4. Other goals calculation (all in EUR)
     // cashPercent% of income invested monthly at 5% until retirement
     const monthlyOtherInvestment = totalIncome * (cashPercent / 100);
     const otherGoalsValue = roundTo100(calculateFutureValue(monthlyOtherInvestment, 0.05, yearsToRetirement));
 
-    // Total wealth = Reserve + Pension Fund at retirement + Housing Value + Other Goals (all in BGN)
+    // Total wealth = Reserve + Pension Fund at retirement + Housing Value + Other Goals (all in EUR)
     const pensionFundRounded = roundTo100(pensionFundAtRetirement);
     const totalWealth = securityValue + pensionFundRounded + housingValue + otherGoalsValue;
 
     return {
       security: securityValue,
-      pension: totalMonthlyPension, // This shows monthly pension income in BGN
+      pension: totalMonthlyPension, // This shows monthly pension income in EUR
       pensionFund: pensionFundRounded, // For total wealth calculation
       housing: housingValue,
       cash: otherGoalsValue,
@@ -284,6 +284,11 @@ export default function FinancialPlanner() {
   const handleAllocationChange = (changedKey, newValue) => {
     const oldValue = allocations[changedKey];
     const difference = newValue - oldValue;
+
+    // Auto-lock the slider being changed
+    if (!lockedGoals[changedKey]) {
+      setLockedGoals(prev => ({ ...prev, [changedKey]: true }));
+    }
 
     // Get unlocked allocations (excluding the one being changed)
     const unlockedKeys = Object.keys(allocations).filter(
@@ -1958,19 +1963,19 @@ export default function FinancialPlanner() {
                           }}
                           className={cn("text-4xl font-bold text-blue-500 bg-transparent border-none text-center w-36 outline-none focus:ring-2 focus:ring-blue-500 rounded")}
                         />
-                        <span className={cn("text-xl ml-2", mutedTextClasses)}>лв</span>
+                        <span className={cn("text-xl ml-2", mutedTextClasses)}>€</span>
                       </div>
                       <Slider
                         value={[typeof monthlyIncome === 'number' ? monthlyIncome : 1000]}
                         onValueChange={(v) => setMonthlyIncome(v[0])}
-                        min={800}
-                        max={30000}
+                        min={400}
+                        max={15000}
                         step={100}
                         className="mb-2"
                       />
                       <div className={cn("flex justify-between text-sm", mutedTextClasses)}>
-                        <span>800 лв</span>
-                        <span>30 000 лв</span>
+                        <span>400 €</span>
+                        <span>15 000 €</span>
                       </div>
                     </div>
 
@@ -2000,19 +2005,19 @@ export default function FinancialPlanner() {
                             }}
                             className={cn("text-4xl font-bold text-blue-500 bg-transparent border-none text-center w-36 outline-none focus:ring-2 focus:ring-blue-500 rounded")}
                           />
-                          <span className={cn("text-xl ml-2", mutedTextClasses)}>лв</span>
+                          <span className={cn("text-xl ml-2", mutedTextClasses)}>€</span>
                         </div>
                         <Slider
                           value={[typeof partnerIncome === 'number' ? partnerIncome : 1000]}
                           onValueChange={(v) => setPartnerIncome(v[0])}
-                          min={800}
-                          max={30000}
+                          min={400}
+                          max={15000}
                           step={100}
                           className="mb-2"
                         />
                         <div className={cn("flex justify-between text-sm", mutedTextClasses)}>
-                          <span>800 лв</span>
-                          <span>30 000 лв</span>
+                          <span>400 €</span>
+                          <span>15 000 €</span>
                         </div>
                       </div>
                     )}
@@ -2028,7 +2033,7 @@ export default function FinancialPlanner() {
                       <div className="flex justify-between items-center">
                         <span className="text-base font-semibold text-blue-900">Общо месечен доход:</span>
                         <span className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
-                          {formatNumber((typeof monthlyIncome === 'number' ? monthlyIncome : 0) + (typeof partnerIncome === 'number' ? partnerIncome : 0))} лв
+                          {formatNumber((typeof monthlyIncome === 'number' ? monthlyIncome : 0) + (typeof partnerIncome === 'number' ? partnerIncome : 0))} €
                         </span>
                       </div>
                     </motion.div>
@@ -2513,7 +2518,7 @@ export default function FinancialPlanner() {
                       animate={{ scale: 1 }}
                       transition={{ duration: 0.2 }}
                     >
-                      {formatNumber(calculateGoals.security)} лв
+                      {formatNumber(calculateGoals.security)} €
                     </motion.p>
                     <Slider
                       value={[allocations.security]}
@@ -2589,7 +2594,7 @@ export default function FinancialPlanner() {
                       animate={{ scale: 1 }}
                       transition={{ duration: 0.2 }}
                     >
-                      {formatNumber(calculateGoals.pension)} лв
+                      {formatNumber(calculateGoals.pension)} €
                     </motion.p>
                     <Slider
                       value={[allocations.pension]}
@@ -2668,7 +2673,7 @@ export default function FinancialPlanner() {
                       animate={{ scale: 1 }}
                       transition={{ duration: 0.2 }}
                     >
-                      {formatNumber(calculateGoals.housing)} лв
+                      {formatNumber(calculateGoals.housing)} €
                     </motion.p>
                     <Slider
                       value={[allocations.housing]}
@@ -2747,7 +2752,7 @@ export default function FinancialPlanner() {
                       animate={{ scale: 1 }}
                       transition={{ duration: 0.2 }}
                     >
-                      {formatNumber(calculateGoals.cash)} лв
+                      {formatNumber(calculateGoals.cash)} €
                     </motion.p>
                     <Slider
                       value={[allocations.cash]}
@@ -2831,7 +2836,7 @@ export default function FinancialPlanner() {
                     animate={{ scale: 1 }}
                     transition={{ duration: 0.3 }}
                   >
-                    {formatNumber(calculateGoals.totalWealth)} лв
+                    {formatNumber(calculateGoals.totalWealth)} €
                   </motion.p>
                   <p className="text-xs text-blue-200 mt-2 relative z-10">при пенсиониране на {Math.round(avgAge)} + {yearsToRetirement} = {Math.round(avgAge) + yearsToRetirement} години</p>
                 </motion.div>

@@ -1142,9 +1142,9 @@ export default function FinancialAnalysis() {
                   whileHover={{ scale: 1.02 }}
                   className="bg-white rounded-xl p-6 border-2 border-blue-300 hover:border-blue-500 transition-all cursor-pointer shadow-sm hover:shadow-md"
                   onClick={() => {
-                    // Navigate to financial plan presentation
+                    // Navigate to financial plan creation page with analysis preselected
                     if (analysisRecordId) {
-                      window.location.href = createPageUrl('FinancialPlanView') + `?analysisId=${analysisRecordId}`;
+                      window.location.href = createPageUrl('FinancialPlanCreate') + `?analysisId=${analysisRecordId}`;
                     }
                   }}
                 >

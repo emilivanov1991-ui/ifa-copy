@@ -43,6 +43,27 @@ for (let rate = 1; rate <= 8; rate += 0.5) {
   interestRateOptions.push(rate);
 }
 
+const bankOptions = [
+  { value: "allianz", label: "Алианц Банк България АД" },
+  { value: "dsk", label: "Банка ДСК АД" },
+  { value: "bacb", label: "Българо-Американска Кредитна Банка (БАКБ) АД" },
+  { value: "bbr", label: "Българска Банка за Развитие ЕАД" },
+  { value: "ccb", label: "Централна Кооперативна Банка (ЦКБ) АД" },
+  { value: "investbank", label: "Инвестбанк АД" },
+  { value: "iab", label: "Интернешънъл Асет Банк АД" },
+  { value: "municipal", label: "Общинска Банка АД" },
+  { value: "ubb", label: "Обединена Българска Банка (ОББ) АД" },
+  { value: "fibank", label: "Първа Инвестиционна Банка АД (Fibank)" },
+  { value: "procredit", label: "ПроКредит Банк (България) ЕАД" },
+  { value: "postbank", label: "Пощенска Банка Юробанк България АД" },
+  { value: "texim", label: "Тексим Банк АД" },
+  { value: "tbi", label: "Ти Би Ай Банк ЕАД" },
+  { value: "tokuda", label: "Токуда Банк АД" },
+  { value: "tbank", label: "Търговска Банка Д АД" },
+  { value: "unicredit", label: "Уникредит Булбанк АД" },
+  { value: "eurobank", label: "Юробанк България АД (Пощенска Банка)" },
+];
+
 export default function HousingStep({ data, onChange, showErrors }) {
   const [showDownPaymentWarning, setShowDownPaymentWarning] = React.useState(false);
   const isFieldInvalid = (value) => showErrors && (value === undefined || value === '' || value === null);

@@ -65,26 +65,7 @@ export default function PrioritiesStep({ data, onChange, showErrors }) {
   // Filter priorities based on conditions
   const getActivePriorities = () => {
     return allPriorities.filter(p => {
-      // Skip "Други" if other goals section is skipped
-      if (p.key === 'priority_other' && data.skip_other_goals_section) return false;
-      
-      // Skip "Финансово подсигуряване на децата" if children section is skipped
-      if (p.key === 'priority_children' && data.skip_children_section) return false;
-      
-      // Skip "Ново жилище" if not planning change AND no mortgage on owned property
-      if (p.key === 'priority_housing') {
-        const notPlanningChange = data.planning_housing_change === false;
-        const noMortgage = !data.current_housing_has_mortgage;
-        if (notPlanningChange && noMortgage) return false;
-      }
-      
-      // Skip "Защита на собствеността" if no property and no car
-      if (p.key === 'priority_property_protection') {
-        const hasProperty = data.has_property_1 || data.has_property_2 || data.has_property_3;
-        const hasCar = data.has_car_1 || data.has_car_2 || data.has_car_3;
-        if (!hasProperty && !hasCar) return false;
-      }
-      
+      // Always show all priorities - no filtering based on old PersonalDataStep fields
       return true;
     });
   };
@@ -116,7 +97,7 @@ export default function PrioritiesStep({ data, onChange, showErrors }) {
 
   // Check if all priorities are filled
   const allFilled = priorities.every(p => data[p.key] !== undefined && data[p.key] !== null && data[p.key] !== '');
-  const isInvalid = showErrors && !allFilled;
+  const isInvalid = !allFilled; // Always show validation state, not dependent on showErrors
 
   return (
     <div className="space-y-8">

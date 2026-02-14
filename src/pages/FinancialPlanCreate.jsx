@@ -11,7 +11,11 @@ import { createPageUrl } from '../utils';
 import FinancialPlanView from '../components/financial-plan/FinancialPlanView';
 
 export default function FinancialPlanCreate() {
-  const [selectedAnalysisId, setSelectedAnalysisId] = useState(null);
+  // Check URL for preselected analysisId
+  const urlParams = new URLSearchParams(window.location.search);
+  const preselectedAnalysisId = urlParams.get('analysisId');
+  
+  const [selectedAnalysisId, setSelectedAnalysisId] = useState(preselectedAnalysisId || null);
   const [searchTerm, setSearchTerm] = useState('');
   const [planCreated, setPlanCreated] = useState(false);
 

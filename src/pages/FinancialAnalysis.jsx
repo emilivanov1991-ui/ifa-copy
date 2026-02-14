@@ -1168,37 +1168,48 @@ export default function FinancialAnalysis() {
                 <ArrowRight className="ml-2 h-4 w-4" />
               </Button>
             ) : (
-              <Button
-                type="button"
-                onClick={() => {
-                  if (canSubmit) {
-                    if (needsMoreReferrals) {
-                      setShowReferralsStep(true);
+              <div className="flex flex-col items-end gap-2">
+                <Button
+                  type="button"
+                  onClick={() => {
+                    if (canSubmit) {
+                      if (needsMoreReferrals) {
+                        setShowReferralsStep(true);
+                      } else {
+                        handleSubmit();
+                      }
                     } else {
-                      handleSubmit();
+                      // Show which steps are incomplete
+                      console.log('Incomplete steps:', incompleteSteps);
+                      alert(`Непопълнени стъпки: ${incompleteSteps.map(s => steps.find(st => st.id === s)?.title || s).join(', ')}`);
                     }
-                  }
-                }}
-                disabled={isSubmitting || !canSubmit}
-                className="bg-green-600 hover:bg-green-700 rounded-full px-8 disabled:opacity-50"
-              >
-                {isSubmitting ? (
-                  <>
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Изпращане...
-                  </>
-                ) : !canSubmit ? (
-                  <>
-                    <AlertTriangle className="mr-2 h-4 w-4" />
-                    Попълнете всички полета
-                  </>
-                ) : (
-                  <>
-                    Завърши анализа
-                    <CheckCircle className="ml-2 h-4 w-4" />
-                  </>
+                  }}
+                  disabled={isSubmitting || !canSubmit}
+                  className="bg-green-600 hover:bg-green-700 rounded-full px-8 disabled:opacity-50"
+                >
+                  {isSubmitting ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      Изпращане...
+                    </>
+                  ) : !canSubmit ? (
+                    <>
+                      <AlertTriangle className="mr-2 h-4 w-4" />
+                      Попълнете всички полета
+                    </>
+                  ) : (
+                    <>
+                      Завърши анализа
+                      <CheckCircle className="ml-2 h-4 w-4" />
+                    </>
+                  )}
+                </Button>
+                {!canSubmit && (
+                  <p className="text-xs text-red-500">
+                    Непопълнени: {incompleteSteps.map(s => steps.find(st => st.id === s)?.title || s).join(', ')}
+                  </p>
                 )}
-              </Button>
+              </div>
             )}
           </div>
         </motion.div>

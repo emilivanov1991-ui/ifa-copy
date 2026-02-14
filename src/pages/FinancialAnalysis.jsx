@@ -916,10 +916,25 @@ export default function FinancialAnalysis() {
         // Update existing analysis
         await base44.entities.FinancialAnalysisSubmission.update(analysisRecordId, cleanData);
       } else if (plannerData?.client_id) {
-        // Create new analysis with client_id
-        cleanData.client_id = plannerData.client_id;
-        const newAnalysis = await base44.entities.FinancialAnalysisSubmission.create(cleanData);
-        setAnalysisRecordId(newAnalysis.id);
+        // Check if analysis already exists for this client
+        const existingAnalyses = await base44.entities.FinancialAnalysisSubmission.filter(
+          { client_id: plannerData.client_id },
+          '-created_date',
+          1
+        );
+
+        if (existingAnalyses.length > 0) {
+          // Update existing analysis instead of creating new
+          const existingId = existingAnalyses[0].id;
+          cleanData.client_id = plannerData.client_id;
+          await base44.entities.FinancialAnalysisSubmission.update(existingId, cleanData);
+          setAnalysisRecordId(existingId);
+        } else {
+          // Create new analysis with client_id
+          cleanData.client_id = plannerData.client_id;
+          const newAnalysis = await base44.entities.FinancialAnalysisSubmission.create(cleanData);
+          setAnalysisRecordId(newAnalysis.id);
+        }
       }
     } catch (error) {
       console.error('Error saving progress:', error);

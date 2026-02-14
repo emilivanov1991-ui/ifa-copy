@@ -2474,19 +2474,20 @@ export default function FinancialPlanner() {
                     <div className="absolute top-3 right-3 z-10">
                       <Tooltip>
                         <TooltipTrigger asChild>
-                          <motion.button 
-                            onClick={() => toggleLock('security')}
-                            whileHover={{ scale: 1.1 }}
-                            whileTap={{ scale: 0.9 }}
+                          <button 
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              toggleLock('security');
+                            }}
                             className={cn(
-                              "p-2 rounded-lg transition-all shadow-lg",
+                              "p-3 rounded-lg transition-all shadow-lg hover:scale-110 active:scale-95",
                               lockedGoals.security 
                                 ? "bg-blue-600 text-white" 
                                 : "bg-slate-100 text-slate-400 hover:bg-blue-50 hover:text-blue-600"
                             )}
                           >
-                            {lockedGoals.security ? <Lock className="w-4 h-4" /> : <Unlock className="w-4 h-4" />}
-                          </motion.button>
+                            {lockedGoals.security ? <Lock className="w-5 h-5" /> : <Unlock className="w-5 h-5" />}
+                          </button>
                         </TooltipTrigger>
                         <TooltipContent side="top" className="bg-slate-900 text-white">
                           <p>{lockedGoals.security ? 'Отключи за авто-корекция' : 'Заключи текущата стойност'}</p>
@@ -2550,19 +2551,20 @@ export default function FinancialPlanner() {
                     <div className="absolute top-3 right-3 z-10">
                       <Tooltip>
                         <TooltipTrigger asChild>
-                          <motion.button 
-                            onClick={() => toggleLock('pension')}
-                            whileHover={{ scale: 1.1 }}
-                            whileTap={{ scale: 0.9 }}
+                          <button 
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              toggleLock('pension');
+                            }}
                             className={cn(
-                              "p-2 rounded-lg transition-all shadow-lg",
+                              "p-3 rounded-lg transition-all shadow-lg hover:scale-110 active:scale-95",
                               lockedGoals.pension 
                                 ? "bg-blue-600 text-white" 
                                 : "bg-slate-100 text-slate-400 hover:bg-blue-50 hover:text-blue-600"
                             )}
                           >
-                            {lockedGoals.pension ? <Lock className="w-4 h-4" /> : <Unlock className="w-4 h-4" />}
-                          </motion.button>
+                            {lockedGoals.pension ? <Lock className="w-5 h-5" /> : <Unlock className="w-5 h-5" />}
+                          </button>
                         </TooltipTrigger>
                         <TooltipContent side="top" className="bg-slate-900 text-white">
                           <p>{lockedGoals.pension ? 'Отключи за авто-корекция' : 'Заключи текущата стойност'}</p>
@@ -2626,19 +2628,20 @@ export default function FinancialPlanner() {
                     <div className="absolute top-3 right-3 z-10">
                       <Tooltip>
                         <TooltipTrigger asChild>
-                          <motion.button 
-                            onClick={() => toggleLock('housing')}
-                            whileHover={{ scale: 1.1 }}
-                            whileTap={{ scale: 0.9 }}
+                          <button 
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              toggleLock('housing');
+                            }}
                             className={cn(
-                              "p-2 rounded-lg transition-all shadow-lg",
+                              "p-3 rounded-lg transition-all shadow-lg hover:scale-110 active:scale-95",
                               lockedGoals.housing 
                                 ? "bg-blue-600 text-white" 
                                 : "bg-slate-100 text-slate-400 hover:bg-blue-50 hover:text-blue-600"
                             )}
                           >
-                            {lockedGoals.housing ? <Lock className="w-4 h-4" /> : <Unlock className="w-4 h-4" />}
-                          </motion.button>
+                            {lockedGoals.housing ? <Lock className="w-5 h-5" /> : <Unlock className="w-5 h-5" />}
+                          </button>
                         </TooltipTrigger>
                         <TooltipContent side="top" className="bg-slate-900 text-white">
                           <p>{lockedGoals.housing ? 'Отключи за авто-корекция' : 'Заключи текущата стойност'}</p>
@@ -2705,19 +2708,20 @@ export default function FinancialPlanner() {
                     <div className="absolute top-3 right-3 z-10">
                       <Tooltip>
                         <TooltipTrigger asChild>
-                          <motion.button 
-                            onClick={() => toggleLock('cash')}
-                            whileHover={{ scale: 1.1 }}
-                            whileTap={{ scale: 0.9 }}
+                          <button 
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              toggleLock('cash');
+                            }}
                             className={cn(
-                              "p-2 rounded-lg transition-all shadow-lg",
+                              "p-3 rounded-lg transition-all shadow-lg hover:scale-110 active:scale-95",
                               lockedGoals.cash 
                                 ? "bg-blue-600 text-white" 
                                 : "bg-slate-100 text-slate-400 hover:bg-blue-50 hover:text-blue-600"
                             )}
                           >
-                            {lockedGoals.cash ? <Lock className="w-4 h-4" /> : <Unlock className="w-4 h-4" />}
-                          </motion.button>
+                            {lockedGoals.cash ? <Lock className="w-5 h-5" /> : <Unlock className="w-5 h-5" />}
+                          </button>
                         </TooltipTrigger>
                         <TooltipContent side="top" className="bg-slate-900 text-white">
                           <p>{lockedGoals.cash ? 'Отключи за авто-корекция' : 'Заключи текущата стойност'}</p>

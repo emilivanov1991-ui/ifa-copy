@@ -74,20 +74,20 @@ export default function FinancialAnalysis() {
   // Зареждане на данни от Financial Planner или resume на анализ
   useEffect(() => {
     const resumeId = localStorage.getItem('resumeAnalysisId');
-    
+
     if (resumeId) {
       // Resume existing analysis
       base44.entities.FinancialAnalysisSubmission.filter({ id: resumeId }).then(results => {
         if (results.length > 0) {
           const analysis = results[0];
           setAnalysisRecordId(analysis.id);
-          
+
           // Load client data to fill missing fields
           if (analysis.client_id) {
             base44.entities.Client.filter({ id: analysis.client_id }).then(clients => {
               if (clients.length > 0) {
                 const client = clients[0];
-                
+
                 // Merge client data with analysis data (analysis data takes priority)
                 const mergedData = {
                   ...analysis,
@@ -101,10 +101,10 @@ export default function FinancialAnalysis() {
                   partner_email: analysis.partner_email || client.partner_email,
                   children_count: analysis.children_count ?? client.children_count,
                 };
-                
+
                 setFormData(mergedData);
                 setCurrentStep(analysis.current_step || 1);
-                
+
                 setPlannerData({
                   client_id: client.id,
                   family_type: client.family_type,
@@ -132,36 +132,94 @@ export default function FinancialAnalysis() {
       });
       return;
     }
-    
+
     const storedData = localStorage.getItem('financialPlannerData');
     if (storedData) {
       const parsed = JSON.parse(storedData);
       setPlannerData(parsed);
-      
-      // Попълване на формата с данни от планера
-      setFormData(prev => ({
-        ...prev,
-        include_partner: parsed.family_type === 'family',
-        client_first_name: parsed.client_first_name,
-        client_last_name: parsed.client_last_name,
-        partner_first_name: parsed.partner_first_name,
-        partner_last_name: parsed.partner_last_name,
-        children_count: parsed.children_count,
-        client_age: parsed.client_age,
-        partner_age: parsed.partner_age,
-        client_monthly_net_income: parsed.monthly_income,
-        partner_monthly_net_income: parsed.partner_income,
-        total_monthly_income: (parsed.monthly_income || 0) + (parsed.partner_income || 0),
-        gdpr_consent_a: parsed.gdpr_consent_a || false,
-        gdpr_consent_b: parsed.gdpr_consent_b || false,
-        gdpr_consent_c: parsed.gdpr_consent_c || false
-      }));
-      
-      // Ако има дадени съгласия, прескачаме стъпка 1 (Съгласие)
-      if (parsed.gdpr_consent_a && parsed.gdpr_consent_c) {
-        setCurrentStep(3); // Директно към "Ново жилище"
+
+      // Проверка дали вече съществува анализ за този клиент
+      if (parsed.client_id) {
+        base44.entities.FinancialAnalysisSubmission.filter(
+          { client_id: parsed.client_id },
+          '-created_date',
+          1
+        ).then(existingAnalyses => {
+          if (existingAnalyses.length > 0) {
+            // Зареди съществуващия анализ
+            const existingAnalysis = existingAnalyses[0];
+            setAnalysisRecordId(existingAnalysis.id);
+
+            // Merge existing analysis data with planner data
+            const mergedData = {
+              ...existingAnalysis,
+              include_partner: parsed.family_type === 'family',
+              client_first_name: existingAnalysis.client_first_name || parsed.client_first_name,
+              client_last_name: existingAnalysis.client_last_name || parsed.client_last_name,
+              partner_first_name: existingAnalysis.partner_first_name || parsed.partner_first_name,
+              partner_last_name: existingAnalysis.partner_last_name || parsed.partner_last_name,
+              children_count: existingAnalysis.children_count ?? parsed.children_count,
+              client_age: existingAnalysis.client_age || parsed.client_age,
+              partner_age: existingAnalysis.partner_age || parsed.partner_age,
+              gdpr_consent_a: existingAnalysis.gdpr_consent_a ?? parsed.gdpr_consent_a ?? false,
+              gdpr_consent_b: existingAnalysis.gdpr_consent_b ?? parsed.gdpr_consent_b ?? false,
+              gdpr_consent_c: existingAnalysis.gdpr_consent_c ?? parsed.gdpr_consent_c ?? false
+            };
+
+            setFormData(mergedData);
+            setCurrentStep(existingAnalysis.current_step || 1);
+          } else {
+            // Няма съществуващ анализ, попълни с данни от планера
+            setFormData(prev => ({
+              ...prev,
+              include_partner: parsed.family_type === 'family',
+              client_first_name: parsed.client_first_name,
+              client_last_name: parsed.client_last_name,
+              partner_first_name: parsed.partner_first_name,
+              partner_last_name: parsed.partner_last_name,
+              children_count: parsed.children_count,
+              client_age: parsed.client_age,
+              partner_age: parsed.partner_age,
+              client_monthly_net_income: parsed.monthly_income,
+              partner_monthly_net_income: parsed.partner_income,
+              total_monthly_income: (parsed.monthly_income || 0) + (parsed.partner_income || 0),
+              gdpr_consent_a: parsed.gdpr_consent_a || false,
+              gdpr_consent_b: parsed.gdpr_consent_b || false,
+              gdpr_consent_c: parsed.gdpr_consent_c || false
+            }));
+
+            // Ако има дадени съгласия, прескачаме стъпка 1 (Съгласие)
+            if (parsed.gdpr_consent_a && parsed.gdpr_consent_c) {
+              setCurrentStep(3); // Директно към "Ново жилище"
+            }
+          }
+        });
+      } else {
+        // Няма client_id, попълни с данни от планера
+        setFormData(prev => ({
+          ...prev,
+          include_partner: parsed.family_type === 'family',
+          client_first_name: parsed.client_first_name,
+          client_last_name: parsed.client_last_name,
+          partner_first_name: parsed.partner_first_name,
+          partner_last_name: parsed.partner_last_name,
+          children_count: parsed.children_count,
+          client_age: parsed.client_age,
+          partner_age: parsed.partner_age,
+          client_monthly_net_income: parsed.monthly_income,
+          partner_monthly_net_income: parsed.partner_income,
+          total_monthly_income: (parsed.monthly_income || 0) + (parsed.partner_income || 0),
+          gdpr_consent_a: parsed.gdpr_consent_a || false,
+          gdpr_consent_b: parsed.gdpr_consent_b || false,
+          gdpr_consent_c: parsed.gdpr_consent_c || false
+        }));
+
+        // Ако има дадени съгласия, прескачаме стъпка 1 (Съгласие)
+        if (parsed.gdpr_consent_a && parsed.gdpr_consent_c) {
+          setCurrentStep(3); // Директно към "Ново жилище"
+        }
       }
-      
+
       // Изчистване на данните след зареждане
       localStorage.removeItem('financialPlannerData');
     }

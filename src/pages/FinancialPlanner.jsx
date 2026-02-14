@@ -285,6 +285,11 @@ export default function FinancialPlanner() {
     const oldValue = allocations[changedKey];
     const difference = newValue - oldValue;
 
+    // Auto-lock the slider being changed
+    if (!lockedGoals[changedKey]) {
+      setLockedGoals(prev => ({ ...prev, [changedKey]: true }));
+    }
+
     // Get unlocked allocations (excluding the one being changed)
     const unlockedKeys = Object.keys(allocations).filter(
       key => key !== changedKey && !lockedGoals[key]

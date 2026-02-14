@@ -310,6 +310,25 @@ export default function ClientDossierView({ clientId }) {
               </div>
             </div>
           )}
+
+          {/* Analysis Detail View Modal */}
+          {viewingAnalysisId && (
+            <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4 overflow-y-auto">
+              <div className="bg-white rounded-2xl shadow-2xl max-w-5xl w-full max-h-[95vh] overflow-y-auto">
+                <div className="sticky top-0 bg-white border-b border-slate-200 p-4 flex items-center justify-between z-10">
+                  <h2 className="text-xl font-semibold text-slate-900">Преглед на анализ</h2>
+                  <Button 
+                    variant="ghost" 
+                    size="icon"
+                    onClick={() => setViewingAnalysisId(null)}
+                  >
+                    <X className="h-4 w-4" />
+                  </Button>
+                </div>
+                <AnalysisDetailView analysis={analyses.find(a => a.id === viewingAnalysisId)} />
+              </div>
+            </div>
+          )}
         </TabsContent>
 
         {/* Планове */}

@@ -21,7 +21,7 @@ import {
   Briefcase
 } from 'lucide-react';
 import { cn } from "@/lib/utils";
-import { createPageUrl } from './utils';
+import { createPageUrl } from '../utils';
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";

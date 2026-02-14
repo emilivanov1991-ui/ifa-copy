@@ -35,7 +35,16 @@ export default function ClientDossierView({ clientId }) {
   const [loading, setLoading] = useState(true);
   const [selectedAnalysis, setSelectedAnalysis] = useState(null);
   const [showPlanGenerator, setShowPlanGenerator] = useState(false);
+  const [viewingAnalysisId, setViewingAnalysisId] = useState(null);
   const navigate = useNavigate();
+
+  // Expose setViewingAnalysisId globally
+  React.useEffect(() => {
+    window.setViewAnalysisId = setViewingAnalysisId;
+    return () => {
+      delete window.setViewAnalysisId;
+    };
+  }, []);
 
   useEffect(() => {
     loadDossier();

@@ -103,7 +103,8 @@ export default function FinancialAnalysis() {
                 };
 
                 setFormData(mergedData);
-                setCurrentStep(analysis.current_step || 1);
+                // If analysis was completed (step 10), start from step 1 for editing
+                setCurrentStep(analysis.current_step >= 10 ? 1 : (analysis.current_step || 1));
 
                 setPlannerData({
                   client_id: client.id,
@@ -167,8 +168,9 @@ export default function FinancialAnalysis() {
             };
 
             setFormData(mergedData);
-            setCurrentStep(existingAnalysis.current_step || 1);
-          } else {
+            // If analysis was completed (step 10), start from step 1 for editing
+            setCurrentStep(existingAnalysis.current_step >= 10 ? 1 : (existingAnalysis.current_step || 1));
+            } else {
             // Няма съществуващ анализ, попълни с данни от планера
             setFormData(prev => ({
               ...prev,
@@ -962,16 +964,25 @@ export default function FinancialAnalysis() {
         }
       });
 
-      let clientRecord;
-      let partnerRecord;
-      
-      // Generate passwords for portal access
-      const clientPassword = generatePassword();
-      const partnerPassword = generatePassword();
+      // Mark analysis as completed (step 10 = submitted)
+      cleanData.current_step = 10;
+      cleanData.last_updated_step = new Date().toISOString();
 
-      // If coming from Financial Planner with existing client
-      if (plannerData?.client_id) {
-        // Update existing client record
+      if (analysisRecordId) {
+        // Update existing analysis record (covers re-submit, edit, and normal completion)
+        await base44.entities.FinancialAnalysisSubmission.update(analysisRecordId, cleanData);
+        if (plannerData?.client_id) {
+          await base44.entities.Client.update(plannerData.client_id, {
+            stage: 'analysis',
+            gdpr_consent_a: formData.gdpr_consent_a,
+            gdpr_consent_b: formData.gdpr_consent_b,
+            gdpr_consent_c: formData.gdpr_consent_c,
+            gdpr_consent_date: new Date().toISOString()
+          });
+        }
+      } else if (plannerData?.client_id) {
+        // Update client and find/create analysis
+        const clientPassword = generatePassword();
         await base44.entities.Client.update(plannerData.client_id, {
           stage: 'analysis',
           portal_password: clientPassword,
@@ -980,15 +991,22 @@ export default function FinancialAnalysis() {
           gdpr_consent_c: formData.gdpr_consent_c,
           gdpr_consent_date: new Date().toISOString()
         });
-        
-        // Create analysis linked to existing client
-        cleanData.client_id = plannerData.client_id;
-        const analysisSubmission = await base44.entities.FinancialAnalysisSubmission.create(cleanData);
-        setAnalysisRecordId(analysisSubmission.id);
-        
+        const existingForClient = await base44.entities.FinancialAnalysisSubmission.filter(
+          { client_id: plannerData.client_id }, '-created_date', 1
+        );
+        if (existingForClient.length > 0) {
+          await base44.entities.FinancialAnalysisSubmission.update(existingForClient[0].id, cleanData);
+          setAnalysisRecordId(existingForClient[0].id);
+        } else {
+          cleanData.client_id = plannerData.client_id;
+          const newAnalysis = await base44.entities.FinancialAnalysisSubmission.create(cleanData);
+          setAnalysisRecordId(newAnalysis.id);
+        }
       } else {
-        // Create new client from planner data
-        clientRecord = await base44.entities.Client.create({
+        // Create new client and analysis from scratch
+        const clientPassword = generatePassword();
+        const partnerPassword = generatePassword();
+        const clientRecord = await base44.entities.Client.create({
           first_name: plannerData?.client_first_name || 'Клиент',
           last_name: plannerData?.client_last_name || '',
           email: plannerData?.client_email || formData.client_email || '',
@@ -1002,15 +1020,11 @@ export default function FinancialAnalysis() {
           gdpr_consent_c: formData.gdpr_consent_c,
           gdpr_consent_date: new Date().toISOString()
         });
-
-        // Create analysis linked to new client
         cleanData.client_id = clientRecord.id;
-        const analysisSubmission = await base44.entities.FinancialAnalysisSubmission.create(cleanData);
-        setAnalysisRecordId(analysisSubmission.id);
-        
-        // Create partner client if included
+        const newAnalysis = await base44.entities.FinancialAnalysisSubmission.create(cleanData);
+        setAnalysisRecordId(newAnalysis.id);
         if (formData.include_partner && plannerData?.partner_email) {
-          partnerRecord = await base44.entities.Client.create({
+          await base44.entities.Client.create({
             first_name: plannerData?.partner_first_name || 'Партньор',
             last_name: plannerData?.partner_last_name || '',
             email: plannerData?.partner_email || '',

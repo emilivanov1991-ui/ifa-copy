@@ -298,8 +298,8 @@ export default function HousingStep({ data, onChange, showErrors }) {
                       options={bankOptions}
                       value={data.current_mortgage_bank || ''}
                       onValueChange={(value) => onChange('current_mortgage_bank', value)}
-                      placeholder="Изберете банка"
-                      searchPlaceholder="Търсене на банка..."
+                      placeholder="Търси банка..."
+                      searchPlaceholder="Търси банка..."
                       emptyText="Няма намерена банка."
                       triggerClassName={`rounded-lg ${isFieldInvalid(data.current_mortgage_bank) ? 'border-red-500 bg-red-50' : ''}`}
                     />

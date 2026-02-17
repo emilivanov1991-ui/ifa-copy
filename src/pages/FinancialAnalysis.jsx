@@ -722,11 +722,8 @@ export default function FinancialAnalysis() {
           }
         }
 
-        // Check monthly allocation and next meeting
+        // Check monthly allocation
         if (formData.monthly_priority_allocation === undefined || formData.monthly_priority_allocation === '') {
-          return false;
-        }
-        if (!formData.next_meeting_datetime) {
           return false;
         }
 

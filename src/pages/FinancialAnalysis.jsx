@@ -832,18 +832,18 @@ export default function FinancialAnalysis() {
     });
     
     // Children & Goals referrals
-    (formData.referrals_have_children || []).forEach(name => {
+    (formData.children_referrals_has_kids || []).forEach(name => {
       if (name && name.trim()) allNames.add(name.trim());
     });
-    (formData.referrals_recent_wedding || []).forEach(name => {
+    (formData.children_referrals_recent_wedding || []).forEach(name => {
       if (name && name.trim()) allNames.add(name.trim());
     });
     
     // Protection referrals
-    (formData.referrals_property_protection || []).forEach(name => {
+    (formData.property_referrals_significant || []).forEach(name => {
       if (name && name.trim()) allNames.add(name.trim());
     });
-    (formData.referrals_car_protection || []).forEach(name => {
+    (formData.property_referrals_expensive_car || []).forEach(name => {
       if (name && name.trim()) allNames.add(name.trim());
     });
     

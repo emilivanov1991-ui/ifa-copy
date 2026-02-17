@@ -902,8 +902,11 @@ export default function FinancialAnalysis() {
 
   // Save progress to database
   const saveProgress = async (step) => {
+    // Also update formData.current_step so auto-save doesn't overwrite with stale value
+    setFormData(prev => ({ ...prev, current_step: step }));
+
     try {
-      const cleanData = { ...formData };
+      const cleanData = { ...formData, current_step: step };
       // Only delete null values, keep empty strings to preserve user input
       Object.keys(cleanData).forEach(key => {
         if (cleanData[key] === null) {

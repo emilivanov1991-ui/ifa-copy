@@ -145,7 +145,7 @@ export default function FinancialAnalysis() {
           '-created_date',
           1
         ).then(existingAnalyses => {
-          if (existingAnalyses.length > 0) {
+          if (existingAnalyses.length > 0 && !parsed.forceNewAnalysis) {
             // Зареди съществуващия анализ
             const existingAnalysis = existingAnalyses[0];
             setAnalysisRecordId(existingAnalysis.id);

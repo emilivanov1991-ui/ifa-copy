@@ -35,7 +35,6 @@ import PrioritiesStep from '../analysis/PrioritiesStep';
 
 const steps = [
   { id: 1, title: 'Съгласие', icon: Shield },
-  { id: 2, title: 'Лични данни', icon: User },
   { id: 3, title: 'Ново жилище', icon: Home },
   { id: 4, title: 'Резерв', icon: PiggyBank },
   { id: 5, title: 'Пенсия', icon: Umbrella },

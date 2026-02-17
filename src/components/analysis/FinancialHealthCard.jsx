@@ -665,6 +665,16 @@ ${JSON.stringify(analysisContext, null, 2)}
         </div>
       </div>
 
+      {/* Priorities Warning - shown right after house */}
+      {prioritiesWarning && (
+        <div className="mt-4 flex items-start gap-3 bg-amber-50 border border-amber-300 rounded-lg p-4">
+          <AlertCircle className="h-5 w-5 text-amber-600 flex-shrink-0 mt-0.5" />
+          <p className="text-sm text-amber-800 font-medium">
+            Всички останали Ваши цели зависят от възможността Ви да генерирате средства. Подсигуряването на доходите Ви следва да е приоритет.
+          </p>
+        </div>
+      )}
+
       {/* Legend */}
       <div className="flex flex-wrap justify-center gap-4 mt-6 pt-4 border-t border-slate-100 text-xs">
         <div className="flex items-center gap-1">

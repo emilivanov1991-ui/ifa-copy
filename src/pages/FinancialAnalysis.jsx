@@ -1180,33 +1180,71 @@ export default function FinancialAnalysis() {
                 </motion.div>
 
                 {/* Option 2: Schedule Meeting */}
-                <motion.div
-                  whileHover={{ scale: 1.02 }}
-                  className="bg-white rounded-xl p-6 border-2 border-green-300 hover:border-green-500 transition-all cursor-pointer shadow-sm hover:shadow-md"
-                  onClick={() => window.location.href = createPageUrl('Home')}
-                >
+                <div className="bg-white rounded-xl p-6 border-2 border-green-300 shadow-sm">
                   <div className="w-12 h-12 rounded-full bg-green-100 flex items-center justify-center mb-4 mx-auto">
                     <Shield className="h-6 w-6 text-green-600" />
                   </div>
-                  <h3 className="font-semibold text-slate-900 mb-2 text-center">Виждане на среща</h3>
-                  <p className="text-sm text-slate-600 text-center mb-2">
-                    Ще се видим на насрочената среща
+                  <h3 className="font-semibold text-slate-900 mb-2 text-center">Насрочете среща</h3>
+                  <p className="text-sm text-slate-600 text-center mb-4">
+                    Изберете дата и час за следващата ни среща
                   </p>
-                  {formData.next_meeting_datetime && (
-                    <p className="text-xs text-green-600 font-medium text-center">
-                      📅 {new Date(formData.next_meeting_datetime).toLocaleString('bg-BG', {
-                        day: 'numeric',
-                        month: 'long',
-                        year: 'numeric',
-                        hour: '2-digit',
-                        minute: '2-digit'
-                      })}
-                    </p>
-                  )}
-                  <Button variant="outline" className="w-full mt-4 border-green-600 text-green-700 hover:bg-green-50">
+                  <div className="space-y-3">
+                    <div>
+                      <label className="text-xs font-medium text-slate-600 mb-1 block">Дата</label>
+                      <input
+                        type="date"
+                        min={new Date(Date.now() + 86400000).toISOString().split('T')[0]}
+                        value={formData.next_meeting_date || ''}
+                        onChange={(e) => {
+                          const val = e.target.value;
+                          setFormData(prev => {
+                            const updated = { ...prev, next_meeting_date: val, next_meeting_datetime: val && prev.next_meeting_time ? `${val}T${prev.next_meeting_time}` : prev.next_meeting_datetime };
+                            return updated;
+                          });
+                        }}
+                        className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-green-500"
+                      />
+                    </div>
+                    <div>
+                      <label className="text-xs font-medium text-slate-600 mb-1 block">Час</label>
+                      <input
+                        type="time"
+                        value={formData.next_meeting_time || ''}
+                        onChange={(e) => {
+                          const val = e.target.value;
+                          setFormData(prev => {
+                            const updated = { ...prev, next_meeting_time: val, next_meeting_datetime: prev.next_meeting_date && val ? `${prev.next_meeting_date}T${val}` : prev.next_meeting_datetime };
+                            return updated;
+                          });
+                        }}
+                        className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-green-500"
+                      />
+                    </div>
+                    {formData.next_meeting_datetime && (
+                      <p className="text-xs text-green-600 font-medium text-center">
+                        📅 {new Date(formData.next_meeting_datetime).toLocaleString('bg-BG', {
+                          day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit'
+                        })}
+                      </p>
+                    )}
+                  </div>
+                  <Button
+                    variant="outline"
+                    className="w-full mt-4 border-green-600 text-green-700 hover:bg-green-50"
+                    onClick={async () => {
+                      if (analysisRecordId && formData.next_meeting_datetime) {
+                        await base44.entities.FinancialAnalysisSubmission.update(analysisRecordId, {
+                          next_meeting_date: formData.next_meeting_date,
+                          next_meeting_time: formData.next_meeting_time,
+                          next_meeting_datetime: formData.next_meeting_datetime
+                        });
+                      }
+                      window.location.href = createPageUrl('Home');
+                    }}
+                  >
                     Благодаря, довиждане
                   </Button>
-                </motion.div>
+                </div>
               </div>
             </div>
 

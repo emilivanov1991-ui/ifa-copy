@@ -106,12 +106,9 @@ export default function PrioritiesStep({ data, onChange, showErrors }) {
     incomeProtectionPriority !== '' && 
     incomeProtectionPriority !== 1;
 
-  return (
-    <div className="space-y-8">
-      {/* Financial Health Card */}
-      <FinancialHealthCard data={data} prioritiesWarning={showIncomeProtectionWarning} />
-
-      {/* Priorities */}
+  const prioritiesSection = (
+    <div className="space-y-6">
+      {/* Priorities Table */}
       <div className="bg-slate-50 rounded-xl p-6">
         <div className="flex items-center gap-2 mb-2">
           <ListOrdered className="h-5 w-5 text-blue-600" />
@@ -131,12 +128,11 @@ export default function PrioritiesStep({ data, onChange, showErrors }) {
               {sortedPriorities.map((priority) => {
                 const value = data[priority.key];
                 const hasValue = value !== undefined && value !== null && value !== '';
-                
                 return (
                   <tr key={priority.key} className="hover:bg-slate-50">
                     <td className="px-4 py-2 text-center">
-                      <Select 
-                        value={value?.toString() || ''} 
+                      <Select
+                        value={value?.toString() || ''}
                         onValueChange={(val) => onChange(priority.key, parseInt(val))}
                       >
                         <SelectTrigger className={`rounded-lg w-14 mx-auto ${!hasValue && isInvalid ? 'border-red-500 bg-red-50' : ''}`}>
@@ -161,7 +157,6 @@ export default function PrioritiesStep({ data, onChange, showErrors }) {
         {isInvalid && (
           <p className="text-red-500 text-sm mt-2">Моля, задайте приоритет на всички елементи.</p>
         )}
-
       </div>
 
       {/* Monthly Allocation */}
@@ -170,22 +165,19 @@ export default function PrioritiesStep({ data, onChange, showErrors }) {
           <TrendingUp className="h-5 w-5 text-blue-600" />
           <h3 className="font-semibold text-slate-900">Месечно заделяне</h3>
         </div>
-
-        <div className="space-y-4">
-          <div className="space-y-2" data-invalid={showErrors && (data.monthly_priority_allocation === undefined || data.monthly_priority_allocation === '') ? "true" : undefined}>
-            <Label>
-              Каква част от <span className="font-semibold text-blue-600">{monthlyBalance.toLocaleString()} €</span> (месечен баланс от "Финансов поток"), която Ви остава на месечна база бихте заделили за осигуряване на Вашите приоритети? <span className="text-red-500">*</span>
-            </Label>
-            <Input
-              type="number"
-              min="0"
-              placeholder="Въведете сума в евро"
-              value={data.monthly_priority_allocation ?? ''}
-              onChange={(e) => onChange('monthly_priority_allocation', e.target.value === '' ? '' : parseInt(e.target.value))}
-              className={`rounded-lg max-w-xs ${showErrors && (data.monthly_priority_allocation === undefined || data.monthly_priority_allocation === '') ? 'border-red-500 bg-red-50' : ''}`}
-              required
-            />
-          </div>
+        <div className="space-y-2" data-invalid={showErrors && (data.monthly_priority_allocation === undefined || data.monthly_priority_allocation === '') ? "true" : undefined}>
+          <Label>
+            Каква част от <span className="font-semibold text-blue-600">{monthlyBalance.toLocaleString()} €</span> (месечен баланс от "Финансов поток"), която Ви остава на месечна база бихте заделили за осигуряване на Вашите приоритети? <span className="text-red-500">*</span>
+          </Label>
+          <Input
+            type="number"
+            min="0"
+            placeholder="Въведете сума в евро"
+            value={data.monthly_priority_allocation ?? ''}
+            onChange={(e) => onChange('monthly_priority_allocation', e.target.value === '' ? '' : parseInt(e.target.value))}
+            className={`rounded-lg max-w-xs ${showErrors && (data.monthly_priority_allocation === undefined || data.monthly_priority_allocation === '') ? 'border-red-500 bg-red-50' : ''}`}
+            required
+          />
         </div>
       </div>
 
@@ -195,7 +187,6 @@ export default function PrioritiesStep({ data, onChange, showErrors }) {
           <ListOrdered className="h-5 w-5 text-blue-600" />
           <h3 className="font-semibold text-slate-900">Следваща среща</h3>
         </div>
-
         <div className="space-y-2" data-invalid={showErrors && !data.next_meeting_datetime ? "true" : undefined}>
           <Label>
             Кога би било удобно да се срещнем за презентация на Вашия финансов план? <span className="text-red-500">*</span>
@@ -230,6 +221,16 @@ export default function PrioritiesStep({ data, onChange, showErrors }) {
           )}
         </div>
       </div>
+    </div>
+  );
+
+  return (
+    <div className="space-y-8">
+      <FinancialHealthCard
+        data={data}
+        prioritiesWarning={showIncomeProtectionWarning}
+        prioritiesSection={prioritiesSection}
+      />
     </div>
   );
 }

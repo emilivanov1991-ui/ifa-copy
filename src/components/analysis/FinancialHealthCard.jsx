@@ -692,15 +692,7 @@ ${JSON.stringify(analysisContext, null, 2)}
         </div>
       )}
 
-      {/* Priorities Warning - shown after priorities section */}
-      {prioritiesWarning && (
-        <div className="mt-4 flex items-start gap-3 bg-amber-50 border border-amber-300 rounded-lg p-4">
-          <AlertCircle className="h-5 w-5 text-amber-600 flex-shrink-0 mt-0.5" />
-          <p className="text-sm text-amber-800 font-medium">
-            Всички останали Ваши цели зависят от възможността Ви да генерирате средства. Подсигуряването на доходите Ви следва да е приоритет.
-          </p>
-        </div>
-      )}
+
 
       {/* AI Analysis Section */}
       <div className="mt-8 pt-6 border-t-2 border-slate-200">

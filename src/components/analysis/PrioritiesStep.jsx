@@ -8,7 +8,7 @@ import {
   SelectTrigger, 
   SelectValue 
 } from "@/components/ui/select";
-import { ListOrdered, TrendingUp } from 'lucide-react';
+import { ListOrdered, TrendingUp, AlertTriangle } from 'lucide-react';
 import FinancialHealthCard from './FinancialHealthCard';
 import BulgarianDateInput from '@/components/ui/BulgarianDateInput';
 

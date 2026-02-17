@@ -9,6 +9,7 @@ import {
   SelectTrigger, 
   SelectValue 
 } from "@/components/ui/select";
+import { Combobox } from "@/components/ui/combobox";
 import { Umbrella, User, Users } from 'lucide-react';
 import { cn } from "@/lib/utils";
 

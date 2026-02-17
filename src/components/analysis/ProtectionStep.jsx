@@ -784,19 +784,15 @@ export default function ProtectionStep({ data, onChange, showErrors, plannerData
                 <div className="pt-4 border-t border-slate-200 space-y-3">
                   <div className="space-y-2" data-invalid={data.has_car_2 && isFieldInvalid(data.car_2_go_insurer) ? "true" : undefined}>
                     <Label className="text-sm">ГО-Застраховател <span className="text-red-500">*</span></Label>
-                    <Select 
-                      value={data.car_2_go_insurer || ''} 
+                    <Combobox
+                      options={INSURANCE_COMPANIES}
+                      value={data.car_2_go_insurer || ''}
                       onValueChange={(value) => onChange('car_2_go_insurer', value)}
-                    >
-                      <SelectTrigger className={`rounded-lg ${data.has_car_2 && isFieldInvalid(data.car_2_go_insurer) ? 'border-red-500 bg-red-50' : ''}`}>
-                        <SelectValue placeholder="Изберете" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {INSURANCE_COMPANIES.map(ins => (
-                          <SelectItem key={ins.value} value={ins.value}>{ins.label}</SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
+                      placeholder="Търси застраховател..."
+                      searchPlaceholder="Търси..."
+                      emptyText="Няма намерен застраховател."
+                      triggerClassName={`rounded-lg ${data.has_car_2 && isFieldInvalid(data.car_2_go_insurer) ? 'border-red-500 bg-red-50' : ''}`}
+                    />
                   </div>
                 </div>
 

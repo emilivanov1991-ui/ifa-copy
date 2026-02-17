@@ -197,46 +197,6 @@ export default function PrioritiesStep({ data, onChange, showErrors }) {
         </div>
       </div>
 
-      {/* Next Meeting */}
-      <div className="bg-slate-50 rounded-xl p-6">
-        <div className="flex items-center gap-2 mb-6">
-          <ListOrdered className="h-5 w-5 text-blue-600" />
-          <h3 className="font-semibold text-slate-900">Следваща среща</h3>
-        </div>
-        <div className="space-y-2" data-invalid={showErrors && !data.next_meeting_datetime ? "true" : undefined}>
-          <Label>
-            Кога би било удобно да се срещнем за презентация на Вашия финансов план? <span className="text-red-500">*</span>
-          </Label>
-          <div className="flex gap-2 max-w-md">
-            <BulgarianDateInput
-              value={data.next_meeting_date || ''}
-              onChange={(value) => {
-                onChange('next_meeting_date', value);
-                if (value && data.next_meeting_time) {
-                  onChange('next_meeting_datetime', `${value}T${data.next_meeting_time}`);
-                }
-              }}
-              minDate={getMinDate()}
-              className={`rounded-lg flex-1 ${showErrors && !data.next_meeting_datetime ? 'border-red-500 bg-red-50' : ''}`}
-              placeholder="дд.мм.гггг"
-            />
-            <Input
-              type="time"
-              value={data.next_meeting_time || ''}
-              onChange={(e) => {
-                onChange('next_meeting_time', e.target.value);
-                if (data.next_meeting_date && e.target.value) {
-                  onChange('next_meeting_datetime', `${data.next_meeting_date}T${e.target.value}`);
-                }
-              }}
-              className={`rounded-lg w-32 ${showErrors && !data.next_meeting_datetime ? 'border-red-500 bg-red-50' : ''}`}
-            />
-          </div>
-          {data.next_meeting_date && new Date(data.next_meeting_date) <= new Date() && (
-            <p className="text-red-500 text-xs">Моля, изберете бъдеща дата</p>
-          )}
-        </div>
-      </div>
     </div>
   );
 

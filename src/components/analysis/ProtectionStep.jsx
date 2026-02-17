@@ -11,6 +11,7 @@ import {
   SelectTrigger, 
   SelectValue 
 } from "@/components/ui/select";
+import { Combobox } from "@/components/ui/combobox";
 import { Shield, Wallet, Building2, Car, Plus, Download, User, Users } from 'lucide-react';
 import { cn } from "@/lib/utils";
 import BulgarianDateInput from '@/components/ui/BulgarianDateInput';

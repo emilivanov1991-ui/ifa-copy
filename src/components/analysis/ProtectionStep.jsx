@@ -962,19 +962,15 @@ export default function ProtectionStep({ data, onChange, showErrors, plannerData
                     <div className="grid sm:grid-cols-2 gap-4">
                       <div className="space-y-2" data-invalid={data.car_3_has_casco && isFieldInvalid(data.car_3_casco_insurer) ? "true" : undefined}>
                         <Label className="text-sm">Застраховател <span className="text-red-500">*</span></Label>
-                        <Select 
-                          value={data.car_3_casco_insurer || ''} 
+                        <Combobox
+                          options={INSURANCE_COMPANIES}
+                          value={data.car_3_casco_insurer || ''}
                           onValueChange={(value) => onChange('car_3_casco_insurer', value)}
-                        >
-                          <SelectTrigger className={`rounded-lg ${data.car_3_has_casco && isFieldInvalid(data.car_3_casco_insurer) ? 'border-red-500 bg-red-50' : ''}`}>
-                            <SelectValue placeholder="Изберете" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            {INSURANCE_COMPANIES.map(ins => (
-                              <SelectItem key={ins.value} value={ins.value}>{ins.label}</SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
+                          placeholder="Търси застраховател..."
+                          searchPlaceholder="Търси..."
+                          emptyText="Няма намерен застраховател."
+                          triggerClassName={`rounded-lg ${data.car_3_has_casco && isFieldInvalid(data.car_3_casco_insurer) ? 'border-red-500 bg-red-50' : ''}`}
+                        />
                       </div>
                       <div className="space-y-2" data-invalid={data.car_3_has_casco && isFieldInvalid(data.car_3_casco_expiry) ? "true" : undefined}>
                         <Label className="text-sm">Срок на полицата (дд.мм.гггг) <span className="text-red-500">*</span></Label>

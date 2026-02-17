@@ -64,6 +64,61 @@ const bankOptions = [
   { value: "eurobank", label: "Юробанк България АД (Пощенска Банка)" },
 ];
 
+const MONTHS = ['Януари','Февруари','Март','Април','Май','Юни','Юли','Август','Септември','Октомври','Ноември','Декември'];
+
+function getBdayLabel(data) {
+  const clientBday = data.client_birthday_day && data.client_birthday_month
+    ? `${data.client_birthday_day}-ти ${MONTHS[data.client_birthday_month - 1]}`
+    : null;
+  const partnerBday = data.include_partner && data.partner_birthday_day && data.partner_birthday_month
+    ? `${data.partner_birthday_day}-ти ${MONTHS[data.partner_birthday_month - 1]}`
+    : null;
+  return clientBday
+    ? (partnerBday ? `${clientBday} / ${partnerBday}` : clientBday)
+    : '(въведете рожден ден)';
+}
+
+function BirthdayPlaceQuestion({ data, onChange }) {
+  const bdayLabel = getBdayLabel(data);
+  return (
+    <div className="space-y-3">
+      <Label className="text-slate-700">
+        Представете си, че днес е <span className="font-semibold">{bdayLabel}</span> и <span className="font-bold">имате неограничен бюджет</span>! Къде бихте празнували своя рожен ден?
+      </Label>
+      <Input
+        placeholder="Опишете мястото..."
+        value={data.birthday_celebration_place || ''}
+        onChange={(e) => {
+          onChange('birthday_celebration_place', e.target.value);
+          onChange('birthday_place_ready', false);
+          if (e.target.value) {
+            clearTimeout(window.birthdayPlaceTimeout);
+            window.birthdayPlaceTimeout = setTimeout(() => {
+              onChange('birthday_place_ready', true);
+            }, 2000);
+          }
+        }}
+        className="rounded-lg"
+      />
+    </div>
+  );
+}
+
+function BirthdayPartyQuestion({ data }) {
+  const clientBday = data.client_birthday_day && data.client_birthday_month
+    ? `${data.client_birthday_day}-ти ${MONTHS[data.client_birthday_month - 1]}`
+    : '';
+  const partnerBday = data.include_partner && data.partner_birthday_day && data.partner_birthday_month
+    ? ` / ${data.partner_birthday_day}-ти ${MONTHS[data.partner_birthday_month - 1]}`
+    : '';
+  const preposition = /^[аъоуеиАЪОУЕИ]/.test(data.birthday_celebration_place || '') ? 'в' : 'на';
+  return (
+    <Label className="text-slate-700">
+      Представете си, че сте {preposition} <span className="font-semibold">{data.birthday_celebration_place}</span> и е {clientBday}{partnerBday}, <span className="font-bold">имате неограничен бюджет и организирате едно голямо парти. Колко човека бихте поканили на едно такова голямо парти?</span>
+    </Label>
+  );
+}
+
 export default function HousingStep({ data, onChange, showErrors }) {
   const [showDownPaymentWarning, setShowDownPaymentWarning] = React.useState(false);
   const isFieldInvalid = (value) => showErrors && (value === undefined || value === '' || value === null);

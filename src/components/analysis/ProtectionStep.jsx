@@ -1403,19 +1403,15 @@ export default function ProtectionStep({ data, onChange, showErrors, plannerData
                       <div className="grid sm:grid-cols-2 gap-3">
                         <div className="space-y-1" data-invalid={data.client_has_income_protection && isFieldInvalid(data.client_income_protection_insurer) ? "true" : undefined}>
                           <Label className="text-xs text-slate-500">Застраховател <span className="text-red-500">*</span></Label>
-                          <Select 
-                            value={data.client_income_protection_insurer || ''} 
+                          <Combobox
+                            options={INSURANCE_COMPANIES}
+                            value={data.client_income_protection_insurer || ''}
                             onValueChange={(value) => onChange('client_income_protection_insurer', value)}
-                          >
-                            <SelectTrigger className={`rounded-lg text-sm ${data.client_has_income_protection && isFieldInvalid(data.client_income_protection_insurer) ? 'border-red-500 bg-red-50' : ''}`}>
-                              <SelectValue placeholder="Изберете" />
-                            </SelectTrigger>
-                            <SelectContent>
-                              {INSURANCE_COMPANIES.map(ins => (
-                                <SelectItem key={ins.value} value={ins.value}>{ins.label}</SelectItem>
-                              ))}
-                            </SelectContent>
-                          </Select>
+                            placeholder="Търси застраховател..."
+                            searchPlaceholder="Търси..."
+                            emptyText="Няма намерен застраховател."
+                            triggerClassName={`rounded-lg text-sm ${data.client_has_income_protection && isFieldInvalid(data.client_income_protection_insurer) ? 'border-red-500 bg-red-50' : ''}`}
+                          />
                         </div>
                         <div className="space-y-1" data-invalid={data.client_has_income_protection && isFieldInvalid(data.client_income_protection_date) ? "true" : undefined}>
                           <Label className="text-xs text-slate-500">Дата на сключване <span className="text-red-500">*</span></Label>

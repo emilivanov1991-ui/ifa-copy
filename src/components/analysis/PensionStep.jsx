@@ -493,19 +493,14 @@ export default function PensionStep({ data, onChange, showErrors, plannerData })
                     <div className="ml-4 space-y-3">
                       <div className="space-y-2">
                         <Label className="text-sm">Име на частен пенсионен фонд <span className="text-red-500">*</span></Label>
-                        <Select 
-                          value={data.client_voluntary_pension_fund || ''} 
+                        <Combobox
+                          options={VOLUNTARY_PENSION_FUND_OPTIONS}
+                          value={data.client_voluntary_pension_fund || ''}
                           onValueChange={(value) => onChange('client_voluntary_pension_fund', value)}
-                        >
-                          <SelectTrigger className="rounded-lg">
-                            <SelectValue placeholder="Изберете" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            {VOLUNTARY_PENSION_FUND_OPTIONS.map(fund => (
-                              <SelectItem key={fund.value} value={fund.value}>{fund.label}</SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
+                          placeholder="Търси фонд..."
+                          searchPlaceholder="Търси..."
+                          emptyText="Няма намерен фонд."
+                        />
                       </div>
                       <div className="space-y-2">
                         <Label className="text-sm">Месечна вноска (€) <span className="text-red-500">*</span></Label>

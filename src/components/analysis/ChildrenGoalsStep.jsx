@@ -308,16 +308,16 @@ export default function ChildrenGoalsStep({ data, onChange, showErrors, plannerD
             {/* Has children */}
             <div className="space-y-3">
               <Label className="text-slate-700">Има деца?</Label>
-              {(data.children_referrals_has_kids || ['']).map((name, index) => {
+              {(data.children_referrals_has_kids?.length > 0 ? data.children_referrals_has_kids : ['']).map((name, index) => {
                 const isDuplicate = isDuplicateName(name);
-                
+                const list = data.children_referrals_has_kids?.length > 0 ? data.children_referrals_has_kids : [''];
                 return (
                   <div key={`has_kids_${index}`}>
                     <Input
                       placeholder="Име на познат"
                       value={name}
                       onChange={(e) => {
-                        const newList = [...(data.children_referrals_has_kids || [''])];
+                        const newList = [...list];
                         newList[index] = e.target.value;
                         if (index === newList.length - 1 && e.target.value) {
                           newList.push('');
@@ -334,21 +334,21 @@ export default function ChildrenGoalsStep({ data, onChange, showErrors, plannerD
                   </div>
                 );
               })}
-            </div>
+              </div>
 
-            {/* Recent wedding */}
-            <div className="space-y-3">
+              {/* Recent wedding */}
+              <div className="space-y-3">
               <Label className="text-slate-700">Е имал сватба през последните три години?</Label>
-              {(data.children_referrals_recent_wedding || ['']).map((name, index) => {
+              {(data.children_referrals_recent_wedding?.length > 0 ? data.children_referrals_recent_wedding : ['']).map((name, index) => {
                 const isDuplicate = isDuplicateName(name);
-                
+                const list = data.children_referrals_recent_wedding?.length > 0 ? data.children_referrals_recent_wedding : [''];
                 return (
                   <div key={`wedding_${index}`}>
                     <Input
                       placeholder="Име на познат"
                       value={name}
                       onChange={(e) => {
-                        const newList = [...(data.children_referrals_recent_wedding || [''])];
+                        const newList = [...list];
                         newList[index] = e.target.value;
                         if (index === newList.length - 1 && e.target.value) {
                           newList.push('');
@@ -365,16 +365,16 @@ export default function ChildrenGoalsStep({ data, onChange, showErrors, plannerD
                   </div>
                 );
               })}
-            </div>
-          </div>
-        </div>
+              </div>
+              </div>
+              </div>
 
-        {renderOtherGoalsSection()}
-      </div>
-    );
-  }
+              {renderOtherGoalsSection()}
+              </div>
+              );
+              }
 
-  return (
+              return (
     <div className="space-y-8">
       {/* Children Expenses */}
       <div className="bg-slate-50 rounded-xl p-6">
@@ -574,16 +574,16 @@ export default function ChildrenGoalsStep({ data, onChange, showErrors, plannerD
           {/* Has children */}
           <div className="space-y-3">
             <Label className="text-slate-700">Има деца?</Label>
-            {(data.children_referrals_has_kids || ['']).map((name, index) => {
+            {(data.children_referrals_has_kids?.length > 0 ? data.children_referrals_has_kids : ['']).map((name, index) => {
               const isDuplicate = isDuplicateName(name);
-              
+              const list = data.children_referrals_has_kids?.length > 0 ? data.children_referrals_has_kids : [''];
               return (
                 <div key={`has_kids_${index}`}>
                   <Input
                     placeholder="Име на познат"
                     value={name}
                     onChange={(e) => {
-                      const newList = [...(data.children_referrals_has_kids || [''])];
+                      const newList = [...list];
                       newList[index] = e.target.value;
                       if (index === newList.length - 1 && e.target.value) {
                         newList.push('');
@@ -605,16 +605,16 @@ export default function ChildrenGoalsStep({ data, onChange, showErrors, plannerD
           {/* Recent wedding */}
           <div className="space-y-3">
             <Label className="text-slate-700">Е имал сватба през последните три години?</Label>
-            {(data.children_referrals_recent_wedding || ['']).map((name, index) => {
+            {(data.children_referrals_recent_wedding?.length > 0 ? data.children_referrals_recent_wedding : ['']).map((name, index) => {
               const isDuplicate = isDuplicateName(name);
-              
+              const list = data.children_referrals_recent_wedding?.length > 0 ? data.children_referrals_recent_wedding : [''];
               return (
                 <div key={`wedding_${index}`}>
                   <Input
                     placeholder="Име на познат"
                     value={name}
                     onChange={(e) => {
-                      const newList = [...(data.children_referrals_recent_wedding || [''])];
+                      const newList = [...list];
                       newList[index] = e.target.value;
                       if (index === newList.length - 1 && e.target.value) {
                         newList.push('');

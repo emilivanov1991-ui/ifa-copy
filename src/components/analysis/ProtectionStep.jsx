@@ -1033,16 +1033,16 @@ export default function ProtectionStep({ data, onChange, showErrors, plannerData
           {/* Has significant property */}
           <div className="space-y-3">
             <Label className="text-slate-700">Има по-значително имущество, което е добре да бъде защитено?</Label>
-            {(data.property_referrals_significant || ['']).map((name, index) => {
+            {(data.property_referrals_significant?.length > 0 ? data.property_referrals_significant : ['']).map((name, index) => {
               const isDuplicate = isDuplicateName(name);
-              
+              const list = data.property_referrals_significant?.length > 0 ? data.property_referrals_significant : [''];
               return (
                 <div key={`significant_${index}`}>
                   <Input
                     placeholder="Име на познат"
                     value={name}
                     onChange={(e) => {
-                      const newList = [...(data.property_referrals_significant || [''])];
+                      const newList = [...list];
                       newList[index] = e.target.value;
                       if (index === newList.length - 1 && e.target.value) {
                         newList.push('');
@@ -1064,16 +1064,16 @@ export default function ProtectionStep({ data, onChange, showErrors, plannerData
           {/* Has expensive car */}
           <div className="space-y-3">
             <Label className="text-slate-700">Има по-скъп автомобил/и?</Label>
-            {(data.property_referrals_expensive_car || ['']).map((name, index) => {
+            {(data.property_referrals_expensive_car?.length > 0 ? data.property_referrals_expensive_car : ['']).map((name, index) => {
               const isDuplicate = isDuplicateName(name);
-              
+              const list = data.property_referrals_expensive_car?.length > 0 ? data.property_referrals_expensive_car : [''];
               return (
                 <div key={`expensive_car_${index}`}>
                   <Input
                     placeholder="Име на познат"
                     value={name}
                     onChange={(e) => {
-                      const newList = [...(data.property_referrals_expensive_car || [''])];
+                      const newList = [...list];
                       newList[index] = e.target.value;
                       if (index === newList.length - 1 && e.target.value) {
                         newList.push('');

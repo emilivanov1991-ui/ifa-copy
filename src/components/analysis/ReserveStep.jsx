@@ -363,7 +363,7 @@ export default function ReserveStep({ data, onChange, showErrors, plannerData })
 
             {/* Client subtotal */}
             <div className="mt-3 pt-3 border-t border-slate-200 flex justify-between items-center">
-              <span className="text-sm text-slate-600">Подсума {clientName.toLowerCase()}:</span>
+              <span className="text-sm text-slate-600">Подсума {clientName}:</span>
               <span className="font-semibold text-slate-700">{clientTotal.toLocaleString('bg-BG')} €</span>
             </div>
           </div>
@@ -533,7 +533,7 @@ export default function ReserveStep({ data, onChange, showErrors, plannerData })
 
               {/* Partner subtotal */}
               <div className="mt-3 pt-3 border-t border-slate-200 flex justify-between items-center">
-                <span className="text-sm text-slate-600">Подсума {partnerName.toLowerCase()}:</span>
+                <span className="text-sm text-slate-600">Подсума {partnerName}:</span>
                 <span className="font-semibold text-slate-700">{partnerTotal.toLocaleString('bg-BG')} €</span>
               </div>
             </div>

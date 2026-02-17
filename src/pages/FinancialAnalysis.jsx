@@ -956,6 +956,11 @@ export default function FinancialAnalysis() {
   };
 
   const handleSubmit = async () => {
+    // Cancel any pending auto-save to prevent it from overwriting current_step: 10
+    if (window.autoSaveTimeout) {
+      clearTimeout(window.autoSaveTimeout);
+      window.autoSaveTimeout = null;
+    }
     setIsSubmitting(true);
     
     try {

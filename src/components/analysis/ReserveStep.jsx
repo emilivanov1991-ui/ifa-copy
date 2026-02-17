@@ -227,19 +227,14 @@ export default function ReserveStep({ data, onChange, showErrors, plannerData })
                   className={`rounded-lg text-center ${isFieldInvalid(data.client_checking_account) ? 'border-red-500 bg-red-50' : ''}`}
                   required
                 />
-                <Select 
-                  value={data.client_checking_account_bank || ''} 
+                <Combobox
+                  options={BANK_OPTIONS}
+                  value={data.client_checking_account_bank || ''}
                   onValueChange={(value) => onChange('client_checking_account_bank', value)}
-                >
-                  <SelectTrigger className="rounded-lg text-sm [&>span]:text-center [&>span]:w-full">
-                    <SelectValue placeholder="Изберете" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {BANK_OPTIONS.map(bank => (
-                      <SelectItem key={bank.value} value={bank.value}>{bank.label}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                  placeholder="Банка"
+                  searchPlaceholder="Търси банка..."
+                  emptyText="Няма намерена банка."
+                />
               </div>
 
               {/* Спестовна сметка */}

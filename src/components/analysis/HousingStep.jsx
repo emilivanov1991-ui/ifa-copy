@@ -784,11 +784,24 @@ export default function HousingStep({ data, onChange, showErrors }) {
               />
             </div>
 
+            )})()}
+
             {data.birthday_celebration_place && data.birthday_place_ready && (
               <div className="space-y-3">
+                {(() => {
+                  const months = ['Януари','Февруари','Март','Април','Май','Юни','Юли','Август','Септември','Октомври','Ноември','Декември'];
+                  const clientBday = data.client_birthday_day && data.client_birthday_month
+                    ? `${data.client_birthday_day}-ти ${months[data.client_birthday_month - 1]}`
+                    : '';
+                  const partnerBday = data.include_partner && data.partner_birthday_day && data.partner_birthday_month
+                    ? ` / ${data.partner_birthday_day}-ти ${months[data.partner_birthday_month - 1]}`
+                    : '';
+                  return (
                 <Label className="text-slate-700">
-                  Представете си, че сте {/^[аъоуеи|АЪОУЕИ]/.test(data.birthday_celebration_place || '') ? 'в' : 'на'} <span className="font-semibold">{data.birthday_celebration_place}</span> и е {data.client_birthdate ? formatBulgarianDate(data.client_birthdate) : ''}{data.include_partner && data.partner_birthdate ? ` / ${formatBulgarianDate(data.partner_birthdate)}` : ''}, <span className="font-bold">имате неограничен бюджет и организирате едно голямо парти. Колко човека бихте поканили на едно такова голямо парти?</span>
+                  Представете си, че сте {/^[аъоуеи|АЪОУЕИ]/.test(data.birthday_celebration_place || '') ? 'в' : 'на'} <span className="font-semibold">{data.birthday_celebration_place}</span> и е {clientBday}{partnerBday}, <span className="font-bold">имате неограничен бюджет и организирате едно голямо парти. Колко човека бихте поканили на едно такова голямо парти?</span>
                 </Label>
+                  );
+                })()}
                 <Input
                   type="number"
                   min="0"

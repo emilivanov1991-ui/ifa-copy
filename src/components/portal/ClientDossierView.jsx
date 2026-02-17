@@ -192,8 +192,13 @@ export default function ClientDossierView({ clientId }) {
             const serviceAnalyses = sorted.slice(1);
             const hasPlan = plans.some(p => p.analysis_id === primary.id);
 
-            const startServiceAnalysis = () => {
-              const plannerData = {
+            const isCompleted = primary.current_step >= 10;
+            const daysSinceCreation = (Date.now() - new Date(primary.created_date).getTime()) / (1000 * 60 * 60 * 24);
+            const canEdit = isCompleted && daysSinceCreation <= 30;
+            const canServiceAnalysis = isCompleted && daysSinceCreation > 30;
+
+            const openClientPlannerData = (forceNew = false) => {
+              const pd = {
                 client_id: client.id,
                 family_type: client.family_type,
                 client_first_name: client.first_name,
@@ -209,110 +214,167 @@ export default function ClientDossierView({ clientId }) {
                 gdpr_consent_a: client.gdpr_consent_a,
                 gdpr_consent_b: client.gdpr_consent_b,
                 gdpr_consent_c: client.gdpr_consent_c,
-                forceNewAnalysis: true
+                ...(forceNew ? { forceNewAnalysis: true } : {})
               };
-              localStorage.setItem('financialPlannerData', JSON.stringify(plannerData));
+              localStorage.setItem('financialPlannerData', JSON.stringify(pd));
               window.location.href = createPageUrl('FinancialAnalysis');
             };
 
+            const AnalysisInfoRow = ({ analysis }) => (
+              <div className="grid md:grid-cols-3 gap-4 text-sm mt-3">
+                <div className="flex items-center gap-2">
+                  <User className="w-4 h-4 text-blue-600" />
+                  <span className="text-slate-600">{analysis.client_first_name} {analysis.client_last_name}</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Calendar className="w-4 h-4 text-blue-600" />
+                  <span className="text-slate-600">{analysis.client_age} години</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Users className="w-4 h-4 text-blue-600" />
+                  <span className="text-slate-600">
+                    {analysis.include_partner ? 'С партньор' : 'Без партньор'}
+                    {analysis.children_count > 0 && `, ${analysis.children_count} деца`}
+                  </span>
+                </div>
+              </div>
+            );
+
             return (
-              <div className="space-y-4">
-                {/* Primary Analysis */}
-                <Card className="hover:shadow-lg transition-shadow border-blue-200">
-                  <CardContent className="p-6">
-                    <div className="flex items-start justify-between mb-4">
-                      <div className="flex-1">
-                        <div className="flex items-center gap-3 mb-2">
-                          <h3 className="text-lg font-semibold text-slate-900">
-                            Финансов анализ
-                          </h3>
-                          <Badge variant="outline">
-                            {new Date(primary.created_date).toLocaleDateString('bg-BG')}
+              <div className="space-y-6">
+                {/* PRIMARY ANALYSIS */}
+                {isCompleted ? (
+                  /* === ЗАВЪРШЕН АНАЛИЗ === */
+                  <div>
+                    <div className="flex items-center gap-2 mb-3">
+                      <CheckCircle2 className="w-5 h-5 text-green-600" />
+                      <span className="font-semibold text-green-700 text-sm uppercase tracking-wide">Завършен анализ</span>
+                    </div>
+                    <Card className="border-green-200 shadow-md">
+                      <CardContent className="p-6">
+                        <div className="flex items-center justify-between mb-1">
+                          <h3 className="text-lg font-semibold text-slate-900">Финансов анализ</h3>
+                          <Badge className="bg-green-100 text-green-700 border-green-300">
+                            <CheckCircle2 className="w-3 h-3 mr-1" /> Завършен
                           </Badge>
-                          {primary.current_step >= 9 && (
-                            <Badge className="bg-green-100 text-green-700 border-green-300">✓ Завършен</Badge>
+                        </div>
+                        <p className="text-xs text-slate-500 mb-1">
+                          Създаден: {new Date(primary.created_date).toLocaleDateString('bg-BG')}
+                        </p>
+                        <AnalysisInfoRow analysis={primary} />
+
+                        {/* Action buttons for completed */}
+                        <div className="mt-5 pt-4 border-t border-slate-100 grid grid-cols-1 gap-2">
+                          {/* 1. Прегледай анализа */}
+                          <Button
+                            variant="outline"
+                            onClick={() => { if (window.setViewAnalysisId) window.setViewAnalysisId(primary.id); }}
+                            className="w-full border-slate-300 text-slate-700 hover:bg-slate-50"
+                          >
+                            <Eye className="w-4 h-4 mr-2" />
+                            Прегледай анализа
+                          </Button>
+
+                          {/* 2. Промени анализ (active ≤30 days) */}
+                          <div className="relative">
+                            <Button
+                              variant="outline"
+                              disabled={!canEdit}
+                              onClick={() => {
+                                localStorage.setItem('resumeAnalysisId', primary.id);
+                                window.location.href = createPageUrl('FinancialAnalysis');
+                              }}
+                              className={`w-full ${canEdit ? 'border-blue-300 text-blue-700 hover:bg-blue-50' : 'border-slate-200 text-slate-400 cursor-not-allowed'}`}
+                            >
+                              {canEdit ? <PenLine className="w-4 h-4 mr-2" /> : <Lock className="w-4 h-4 mr-2" />}
+                              Промени анализ
+                              {!canEdit && (
+                                <span className="ml-2 text-xs text-slate-400">(изтекъл 30-дневен срок)</span>
+                              )}
+                            </Button>
+                            {canEdit && (
+                              <p className="text-xs text-slate-400 mt-1 text-center">
+                                <Clock className="w-3 h-3 inline mr-1" />
+                                Активен още {Math.max(0, 30 - Math.floor(daysSinceCreation))} дни
+                              </p>
+                            )}
+                          </div>
+
+                          {/* 3. Създай финансов план */}
+                          {hasPlan && (
+                            <Badge className="bg-green-100 text-green-700 border-green-300 w-fit">
+                              ✓ Финансовият план е създаден
+                            </Badge>
                           )}
-                        </div>
-                        
-                        <div className="grid md:grid-cols-3 gap-4 text-sm mt-4">
-                          <div className="flex items-center gap-2">
-                            <User className="w-4 h-4 text-blue-600" />
-                            <span className="text-slate-600">
-                              {primary.client_first_name} {primary.client_last_name}
-                            </span>
-                          </div>
-                          <div className="flex items-center gap-2">
-                            <Calendar className="w-4 h-4 text-blue-600" />
-                            <span className="text-slate-600">
-                              {primary.client_age} години
-                            </span>
-                          </div>
-                          <div className="flex items-center gap-2">
-                            <Users className="w-4 h-4 text-blue-600" />
-                            <span className="text-slate-600">
-                              {primary.include_partner ? 'С партньор' : 'Без партньор'}
-                              {primary.children_count > 0 && `, ${primary.children_count} деца`}
-                            </span>
-                          </div>
-                        </div>
-                      </div>
+                          <Button
+                            onClick={() => { setSelectedAnalysis(primary); setShowPlanGenerator(true); }}
+                            className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white shadow-md"
+                          >
+                            <Sparkles className="w-4 h-4 mr-2" />
+                            Създай финансов план
+                            <ArrowRight className="w-4 h-4 ml-2" />
+                          </Button>
 
-                      <div className="flex gap-2">
-                        <Button 
-                          variant="outline" 
-                          size="sm"
-                          onClick={() => {
-                            localStorage.setItem('resumeAnalysisId', primary.id);
-                            window.location.href = createPageUrl('FinancialAnalysis');
-                          }}
-                        >
-                          <ArrowRight className="h-4 w-4 mr-2" />
-                          {primary.current_step >= 9 ? 'Прегледай' : 'Довърши'} анализ
-                        </Button>
-                        <Button 
-                          variant="outline" 
-                          size="sm"
-                          onClick={() => {
-                            if (window.setViewAnalysisId) {
-                              window.setViewAnalysisId(primary.id);
-                            }
-                          }}
-                        >
-                          <Eye className="w-4 h-4 mr-2" />
-                          Детайли
-                        </Button>
-                      </div>
+                          {/* 4. Нов Сервизен анализ (active >30 days) */}
+                          <div className="relative">
+                            <Button
+                              variant="outline"
+                              disabled={!canServiceAnalysis}
+                              onClick={() => openClientPlannerData(true)}
+                              className={`w-full ${canServiceAnalysis ? 'border-amber-300 text-amber-700 hover:bg-amber-50' : 'border-slate-200 text-slate-400 cursor-not-allowed'}`}
+                            >
+                              {canServiceAnalysis ? <FileText className="w-4 h-4 mr-2" /> : <Lock className="w-4 h-4 mr-2" />}
+                              Направи нов (Сервизен) анализ
+                              {!canServiceAnalysis && (
+                                <span className="ml-2 text-xs text-slate-400">
+                                  (активен след {Math.max(0, 31 - Math.floor(daysSinceCreation))} дни)
+                                </span>
+                              )}
+                            </Button>
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  </div>
+                ) : (
+                  /* === ЗАПОЧНАТ АНАЛИЗ (незавършен) === */
+                  <div>
+                    <div className="flex items-center gap-2 mb-3">
+                      <Clock className="w-5 h-5 text-amber-500" />
+                      <span className="font-semibold text-amber-700 text-sm uppercase tracking-wide">Започнат анализ</span>
                     </div>
+                    <Card className="border-amber-200 shadow-md">
+                      <CardContent className="p-6">
+                        <div className="flex items-center justify-between mb-1">
+                          <h3 className="text-lg font-semibold text-slate-900">Финансов анализ</h3>
+                          <Badge className="bg-amber-100 text-amber-700 border-amber-300">
+                            <Clock className="w-3 h-3 mr-1" /> Незавършен — стъпка {primary.current_step || 1} от 9
+                          </Badge>
+                        </div>
+                        <p className="text-xs text-slate-500 mb-1">
+                          Започнат: {new Date(primary.created_date).toLocaleDateString('bg-BG')}
+                        </p>
+                        <AnalysisInfoRow analysis={primary} />
 
-                    {/* Create Plan Button */}
-                    <div className="mt-4 pt-4 border-t border-slate-100 space-y-3">
-                      {hasPlan && (
-                        <Badge className="bg-green-100 text-green-700 border-green-300">
-                          ✓ Финансовият план е създаден
-                        </Badge>
-                      )}
-                      <Button 
-                        onClick={() => {
-                          setSelectedAnalysis(primary);
-                          setShowPlanGenerator(true);
-                        }}
-                        className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white shadow-lg"
-                      >
-                        <Sparkles className="w-4 h-4 mr-2" />
-                        Създай финансов план
-                        <ArrowRight className="w-4 h-4 ml-2" />
-                      </Button>
-                      <Button 
-                        variant="outline"
-                        onClick={startServiceAnalysis}
-                        className="w-full border-amber-300 text-amber-700 hover:bg-amber-50"
-                      >
-                        <FileText className="w-4 h-4 mr-2" />
-                        Направи нов (сервизен) анализ
-                      </Button>
-                    </div>
-                  </CardContent>
-                </Card>
+                        <div className="mt-5 pt-4 border-t border-slate-100">
+                          <Button
+                            onClick={() => {
+                              localStorage.setItem('resumeAnalysisId', primary.id);
+                              window.location.href = createPageUrl('FinancialAnalysis');
+                            }}
+                            className="w-full bg-amber-500 hover:bg-amber-600 text-white shadow-md"
+                          >
+                            <ArrowRight className="w-4 h-4 mr-2" />
+                            Довърши анализ
+                          </Button>
+                          <p className="text-xs text-slate-500 text-center mt-2">
+                            Анализът остава незавършен докато не бъде финализиран от стъпка "Обобщение"
+                          </p>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  </div>
+                )}
 
                 {/* Service / Older Analyses */}
                 {serviceAnalyses.length > 0 && (
@@ -320,47 +382,46 @@ export default function ClientDossierView({ clientId }) {
                     <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider px-1">
                       Предишни анализи ({serviceAnalyses.length})
                     </p>
-                    {serviceAnalyses.map((analysis) => (
-                      <Card key={analysis.id} className="border-slate-200 bg-slate-50">
-                        <CardContent className="p-4">
-                          <div className="flex items-center justify-between">
-                            <div className="flex items-center gap-3">
-                              <Badge variant="outline" className="text-xs">
-                                {new Date(analysis.created_date).toLocaleDateString('bg-BG')}
-                              </Badge>
-                              {analysis.current_step >= 9 ? (
-                                <Badge className="bg-green-100 text-green-700 text-xs">Завършен</Badge>
-                              ) : (
-                                <Badge className="bg-amber-100 text-amber-700 text-xs">Незавършен (стъпка {analysis.current_step})</Badge>
-                              )}
+                    {serviceAnalyses.map((analysis) => {
+                      const isOldCompleted = analysis.current_step >= 10;
+                      return (
+                        <Card key={analysis.id} className="border-slate-200 bg-slate-50">
+                          <CardContent className="p-4">
+                            <div className="flex items-center justify-between">
+                              <div className="flex items-center gap-3">
+                                <span className="text-xs text-slate-500">
+                                  {new Date(analysis.created_date).toLocaleDateString('bg-BG')}
+                                </span>
+                                {isOldCompleted ? (
+                                  <Badge className="bg-green-100 text-green-700 text-xs">Завършен</Badge>
+                                ) : (
+                                  <Badge className="bg-amber-100 text-amber-700 text-xs">
+                                    Незавършен — стъпка {analysis.current_step || 1}
+                                  </Badge>
+                                )}
+                              </div>
+                              <div className="flex gap-2">
+                                <Button variant="ghost" size="sm"
+                                  onClick={() => {
+                                    localStorage.setItem('resumeAnalysisId', analysis.id);
+                                    window.location.href = createPageUrl('FinancialAnalysis');
+                                  }}
+                                >
+                                  <ArrowRight className="h-3 w-3 mr-1" />
+                                  {isOldCompleted ? 'Прегледай' : 'Довърши'}
+                                </Button>
+                                <Button variant="ghost" size="sm"
+                                  onClick={() => { if (window.setViewAnalysisId) window.setViewAnalysisId(analysis.id); }}
+                                >
+                                  <Eye className="h-3 w-3 mr-1" />
+                                  Детайли
+                                </Button>
+                              </div>
                             </div>
-                            <div className="flex gap-2">
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                onClick={() => {
-                                  localStorage.setItem('resumeAnalysisId', analysis.id);
-                                  window.location.href = createPageUrl('FinancialAnalysis');
-                                }}
-                              >
-                                <ArrowRight className="h-3 w-3 mr-1" />
-                                Отвори
-                              </Button>
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                onClick={() => {
-                                  if (window.setViewAnalysisId) window.setViewAnalysisId(analysis.id);
-                                }}
-                              >
-                                <Eye className="h-3 w-3 mr-1" />
-                                Детайли
-                              </Button>
-                            </div>
-                          </div>
-                        </CardContent>
-                      </Card>
-                    ))}
+                          </CardContent>
+                        </Card>
+                      );
+                    })}
                   </div>
                 )}
               </div>

@@ -27,7 +27,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 
-export default function FinancialHealthCard({ data }) {
+export default function FinancialHealthCard({ data, prioritiesWarning }) {
   const [aiAnalysis, setAiAnalysis] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const [hasGenerated, setHasGenerated] = useState(false);

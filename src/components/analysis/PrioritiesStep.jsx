@@ -109,7 +109,7 @@ export default function PrioritiesStep({ data, onChange, showErrors }) {
   return (
     <div className="space-y-8">
       {/* Financial Health Card */}
-      <FinancialHealthCard data={data} />
+      <FinancialHealthCard data={data} prioritiesWarning={showIncomeProtectionWarning} />
 
       {/* Priorities */}
       <div className="bg-slate-50 rounded-xl p-6">

@@ -269,19 +269,14 @@ export default function ReserveStep({ data, onChange, showErrors, plannerData })
                   onChange={(e) => onChange('client_term_deposit', parseInt(e.target.value) || 0)}
                   className="rounded-lg text-center"
                 />
-                <Select 
-                  value={data.client_term_deposit_bank || ''} 
+                <Combobox
+                  options={BANK_OPTIONS}
+                  value={data.client_term_deposit_bank || ''}
                   onValueChange={(value) => onChange('client_term_deposit_bank', value)}
-                >
-                  <SelectTrigger className="rounded-lg text-sm [&>span]:text-center [&>span]:w-full">
-                    <SelectValue placeholder="Изберете" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {BANK_OPTIONS.map(bank => (
-                      <SelectItem key={bank.value} value={bank.value}>{bank.label}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                  placeholder="Банка"
+                  searchPlaceholder="Търси банка..."
+                  emptyText="Няма намерена банка."
+                />
               </div>
 
               {/* Пари в брой */}

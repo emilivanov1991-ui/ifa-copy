@@ -356,7 +356,7 @@ export default function ClientDossierView({ clientId }) {
                         </p>
                         <AnalysisInfoRow analysis={primary} />
 
-                        <div className="mt-5 pt-4 border-t border-slate-100">
+                        <div className="mt-5 pt-4 border-t border-slate-100 space-y-2">
                           <Button
                             onClick={() => {
                               localStorage.setItem('resumeAnalysisId', primary.id);
@@ -367,7 +367,21 @@ export default function ClientDossierView({ clientId }) {
                             <ArrowRight className="w-4 h-4 mr-2" />
                             Довърши анализ
                           </Button>
-                          <p className="text-xs text-slate-500 text-center mt-2">
+                          {/* Manual complete button - for cases where step 9 was reached but current_step wasn't set to 10 */}
+                          {primary.current_step === 9 && (
+                            <Button
+                              variant="outline"
+                              onClick={async () => {
+                                await base44.entities.FinancialAnalysisSubmission.update(primary.id, { current_step: 10 });
+                                loadDossier();
+                              }}
+                              className="w-full border-green-300 text-green-700 hover:bg-green-50"
+                            >
+                              <CheckCircle2 className="w-4 h-4 mr-2" />
+                              Маркирай като завършен
+                            </Button>
+                          )}
+                          <p className="text-xs text-slate-500 text-center">
                             Анализът остава незавършен докато не бъде финализиран от стъпка "Обобщение"
                           </p>
                         </div>

@@ -244,11 +244,14 @@ export default function AnalysisViewDialog({ analysisId, open, onOpenChange }) {
             Назад
           </Button>
           <span className="text-sm text-slate-500">
-            Стъпка {currentStep} от {steps.length}
+            Стъпка {steps.findIndex(s => s.id === currentStep) + 1} от {steps.length}
           </span>
           <Button
-            onClick={() => setCurrentStep(prev => Math.min(9, prev + 1))}
-            disabled={currentStep === 9}
+            onClick={() => {
+              const idx = steps.findIndex(s => s.id === currentStep);
+              if (idx < steps.length - 1) setCurrentStep(steps[idx + 1].id);
+            }}
+            disabled={currentStep === steps[steps.length - 1].id}
             className="bg-blue-600 hover:bg-blue-700"
           >
             Напред

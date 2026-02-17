@@ -662,18 +662,110 @@ export default function HousingStep({ data, onChange, showErrors }) {
 
         {data.birthday_example_enabled && (
           <div className="space-y-6">
-            <div className="p-4 bg-white rounded-lg border border-slate-200">
-              <Label className="text-slate-700 mb-2 block">
-                Рожден ден на {data.client_first_name || 'Клиент'} ({data.client_birthdate ? formatBulgarianDate(data.client_birthdate) : 'не е въведена дата'})
-                {data.include_partner && data.partner_birthdate && (
-                  <> и на {data.partner_first_name || 'Партньор'} ({formatBulgarianDate(data.partner_birthdate)})</>
-                )}
-              </Label>
+            {/* Birthday date inputs */}
+            <div className="p-4 bg-white rounded-lg border border-slate-200 space-y-4">
+              <div>
+                <Label className="text-slate-700 mb-2 block font-medium">
+                  Рожден ден на {data.client_first_name || 'Клиент'}
+                </Label>
+                <div className="flex items-center gap-3">
+                  <div className="space-y-1">
+                    <Label className="text-xs text-slate-500">Ден</Label>
+                    <Input
+                      type="number"
+                      min="1"
+                      max="31"
+                      placeholder="дд"
+                      value={data.client_birthday_day || ''}
+                      onChange={(e) => onChange('client_birthday_day', parseInt(e.target.value) || '')}
+                      className="rounded-lg w-20"
+                    />
+                  </div>
+                  <div className="space-y-1">
+                    <Label className="text-xs text-slate-500">Месец</Label>
+                    <Select
+                      value={(data.client_birthday_month || '').toString()}
+                      onValueChange={(v) => onChange('client_birthday_month', parseInt(v))}
+                    >
+                      <SelectTrigger className="rounded-lg w-36">
+                        <SelectValue placeholder="Месец" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {['Януари','Февруари','Март','Април','Май','Юни','Юли','Август','Септември','Октомври','Ноември','Декември'].map((m, i) => (
+                          <SelectItem key={i+1} value={(i+1).toString()}>{m}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  {data.client_birthday_day && data.client_birthday_month && (
+                    <span className="text-sm text-slate-600 mt-5">
+                      → {data.client_birthday_day}-ти {['Януари','Февруари','Март','Април','Май','Юни','Юли','Август','Септември','Октомври','Ноември','Декември'][data.client_birthday_month - 1]}
+                    </span>
+                  )}
+                </div>
+              </div>
+
+              {data.include_partner && (
+                <div>
+                  <Label className="text-slate-700 mb-2 block font-medium">
+                    Рожден ден на {data.partner_first_name || 'Партньор'}
+                  </Label>
+                  <div className="flex items-center gap-3">
+                    <div className="space-y-1">
+                      <Label className="text-xs text-slate-500">Ден</Label>
+                      <Input
+                        type="number"
+                        min="1"
+                        max="31"
+                        placeholder="дд"
+                        value={data.partner_birthday_day || ''}
+                        onChange={(e) => onChange('partner_birthday_day', parseInt(e.target.value) || '')}
+                        className="rounded-lg w-20"
+                      />
+                    </div>
+                    <div className="space-y-1">
+                      <Label className="text-xs text-slate-500">Месец</Label>
+                      <Select
+                        value={(data.partner_birthday_month || '').toString()}
+                        onValueChange={(v) => onChange('partner_birthday_month', parseInt(v))}
+                      >
+                        <SelectTrigger className="rounded-lg w-36">
+                          <SelectValue placeholder="Месец" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {['Януари','Февруари','Март','Април','Май','Юни','Юли','Август','Септември','Октомври','Ноември','Декември'].map((m, i) => (
+                            <SelectItem key={i+1} value={(i+1).toString()}>{m}</SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    {data.partner_birthday_day && data.partner_birthday_month && (
+                      <span className="text-sm text-slate-600 mt-5">
+                        → {data.partner_birthday_day}-ти {['Януари','Февруари','Март','Април','Май','Юни','Юли','Август','Септември','Октомври','Ноември','Декември'][data.partner_birthday_month - 1]}
+                      </span>
+                    )}
+                  </div>
+                </div>
+              )}
             </div>
 
+            {/* Birthday label computed from new fields */}
+            {(() => {
+              const months = ['Януари','Февруари','Март','Април','Май','Юни','Юли','Август','Септември','Октомври','Ноември','Декември'];
+              const clientBday = data.client_birthday_day && data.client_birthday_month
+                ? `${data.client_birthday_day}-ти ${months[data.client_birthday_month - 1]}`
+                : null;
+              const partnerBday = data.include_partner && data.partner_birthday_day && data.partner_birthday_month
+                ? `${data.partner_birthday_day}-ти ${months[data.partner_birthday_month - 1]}`
+                : null;
+              const bdayLabel = clientBday
+                ? (partnerBday ? `${clientBday} / ${partnerBday}` : clientBday)
+                : '(въведете рожден ден)';
+
+              return (
             <div className="space-y-3">
               <Label className="text-slate-700">
-                Представете си, че днес е {data.client_birthdate ? formatBulgarianDate(data.client_birthdate) : '(вашият рожден ден)'}{data.include_partner && data.partner_birthdate ? ` / ${formatBulgarianDate(data.partner_birthdate)}` : ''} и <span className="font-bold">имате неограничен бюджет</span>! Къде бихте празнували своя рожен ден?
+                Представете си, че днес е <span className="font-semibold">{bdayLabel}</span> и <span className="font-bold">имате неограничен бюджет</span>! Къде бихте празнували своя рожен ден?
               </Label>
               <Input
                 placeholder="Опишете мястото..."

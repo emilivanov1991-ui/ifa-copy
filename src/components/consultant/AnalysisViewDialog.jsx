@@ -238,8 +238,11 @@ export default function AnalysisViewDialog({ analysisId, open, onOpenChange }) {
         <div className="px-6 py-4 border-t border-slate-200 flex justify-between items-center">
           <Button
             variant="outline"
-            onClick={() => setCurrentStep(prev => Math.max(1, prev - 1))}
-            disabled={currentStep === 1}
+            onClick={() => {
+              const idx = steps.findIndex(s => s.id === currentStep);
+              if (idx > 0) setCurrentStep(steps[idx - 1].id);
+            }}
+            disabled={currentStep === steps[0].id}
           >
             Назад
           </Button>

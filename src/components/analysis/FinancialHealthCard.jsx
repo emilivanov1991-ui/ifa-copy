@@ -685,13 +685,20 @@ ${JSON.stringify(analysisContext, null, 2)}
         </div>
       </div>
 
-      {/* Priorities Warning - shown before AI analysis */}
+      {/* Priorities Warning + Priorities Section - shown before AI analysis */}
       {prioritiesWarning && (
         <div className="mt-6 flex items-start gap-3 bg-amber-50 border border-amber-300 rounded-lg p-4">
           <AlertCircle className="h-5 w-5 text-amber-600 flex-shrink-0 mt-0.5" />
           <p className="text-sm text-amber-800 font-medium">
             Всички останали Ваши цели зависят от възможността Ви да генерирате средства. Подсигуряването на доходите Ви следва да е приоритет.
           </p>
+        </div>
+      )}
+
+      {/* Priorities Section - before AI analysis */}
+      {prioritiesSection && (
+        <div className="mt-6">
+          {prioritiesSection}
         </div>
       )}
 

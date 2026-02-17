@@ -782,20 +782,23 @@ export default function HousingStep({ data, onChange, showErrors }) {
                       />
                     </div>
                     <div className="space-y-1">
-                      <Label className="text-xs text-slate-500">Месец</Label>
-                      <Select
-                        value={(data.partner_birthday_month || '').toString()}
-                        onValueChange={(v) => onChange('partner_birthday_month', parseInt(v))}
-                      >
-                        <SelectTrigger className="rounded-lg w-36">
-                          <SelectValue placeholder="Месец" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {['Януари','Февруари','Март','Април','Май','Юни','Юли','Август','Септември','Октомври','Ноември','Декември'].map((m, i) => (
-                            <SelectItem key={i+1} value={(i+1).toString()}>{m}</SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
+                     <Label className="text-xs text-slate-500">Месец</Label>
+                     <div className="relative">
+                       <Input
+                         type="number"
+                         min="1"
+                         max="12"
+                         placeholder="мм"
+                         value={data.partner_birthday_month || ''}
+                         onChange={(e) => onChange('partner_birthday_month', parseInt(e.target.value) || '')}
+                         className="rounded-lg w-20"
+                       />
+                       {data.partner_birthday_month >= 1 && data.partner_birthday_month <= 12 && (
+                         <span className="absolute left-0 -bottom-5 text-xs text-blue-600 whitespace-nowrap">
+                           {MONTHS[data.partner_birthday_month - 1]}
+                         </span>
+                       )}
+                     </div>
                     </div>
                     {data.partner_birthday_day && data.partner_birthday_month && (
                       <span className="text-sm text-slate-600 mt-5">

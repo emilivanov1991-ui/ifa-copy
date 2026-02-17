@@ -154,7 +154,6 @@ export default function ClientDossierView({ clientId }) {
                 <p className="text-slate-600 mb-4">Все още няма анализи</p>
                 <Button 
                   onClick={() => {
-                    // Запазваме client_id и отваряме анализа
                     const plannerData = {
                       client_id: client.id,
                       family_type: client.family_type,
@@ -182,101 +181,187 @@ export default function ClientDossierView({ clientId }) {
                 </Button>
               </CardContent>
             </Card>
-          ) : (
-            <div className="space-y-4">
-              {analyses.map((analysis) => {
-                const hasPlan = plans.some(p => p.analysis_id === analysis.id);
-                
-                return (
-                  <Card key={analysis.id} className="hover:shadow-lg transition-shadow">
-                    <CardContent className="p-6">
-                      <div className="flex items-start justify-between mb-4">
-                        <div className="flex-1">
-                          <div className="flex items-center gap-3 mb-2">
-                            <h3 className="text-lg font-semibold text-slate-900">
-                              Финансов анализ
-                            </h3>
-                            <Badge variant="outline">
-                              {new Date(analysis.created_date).toLocaleDateString('bg-BG')}
-                            </Badge>
-                          </div>
-                          
-                          <div className="grid md:grid-cols-3 gap-4 text-sm mt-4">
-                            <div className="flex items-center gap-2">
-                              <User className="w-4 h-4 text-blue-600" />
-                              <span className="text-slate-600">
-                                {analysis.client_first_name} {analysis.client_last_name}
-                              </span>
-                            </div>
-                            <div className="flex items-center gap-2">
-                              <Calendar className="w-4 h-4 text-blue-600" />
-                              <span className="text-slate-600">
-                                {analysis.client_age} години
-                              </span>
-                            </div>
-                            <div className="flex items-center gap-2">
-                              <Users className="w-4 h-4 text-blue-600" />
-                              <span className="text-slate-600">
-                                {analysis.include_partner ? 'С партньор' : 'Без партньор'}
-                                {analysis.children_count > 0 && `, ${analysis.children_count} деца`}
-                              </span>
-                            </div>
-                          </div>
-                        </div>
+          ) : (() => {
+            // Sort by created_date descending; primary = most recent
+            const sorted = [...analyses].sort((a, b) => new Date(b.created_date) - new Date(a.created_date));
+            const primary = sorted[0];
+            const serviceAnalyses = sorted.slice(1);
+            const hasPlan = plans.some(p => p.analysis_id === primary.id);
 
-                        <div className="flex gap-2">
-                          <Button 
-                            variant="outline" 
-                            size="sm"
-                            onClick={() => {
-                              // Load analysis and continue from where left off
-                              localStorage.setItem('resumeAnalysisId', analysis.id);
-                              window.location.href = createPageUrl('FinancialAnalysis');
-                            }}
-                          >
-                            <ArrowRight className="h-4 w-4 mr-2" />
-                            {analysis.current_step >= 9 ? 'Прегледай' : 'Довърши'} анализ
-                          </Button>
-                          <Button 
-                            variant="outline" 
-                            size="sm"
-                            onClick={() => {
-                              if (window.setViewAnalysisId) {
-                                window.setViewAnalysisId(analysis.id);
-                              }
-                            }}
-                          >
-                            <Eye className="w-4 h-4 mr-2" />
-                            Детайли
-                          </Button>
+            const startServiceAnalysis = () => {
+              const plannerData = {
+                client_id: client.id,
+                family_type: client.family_type,
+                client_first_name: client.first_name,
+                client_last_name: client.last_name,
+                client_phone: client.phone,
+                client_email: client.email,
+                partner_first_name: client.partner_first_name,
+                partner_last_name: client.partner_last_name,
+                partner_email: client.partner_email,
+                children_count: client.children_count,
+                children_names: client.children_names,
+                children_ages: client.children_ages,
+                gdpr_consent_a: client.gdpr_consent_a,
+                gdpr_consent_b: client.gdpr_consent_b,
+                gdpr_consent_c: client.gdpr_consent_c,
+                forceNewAnalysis: true
+              };
+              localStorage.setItem('financialPlannerData', JSON.stringify(plannerData));
+              window.location.href = createPageUrl('FinancialAnalysis');
+            };
+
+            return (
+              <div className="space-y-4">
+                {/* Primary Analysis */}
+                <Card className="hover:shadow-lg transition-shadow border-blue-200">
+                  <CardContent className="p-6">
+                    <div className="flex items-start justify-between mb-4">
+                      <div className="flex-1">
+                        <div className="flex items-center gap-3 mb-2">
+                          <h3 className="text-lg font-semibold text-slate-900">
+                            Финансов анализ
+                          </h3>
+                          <Badge variant="outline">
+                            {new Date(primary.created_date).toLocaleDateString('bg-BG')}
+                          </Badge>
+                          {primary.current_step >= 9 && (
+                            <Badge className="bg-green-100 text-green-700 border-green-300">✓ Завършен</Badge>
+                          )}
+                        </div>
+                        
+                        <div className="grid md:grid-cols-3 gap-4 text-sm mt-4">
+                          <div className="flex items-center gap-2">
+                            <User className="w-4 h-4 text-blue-600" />
+                            <span className="text-slate-600">
+                              {primary.client_first_name} {primary.client_last_name}
+                            </span>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <Calendar className="w-4 h-4 text-blue-600" />
+                            <span className="text-slate-600">
+                              {primary.client_age} години
+                            </span>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <Users className="w-4 h-4 text-blue-600" />
+                            <span className="text-slate-600">
+                              {primary.include_partner ? 'С партньор' : 'Без партньор'}
+                              {primary.children_count > 0 && `, ${primary.children_count} деца`}
+                            </span>
+                          </div>
                         </div>
                       </div>
 
-                      {/* Create Plan Button */}
-                      <div className="mt-4 pt-4 border-t border-slate-100">
-                        {hasPlan && (
-                          <Badge className="bg-green-100 text-green-700 border-green-300 mb-3">
-                            ✓ Финансовият план е създаден
-                          </Badge>
-                        )}
+                      <div className="flex gap-2">
                         <Button 
+                          variant="outline" 
+                          size="sm"
                           onClick={() => {
-                            setSelectedAnalysis(analysis);
-                            setShowPlanGenerator(true);
+                            localStorage.setItem('resumeAnalysisId', primary.id);
+                            window.location.href = createPageUrl('FinancialAnalysis');
                           }}
-                          className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white shadow-lg"
                         >
-                          <Sparkles className="w-4 h-4 mr-2" />
-                          Създай финансов план
-                          <ArrowRight className="w-4 h-4 ml-2" />
+                          <ArrowRight className="h-4 w-4 mr-2" />
+                          {primary.current_step >= 9 ? 'Прегледай' : 'Довърши'} анализ
+                        </Button>
+                        <Button 
+                          variant="outline" 
+                          size="sm"
+                          onClick={() => {
+                            if (window.setViewAnalysisId) {
+                              window.setViewAnalysisId(primary.id);
+                            }
+                          }}
+                        >
+                          <Eye className="w-4 h-4 mr-2" />
+                          Детайли
                         </Button>
                       </div>
-                    </CardContent>
-                  </Card>
-                );
-              })}
-            </div>
-          )}
+                    </div>
+
+                    {/* Create Plan Button */}
+                    <div className="mt-4 pt-4 border-t border-slate-100 space-y-3">
+                      {hasPlan && (
+                        <Badge className="bg-green-100 text-green-700 border-green-300">
+                          ✓ Финансовият план е създаден
+                        </Badge>
+                      )}
+                      <Button 
+                        onClick={() => {
+                          setSelectedAnalysis(primary);
+                          setShowPlanGenerator(true);
+                        }}
+                        className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white shadow-lg"
+                      >
+                        <Sparkles className="w-4 h-4 mr-2" />
+                        Създай финансов план
+                        <ArrowRight className="w-4 h-4 ml-2" />
+                      </Button>
+                      <Button 
+                        variant="outline"
+                        onClick={startServiceAnalysis}
+                        className="w-full border-amber-300 text-amber-700 hover:bg-amber-50"
+                      >
+                        <FileText className="w-4 h-4 mr-2" />
+                        Направи нов (сервизен) анализ
+                      </Button>
+                    </div>
+                  </CardContent>
+                </Card>
+
+                {/* Service / Older Analyses */}
+                {serviceAnalyses.length > 0 && (
+                  <div className="space-y-2">
+                    <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider px-1">
+                      Предишни анализи ({serviceAnalyses.length})
+                    </p>
+                    {serviceAnalyses.map((analysis) => (
+                      <Card key={analysis.id} className="border-slate-200 bg-slate-50">
+                        <CardContent className="p-4">
+                          <div className="flex items-center justify-between">
+                            <div className="flex items-center gap-3">
+                              <Badge variant="outline" className="text-xs">
+                                {new Date(analysis.created_date).toLocaleDateString('bg-BG')}
+                              </Badge>
+                              {analysis.current_step >= 9 ? (
+                                <Badge className="bg-green-100 text-green-700 text-xs">Завършен</Badge>
+                              ) : (
+                                <Badge className="bg-amber-100 text-amber-700 text-xs">Незавършен (стъпка {analysis.current_step})</Badge>
+                              )}
+                            </div>
+                            <div className="flex gap-2">
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => {
+                                  localStorage.setItem('resumeAnalysisId', analysis.id);
+                                  window.location.href = createPageUrl('FinancialAnalysis');
+                                }}
+                              >
+                                <ArrowRight className="h-3 w-3 mr-1" />
+                                Отвори
+                              </Button>
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => {
+                                  if (window.setViewAnalysisId) window.setViewAnalysisId(analysis.id);
+                                }}
+                              >
+                                <Eye className="h-3 w-3 mr-1" />
+                                Детайли
+                              </Button>
+                            </div>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    ))}
+                  </div>
+                )}
+              </div>
+            );
+          })()}
 
           {/* Plan Generator Modal */}
           {showPlanGenerator && selectedAnalysis && (

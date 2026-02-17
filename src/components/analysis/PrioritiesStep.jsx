@@ -10,7 +10,6 @@ import {
 } from "@/components/ui/select";
 import { ListOrdered, TrendingUp, AlertTriangle } from 'lucide-react';
 import FinancialHealthCard from './FinancialHealthCard';
-import BulgarianDateInput from '@/components/ui/BulgarianDateInput';
 
 const allPriorities = [
   { key: 'priority_income_protection', label: 'Подсигуряване на доходите' },

@@ -99,6 +99,13 @@ export default function PrioritiesStep({ data, onChange, showErrors }) {
   const allFilled = priorities.every(p => data[p.key] !== undefined && data[p.key] !== null && data[p.key] !== '');
   const isInvalid = !allFilled; // Always show validation state, not dependent on showErrors
 
+  // Check if income protection is NOT priority 1
+  const incomeProtectionPriority = data.priority_income_protection;
+  const showIncomeProtectionWarning = incomeProtectionPriority !== undefined && 
+    incomeProtectionPriority !== null && 
+    incomeProtectionPriority !== '' && 
+    incomeProtectionPriority !== 1;
+
   return (
     <div className="space-y-8">
       {/* Financial Health Card */}

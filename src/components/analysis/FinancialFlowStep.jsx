@@ -21,64 +21,74 @@ export default function FinancialFlowStep({ data, onChange, showErrors, plannerD
 
   // Auto-populate gross income from Pension step
   useEffect(() => {
-    if (data.client_gross_income_pension !== undefined && data.client_gross_income === undefined) {
+    if (data.client_gross_income_pension !== undefined && (data.client_gross_income === undefined || data.client_gross_income === null)) {
       onChange('client_gross_income', data.client_gross_income_pension);
     }
-    if (includePartner && data.partner_gross_income_pension !== undefined && data.partner_gross_income === undefined) {
+    if (includePartner && data.partner_gross_income_pension !== undefined && (data.partner_gross_income === undefined || data.partner_gross_income === null)) {
       onChange('partner_gross_income', data.partner_gross_income_pension);
     }
-  }, [data.client_gross_income_pension, data.partner_gross_income_pension, includePartner]);
+  }, [data.client_gross_income_pension, data.partner_gross_income_pension, data.client_gross_income, data.partner_gross_income, includePartner]);
+
+  // Auto-populate net income from Reserve step
+  useEffect(() => {
+    if (data.client_monthly_net_income !== undefined && (data.client_net_income === undefined || data.client_net_income === null)) {
+      onChange('client_net_income', data.client_monthly_net_income);
+    }
+    if (includePartner && data.partner_monthly_net_income !== undefined && (data.partner_net_income === undefined || data.partner_net_income === null)) {
+      onChange('partner_net_income', data.partner_monthly_net_income);
+    }
+  }, [data.client_monthly_net_income, data.partner_monthly_net_income, data.client_net_income, data.partner_net_income, includePartner]);
 
   // Auto-populate checking account from Reserve step
   useEffect(() => {
-    if (data.asset_checking_account === undefined) {
+    if (data.asset_checking_account === undefined || data.asset_checking_account === null) {
       const clientChecking = (data.client_checking_account || 0) + (data.client_cash || 0);
       const partnerChecking = includePartner ? ((data.partner_checking_account || 0) + (data.partner_cash || 0)) : 0;
       onChange('asset_checking_account', clientChecking + partnerChecking);
     }
-  }, [data.client_checking_account, data.client_cash, data.partner_checking_account, data.partner_cash, includePartner]);
+  }, [data.client_checking_account, data.client_cash, data.partner_checking_account, data.partner_cash, data.asset_checking_account, includePartner]);
 
   // Auto-populate short-term savings from Reserve step
   useEffect(() => {
-    if (data.asset_short_term_savings === undefined) {
+    if (data.asset_short_term_savings === undefined || data.asset_short_term_savings === null) {
       const clientShort = (data.client_savings_account || 0) + (data.client_term_deposit || 0);
       const partnerShort = includePartner ? ((data.partner_savings_account || 0) + (data.partner_term_deposit || 0)) : 0;
       onChange('asset_short_term_savings', clientShort + partnerShort);
     }
-  }, [data.client_savings_account, data.client_term_deposit, data.partner_savings_account, data.partner_term_deposit, includePartner]);
+  }, [data.client_savings_account, data.client_term_deposit, data.partner_savings_account, data.partner_term_deposit, data.asset_short_term_savings, includePartner]);
 
   // Auto-populate medium-term savings from Reserve step
   useEffect(() => {
-    if (data.asset_medium_term_savings === undefined) {
+    if (data.asset_medium_term_savings === undefined || data.asset_medium_term_savings === null) {
       const clientMedium = (data.client_mutual_funds || 0) + (data.client_crypto || 0) + (data.client_gold || 0);
       const partnerMedium = includePartner ? ((data.partner_mutual_funds || 0) + (data.partner_crypto || 0) + (data.partner_gold || 0)) : 0;
       onChange('asset_medium_term_savings', clientMedium + partnerMedium);
     }
-  }, [data.client_mutual_funds, data.client_crypto, data.client_gold, data.partner_mutual_funds, data.partner_crypto, data.partner_gold, includePartner]);
+  }, [data.client_mutual_funds, data.client_crypto, data.client_gold, data.partner_mutual_funds, data.partner_crypto, data.partner_gold, data.asset_medium_term_savings, includePartner]);
 
   // Auto-populate long-term savings from Pension and Children steps
   useEffect(() => {
-    if (data.asset_long_term_savings === undefined) {
+    if (data.asset_long_term_savings === undefined || data.asset_long_term_savings === null) {
       const clientPension = data.client_voluntary_pension_total || 0;
       const partnerPension = includePartner ? (data.partner_voluntary_pension_total || 0) : 0;
       const childrenSavings = data.children_current_savings || 0;
       onChange('asset_long_term_savings', clientPension + partnerPension + childrenSavings);
     }
-  }, [data.client_voluntary_pension_total, data.partner_voluntary_pension_total, data.children_current_savings, includePartner]);
+  }, [data.client_voluntary_pension_total, data.partner_voluntary_pension_total, data.children_current_savings, data.asset_long_term_savings, includePartner]);
 
   // Auto-populate real estate value
   useEffect(() => {
-    if (data.asset_real_estate === undefined) {
+    if (data.asset_real_estate === undefined || data.asset_real_estate === null) {
       const currentHousing = data.current_housing === 'owned' ? (data.current_housing_value || 0) : 0;
       const property2 = data.has_property_2 ? (data.property_2_value || 0) : 0;
       const property3 = data.has_property_3 ? (data.property_3_value || 0) : 0;
       onChange('asset_real_estate', currentHousing + property2 + property3);
     }
-  }, [data.current_housing, data.current_housing_value, data.has_property_2, data.property_2_value, data.has_property_3, data.property_3_value]);
+  }, [data.current_housing, data.current_housing_value, data.has_property_2, data.property_2_value, data.has_property_3, data.property_3_value, data.asset_real_estate]);
 
   // Auto-populate movable property value
   useEffect(() => {
-    if (data.asset_movable_property === undefined) {
+    if (data.asset_movable_property === undefined || data.asset_movable_property === null) {
       const currentMovable = data.current_housing === 'owned' ? (data.current_housing_movable_value || 0) : 0;
       const property2Movable = data.has_property_2 ? (data.property_2_movable_value || 0) : 0;
       const property3Movable = data.has_property_3 ? (data.property_3_movable_value || 0) : 0;
@@ -87,17 +97,17 @@ export default function FinancialFlowStep({ data, onChange, showErrors, plannerD
       const car3 = data.has_car_3 ? (data.car_3_value || 0) : 0;
       onChange('asset_movable_property', currentMovable + property2Movable + property3Movable + car1 + car2 + car3);
     }
-  }, [data.current_housing, data.current_housing_movable_value, data.has_property_2, data.property_2_movable_value, data.has_property_3, data.property_3_movable_value, data.has_car_1, data.car_1_value, data.has_car_2, data.car_2_value, data.has_car_3, data.car_3_value]);
+  }, [data.current_housing, data.current_housing_movable_value, data.has_property_2, data.property_2_movable_value, data.has_property_3, data.property_3_movable_value, data.has_car_1, data.car_1_value, data.has_car_2, data.car_2_value, data.has_car_3, data.car_3_value, data.asset_movable_property]);
 
   // Auto-populate mortgage from Housing step
   useEffect(() => {
-    if (data.liability_mortgage_monthly === undefined && data.current_mortgage_monthly_payment) {
+    if ((data.liability_mortgage_monthly === undefined || data.liability_mortgage_monthly === null) && data.current_mortgage_monthly_payment) {
       onChange('liability_mortgage_monthly', data.current_mortgage_monthly_payment);
     }
-    if (data.liability_mortgage_remaining === undefined && data.current_mortgage_remaining) {
+    if ((data.liability_mortgage_remaining === undefined || data.liability_mortgage_remaining === null) && data.current_mortgage_remaining) {
       onChange('liability_mortgage_remaining', data.current_mortgage_remaining);
     }
-  }, [data.current_mortgage_monthly_payment, data.current_mortgage_remaining]);
+  }, [data.current_mortgage_monthly_payment, data.current_mortgage_remaining, data.liability_mortgage_monthly, data.liability_mortgage_remaining]);
 
   // Auto-populate fields with default 0 if undefined
   useEffect(() => {

@@ -451,19 +451,15 @@ export default function PensionStep({ data, onChange, showErrors, plannerData })
                 {(data.client_pillar_2 ?? true) && (
                     <div className="ml-4 space-y-2" data-invalid={isFieldInvalid(data.client_pension_fund) ? "true" : undefined}>
                       <Label className="text-sm">Име на частен пенсионен фонд? <span className="text-red-500">*</span></Label>
-                      <Select 
-                        value={data.client_pension_fund || ''} 
+                      <Combobox
+                        options={PENSION_FUND_OPTIONS}
+                        value={data.client_pension_fund || ''}
                         onValueChange={(value) => onChange('client_pension_fund', value)}
-                      >
-                        <SelectTrigger className={`rounded-lg ${isFieldInvalid(data.client_pension_fund) ? 'border-red-500 bg-red-50' : ''}`}>
-                          <SelectValue placeholder="Изберете" />
-                        </SelectTrigger>
-                      <SelectContent>
-                        {PENSION_FUND_OPTIONS.map(fund => (
-                          <SelectItem key={fund.value} value={fund.value}>{fund.label}</SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
+                        placeholder="Търси фонд..."
+                        searchPlaceholder="Търси..."
+                        emptyText="Няма намерен фонд."
+                        triggerClassName={`rounded-lg ${isFieldInvalid(data.client_pension_fund) ? 'border-red-500 bg-red-50' : ''}`}
+                      />
                     <p className="text-xs text-slate-500 mt-2">
                       В случай, на необходимост за откриване на дружеството, което управлява Вашите средства: Телефон за информация на НОИ: <span className="font-bold">0700 10 292</span> !
                     </p>

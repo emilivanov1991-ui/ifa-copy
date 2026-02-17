@@ -157,6 +157,16 @@ export default function PrioritiesStep({ data, onChange, showErrors }) {
         {isInvalid && (
           <p className="text-red-500 text-sm mt-2">Моля, задайте приоритет на всички елементи.</p>
         )}
+
+        {/* Income protection warning - right after priorities table */}
+        {showIncomeProtectionWarning && (
+          <div className="mt-3 flex items-start gap-3 bg-amber-50 border border-amber-300 rounded-lg p-4">
+            <AlertTriangle className="h-5 w-5 text-amber-600 flex-shrink-0 mt-0.5" />
+            <p className="text-sm text-amber-800 font-medium">
+              Всички останали Ваши цели зависят от възможността Ви да генерирате средства. Подсигуряването на доходите Ви следва да е приоритет.
+            </p>
+          </div>
+        )}
       </div>
 
       {/* Monthly Allocation */}
@@ -178,6 +188,12 @@ export default function PrioritiesStep({ data, onChange, showErrors }) {
             className={`rounded-lg max-w-xs ${showErrors && (data.monthly_priority_allocation === undefined || data.monthly_priority_allocation === '') ? 'border-red-500 bg-red-50' : ''}`}
             required
           />
+          {data.monthly_priority_allocation !== undefined && data.monthly_priority_allocation !== '' && monthlyBalance > 0 && data.monthly_priority_allocation > monthlyBalance && (
+            <div className="flex items-start gap-2 mt-2 text-amber-700 bg-amber-50 border border-amber-300 rounded-lg px-3 py-2">
+              <AlertTriangle className="h-4 w-4 flex-shrink-0 mt-0.5" />
+              <p className="text-sm font-medium">Сумата надхвърля текущите ви възможности за спестяване.</p>
+            </div>
+          )}
         </div>
       </div>
 

@@ -87,11 +87,12 @@ export default function FinancialAnalysis() {
             base44.entities.Client.filter({ id: analysis.client_id }).then(clients => {
               if (clients.length > 0) {
                 const client = clients[0];
+                const includePartner = client.family_type === 'family';
 
                 // Merge client data with analysis data (analysis data takes priority)
                 const mergedData = {
                   ...analysis,
-                  include_partner: client.family_type === 'family',
+                  include_partner: includePartner,
                   client_first_name: analysis.client_first_name || client.first_name,
                   client_last_name: analysis.client_last_name || client.last_name,
                   client_email: analysis.client_email || client.email,

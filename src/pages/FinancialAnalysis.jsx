@@ -120,7 +120,9 @@ export default function FinancialAnalysis() {
                   children_names: client.children_names,
                   children_ages: client.children_ages,
                   gdpr_consent_a: analysis.gdpr_consent_a,
-                  gdpr_consent_c: analysis.gdpr_consent_c
+                  gdpr_consent_c: analysis.gdpr_consent_c,
+                  // Pass these so steps can use client names properly
+                  include_partner: client.family_type === 'family',
                 });
               }
             });

@@ -88,10 +88,10 @@ export default function PensionStep({ data, onChange, showErrors, plannerData })
   // Helper to check if a field is invalid - only when showErrors is true
   const isFieldInvalid = (value) => showErrors && (value === undefined || value === '' || value === null);
   
-  // Get names from Financial Planner
-  const clientName = plannerData?.client_first_name || 'Клиент';
-  const partnerName = plannerData?.partner_first_name || 'Партньор';
-  const includePartner = plannerData?.family_type === 'family' || data.include_partner;
+  // Get names from Financial Planner or from analysis data directly
+  const clientName = plannerData?.client_first_name || data.client_first_name || 'Клиент';
+  const partnerName = plannerData?.partner_first_name || data.partner_first_name || 'Партньор';
+  const includePartner = plannerData?.family_type === 'family' || data.include_partner || plannerData?.include_partner;
 
   // Auto-populate gross income from net income (from Reserve step)
   // For entrepreneurs from Financial Planner step 2, set 620 EUR

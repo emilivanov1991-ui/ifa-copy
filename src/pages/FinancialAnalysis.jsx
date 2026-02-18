@@ -128,7 +128,7 @@ export default function FinancialAnalysis() {
             });
           } else {
             setFormData(analysis);
-            setCurrentStep(analysis.current_step || 1);
+            setCurrentStep(analysis.current_step >= 10 ? 1 : (analysis.current_step || 1));
           }
         }
         localStorage.removeItem('resumeAnalysisId');

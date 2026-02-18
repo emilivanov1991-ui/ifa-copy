@@ -119,7 +119,7 @@ function BirthdayPartyQuestion({ data }) {
   );
 }
 
-export default function HousingStep({ data, onChange, showErrors }) {
+export default function HousingStep({ data, onChange, showErrors, plannerData }) {
   const [showDownPaymentWarning, setShowDownPaymentWarning] = React.useState(false);
   const isFieldInvalid = (value) => showErrors && (value === undefined || value === '' || value === null);
   const plannedValue = data.planned_housing_value || 0;

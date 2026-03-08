@@ -41,7 +41,7 @@ import ConsultantDashboard from '@/components/consultant/ConsultantDashboard';
 import ConsultantCRMAdvanced from '@/components/consultant/ConsultantCRMAdvanced';
 import ConsultantStatistics from '@/components/consultant/ConsultantStatistics';
 import ConsultantReports from '@/components/consultant/ConsultantReports';
-import ConsultantElearningAdvanced from '@/components/consultant/ConsultantElearningAdvanced';
+import ElearningPortal from '@/components/consultant/ElearningPortal';
 import ConsultantCalendar from '@/components/consultant/ConsultantCalendar';
 import ConsultantMail from '@/components/consultant/ConsultantMail';
 import ConsultantAnalytics from '@/components/consultant/ConsultantAnalytics';

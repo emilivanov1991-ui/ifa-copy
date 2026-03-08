@@ -330,7 +330,7 @@ export default function ConsultantPortal() {
               {activeTab === 'commissions' && <CommissionsManager consultantEmail={currentUser?.email} />}
               {activeTab === 'ai-analytics' && <AIAnalyticsDashboard />}
               {activeTab === 'reports' && <ConsultantReports />}
-              {activeTab === 'elearning' && <ConsultantElearningAdvanced />}
+              {activeTab === 'elearning' && <ElearningPortal isAdmin={currentUser?.role === 'admin'} />}
               {activeTab === 'calendar' && <ConsultantCalendar />}
               {activeTab === 'mail' && <ConsultantMail />}
               {activeTab === 'integrations' && <ConsultantIntegrations />}

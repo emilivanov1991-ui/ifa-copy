@@ -238,9 +238,9 @@ function LayoutContent({ children, currentPageName }) {
             <div>
               <h4 className="font-semibold mb-4">{t('Контакти', 'Contact')}</h4>
               <ul className="space-y-3 text-slate-400 font-light">
-                <li>+359 2 123 4567</li>
-                <li>info@example.bg</li>
-                <li>{t('бул. Витоша 100', 'Vitosha Blvd 100')}<br />{t('София 1000', 'Sofia 1000')}</li>
+                <li>+359 89 222 2990</li>
+                <li>krassimir.stankov@ifa.bg</li>
+                <li>{t('ул. Поморие 20, ет. 5, ап. 1', 'Pomorie St. 20, fl. 5, apt. 1')}<br />{t('Бургас 8001', 'Burgas 8001')}</li>
               </ul>
             </div>
           </div>

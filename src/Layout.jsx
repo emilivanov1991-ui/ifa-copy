@@ -23,8 +23,6 @@ function LayoutContent({ children, currentPageName }) {
     { name: t('За нас', 'About'), page: 'About' },
     { name: t('Услуги', 'Services'), page: 'Services' },
     { name: t('Калкулатори', 'Calculators'), page: 'Calculators' },
-    { name: 'Financial Planner', page: 'FinancialPlanner' },
-    { name: t('Безплатен анализ', 'Free Analysis'), page: 'FinancialAnalysis' },
     { name: t('Контакти', 'Contact'), page: 'Contact' },
   ];
   const [isScrolled, setIsScrolled] = useState(false);
@@ -57,11 +55,11 @@ function LayoutContent({ children, currentPageName }) {
         <div className="max-w-7xl mx-auto px-6 flex items-center justify-between">
           {/* Logo */}
           <Link to={createPageUrl('Home')} className="flex items-center gap-3">
-            <div className={`w-10 h-10 rounded-xl flex items-center justify-center transition-colors duration-300 ${
-              isScrolled || !hasDarkHero ? 'bg-blue-600' : 'bg-white/20 backdrop-blur-sm'
-            }`}>
-              <TrendingUp className="h-5 w-5 text-white" />
-            </div>
+            <img
+              src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6925a960748714fa4828395a/41aaf7118_e5f40c4d-55b8-4282-8932-7925562f3c5b.png"
+              alt="Integrity Financial Advisors"
+              className={`h-10 w-auto transition-all duration-300 ${!isScrolled && hasDarkHero ? 'brightness-0 invert' : ''}`}
+            />
           </Link>
 
           {/* Desktop Nav */}

@@ -29,22 +29,22 @@ export default function Contact() {
     icon: MapPin,
     titleBg: 'Посетете ни',
     titleEn: 'Visit Us',
-    detailsBg: ['бул. Витоша 100', 'София 1000'],
-    detailsEn: ['Vitosha Blvd 100', 'Sofia 1000']
+    detailsBg: ['ул. Поморие 20, ет. 5, ап. 1', 'Бургас 8001'],
+    detailsEn: ['Pomorie St. 20, fl. 5, apt. 1', 'Burgas 8001']
   },
   {
     icon: Phone,
     titleBg: 'Обадете ни се',
     titleEn: 'Call Us',
-    detailsBg: ['+359 2 123 4567', '+359 888 123 456'],
-    detailsEn: ['+359 2 123 4567', '+359 888 123 456']
+    detailsBg: ['+359 89 222 2990'],
+    detailsEn: ['+359 89 222 2990']
   },
   {
     icon: Mail,
     titleBg: 'Пишете ни',
     titleEn: 'Email Us',
-    detailsBg: ['info@example.bg', 'support@example.bg'],
-    detailsEn: ['info@example.bg', 'support@example.bg']
+    detailsBg: ['krassimir.stankov@ifa.bg'],
+    detailsEn: ['krassimir.stankov@ifa.bg']
   },
   {
     icon: Clock,

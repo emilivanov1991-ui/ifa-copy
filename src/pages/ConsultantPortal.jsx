@@ -76,14 +76,32 @@ const menuItems = [
 export default function ConsultantPortal() {
   const [activeTab, setActiveTab] = useState('dashboard');
   const [currentUser, setCurrentUser] = useState(null);
+  const [consultantAccount, setConsultantAccount] = useState(null);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [currentTime, setCurrentTime] = useState(new Date());
 
   useEffect(() => {
     base44.auth.me().then(setCurrentUser).catch(() => {});
+    // Check session storage for logged-in consultant
+    const saved = sessionStorage.getItem('consultantAccount');
+    if (saved) setConsultantAccount(JSON.parse(saved));
     const timer = setInterval(() => setCurrentTime(new Date()), 60000);
     return () => clearInterval(timer);
   }, []);
+
+  const handleConsultantLogin = (account) => {
+    setConsultantAccount(account);
+    sessionStorage.setItem('consultantAccount', JSON.stringify(account));
+  };
+
+  const handleLogout = () => {
+    setConsultantAccount(null);
+    sessionStorage.removeItem('consultantAccount');
+  };
+
+  if (!consultantAccount) {
+    return <ConsultantLogin onLogin={handleConsultantLogin} />;
+  }
 
   const getGreeting = () => {
     const hour = currentTime.getHours();

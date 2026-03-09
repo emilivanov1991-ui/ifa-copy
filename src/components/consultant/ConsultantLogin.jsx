@@ -6,13 +6,8 @@ import { Label } from "@/components/ui/label";
 import { base44 } from '@/api/base44Client';
 import { Lock, User, Eye, EyeOff, AlertCircle } from 'lucide-react';
 
-// Simple SHA-256 hash using Web Crypto API
-async function hashPassword(password) {
-  const encoder = new TextEncoder();
-  const data = encoder.encode(password);
-  const hashBuffer = await crypto.subtle.digest('SHA-256', data);
-  const hashArray = Array.from(new Uint8Array(hashBuffer));
-  return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+function hashPassword(password) {
+  return btoa(password);
 }
 
 export default function ConsultantLogin({ onLogin }) {
@@ -27,7 +22,7 @@ export default function ConsultantLogin({ onLogin }) {
     setError('');
     setLoading(true);
 
-    const hash = await hashPassword(password);
+    const hash = hashPassword(password);
     const accounts = await base44.entities.ConsultantAccount.filter({ username, password_hash: hash, is_active: true });
 
     if (accounts.length > 0) {

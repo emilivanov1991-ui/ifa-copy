@@ -56,7 +56,7 @@ function LayoutContent({ children, currentPageName }) {
           {/* Logo */}
           <Link to={createPageUrl('Home')} className="flex items-center gap-3">
             <img
-              src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6925a960748714fa4828395a/41aaf7118_e5f40c4d-55b8-4282-8932-7925562f3c5b.png"
+              src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6925a960748714fa4828395a/258cedab0_output-onlinepngtools.png"
               alt="Integrity Financial Advisors"
               className={`h-10 w-auto transition-all duration-300 ${!isScrolled && hasDarkHero ? 'brightness-0 invert' : ''}`}
             />
@@ -205,7 +205,7 @@ function LayoutContent({ children, currentPageName }) {
             <div className="md:col-span-2">
               <div className="mb-4">
                 <img
-                  src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6925a960748714fa4828395a/41aaf7118_e5f40c4d-55b8-4282-8932-7925562f3c5b.png"
+                  src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6925a960748714fa4828395a/258cedab0_output-onlinepngtools.png"
                   alt="Integrity Financial Advisors"
                   className="h-12 w-auto brightness-0 invert"
                 />

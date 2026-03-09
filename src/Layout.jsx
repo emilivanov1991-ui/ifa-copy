@@ -247,7 +247,7 @@ function LayoutContent({ children, currentPageName }) {
 
           <div className="border-t border-slate-800 pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
             <p className="text-slate-500 text-sm font-light">
-              © {new Date().getFullYear()} Всички права запазени.
+              © {new Date().getFullYear()} „ИНТЕГРИТИ ФАЙНЕНШЪЛ АДВАЙЗЪРС" ЕООД · КФН Решение №&nbsp;33–ЗБ/27.01.2026 г. · Всички права запазени.
             </p>
             <div className="flex gap-6 text-sm text-slate-500">
               <a href="#" className="hover:text-white transition-colors">{t('Политика за поверителност', 'Privacy Policy')}</a>

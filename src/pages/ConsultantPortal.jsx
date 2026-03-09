@@ -219,7 +219,9 @@ export default function ConsultantPortal() {
               whileHover={{ scale: 1.1 }}
               className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500 to-indigo-500 flex items-center justify-center shadow-lg shadow-blue-500/25"
             >
-              <span className="text-sm font-bold text-white">ИП</span>
+              <span className="text-sm font-bold text-white">
+                {consultantAccount?.full_name?.charAt(0) || 'К'}
+              </span>
             </motion.div>
             <AnimatePresence>
               {!sidebarCollapsed && (
@@ -229,19 +231,17 @@ export default function ConsultantPortal() {
                   exit={{ opacity: 0, x: -10 }}
                   className="flex-1 min-w-0"
                 >
-                  <p className="text-sm font-semibold text-slate-900 truncate">Иван Петров</p>
-                  <p className="text-xs text-slate-500">Старши консултант</p>
+                  <p className="text-sm font-semibold text-slate-900 truncate">{consultantAccount?.full_name}</p>
+                  <p className="text-xs text-slate-500 capitalize">{consultantAccount?.role}</p>
                 </motion.div>
               )}
             </AnimatePresence>
           </div>
           {!sidebarCollapsed && (
-            <Link to={createPageUrl('Home')}>
-              <Button variant="outline" className="w-full text-slate-600 hover:text-red-600 hover:border-red-300 hover:bg-red-50 rounded-xl transition-all">
-                <LogOut className="h-4 w-4 mr-2" />
-                Изход
-              </Button>
-            </Link>
+            <Button variant="outline" onClick={handleLogout} className="w-full text-slate-600 hover:text-red-600 hover:border-red-300 hover:bg-red-50 rounded-xl transition-all">
+              <LogOut className="h-4 w-4 mr-2" />
+              Изход
+            </Button>
           )}
         </div>
       </motion.aside>

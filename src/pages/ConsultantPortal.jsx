@@ -263,7 +263,7 @@ export default function ConsultantPortal() {
             >
               {menuItems.find(m => m.id === activeTab)?.label || 'Табло'}
             </motion.h2>
-            <p className="text-xs text-slate-500">{getGreeting()}, Иван! • {currentTime.toLocaleDateString('bg-BG', { weekday: 'long', day: 'numeric', month: 'long' })}</p>
+            <p className="text-xs text-slate-500">{getGreeting()}, {consultantAccount?.full_name?.split(' ')[0]}! • {currentTime.toLocaleDateString('bg-BG', { weekday: 'long', day: 'numeric', month: 'long' })}</p>
           </div>
           <div className="flex items-center gap-2">
             <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>

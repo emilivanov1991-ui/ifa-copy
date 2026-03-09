@@ -58,7 +58,7 @@ function LayoutContent({ children, currentPageName }) {
             <img
               src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6925a960748714fa4828395a/258cedab0_output-onlinepngtools.png"
               alt="Integrity Financial Advisors"
-              className={`h-16 w-auto transition-all duration-300 ${!isScrolled && hasDarkHero ? 'brightness-0 invert' : ''}`}
+              className={`h-32 w-auto transition-all duration-300 ${!isScrolled && hasDarkHero ? 'brightness-0 invert' : ''}`}
             />
           </Link>
 

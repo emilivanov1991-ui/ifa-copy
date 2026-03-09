@@ -52,6 +52,7 @@ import RBACManager from '@/components/consultant/RBACManager';
 import CommissionsManager from '@/components/consultant/CommissionsManager';
 import ProductCatalogManager from '@/components/admin/ProductCatalogManager';
 import DossiersManager from '@/components/consultant/DossiersManager';
+import ConsultantLogin from '@/components/consultant/ConsultantLogin';
 import { Package, FolderOpen } from 'lucide-react';
 
 const menuItems = [

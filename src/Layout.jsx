@@ -203,14 +203,17 @@ function LayoutContent({ children, currentPageName }) {
           <div className="grid md:grid-cols-4 gap-12 mb-12">
             {/* Brand */}
             <div className="md:col-span-2">
-              <div className="flex items-center gap-3 mb-4">
-                <div className="w-10 h-10 rounded-xl bg-blue-600 flex items-center justify-center">
-                  <TrendingUp className="h-5 w-5 text-white" />
-                </div>
+              <div className="mb-4">
+                <img
+                  src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6925a960748714fa4828395a/41aaf7118_e5f40c4d-55b8-4282-8932-7925562f3c5b.png"
+                  alt="Integrity Financial Advisors"
+                  className="h-12 w-auto brightness-0 invert"
+                />
               </div>
               <p className="text-slate-400 font-light leading-relaxed max-w-md">
-                Независими финансови консултанти, посветени на постигането на вашите 
-                финансови цели с персонализирани стратегии и експертни насоки.
+                „ИНТЕГРИТИ ФАЙНЕНШЪЛ АДВАЙЗЪРС" ЕООД — независими финансови консултанти,
+                лицензирани от Комисията за финансов надзор с Решение №&nbsp;33–ЗБ от 27.01.2026&nbsp;г.,
+                вписани в регистъра на застрахователните брокери (КФН).
               </p>
             </div>
 

@@ -504,7 +504,10 @@ export const PLAN_CONSTITUTION = {
         },
         formula: "annual_investment_component * age_multiplier"
       },
-      additional_life_coverage: { include: false },
+      additional_life_coverage: {
+        include: false,
+        note: "Допълнително покритие срочен живот — НЕ се включва в плана"
+      },
       death_from_accident: {
         include: false,
         shown_in_presentation: true,

@@ -94,7 +94,10 @@ export const PLAN_CONSTITUTION = {
         recommend_metlife_credit_guard: true,
         coverage_basis: "full_combined_amount"
       },
-      breakeven_condition: "PENDING" // Важи ли 2-годишното break-even? — предстои изясняване
+      // ✅ При обединяване НЕ се проверява break-even.
+      // Условието е единствено: новата обща вноска < сбор от всички стари вноски.
+      breakeven_condition: "NONE",
+      condition_formula: "new_combined_monthly < (old_mortgage_monthly + SUM(old_consumer_loans_monthly))"
     },
 
     /**

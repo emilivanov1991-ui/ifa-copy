@@ -440,4 +440,209 @@ export const PLAN_CONSTITUTION = {
 
   },
 
+  // ──────────────────────────────────────────────────────────
+  // СТЪПКА 4: ПРАВИЛА ЗА ПРОДУКТИ — ЗАЩИТА НА ДОХОДА
+  // Статус: ✅ ПОТВЪРДЕНО
+  // ──────────────────────────────────────────────────────────
+
+  product_rules: {
+
+    /**
+     * ДЪРЖАВНО ОБЕЗЩЕТЕНИЕ ПРИ ИНВАЛИДНОСТ
+     * Статус: ✅ ПОТВЪРДЕНО
+     *
+     * До 2111.64 € бруто → 50% от брутното
+     * Над 2111.64 € бруто → фиксирано 1055.82 € (таванът не расте)
+     */
+    state_disability_benefit: {
+      threshold_gross: 2111.64,
+      max_benefit: 1055.82,
+      formula: "MIN(gross_income * 0.50, 1055.82)"
+    },
+
+    /**
+     * ИЗБОР НА МЕТЛАЙФ ПРОДУКТ
+     * Статус: ✅ ПОТВЪРДЕНО
+     *
+     * Приоритет: UL > Срочен живот > ДЗИ Закрила (заместител)
+     *
+     * UL = когато остава поне 25 € месечно за инвестиции (мин. 300 € год.)
+     * Срочен живот = когато инвестиционният бюджет е < 25 € месечно
+     * ДЗИ Закрила (Платинен) = заместващ когато бюджетът е изчерпан за MetLife
+     */
+    metlife_product_selection: {
+      unit_linked: {
+        condition: "monthly_investment_budget >= 25",
+        min_annual_investment: 300
+      },
+      term_life: {
+        condition: "monthly_investment_budget < 25"
+      },
+      dzi_zakrila_substitute: {
+        condition: "budget_exhausted_no_metlife_possible",
+        package: "platinum",
+        for_whom: "both_client_and_partner"
+      }
+    },
+
+    /**
+     * МЕТЛАЙФ UNIT LINKED — ПОКРИТИЯ
+     * Статус: ✅ ПОТВЪРДЕНО
+     *
+     * Базата за мултипликатора е САМО инвестиционната компонента (без цената на покритията)
+     */
+    metlife_unit_linked: {
+      integrated_life_coverage: {
+        include: true,
+        basis: "annual_investment_component_only",
+        multiplier_by_age: {
+          "up_to_30":  30,
+          "31_to_35":  20,
+          "36_to_45":  15,
+          "46_to_55":  10,
+          "56_to_65":   6
+        },
+        formula: "annual_investment_component * age_multiplier"
+      },
+      additional_life_coverage: { include: false },
+      death_from_accident: {
+        include: false,
+        shown_in_presentation: true,
+        presentation_note: "Визуализира се сумата на интегрираното покритие живот"
+      },
+      permanent_disability_from_accident: {
+        include: true,
+        // PV на анюитет — пропуснат доход до пенсия при 4% доходност (ниско-рискови активи)
+        formula: "CEILING( PV(4%/12, (65 - age) * 12) * (net_income - state_disability_benefit) * 1.5, 100 )",
+        note: "Изчислява се индивидуално за всеки от клиентите"
+      },
+      daily_hospitalization: { include: false },
+      surgery: { include: false },
+      fractures_and_burns: {
+        include: true,
+        amount: 1500,
+        note: "Винаги 1500 € — избира се най-голямата от трите опции"
+      },
+      critical_illnesses_40: {
+        include: true,
+        formula: "(net_income - state_disability_benefit) * 24",
+        note: "40 тежки заболявания — специфично за UL (не 32)"
+      },
+      telemedicine: { include: true },
+      premium_waiver: { include: true }
+    },
+
+    /**
+     * МЕТЛАЙФ СРОЧЕН ЖИВОТ — ПОКРИТИЯ
+     * Статус: ✅ ПОТВЪРДЕНО
+     */
+    metlife_term_life: {
+      basic_life_coverage: {
+        include: true,
+        // Условия за пълно покритие (достатъчно е поне ЕДНО от трите):
+        condition_for_full_coverage:
+          "child_under_18 OR has_mortgage OR income_share_in_household > 55%",
+        full_coverage_formula: "net_income * 24",
+        full_coverage_term_years: 5,
+        minimum_if_no_conditions: 3000,
+        note: "Ако нито едно условие не е изпълнено → минимум 3000 €"
+      },
+      death_from_accident: {
+        include: false,
+        shown_in_presentation: true,
+        presentation_note: "Визуализира се сумата на основното покритие живот"
+      },
+      permanent_disability_from_accident: {
+        include: true,
+        formula: "CEILING( PV(4%/12, (65 - age) * 12) * (net_income - state_disability_benefit) * 1.5, 100 )",
+        note: "Същата формула като при UL — индивидуално за всеки"
+      },
+      daily_hospitalization: { include: false },
+      surgery: { include: false },
+      fractures_and_burns: {
+        include: true,
+        amount: 1500,
+        note: "Винаги 1500 € — най-голямата опция"
+      },
+      critical_illnesses_32: {
+        include: true,
+        formula: "(net_income - state_disability_benefit) * 24",
+        note: "⚠️ 32 тежки заболявания — НЕ 40 (важно разграничение от UL)"
+      },
+      telemedicine: { include: true },
+      premium_waiver: { include: false }
+    },
+
+    /**
+     * МЕТЛАЙФ ДЖУНИЪР — ПОКРИТИЯ
+     * Статус: ✅ ПОТВЪРДЕНО
+     * Само тези две покрития се включват.
+     */
+    metlife_junior: {
+      fractures_and_burns: {
+        include: true,
+        amount: 750,
+        note: "Винаги 750 € — по-високата от двете опции"
+      },
+      child_protection_agreement: {
+        include: true
+      }
+    },
+
+    /**
+     * КРЕДИТ ГАРД — ПРАВИЛА
+     * Статус: ✅ ПОТВЪРДЕНО
+     *
+     * Отделна полица за ВСЕКИ кредит (различни суми и срокове).
+     * Цел: (вноска без банкова застраховка живот + Credit Guard) < (вноска с банкова застраховка)
+     * Важи при нови кредити, рефинансиране и съществуващи кредити.
+     */
+    credit_guard: {
+      one_policy_per_loan: true,
+      coverage_amount: "outstanding_balance_per_loan",
+      term: "remaining_months_per_loan",
+      package: "extended",
+      applies_to: ["new_mortgage", "refinanced_loans", "existing_loans"],
+      optimization_check:
+        "payment_without_bank_insurance + credit_guard_premium < payment_with_bank_insurance"
+    },
+
+    /**
+     * ПАКЕТНИ ПРОДУКТИ
+     * Статус: ✅ ПОТВЪРДЕНО
+     */
+    package_products: {
+
+      // Заместващ продукт на MetLife при изчерпан бюджет
+      dzi_zakrila: {
+        package: "platinum",
+        for_whom: "both_client_and_partner",
+        role: "metlife_substitute",
+        include_when: "budget_exhausted_for_metlife"
+      },
+
+      // Следваща по приоритет след животозастраховането — включва се винаги при бюджет
+      uniqa_zdrave_i_tsennost: {
+        package: "europe",
+        for_whom: "both_client_and_partner",
+        include_when: "budget_available",
+        priority_note: "Следва веднага след животозастраховането по приоритет"
+      },
+
+      // Включва се винаги (ще се обнови когато анализът добие индикатор за здравно от работодател)
+      generali_health_basic: {
+        package: "basic",
+        for_whom: "both_client_and_partner",
+        include_when: "always_currently",
+        pending_change: "Добавяне на индикатор 'employer_health_insurance' в анализа"
+      },
+
+      // Нишови продукти — само upsale, не в стандартните планове
+      metlife_grija:    { include_in_plans: false, role: "niche_upsale_only" },
+      metlife_medica:   { include_in_plans: false, role: "niche_upsale_only" },
+      dzi_best_doctors: { include_in_plans: false, role: "niche_upsale_only" }
+    }
+
+  }
+
 };

@@ -541,12 +541,12 @@ export const PLAN_CONSTITUTION = {
     metlife_term_life: {
       basic_life_coverage: {
         include: true,
+        term_years: 5,
         // Условия за пълно покритие (достатъчно е поне ЕДНО):
         // ⚠️ income_share > 55% важи САМО при двойка — при единичен клиент не се прилага
         condition_for_full_coverage:
           "child_under_18 OR has_mortgage OR (has_partner AND income_share_in_household > 55%)",
         full_coverage_formula: "net_income * 24",
-        full_coverage_term_years: 5,
         minimum_if_no_conditions: 3000,
         note: "Ако нито едно условие не е изпълнено → минимум 3000 €. При единичен клиент: само деца < 18г. и ипотека се проверяват."
       },

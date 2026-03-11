@@ -661,9 +661,11 @@ export const PLAN_CONSTITUTION = {
 
       // Следваща по приоритет след животозастраховането — включва се винаги при бюджет
       uniqa_zdrave_i_tsennost: {
-        package: "europe",
+        package: "europa",
         for_whom: "client, partner, AND all_children",
-        note: "По една отделна полица за клиента, партньора и всяко дете",
+        min_age: 0,
+        max_age_at_signup: 64,
+        note: "По една отделна полица за клиента, партньора и всяко дете. Достъпно за възраст 0–64 г. към датата на сключване.",
         include_when: "budget_available",
         priority_note: "Следва веднага след животозастраховането по приоритет"
       },

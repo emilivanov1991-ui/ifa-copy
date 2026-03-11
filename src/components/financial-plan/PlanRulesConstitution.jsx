@@ -557,7 +557,9 @@ export const PLAN_CONSTITUTION = {
       },
       permanent_disability_from_accident: {
         include: true,
-        formula: "CEILING( PV(4%/12, (65 - age) * 12) * (net_income - state_disability_benefit) * 1.5, 100 )",
+        formula: "CEILING( PV(4%/12, (65 - age) * 12) * (net_income - state_disability_benefit) * 1.2, 100 )",
+        multiplier: 1.2,
+        multiplier_rationale: "Дефинирана бизнес логика — 20% буфер за допълнителни разходи при инвалидност",
         note: "Същата формула като при UL — индивидуално за всеки"
       },
       daily_hospitalization: { include: false },

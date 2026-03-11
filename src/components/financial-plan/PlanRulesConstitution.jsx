@@ -638,7 +638,8 @@ export const PLAN_CONSTITUTION = {
       // Включва се винаги (ще се обнови когато анализът добие индикатор за здравно от работодател)
       generali_health_basic: {
         package: "basic",
-        for_whom: "both_client_and_partner",
+        for_whom: "client_and_partner_only",
+        note: "По една отделна полица за клиента и партньора (не за деца)",
         include_when: "always_currently",
         pending_change: "Добавяне на индикатор 'employer_health_insurance' в анализа"
       },

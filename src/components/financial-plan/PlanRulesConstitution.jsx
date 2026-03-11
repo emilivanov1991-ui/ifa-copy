@@ -570,6 +570,41 @@ export const PLAN_CONSTITUTION = {
     },
 
     /**
+     * ИНТЕГРИРАНО ПОКРИТИЕ ЖИВОТ ПРИ UL (автоматичен план)
+     * Статус: ✅ ПОТВЪРДЕНО
+     *
+     * Формула: integratedLifeCoverage = annualSavings × age_multiplier
+     *
+     * age_multiplier (от MetLifeULCalculator):
+     *   възраст ≤ 25 г.  → ×30
+     *   26–35 г.         → ×20
+     *   36–45 г.         → ×15
+     *   46–55 г.         → ×10
+     *   56–65 г.         → ×6
+     *
+     * ⚠️ Горен праг от калкулатора: 15 000 € — под него няма нужда от здравен въпросник.
+     * Ако формулата дава > 15 000 € → CEILING на 15 000 €.
+     *
+     * Пример: annualSavings = 1200 €, възраст 38 г. → multiplier = 15
+     *   integratedLifeCoverage = 1200 × 15 = 18 000 € → CEILING → 15 000 €
+     *
+     * Пример: annualSavings = 600 €, възраст 38 г. → multiplier = 15
+     *   integratedLifeCoverage = 600 × 15 = 9 000 € (без ограничение)
+     */
+    ul_integrated_life_coverage: {
+      formula: "annualSavings * age_multiplier",
+      age_multipliers: {
+        "up_to_25":  30,
+        "26_to_35":  20,
+        "36_to_45":  15,
+        "46_to_55":  10,
+        "56_to_65":   6
+      },
+      max_without_health_questionnaire: 15000,
+      ceiling_formula: "MIN(annualSavings * age_multiplier, 15000)"
+    },
+
+    /**
      * УНИКА Здраве и Ценност Селект — формула за премия
      * Статус: ✅ ПОТВЪРДЕНО (от UniqaHealthValueConstants)
      *

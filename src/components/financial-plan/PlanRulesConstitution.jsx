@@ -581,9 +581,13 @@ export const PLAN_CONSTITUTION = {
     /**
      * МЕТЛАЙФ ДЖУНИЪР — ПОКРИТИЯ
      * Статус: ✅ ПОТВЪРДЕНО
-     * Само тези две покрития се включват.
+     *
+     * Включва се само за деца на възраст ≤ 11 години.
+     * По една отделна полица за всяко отговарящо дете.
      */
     metlife_junior: {
+      condition: "child_age <= 11",
+      one_policy_per_child: true,
       fractures_and_burns: {
         include: true,
         amount: 750,

@@ -394,8 +394,50 @@ export const PLAN_CONSTITUTION = {
   },
 
   // ──────────────────────────────────────────────────────────
-  // СТЪПКА 3: ФИНАНСОВИ ОГРАНИЧЕНИЯ — ПРЕДСТОИ
+  // СТЪПКА 3: ФИНАНСОВИ ОГРАНИЧЕНИЯ
   // ──────────────────────────────────────────────────────────
-  financial_guardrails: "PENDING",
+
+  financial_guardrails: {
+
+    /**
+     * ПРАВИЛО 6.1.4.7 — Нови кредити (ипотека / потребителски)
+     * Статус: ✅ ПОТВЪРДЕНО
+     *
+     * Нови кредити, препоръчани в плана (напр. ипотека за ново жилище),
+     * НЕ се включват в бюджетния таван за финансови продукти (750 € / 40%).
+     *
+     * Таванът важи САМО за: застраховки, инвестиции, пенсионни продукти.
+     *
+     * Месечното разпределение на клиента изглежда така:
+     *   [нова ипотечна вноска] + [план (застраховки/инвестиции)] + [резерв] = месечен баланс
+     *
+     * Пример:
+     *   Доход: 6000 €, Спестявания: 2000 €, Оптимизация: няма
+     *   Нова ипотека (от "Ново жилище" → "Начин на финансиране: Пари в брой + заем"):
+     *     → Размер на заема + Срок → изчислена вноска: 900 €
+     *   Таван на плана: MIN(6000×1.5/12, 2000×0.40) = MIN(750, 800) = 750 €
+     *   Резерв (остатък): 2000 - 900 - 750 = 350 €/месец
+     *   Общо към финансовия пазар: 1650 € (900 ипотека + 750 план)
+     *
+     * Откъде идва вноската по новата ипотека:
+     *   → from: analysis.planned_housing → financing_method === "cash_and_loan"
+     *   → loan_amount + loan_term_years → изчислява се през ипотечен калкулатор
+     *   → резултатът е: expected_monthly_payment
+     */
+    rule_6_1_4_7_new_loans: {
+      excluded_from_plan_ceiling: true,
+      loan_types: ["mortgage", "consumer_loan"],
+      ceiling_applies_to: ["insurance", "investment", "pension"],
+      monthly_split_formula:
+        "monthly_balance = new_loan_payment + plan_products_budget + reserve_allocation",
+      mortgage_source: {
+        field_financing_method: "cash_and_loan",
+        input_fields: ["loan_amount", "loan_term_years"],
+        output_field: "expected_monthly_payment",
+        calculator: "mortgage_calculator"
+      }
+    }
+
+  },
 
 };

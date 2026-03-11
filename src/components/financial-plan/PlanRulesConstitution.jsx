@@ -571,8 +571,9 @@ export const PLAN_CONSTITUTION = {
       },
       critical_illnesses_32: {
         include: true,
+        term_years: 10,
         formula: "(net_income - state_disability_benefit) * 24",
-        note: "⚠️ 32 тежки заболявания — НЕ 40 (важно разграничение от UL)"
+        note: "⚠️ 32 тежки заболявания — НЕ 40 (важно разграничение от UL). Срок: 10 години."
       },
       telemedicine: { include: true },
       premium_waiver: { include: false }

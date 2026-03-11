@@ -561,6 +561,8 @@ export const PLAN_CONSTITUTION = {
       },
       permanent_disability_from_accident: {
         include: true,
+        term_years: null,
+        term_note: "До прекратяване на полицата — няма отделен срок в калкулатора",
         formula: "CEILING( PV(4%/12, (65 - age) * 12) * (net_income - state_disability_benefit) * 1.2, 100 )",
         multiplier: 1.2,
         multiplier_rationale: "Дефинирана бизнес логика — 20% буфер за допълнителни разходи при инвалидност",
@@ -571,6 +573,8 @@ export const PLAN_CONSTITUTION = {
       fractures_and_burns: {
         include: true,
         amount: 1500,
+        term_years: null,
+        term_note: "До прекратяване на полицата — няма отделен срок в калкулатора",
         note: "Винаги 1500 € — най-голямата опция"
       },
       critical_illnesses_32: {

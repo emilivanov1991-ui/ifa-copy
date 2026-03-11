@@ -462,16 +462,17 @@ export default function FinancialFlowStep({ data, onChange, showErrors, plannerD
           <h3 className="font-semibold text-slate-900">Пасиви / Задължения (кредитно салдо, в €)</h3>
         </div>
         
-        <div className="grid grid-cols-[1fr_auto_auto] gap-2 items-center mb-2">
+        <div className="grid grid-cols-[1fr_auto_auto_auto] gap-2 items-center mb-2">
           <div></div>
           <span className="text-xs text-slate-500 text-center w-28">Месечна вноска</span>
           <span className="text-xs text-slate-500 text-center w-28">Оставаща сума</span>
+          <span className="text-xs text-slate-500 text-center w-28">Оставащ период (мес.)</span>
         </div>
         
         <div className="space-y-3">
           {/* Mortgage */}
           <div>
-            <div className="grid grid-cols-[1fr_auto_auto] gap-2 items-center" data-invalid={isFieldInvalid(data.liability_mortgage_monthly) || isFieldInvalid(data.liability_mortgage_remaining) ? "true" : undefined}>
+            <div className="grid grid-cols-[1fr_auto_auto_auto] gap-2 items-center">
               <Label className="text-sm">Ипотека <span className="text-red-500">*</span></Label>
               <Input type="number" min="0" value={data.liability_mortgage_monthly ?? ''}
                 onChange={(e) => onChange('liability_mortgage_monthly', e.target.value === '' ? '' : parseInt(e.target.value))} 
@@ -479,12 +480,15 @@ export default function FinancialFlowStep({ data, onChange, showErrors, plannerD
               <Input type="number" min="0" value={data.liability_mortgage_remaining ?? ''}
                 onChange={(e) => onChange('liability_mortgage_remaining', e.target.value === '' ? '' : parseInt(e.target.value))} 
                 className={`rounded-lg w-28 ${isFieldInvalid(data.liability_mortgage_remaining) ? 'border-red-500 bg-red-50' : ''}`} />
+              <Input type="number" min="0" value={data.liability_mortgage_remaining_months ?? 0}
+                onChange={(e) => onChange('liability_mortgage_remaining_months', e.target.value === '' ? 0 : parseInt(e.target.value))} 
+                className="rounded-lg w-28" />
             </div>
             <p className="text-xs text-slate-500 mt-1">Това е спрямо информация от тема "Ново жилище"</p>
           </div>
           
           {/* Consumer loans */}
-          <div className="grid grid-cols-[1fr_auto_auto] gap-2 items-center" data-invalid={isFieldInvalid(data.liability_consumer_loans_monthly) || isFieldInvalid(data.liability_consumer_loans_remaining) ? "true" : undefined}>
+          <div className="grid grid-cols-[1fr_auto_auto_auto] gap-2 items-center">
             <Label className="text-sm">Потребителски кредити <span className="text-red-500">*</span></Label>
             <Input type="number" min="0" value={data.liability_consumer_loans_monthly ?? ''}
               onChange={(e) => onChange('liability_consumer_loans_monthly', e.target.value === '' ? '' : parseInt(e.target.value))} 
@@ -492,10 +496,13 @@ export default function FinancialFlowStep({ data, onChange, showErrors, plannerD
             <Input type="number" min="0" value={data.liability_consumer_loans_remaining ?? ''}
               onChange={(e) => onChange('liability_consumer_loans_remaining', e.target.value === '' ? '' : parseInt(e.target.value))} 
               className={`rounded-lg w-28 ${isFieldInvalid(data.liability_consumer_loans_remaining) ? 'border-red-500 bg-red-50' : ''}`} />
+            <Input type="number" min="0" value={data.liability_consumer_loans_remaining_months ?? 0}
+              onChange={(e) => onChange('liability_consumer_loans_remaining_months', e.target.value === '' ? 0 : parseInt(e.target.value))} 
+              className="rounded-lg w-28" />
           </div>
           
           {/* Credit cards */}
-          <div className="grid grid-cols-[1fr_auto_auto] gap-2 items-center" data-invalid={isFieldInvalid(data.liability_credit_cards_monthly) || isFieldInvalid(data.liability_credit_cards_remaining) ? "true" : undefined}>
+          <div className="grid grid-cols-[1fr_auto_auto_auto] gap-2 items-center">
             <Label className="text-sm">Кредитни карти <span className="text-red-500">*</span></Label>
             <Input type="number" min="0" value={data.liability_credit_cards_monthly ?? ''}
               onChange={(e) => onChange('liability_credit_cards_monthly', e.target.value === '' ? '' : parseInt(e.target.value))} 
@@ -503,10 +510,13 @@ export default function FinancialFlowStep({ data, onChange, showErrors, plannerD
             <Input type="number" min="0" value={data.liability_credit_cards_remaining ?? ''}
               onChange={(e) => onChange('liability_credit_cards_remaining', e.target.value === '' ? '' : parseInt(e.target.value))} 
               className={`rounded-lg w-28 ${isFieldInvalid(data.liability_credit_cards_remaining) ? 'border-red-500 bg-red-50' : ''}`} />
+            <Input type="number" min="0" value={data.liability_credit_cards_remaining_months ?? 0}
+              onChange={(e) => onChange('liability_credit_cards_remaining_months', e.target.value === '' ? 0 : parseInt(e.target.value))} 
+              className="rounded-lg w-28" />
           </div>
           
           {/* Leasing */}
-          <div className="grid grid-cols-[1fr_auto_auto] gap-2 items-center" data-invalid={isFieldInvalid(data.liability_leasing_monthly) || isFieldInvalid(data.liability_leasing_remaining) ? "true" : undefined}>
+          <div className="grid grid-cols-[1fr_auto_auto_auto] gap-2 items-center">
             <Label className="text-sm">Лизинг <span className="text-red-500">*</span></Label>
             <Input type="number" min="0" value={data.liability_leasing_monthly ?? ''}
               onChange={(e) => onChange('liability_leasing_monthly', e.target.value === '' ? '' : parseInt(e.target.value))} 
@@ -514,10 +524,13 @@ export default function FinancialFlowStep({ data, onChange, showErrors, plannerD
             <Input type="number" min="0" value={data.liability_leasing_remaining ?? ''}
               onChange={(e) => onChange('liability_leasing_remaining', e.target.value === '' ? '' : parseInt(e.target.value))} 
               className={`rounded-lg w-28 ${isFieldInvalid(data.liability_leasing_remaining) ? 'border-red-500 bg-red-50' : ''}`} />
+            <Input type="number" min="0" value={data.liability_leasing_remaining_months ?? 0}
+              onChange={(e) => onChange('liability_leasing_remaining_months', e.target.value === '' ? 0 : parseInt(e.target.value))} 
+              className="rounded-lg w-28" />
           </div>
           
           {/* Overdraft */}
-          <div className="grid grid-cols-[1fr_auto_auto] gap-2 items-center" data-invalid={isFieldInvalid(data.liability_overdraft_monthly) || isFieldInvalid(data.liability_overdraft_remaining) ? "true" : undefined}>
+          <div className="grid grid-cols-[1fr_auto_auto_auto] gap-2 items-center">
             <Label className="text-sm">Овърдрафт <span className="text-red-500">*</span></Label>
             <Input type="number" min="0" value={data.liability_overdraft_monthly ?? ''}
               onChange={(e) => onChange('liability_overdraft_monthly', e.target.value === '' ? '' : parseInt(e.target.value))} 
@@ -525,13 +538,17 @@ export default function FinancialFlowStep({ data, onChange, showErrors, plannerD
             <Input type="number" min="0" value={data.liability_overdraft_remaining ?? ''}
               onChange={(e) => onChange('liability_overdraft_remaining', e.target.value === '' ? '' : parseInt(e.target.value))} 
               className={`rounded-lg w-28 ${isFieldInvalid(data.liability_overdraft_remaining) ? 'border-red-500 bg-red-50' : ''}`} />
+            <Input type="number" min="0" value={data.liability_overdraft_remaining_months ?? 0}
+              onChange={(e) => onChange('liability_overdraft_remaining_months', e.target.value === '' ? 0 : parseInt(e.target.value))} 
+              className="rounded-lg w-28" />
           </div>
         </div>
         
-        <div className="mt-3 pt-3 border-t border-slate-200 grid grid-cols-[1fr_auto_auto] gap-2">
+        <div className="mt-3 pt-3 border-t border-slate-200 grid grid-cols-[1fr_auto_auto_auto] gap-2">
           <span className="text-sm font-medium">Общо задължения:</span>
           <span className="font-semibold text-orange-600 text-center w-28">{totalLiabilitiesMonthly.toLocaleString()} €</span>
           <span className="font-semibold text-orange-600 text-center w-28">{totalLiabilitiesRemaining.toLocaleString()} €</span>
+          <div className="w-28"></div>
         </div>
       </div>
 

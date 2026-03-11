@@ -278,7 +278,7 @@ export default function Contact() {
                 <div className="absolute bottom-0 left-0 right-0 p-8 text-white">
                   <h3 className="text-2xl font-semibold mb-2">{t('Посетете офиса ни', 'Visit Our Office')}</h3>
                   <p className="text-blue-100 font-light">
-                    {t('ул. Поморие 20, ет. 5, ап. 1, Бургас 8001', 'Pomorie St. 20, fl. 5, apt. 1, Burgas 8001')}
+                    {t('ул. Сребриста липа № 16А, офис 2, р-н Витоша, София 1619', 'Srebristа Lipa St. 16A, office 2, Vitosha district, Sofia 1619')}
                   </p>
                 </div>
               </div>

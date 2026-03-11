@@ -616,6 +616,25 @@ export const PLAN_CONSTITUTION = {
      * ПАКЕТНИ ПРОДУКТИ
      * Статус: ✅ ПОТВЪРДЕНО
      */
+    /**
+     * РЕД НА ВКЛЮЧВАНЕ НА ПАКЕТНИТЕ ПРОДУКТИ
+     * Статус: ✅ ПОТВЪРДЕНО
+     *
+     * 1. Всички MetLife покрития (за клиента и партньора) — живот, трайна нетрудоспособност,
+     *    тежки заболявания, фрактури и изгаряния, телемедицина, waiver of premium
+     * 2. Уника Здраве и Ценност (клиент + партньор + деца)
+     * 3. Дженерали Basic (клиент + партньор)
+     *
+     * Ако бюджетът се изчерпи на стъпка 1 → MetLife се заменя с ДЗИ Закрила (Платинен)
+     * и Уника / Дженерали не се включват.
+     * Ако бюджетът се изчерпи на стъпка 2 → Дженерали не се включва.
+     */
+    package_products_order: [
+      { step: 1, product: "metlife_ul_or_term_life", for_whom: "client_and_partner" },
+      { step: 2, product: "uniqa_zdrave_i_tsennost", for_whom: "client_partner_and_children" },
+      { step: 3, product: "generali_health_basic", for_whom: "client_and_partner" }
+    ],
+
     package_products: {
 
       // Заместващ продукт на MetLife при изчерпан бюджет

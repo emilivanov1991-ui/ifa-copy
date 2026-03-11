@@ -1,6 +1,6 @@
 /**
  * ============================================================
- *   ФИНАНСОВ ПЛАН — КОНСТИТУЦИЯ НА ПРАВИЛАТА (v0.1)
+ *   ФИНАНСОВ ПЛАН — КОНСТИТУЦИЯ НА ПРАВИЛАТА (v0.2)
  *   Последна актуализация: 2026-03-11
  * ============================================================
  *
@@ -70,10 +70,10 @@ export const PLAN_CONSTITUTION = {
 
     /**
      * ПРАВИЛО 1.2: Обединяване на ипотека + потребителски кредит/и
-     * Статус: ✅ ПОТВЪРДЕНО (частично)
+     * Статус: ✅ ПОТВЪРДЕНО
      *
      * ПРИОРИТЕТ: Когато клиентът има ипотека И поне 1 потребителски кредит,
-     * ВИНАГИ се прилага Правило 1.2 (обединяване) — НЕ се прилагат 1.1 + 1.3 поотделно.
+     * ВИНАГИ се прилага Правило 1.2 (обединяване) — НЕ се прилагат 1.1 + 1.3/1.4 поотделно.
      *
      * Логика:
      * - Взима се сборът: остатък ипотека + остатъци всички потребителски кредити
@@ -81,10 +81,16 @@ export const PLAN_CONSTITUTION = {
      * - Срок: до 30 г. (макс. възраст 70 г. в края)
      * - Задължително в различна банка от текущата ипотека
      * - Препоръчително: без банкова застраховка живот + MetLife Credit Guard върху цялата сума
+     *
+     * Break-even: NONE — при обединяване не се проверява break-even.
+     * Условието е единствено: new_combined_monthly < (old_mortgage_monthly + SUM(old_consumer_loans_monthly))
      */
     mortgage_plus_consumer: {
-      priority_over_separate_rules: true, // 1.2 > (1.1 + 1.3) поотделно
+      applies_when: "has_mortgage AND consumer_loans_count >= 1",
+      priority_over_separate_rules: true, // 1.2 > (1.1 + 1.3/1.4) поотделно
       combine_all_balances: true,
+      condition_formula: "new_combined_monthly < (old_mortgage_monthly + SUM(old_consumer_loans_monthly))",
+      breakeven_condition: "NONE",
       max_age_at_end: 70,
       preferred_term_years: 30,
       term_formula: "MIN(30, 70 - client_age)",
@@ -93,31 +99,25 @@ export const PLAN_CONSTITUTION = {
         avoid_bank_life_insurance: true,
         recommend_metlife_credit_guard: true,
         coverage_basis: "full_combined_amount"
-      },
-      // ✅ При обединяване НЕ се проверява break-even.
-      // Условието е единствено: новата обща вноска < сбор от всички стари вноски.
-      breakeven_condition: "NONE",
-      condition_formula: "new_combined_monthly < (old_mortgage_monthly + SUM(old_consumer_loans_monthly))"
+      }
     },
 
     /**
      * ПРАВИЛО 1.3: Само 1 потребителски кредит (без ипотека)
-     * Статус: ✅ ПОТВЪРДЕНО (частично)
+     * Статус: ✅ ПОТВЪРДЕНО
      *
-     * Прилага се САМО когато няма ипотека.
+     * Прилага се САМО когато: няма ипотека AND потребителски кредити === 1
      * Сравнява се с продукти от списъка с ПОТРЕБИТЕЛСКИ кредити (не ипотечни).
-     * Условие: новата вноска < старата за СЪЩИЯ остатъчен срок
-     * Срок: до 10 г. (макс. възраст 70 г., т.е. 65-год. → макс. 5 г.)
-     * term_formula: MIN(10, 70 - client_age)
+     * Условие: new_monthly < old_monthly (за СЪЩИЯ остатъчен срок)
+     * Break-even: NONE — няма нотариални такси при рефинансиране на потребителски кредити.
      * Задължително в различна банка.
-     * Препоръчително: без банкова застраховка + MetLife Credit Guard
-     * Без оптимизация → включва се като съществуващо добро решение.
-     * Break-even: ✅ ВАЖИ — (стара - нова) * 24 > такси (ПРЕДСТОИ ПОТВЪРЖДЕНИЕ — въпрос №4)
      */
     single_consumer_loan: {
       applies_when: "no_mortgage AND consumer_loans_count === 1",
-      product_list: "consumer_loans", // ✅ потвърдено — НЕ ипотечни
+      product_list: "consumer_loans", // ✅ НЕ ипотечни
       condition_formula: "new_monthly < old_monthly (same remaining term)",
+      breakeven_condition: "NONE",
+      reason: "no_notarial_fees_on_consumer_loan_refinancing",
       max_age_at_end: 70,
       preferred_term_years: 10,
       term_formula: "MIN(10, 70 - client_age)",
@@ -126,26 +126,26 @@ export const PLAN_CONSTITUTION = {
         avoid_bank_life_insurance: true,
         recommend_metlife_credit_guard: true,
         coverage_basis: "full_refinanced_amount"
-      },
-      // ✅ Няма нотариални такси при рефинансиране на потребителски кредити.
-      // Break-even НЕ се проверява — достатъчно е новата вноска да е по-ниска.
-      breakeven_condition: "NONE",
-      reason: "no_notarial_fees_on_consumer_loan_refinancing"
+      }
     },
 
     /**
      * ПРАВИЛО 1.4: Множество потребителски кредити (без ипотека)
-     * Статус: ✅ ПОТВЪРДЕНО (частично)
+     * Статус: ✅ ПОТВЪРДЕНО
      *
      * Прилага се когато: няма ипотека AND потребителски кредити >= 2
      * Обединяват се в 1 нов потребителски кредит.
      * Условие: new_combined_monthly < SUM(old_consumer_loans_monthly)
      * Break-even: NONE (няма нотариални такси)
      * Срок и застраховка: същите правила като Правило 1.3
+     *
+     * ✅ Дори ако клиентът има собствен имот — НЕ се предлага ипотечен вариант.
+     * Прилага се само обединяване в потребителски кредит.
      */
     multiple_consumer_loans: {
       applies_when: "no_mortgage AND consumer_loans_count >= 2",
       action: "consolidate_into_single_consumer_loan",
+      ignores_owned_property: true, // не се предлага ипотечен вариант дори при имот
       condition_formula: "new_combined_monthly < SUM(old_consumer_loans_monthly)",
       breakeven_condition: "NONE",
       reason: "no_notarial_fees_on_consumer_loan_refinancing",

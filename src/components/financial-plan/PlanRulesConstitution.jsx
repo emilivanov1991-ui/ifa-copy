@@ -635,6 +635,7 @@ export const PLAN_CONSTITUTION = {
      */
     package_products_order: [
       { step: 1, product: "metlife_ul_or_term_life", for_whom: "client_and_partner" },
+      { step: 1, product: "metlife_junior", for_whom: "children_age_lte_11", note: "Заедно с другите MetLife покрития — Стъпка 1" },
       { step: 2, product: "uniqa_zdrave_i_tsennost", for_whom: "client_partner_and_children" },
       { step: 3, product: "generali_health_basic", for_whom: "client_and_partner" }
     ],

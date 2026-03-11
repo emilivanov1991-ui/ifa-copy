@@ -134,7 +134,34 @@ export const PLAN_CONSTITUTION = {
     },
 
     /**
-     * ПРАВИЛО 1.3: Оптимизация на кредитни карти — ПРЕДСТОИ
+     * ПРАВИЛО 1.4: Множество потребителски кредити (без ипотека)
+     * Статус: ✅ ПОТВЪРДЕНО (частично)
+     *
+     * Прилага се когато: няма ипотека AND потребителски кредити >= 2
+     * Обединяват се в 1 нов потребителски кредит.
+     * Условие: new_combined_monthly < SUM(old_consumer_loans_monthly)
+     * Break-even: NONE (няма нотариални такси)
+     * Срок и застраховка: същите правила като Правило 1.3
+     */
+    multiple_consumer_loans: {
+      applies_when: "no_mortgage AND consumer_loans_count >= 2",
+      action: "consolidate_into_single_consumer_loan",
+      condition_formula: "new_combined_monthly < SUM(old_consumer_loans_monthly)",
+      breakeven_condition: "NONE",
+      reason: "no_notarial_fees_on_consumer_loan_refinancing",
+      max_age_at_end: 70,
+      preferred_term_years: 10,
+      term_formula: "MIN(10, 70 - client_age)",
+      must_change_bank: true,
+      insurance: {
+        avoid_bank_life_insurance: true,
+        recommend_metlife_credit_guard: true,
+        coverage_basis: "full_refinanced_amount"
+      }
+    },
+
+    /**
+     * ПРАВИЛО 1.5: Оптимизация на кредитни карти — ПРЕДСТОИ
      */
     credit_cards: "PENDING",
 

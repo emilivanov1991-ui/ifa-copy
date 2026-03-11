@@ -441,6 +441,109 @@ export const PLAN_CONSTITUTION = {
   },
 
   // ──────────────────────────────────────────────────────────
+  // СТЪПКА 3б: ИЗЧИСЛЯВАНЕ НА ПРЕМИИ
+  // ──────────────────────────────────────────────────────────
+
+  premium_calculation: {
+
+    /**
+     * МЕТЛАЙФ СРОЧЕН ЖИВОТ — формула за премия
+     * Статус: ✅ ПОТВЪРДЕНО (от MetLifeTermLifeCalculator)
+     *
+     * Ключови константи (от FinancialPlanConstants):
+     *   - TERM_LIFE_BASIC_RATES[age][termYears]       → тарифа на 1000 € покритие
+     *   - METLIFE_PA_RISK_CLASSES[riskClass].pi       → тарифа ПТН на 1000 €
+     *   - METLIFE_PA_RISK_CLASSES[riskClass].fracturesAndBurns → тарифа фрактури
+     *   - METLIFE_PA_CRITICAL_ILLNESS_32_RATES[age].yr5 / .yr10 → тарифа 32 заболявания
+     *   - Телемедицина: фиксирано 15 € / год
+     *   - Административна такса: 13 € / год (фиксирана)
+     *
+     * Формули:
+     *   net_premium  = SUM(coverage_i / 1000 * rate_i)
+     *   annual       = net_premium + 13
+     *   semi_annual  = annual * 0.51
+     *   quarterly    = annual * 0.26
+     *   monthly      = annual / 12  (≈ за информация — не е стандарт)
+     *
+     * Минимум: годишна премия >= 50 €
+     */
+    term_life_premium: {
+      source_file: "components/financial-plan/MetLifeTermLifeCalculator",
+      constants_file: "components/financial-plan/FinancialPlanConstants",
+      admin_fee_annual: 13,
+      frequency_multipliers: {
+        annual: 1,
+        semi_annual: 0.51,
+        quarterly: 0.26
+      },
+      min_annual_premium: 50,
+      telemedicine_flat: 15
+    },
+
+    /**
+     * МЕТЛАЙФ UNIT LINKED — формула за премия
+     * Статус: ✅ ПОТВЪРДЕНО (от MetLifeULCalculator)
+     *
+     * Ключови константи (от FinancialPlanConstants):
+     *   - METLIFE_PA_SECURITY_PLUS_COEFFICIENTS[age]  → коефициент за 40 заболявания
+     *     (premium_40ci = coverage / coefficient)
+     *   - METLIFE_PA_RISK_CLASSES[riskClass].pi       → тарифа ПТН
+     *   - METLIFE_PA_RISK_CLASSES[riskClass].fracturesAndBurns → тарифа фрактури
+     *   - Телемедицина: фиксирано 15 € / год
+     *   - Отказ от премия: (annualSavings + totalCoverages) * waiverRate
+     *     waiverRate: рисков клас 1 → 4.38%, клас 2 → 5.25%, клас 3 → 7%
+     *   - Административна такса: 15 € / год (фиксирана)
+     *
+     * Формули:
+     *   total_annual  = annualSavings + totalCoverages + 15
+     *   monthly       = total_annual / 12
+     *   quarterly     = total_annual / 4
+     *   semi_annual   = total_annual / 2
+     */
+    ul_premium: {
+      source_file: "components/financial-plan/MetLifeULCalculator",
+      constants_file: "components/financial-plan/FinancialPlanConstants",
+      admin_fee_annual: 15,
+      premium_waiver_rates: {
+        risk_class_1: 0.0438,
+        risk_class_2: 0.0525,
+        risk_class_3: 0.07
+      },
+      telemedicine_flat: 15
+    },
+
+    /**
+     * УНИКА Здраве и Ценност Селект — формула за премия
+     * Статус: ✅ ПОТВЪРДЕНО (от UniqaHealthValueConstants)
+     *
+     * Тарифа по възрастова група и план (europa / world):
+     *   UNIQA_HEALTH_VALUE_PLANS[plan].tariffs[ageGroup][frequency]
+     * Функция: calculateUniqaHealthValue(age, plan, frequency)
+     */
+    uniqa_health_value_premium: {
+      source_file: "components/financial-plan/UniqaHealthValueConstants",
+      plans: ["europa", "world"],
+      plan_for_standard_plan: "europa",
+      function: "calculateUniqaHealthValue(age, 'europa', 'annual')"
+    },
+
+    /**
+     * ДЖЕНЕРАЛИ Health Line Basic — премия
+     * Статус: ✅ ПОТВЪРДЕНО (от GeneraliHealthLineBasic)
+     *
+     * Фиксирана тарифа — не зависи от възрастта:
+     *   monthly = 60 BGN, annual = 720 BGN
+     */
+    generali_health_basic_premium: {
+      source_file: "components/financial-plan/GeneraliHealthLineBasic",
+      flat_rate: true,
+      monthly_bgn: 60,
+      annual_bgn: 720,
+      currency: "BGN"
+    }
+  },
+
+  // ──────────────────────────────────────────────────────────
   // СТЪПКА 4: ПРАВИЛА ЗА ПРОДУКТИ — ЗАЩИТА НА ДОХОДА
   // Статус: ✅ ПОТВЪРДЕНО
   // ──────────────────────────────────────────────────────────

@@ -128,12 +128,16 @@ export default function FinancialFlowStep({ data, onChange, showErrors, plannerD
     // Liabilities (except mortgage which comes from Housing step)
     if (data.liability_consumer_loans_monthly === undefined) onChange('liability_consumer_loans_monthly', 0);
     if (data.liability_consumer_loans_remaining === undefined) onChange('liability_consumer_loans_remaining', 0);
+    if (data.liability_consumer_loans_remaining_months === undefined) onChange('liability_consumer_loans_remaining_months', 0);
     if (data.liability_credit_cards_monthly === undefined) onChange('liability_credit_cards_monthly', 0);
     if (data.liability_credit_cards_remaining === undefined) onChange('liability_credit_cards_remaining', 0);
+    if (data.liability_credit_cards_remaining_months === undefined) onChange('liability_credit_cards_remaining_months', 0);
     if (data.liability_leasing_monthly === undefined) onChange('liability_leasing_monthly', 0);
     if (data.liability_leasing_remaining === undefined) onChange('liability_leasing_remaining', 0);
+    if (data.liability_leasing_remaining_months === undefined) onChange('liability_leasing_remaining_months', 0);
     if (data.liability_overdraft_monthly === undefined) onChange('liability_overdraft_monthly', 0);
     if (data.liability_overdraft_remaining === undefined) onChange('liability_overdraft_remaining', 0);
+    if (data.liability_overdraft_remaining_months === undefined) onChange('liability_overdraft_remaining_months', 0);
     
     // Insurance
     if (data.insurance_life === undefined) onChange('insurance_life', 0);

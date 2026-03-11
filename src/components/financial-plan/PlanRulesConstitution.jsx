@@ -629,7 +629,8 @@ export const PLAN_CONSTITUTION = {
       // Следваща по приоритет след животозастраховането — включва се винаги при бюджет
       uniqa_zdrave_i_tsennost: {
         package: "europe",
-        for_whom: "both_client_and_partner",
+        for_whom: "client, partner, AND all_children",
+        note: "По една отделна полица за клиента, партньора и всяко дете",
         include_when: "budget_available",
         priority_note: "Следва веднага след животозастраховането по приоритет"
       },

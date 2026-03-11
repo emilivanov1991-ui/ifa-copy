@@ -213,9 +213,36 @@ export const PLAN_CONSTITUTION = {
     },
 
     /**
-     * ПРАВИЛО 1.7: Оптимизация на овърдрафт — ПРЕДСТОИ
+     * ПРАВИЛО 1.7: Оптимизация на овърдрафт
+     * Статус: ✅ ПОТВЪРДЕНО
+     *
+     * 1.7.В — Има потребителски кредити:
+     *   → Овърдрафтът се включва в обединяването заедно с потребителските кредити
+     *   → Третира се идентично с потребителски кредит
+     *
+     * 1.7.Б — Няма потребителски кредити:
+     *   → Ако сума >= 2000 € → рефинансира се в потребителски кредит (ако new_monthly < old_monthly)
+     *   → Ако сума < 2000 € → препоръчва се само погасяване от свободния месечен остатък
      */
-    overdraft: "PENDING",
+    overdraft: {
+      scenario_with_consumer_loans: {
+        applies_when: "consumer_loans_count >= 1",
+        action: "include_in_consumer_loan_consolidation",
+        treat_as: "consumer_loan"
+      },
+      scenario_standalone_large: {
+        applies_when: "consumer_loans_count === 0 AND overdraft_balance >= 2000",
+        action: "refinance_into_consumer_loan",
+        condition_formula: "new_monthly < old_monthly",
+        breakeven_condition: "NONE",
+        product_list: "consumer_loans"
+      },
+      scenario_standalone_small: {
+        applies_when: "consumer_loans_count === 0 AND overdraft_balance < 2000",
+        action: "recommend_payoff_only",
+        note: "Препоръчва се погасяване от свободния месечен остатък — без рефинансиране"
+      }
+    },
   },
 
   // ──────────────────────────────────────────────────────────

@@ -107,7 +107,11 @@ export default function FinancialFlowStep({ data, onChange, showErrors, plannerD
     if ((data.liability_mortgage_remaining === undefined || data.liability_mortgage_remaining === null) && data.current_mortgage_remaining) {
       onChange('liability_mortgage_remaining', data.current_mortgage_remaining);
     }
-  }, [data.current_mortgage_monthly_payment, data.current_mortgage_remaining, data.liability_mortgage_monthly, data.liability_mortgage_remaining]);
+    // Auto-populate mortgage remaining months from Housing step (years * 12)
+    if ((data.liability_mortgage_remaining_months === undefined || data.liability_mortgage_remaining_months === null) && data.current_mortgage_remaining_years) {
+      onChange('liability_mortgage_remaining_months', Math.round(data.current_mortgage_remaining_years * 12));
+    }
+  }, [data.current_mortgage_monthly_payment, data.current_mortgage_remaining, data.current_mortgage_remaining_years, data.liability_mortgage_monthly, data.liability_mortgage_remaining, data.liability_mortgage_remaining_months]);
 
   // Auto-populate fields with default 0 if undefined
   useEffect(() => {

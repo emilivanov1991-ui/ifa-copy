@@ -524,6 +524,52 @@ export const PLAN_CONSTITUTION = {
     risk_class_recalculation: "PENDING — здравен въпросник",
 
     /**
+     * ОПРЕДЕЛЯНЕ НА annualSavings ПРИ UL (автоматичен план)
+     * Статус: ✅ ПОТВЪРДЕНО
+     *
+     * Логика: Генераторът ПЪРВО изчислява всички покрития по мярка,
+     * след което насочва ОСТАТЪКА от бюджетния таван към инвестицията.
+     *
+     * Структура на UL годишна премия (от MetLifeULCalculator):
+     *   total_annual = annualSavings + totalCoverages + adminFee(15) + premiumWaiver
+     *   premiumWaiver = (annualSavings + totalCoverages) * waiverRate
+     *   waiverRate при I рисков клас = 0.0438 (4.38%)
+     *
+     * Искаме: total_annual = budget_ceiling_annual (= max_monthly_plan_budget × 12)
+     *
+     * Алгебрично решение (кръгова зависимост при Отказ от премия):
+     *   (annualSavings + totalCoverages) × (1 + waiverRate) + 15 = budget_ceiling_annual
+     *   annualSavings = (budget_ceiling_annual - 15) / (1 + waiverRate) - totalCoverages
+     *
+     * ⚠️ Ако Отказ от премия НЕ е включен (напр. над 55 г.):
+     *   annualSavings = budget_ceiling_annual - 15 - totalCoverages
+     *
+     * ⚠️ Премиен бонус (getPremiumBonus):
+     *   Бонусът НЕ влияе на платената годишна премия — той се добавя
+     *   ДОПЪЛНИТЕЛНО към инвестиционната сметка. Не се включва в горната формула.
+     *
+     * ⚠️ AV Charge (такса управление, getAVCharge):
+     *   Удържа се вътрешно от сметката на клиента (не е видима в премията).
+     *   Не се включва в формулата за annualSavings — включена е в проекцията.
+     *
+     * Минимум: annualSavings >= 300 € / год (= 25 € / месец)
+     * Ако остатъкът е < 300 € → НЕ се добавя UL, избира се Срочен живот.
+     * (Вж. metlife_product_selection.unit_linked.condition)
+     */
+    ul_annual_savings_formula: {
+      with_premium_waiver:
+        "annualSavings = (budget_ceiling_annual - 15) / (1 + waiverRate) - totalCoverages",
+      without_premium_waiver:
+        "annualSavings = budget_ceiling_annual - 15 - totalCoverages",
+      waiver_rate_class_1: 0.0438,
+      admin_fee: 15,
+      premium_bonus_note: "Не влияе на платената премия — само бонус към сметката",
+      av_charge_note: "Вътрешна такса — само в проекцията",
+      min_annual_savings: 300,
+      fallback_if_below_min: "term_life"
+    },
+
+    /**
      * УНИКА Здраве и Ценност Селект — формула за премия
      * Статус: ✅ ПОТВЪРДЕНО (от UniqaHealthValueConstants)
      *

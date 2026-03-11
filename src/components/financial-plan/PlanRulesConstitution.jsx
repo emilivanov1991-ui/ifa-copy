@@ -103,8 +103,32 @@ export const PLAN_CONSTITUTION = {
     /**
      * ПРАВИЛО 1.3: Само 1 потребителски кредит (без ипотека)
      * Статус: ✅ ПОТВЪРДЕНО (частично)
+     *
+     * Прилага се САМО когато няма ипотека.
+     * Сравнява се с продукти от списъка с ПОТРЕБИТЕЛСКИ кредити (не ипотечни).
+     * Условие: новата вноска < старата за СЪЩИЯ остатъчен срок
+     * Срок: до 10 г. (макс. възраст 70 г., т.е. 65-год. → макс. 5 г.)
+     * term_formula: MIN(10, 70 - client_age)
+     * Задължително в различна банка.
+     * Препоръчително: без банкова застраховка + MetLife Credit Guard
+     * Без оптимизация → включва се като съществуващо добро решение.
+     * Break-even: ✅ ВАЖИ — (стара - нова) * 24 > такси (ПРЕДСТОИ ПОТВЪРЖДЕНИЕ — въпрос №4)
      */
-    single_consumer_loan: "PENDING",
+    single_consumer_loan: {
+      applies_when: "no_mortgage AND consumer_loans_count === 1",
+      product_list: "consumer_loans", // ✅ потвърдено — НЕ ипотечни
+      condition_formula: "new_monthly < old_monthly (same remaining term)",
+      max_age_at_end: 70,
+      preferred_term_years: 10,
+      term_formula: "MIN(10, 70 - client_age)",
+      must_change_bank: true,
+      insurance: {
+        avoid_bank_life_insurance: true,
+        recommend_metlife_credit_guard: true,
+        coverage_basis: "full_refinanced_amount"
+      },
+      breakeven_condition: "PENDING"
+    },
 
     /**
      * ПРАВИЛО 1.3: Оптимизация на кредитни карти — ПРЕДСТОИ

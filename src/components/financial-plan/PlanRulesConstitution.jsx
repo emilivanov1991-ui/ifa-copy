@@ -127,7 +127,10 @@ export const PLAN_CONSTITUTION = {
         recommend_metlife_credit_guard: true,
         coverage_basis: "full_refinanced_amount"
       },
-      breakeven_condition: "PENDING"
+      // ✅ Няма нотариални такси при рефинансиране на потребителски кредити.
+      // Break-even НЕ се проверява — достатъчно е новата вноска да е по-ниска.
+      breakeven_condition: "NONE",
+      reason: "no_notarial_fees_on_consumer_loan_refinancing"
     },
 
     /**

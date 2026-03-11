@@ -6,6 +6,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Slider } from '@/components/ui/slider';
 import { ChevronLeft, ChevronRight, Download, X, CheckCircle, TrendingUp, Shield, Home, Wallet, Euro, AlertTriangle, Edit, Check, Briefcase } from 'lucide-react';
 import { downloadFinancialPlanPDF } from './FinancialPlanPDFGenerator';
+import InvestmentProgressionPanel from './InvestmentProgressionPanel';
 import { toast } from 'sonner';
 import { createPageUrl } from '@/utils';
 

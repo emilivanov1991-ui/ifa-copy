@@ -246,9 +246,152 @@ export const PLAN_CONSTITUTION = {
   },
 
   // ──────────────────────────────────────────────────────────
-  // СТЪПКА 2: СТРАТЕГИЧЕСКО РАЗПРЕДЕЛЕНИЕ — ПРЕДСТОИ
+  // СТЪПКА 2: СТРАТЕГИЧЕСКО РАЗПРЕДЕЛЕНИЕ
+  // Статус: ✅ ПОТВЪРДЕНО
   // ──────────────────────────────────────────────────────────
-  strategic_allocation: "PENDING",
+
+  strategic_allocation: {
+
+    /**
+     * ТАВАНИ НА ПЛАНА (максимален месечен бюджет за нови продукти)
+     *
+     * Изчисляват се ДВА тавана и се взима по-СТРИКТНИЯТ (MIN).
+     *
+     * Таван 1 (доходен): (total_monthly_income × 1.5) / 12
+     *   Пример: доход 6000 € → таван 1 = 750 €
+     *
+     * Таван 2 (баланс): monthly_balance_after_optimization × 0.40
+     *   monthly_balance_after_optimization = месечен баланс преди оптимизация
+     *     + спестявания от оптимизацията (разлика в месечните вноски)
+     *   Пример: баланс преди 1000 €, спестяване 200 € → нов баланс 1200 € → таван 2 = 480 €
+     *
+     * max_monthly_plan_budget = MIN(ceiling_1, ceiling_2)
+     *
+     * ⚠️ ВАЖНО: Нови кредити НЕ се включват в тези проценти → виж Правило 6.1.4.7
+     */
+    plan_budget_ceilings: {
+      ceiling_1_formula: "total_monthly_income * 1.5 / 12",
+      ceiling_2_formula: "monthly_balance_after_optimization * 0.40",
+      monthly_balance_after_optimization_formula:
+        "old_monthly_balance + (old_liabilities_monthly - new_liabilities_monthly)",
+      max_monthly_plan_budget: "MIN(ceiling_1, ceiling_2)",
+      excludes_new_loans: true,
+      reference_for_loans: "Rule 6.1.4.7"
+    },
+
+    /**
+     * ЙЕРАРХИЯ НА ЦЕЛИТЕ (фиксирана, приоритет по ред)
+     *
+     * Бюджетът се разпределя последователно по тази наредба.
+     * Ако не остава бюджет — следващите цели не се включват в плана.
+     */
+    priority_hierarchy: [
+
+      /**
+       * 1. ЗАЩИТА НА ДОХОДА
+       * Включва:
+       *   - Застраховка живот + злополука (напр. MetLife Term Life)
+       *   - Критични заболявания (Uniqa Select, Best Doctors)
+       *   - Здравно застраховане (Generali Health Line, Uniqa)
+       *   - MetLife продукти (Credit Guard, Medica)
+       */
+      {
+        priority: 1,
+        goal: "income_protection",
+        product_categories: [
+          "term_life",
+          "critical_illness",
+          "health_insurance",
+          "personal_accident",
+          "metlife_credit_guard",
+          "metlife_medica"
+        ]
+      },
+
+      /**
+       * 2. ИЗГРАЖДАНЕ НА РЕЗЕРВ
+       *
+       * Целева сума: 6 × коригирани_месечни_разходи
+       *   коригирани_месечни_разходи = variable_expenses + new_liabilities_monthly
+       *   (лихвата на новите кредити се счита за текущ разход)
+       *
+       * Пример: разходи 2000 + нова ипотека 900 = 2900 → резерв = 6 × 2900 = 17 400 €
+       *
+       * Целеви хоризонт: 3 години (36 месеца)
+       * monthly_reserve_allocation = target_reserve / 36
+       *
+       * Ако резервът вече е изграден (клиентски спестявания >= target_reserve):
+       *   → Стъпката се пропуска, но 40%-ният таван (ceiling_2) остава в сила.
+       */
+      {
+        priority: 2,
+        goal: "emergency_reserve",
+        target_months: 6,
+        target_expenses_basis: "variable_expenses + new_liabilities_monthly",
+        target_formula: "6 × (variable_expenses + new_liabilities_monthly)",
+        build_horizon_months: 36,
+        monthly_allocation_formula: "target_reserve / 36",
+        skip_if_already_built: true,
+        skip_condition: "existing_liquid_savings >= target_reserve",
+        note_when_skipped: "40%-ният таван остава в сила дори при вече изграден резерв"
+      },
+
+      /**
+       * 3. НОВО ЖИЛИЩЕ
+       */
+      {
+        priority: 3,
+        goal: "housing",
+        applies_when: "include_housing_in_plan === true"
+      },
+
+      /**
+       * 4. ПЕНСИЯ
+       */
+      {
+        priority: 4,
+        goal: "pension",
+        applies_when: "include_pension_in_plan === true"
+      },
+
+      /**
+       * 5. ДЕЦА
+       */
+      {
+        priority: 5,
+        goal: "children",
+        applies_when: "include_children_in_plan === true"
+      },
+
+      /**
+       * 6. ЗАЩИТА НА ИМУЩЕСТВОТО
+       * Имуществено застраховане (недвижимо + движимо имущество)
+       */
+      {
+        priority: 6,
+        goal: "property_protection",
+        product_categories: [
+          "property_insurance",
+          "home_insurance",
+          "car_insurance"
+        ],
+        applies_when: "include_property_in_plan === true"
+      },
+
+      /**
+       * 7. ИНВЕСТИЦИИ
+       */
+      {
+        priority: 7,
+        goal: "investments",
+        product_categories: [
+          "ul_investment",
+          "partners_regular",
+          "partners_single"
+        ]
+      }
+    ]
+  },
 
   // ──────────────────────────────────────────────────────────
   // СТЪПКА 3: ФИНАНСОВИ ОГРАНИЧЕНИЯ — ПРЕДСТОИ

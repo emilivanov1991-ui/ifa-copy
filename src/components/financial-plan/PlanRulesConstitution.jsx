@@ -530,8 +530,9 @@ export const PLAN_CONSTITUTION = {
       },
       critical_illnesses_40: {
         include: true,
+        term_years: null,
         formula: "(net_income - state_disability_benefit) * 24",
-        note: "40 тежки заболявания — специфично за UL (не 32)"
+        note: "40 тежки заболявания — специфично за UL (не 32). Срокът е вграден в UL договора — не се задава отделно."
       },
       telemedicine: { include: true },
       premium_waiver: { include: true }

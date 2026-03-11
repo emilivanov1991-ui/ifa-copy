@@ -29,8 +29,8 @@ export default function Contact() {
     icon: MapPin,
     titleBg: 'Посетете ни',
     titleEn: 'Visit Us',
-    detailsBg: ['ул. Поморие 20, ет. 5, ап. 1', 'Бургас 8001'],
-    detailsEn: ['Pomorie St. 20, fl. 5, apt. 1', 'Burgas 8001']
+    detailsBg: ['ул. Сребриста липа № 16А, офис 2', 'р-н Витоша, София 1619'],
+    detailsEn: ['Srebristа Lipa St. 16A, office 2', 'Vitosha district, Sofia 1619']
   },
   {
     icon: Phone,

@@ -240,7 +240,7 @@ function LayoutContent({ children, currentPageName }) {
               <ul className="space-y-3 text-slate-400 font-light">
                 <li>+359 89 222 2990</li>
                 <li>krassimir.stankov@ifa.bg</li>
-                <li>{t('ул. Поморие 20, ет. 5, ап. 1', 'Pomorie St. 20, fl. 5, apt. 1')}<br />{t('Бургас 8001', 'Burgas 8001')}</li>
+                <li>{t('ул. Сребриста липа № 16А, офис 2', 'Srebristа Lipa St. 16A, office 2')}<br />{t('р-н Витоша, София 1619', 'Vitosha district, Sofia 1619')}</li>
               </ul>
             </div>
           </div>

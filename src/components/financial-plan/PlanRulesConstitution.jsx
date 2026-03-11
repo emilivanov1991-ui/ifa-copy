@@ -161,9 +161,45 @@ export const PLAN_CONSTITUTION = {
     },
 
     /**
-     * ПРАВИЛО 1.5: Оптимизация на кредитни карти — ПРЕДСТОИ
+     * ПРАВИЛО 1.5: Оптимизация на кредитни карти
+     * Статус: ✅ ПОТВЪРДЕНО
+     *
+     * Три сценария по приоритет:
+     *
+     * 1.5.A — Само кредитни карти (без потребителски кредити), сума >= 2000 €
+     *   → Рефинансиране в потребителски кредит (ако new_monthly < old_monthly)
+     *   → Break-even: NONE
+     *
+     * 1.5.Б — Само кредитни карти (без потребителски кредити), сума < 2000 €
+     *   → Препоръчва се само погасяване — НЕ се рефинансира
+     *   → Действие: план за погасяване от свободния месечен остатък
+     *
+     * 1.5.В — Има и потребителски кредити
+     *   → Кредитните карти се включват в обединяването заедно с потребителските кредити
+     *   → Третират се идентично с потребителски кредит (Правило 1.3 или 1.4)
      */
-    credit_cards: "PENDING",
+    credit_cards: {
+      scenario_with_consumer_loans: {
+        // 1.5.В
+        applies_when: "consumer_loans_count >= 1",
+        action: "include_in_consumer_loan_consolidation",
+        treat_as: "consumer_loan"
+      },
+      scenario_standalone_large: {
+        // 1.5.А
+        applies_when: "consumer_loans_count === 0 AND total_credit_cards_balance >= 2000",
+        action: "refinance_into_consumer_loan",
+        condition_formula: "new_monthly < old_monthly",
+        breakeven_condition: "NONE",
+        product_list: "consumer_loans"
+      },
+      scenario_standalone_small: {
+        // 1.5.Б
+        applies_when: "consumer_loans_count === 0 AND total_credit_cards_balance < 2000",
+        action: "recommend_payoff_only",
+        note: "Препоръчва се погасяване от свободния месечен остатък — без рефинансиране"
+      }
+    },
 
     /**
      * ПРАВИЛО 1.6: Оптимизация на лизинг — ПРЕДСТОИ

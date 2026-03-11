@@ -673,8 +673,15 @@ export const PLAN_CONSTITUTION = {
       // Включва се винаги (ще се обнови когато анализът добие индикатор за здравно от работодател)
       generali_health_basic: {
         package: "basic",
+        product_name: "HEALTH Line - Basic",
         for_whom: "client_and_partner_only",
-        note: "По една отделна полица за клиента и партньора (не за деца)",
+        min_age: 18,
+        max_age_at_signup: 70,
+        currency: "BGN",
+        flat_rate: true,
+        monthly_premium_bgn: 60,
+        annual_premium_bgn: 720,
+        note: "По една отделна полица за клиента и партньора (не за деца). Фиксирана тарифа — не зависи от възрастта.",
         include_when: "always_currently",
         pending_change: "Добавяне на индикатор 'employer_health_insurance' в анализа"
       },

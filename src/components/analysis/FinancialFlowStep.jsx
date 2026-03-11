@@ -481,7 +481,7 @@ export default function FinancialFlowStep({ data, onChange, showErrors, plannerD
         <div className="space-y-3">
           {/* Mortgage */}
           <div>
-            <div className="grid grid-cols-[1fr_auto_auto_auto] gap-2 items-center">
+            <div className="grid grid-cols-[1fr_auto_auto_auto_auto] gap-2 items-center">
               <Label className="text-sm">Ипотека <span className="text-red-500">*</span></Label>
               <Input type="number" min="0" value={data.liability_mortgage_monthly ?? ''}
                 onChange={(e) => onChange('liability_mortgage_monthly', e.target.value === '' ? '' : parseInt(e.target.value))} 
@@ -492,12 +492,15 @@ export default function FinancialFlowStep({ data, onChange, showErrors, plannerD
               <Input type="number" min="0" value={data.liability_mortgage_remaining_months ?? 0}
                 onChange={(e) => onChange('liability_mortgage_remaining_months', e.target.value === '' ? 0 : parseInt(e.target.value))} 
                 className="rounded-lg w-28" />
+              <Input type="number" min="0" step="0.01" value={data.liability_mortgage_interest_rate ?? 0}
+                onChange={(e) => onChange('liability_mortgage_interest_rate', e.target.value === '' ? 0 : parseFloat(e.target.value))} 
+                className="rounded-lg w-24" />
             </div>
             <p className="text-xs text-slate-500 mt-1">Това е спрямо информация от тема "Ново жилище"</p>
           </div>
           
           {/* Consumer loans */}
-          <div className="grid grid-cols-[1fr_auto_auto_auto] gap-2 items-center">
+          <div className="grid grid-cols-[1fr_auto_auto_auto_auto] gap-2 items-center">
             <Label className="text-sm">Потребителски кредити <span className="text-red-500">*</span></Label>
             <Input type="number" min="0" value={data.liability_consumer_loans_monthly ?? ''}
               onChange={(e) => onChange('liability_consumer_loans_monthly', e.target.value === '' ? '' : parseInt(e.target.value))} 
@@ -508,10 +511,13 @@ export default function FinancialFlowStep({ data, onChange, showErrors, plannerD
             <Input type="number" min="0" value={data.liability_consumer_loans_remaining_months ?? 0}
               onChange={(e) => onChange('liability_consumer_loans_remaining_months', e.target.value === '' ? 0 : parseInt(e.target.value))} 
               className="rounded-lg w-28" />
+            <Input type="number" min="0" step="0.01" value={data.liability_consumer_loans_interest_rate ?? 0}
+              onChange={(e) => onChange('liability_consumer_loans_interest_rate', e.target.value === '' ? 0 : parseFloat(e.target.value))} 
+              className="rounded-lg w-24" />
           </div>
           
           {/* Credit cards */}
-          <div className="grid grid-cols-[1fr_auto_auto_auto] gap-2 items-center">
+          <div className="grid grid-cols-[1fr_auto_auto_auto_auto] gap-2 items-center">
             <Label className="text-sm">Кредитни карти <span className="text-red-500">*</span></Label>
             <Input type="number" min="0" value={data.liability_credit_cards_monthly ?? ''}
               onChange={(e) => onChange('liability_credit_cards_monthly', e.target.value === '' ? '' : parseInt(e.target.value))} 
@@ -522,10 +528,13 @@ export default function FinancialFlowStep({ data, onChange, showErrors, plannerD
             <Input type="number" min="0" value={data.liability_credit_cards_remaining_months ?? 0}
               onChange={(e) => onChange('liability_credit_cards_remaining_months', e.target.value === '' ? 0 : parseInt(e.target.value))} 
               className="rounded-lg w-28" />
+            <Input type="number" min="0" step="0.01" value={data.liability_credit_cards_interest_rate ?? 0}
+              onChange={(e) => onChange('liability_credit_cards_interest_rate', e.target.value === '' ? 0 : parseFloat(e.target.value))} 
+              className="rounded-lg w-24" />
           </div>
           
           {/* Leasing */}
-          <div className="grid grid-cols-[1fr_auto_auto_auto] gap-2 items-center">
+          <div className="grid grid-cols-[1fr_auto_auto_auto_auto] gap-2 items-center">
             <Label className="text-sm">Лизинг <span className="text-red-500">*</span></Label>
             <Input type="number" min="0" value={data.liability_leasing_monthly ?? ''}
               onChange={(e) => onChange('liability_leasing_monthly', e.target.value === '' ? '' : parseInt(e.target.value))} 
@@ -536,10 +545,13 @@ export default function FinancialFlowStep({ data, onChange, showErrors, plannerD
             <Input type="number" min="0" value={data.liability_leasing_remaining_months ?? 0}
               onChange={(e) => onChange('liability_leasing_remaining_months', e.target.value === '' ? 0 : parseInt(e.target.value))} 
               className="rounded-lg w-28" />
+            <Input type="number" min="0" step="0.01" value={data.liability_leasing_interest_rate ?? 0}
+              onChange={(e) => onChange('liability_leasing_interest_rate', e.target.value === '' ? 0 : parseFloat(e.target.value))} 
+              className="rounded-lg w-24" />
           </div>
           
           {/* Overdraft */}
-          <div className="grid grid-cols-[1fr_auto_auto_auto] gap-2 items-center">
+          <div className="grid grid-cols-[1fr_auto_auto_auto_auto] gap-2 items-center">
             <Label className="text-sm">Овърдрафт <span className="text-red-500">*</span></Label>
             <Input type="number" min="0" value={data.liability_overdraft_monthly ?? ''}
               onChange={(e) => onChange('liability_overdraft_monthly', e.target.value === '' ? '' : parseInt(e.target.value))} 
@@ -550,14 +562,18 @@ export default function FinancialFlowStep({ data, onChange, showErrors, plannerD
             <Input type="number" min="0" value={data.liability_overdraft_remaining_months ?? 0}
               onChange={(e) => onChange('liability_overdraft_remaining_months', e.target.value === '' ? 0 : parseInt(e.target.value))} 
               className="rounded-lg w-28" />
+            <Input type="number" min="0" step="0.01" value={data.liability_overdraft_interest_rate ?? 0}
+              onChange={(e) => onChange('liability_overdraft_interest_rate', e.target.value === '' ? 0 : parseFloat(e.target.value))} 
+              className="rounded-lg w-24" />
           </div>
         </div>
         
-        <div className="mt-3 pt-3 border-t border-slate-200 grid grid-cols-[1fr_auto_auto_auto] gap-2">
+        <div className="mt-3 pt-3 border-t border-slate-200 grid grid-cols-[1fr_auto_auto_auto_auto] gap-2">
           <span className="text-sm font-medium">Общо задължения:</span>
           <span className="font-semibold text-orange-600 text-center w-28">{totalLiabilitiesMonthly.toLocaleString()} €</span>
           <span className="font-semibold text-orange-600 text-center w-28">{totalLiabilitiesRemaining.toLocaleString()} €</span>
           <div className="w-28"></div>
+          <div className="w-24"></div>
         </div>
       </div>
 

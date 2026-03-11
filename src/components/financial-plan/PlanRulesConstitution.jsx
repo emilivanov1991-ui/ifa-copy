@@ -513,7 +513,9 @@ export const PLAN_CONSTITUTION = {
       permanent_disability_from_accident: {
         include: true,
         // PV на анюитет — пропуснат доход до пенсия при 4% доходност (ниско-рискови активи)
-        formula: "CEILING( PV(4%/12, (65 - age) * 12) * (net_income - state_disability_benefit) * 1.5, 100 )",
+        formula: "CEILING( PV(4%/12, (65 - age) * 12) * (net_income - state_disability_benefit) * 1.2, 100 )",
+        multiplier: 1.2,
+        multiplier_rationale: "Дефинирана бизнес логика — 20% буфер за допълнителни разходи при инвалидност",
         note: "Изчислява се индивидуално за всеки от клиентите"
       },
       daily_hospitalization: { include: false },

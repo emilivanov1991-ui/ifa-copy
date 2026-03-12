@@ -1213,6 +1213,9 @@ export const PLAN_CONSTITUTION = {
         premium_bonus_thresholds: [1800, 3000, 4200],
         av_charge_thresholds: [720, 960, 1200, 1500, 2400, 3600],
         applies_per_contract: true,
+        application_order: "simultaneous",
+        simultaneous_constraint: "SUM(all_snaps) <= investment_budget_remaining",
+        note: "Snap се проверява едновременно за всички договори. Ако общият snap надвишава оставащия бюджет — нито един snap не се прилага (не се избира частично).",
         recheck_after_snap: true
       },
 

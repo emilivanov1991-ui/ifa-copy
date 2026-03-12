@@ -386,6 +386,15 @@ export const PLAN_CONSTITUTION = {
         goal: "emergency_reserve",
         target_months: 6,
         target_expenses_basis: "variable_expenses + new_liabilities_monthly",
+        // ДЕФИНИЦИЯ НА variable_expenses:
+        // = SUM на всички разходи от секция "Разходи" в анализа (expense_* полета)
+        //   БЕЗ да се включват:
+        //     - месечни спестявания (monthly_savings_amount)
+        //     - месечни инвестиции (monthly_investments)
+        //     - месечни вноски по кредити (liability_*_monthly полета)
+        //     - месечни разходи по застраховки (insurance_* полета)
+        // Тези четири категории се третират отделно в плана.
+        variable_expenses_definition: "SUM(expense_*) excluding savings, investments, loan_payments, insurance_premiums",
         target_formula: "6 × (variable_expenses + new_liabilities_monthly)",
         build_horizon_months: 36,
         monthly_allocation_formula: "target_reserve / 36",

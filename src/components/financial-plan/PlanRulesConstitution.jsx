@@ -1026,7 +1026,52 @@ export const PLAN_CONSTITUTION = {
         "Световни ценни книжа (облигации)": "0%"
       },
       years_to_retirement_couple: "AVERAGE(client_age, partner_age) → 65 - average",
-      years_to_retirement_single: "65 - client_age"
+      years_to_retirement_single: "65 - client_age",
+
+      /**
+       * СЪЩЕСТВУВАЩИ АКТИВИ — ПРИСПАДАНЕ ОТ ПЕНСИОННИЯ КОРПУС
+       * Статус: ✅ ПОТВЪРДЕНО
+       *
+       * Приспадат се само ликвидни/инвестиционни активи (БЕЗ основен дом, коли).
+       * Проектират се до 65 г. при съответната доходност и се изваждат от required_corpus.
+       *
+       * АКТИВ 1 — Финансови инвестиции (от "Финансов поток" → Активи):
+       *   Включва: asset_medium_term_savings + asset_long_term_savings
+       *   Доходност: 5% годишно
+       *   Формула: FV(5%, years_to_retirement, 0, -current_value)
+       *   Приспада се от required_corpus: corpus_net = required_corpus - FV_investments
+       *
+       * АКТИВ 2 — Втори и трети имот (от "Защита на собствеността" → Недвижимо имущество):
+       *   Включва: property_2_value + property_3_value (ако съществуват)
+       *   НЕ включва: основния дом (current_housing) — приема се за ползване, не продажба
+       *   Доходност: 3% годишен ръст (инфлация на имотите)
+       *   Формула: FV(3%, years_to_retirement, 0, -property_value)
+       *   Приспада се от required_corpus след финансовите активи
+       *
+       * КРАЙНА ФОРМУЛА:
+       *   fv_investments = (asset_medium_term_savings + asset_long_term_savings) × (1.05)^years
+       *   fv_properties  = (property_2_value + property_3_value) × (1.03)^years
+       *   corpus_net = MAX(0, required_corpus - fv_investments - fv_properties)
+       *
+       * Полетата в FinancialAnalysisSubmission:
+       *   → asset_medium_term_savings, asset_long_term_savings
+       *   → property_2_value (has_property_2 = true), property_3_value (has_property_3 = true)
+       */
+      existing_assets_deduction: {
+        financial_investments: {
+          fields: ["asset_medium_term_savings", "asset_long_term_savings"],
+          annual_return: 0.05,
+          formula: "FV = value × (1.05)^years_to_retirement"
+        },
+        secondary_properties: {
+          fields: ["property_2_value", "property_3_value"],
+          condition: ["has_property_2 === true", "has_property_3 === true"],
+          annual_growth: 0.03,
+          formula: "FV = value × (1.03)^years_to_retirement",
+          excludes: "current_housing (основен дом — не се продава)"
+        },
+        corpus_net_formula: "MAX(0, required_corpus - fv_investments - fv_properties)"
+      }
     },
 
     /**

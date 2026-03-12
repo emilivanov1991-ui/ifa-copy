@@ -1361,7 +1361,8 @@ export const PLAN_CONSTITUTION = {
         skip_if_employer_health_insurance: true,
         skip_condition: "has_employer_health_insurance === true",
         skip_rationale: "Не се дублира покритие — ако клиентът вече има работодателска здравна застраховка, Дженерали Basic не се включва в плана",
-        source_field: "FinancialAnalysisSubmission.has_employer_health_insurance"
+        source_field: "FinancialAnalysisSubmission.has_employer_health_insurance",
+        employer_health_insurer_field: "FinancialAnalysisSubmission.employer_health_insurer"
       },
 
       // Нишови продукти — само upsale, не в стандартните планове

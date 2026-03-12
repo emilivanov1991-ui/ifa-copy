@@ -1135,6 +1135,33 @@ export const PLAN_CONSTITUTION = {
       },
 
       /**
+       * ПРИОРИТЕТ ПРИ НЕДОСТАТЪЧЕН ИНВЕСТИЦИОНЕН БЮДЖЕТ
+       * Статус: ✅ ПОТВЪРДЕНО
+       *
+       * Когато investment_budget_remaining < (ul_pension_needed + junior_education_needed):
+       *
+       * ПРИОРИТЕТ: Образование (Junior) > Пенсия (UL)
+       *
+       * Логика:
+       *   1. Първо се финансира образованието на децата — хоризонтът е по-кратък
+       *      и отлагането е по-вредно (детето порасва и прозорецът се затваря)
+       *   2. Остатъкът от бюджета отива към UL пенсия (клиент + партньор)
+       *   3. Ако остатъкът не стига дори за образованието → Junior се намалява
+       *      пропорционално между децата, и пенсията не се включва
+       *   4. Shortfall се отбелязва в плана
+       *
+       * Алгоритъм:
+       *   budget_for_education = MIN(investment_budget_remaining, junior_education_needed)
+       *   budget_for_pension   = MAX(0, investment_budget_remaining - budget_for_education)
+       */
+      investment_priority_on_shortfall: {
+        order: ["education_junior", "pension_ul"],
+        rationale: "По-кратък хоризонт при децата — забавянето е по-критично",
+        on_insufficient_for_education: "scale Junior proportionally across children",
+        on_insufficient_for_pension: "reduce UL proportionally for client and partner, mark shortfall"
+      },
+
+      /**
        * PARTNERS INVESTMENTS
        * Статус: ✅ ПОТВЪРДЕНО — НЕ СЕ ПРЕДЛАГА
        *

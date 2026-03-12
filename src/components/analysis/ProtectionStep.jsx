@@ -1807,6 +1807,38 @@ export default function ProtectionStep({ data, onChange, showErrors, plannerData
         </div>
       </div>
 
+      {/* Employer Health Insurance */}
+      <div className="bg-slate-50 rounded-xl p-6">
+        <div className="flex items-center justify-between">
+          <div>
+            <p className="font-medium text-slate-900">Работодателска здравна застраховка</p>
+            <p className="text-sm text-slate-500 mt-0.5">Имате ли групова здравна застраховка от работодателя?</p>
+          </div>
+          <div className="flex items-center gap-2">
+            <span className={cn("text-sm font-medium", !(data.has_employer_health_insurance ?? false) ? "text-red-600" : "text-slate-400")}>не</span>
+            <button
+              type="button"
+              onClick={() => onChange('has_employer_health_insurance', !(data.has_employer_health_insurance ?? false))}
+              className={cn(
+                "w-12 h-6 rounded-full transition-colors relative",
+                (data.has_employer_health_insurance ?? false) ? "bg-green-500" : "bg-red-500"
+              )}
+            >
+              <div className={cn(
+                "w-5 h-5 bg-white rounded-full absolute top-0.5 transition-all",
+                (data.has_employer_health_insurance ?? false) ? "left-6" : "left-0.5"
+              )} />
+            </button>
+            <span className={cn("text-sm font-medium", (data.has_employer_health_insurance ?? false) ? "text-green-600" : "text-slate-400")}>да</span>
+          </div>
+        </div>
+        {data.has_employer_health_insurance && (
+          <p className="mt-3 text-sm text-amber-700 bg-amber-50 border border-amber-200 rounded-lg px-4 py-2">
+            Дженерали Health Line Basic няма да бъде включен в плана, за да не се дублира покритието.
+          </p>
+        )}
+      </div>
+
       {/* Include income protection in plan */}
       <label className="flex items-center gap-3 p-4 rounded-xl border-2 border-blue-200 bg-blue-50 cursor-pointer">
         <Checkbox

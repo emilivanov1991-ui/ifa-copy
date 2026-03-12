@@ -307,6 +307,12 @@ export const PLAN_CONSTITUTION = {
         ceiling_2_formula: "monthly_balance_after_optimization * 0.40",
         max_monthly_plan_budget: "MIN(ceiling_1, ceiling_2)"
       },
+      // ДЕФИНИЦИЯ НА existing_liquid_savings:
+      // = asset_checking_account + asset_short_term_savings + asset_medium_term_savings + client_cash
+      // НЕ включва: asset_long_term_savings, mutual_funds, crypto, gold
+      // Логика: само реално достъпни и ликвидни активи (без дългосрочни инвестиции, крипто и злато)
+      existing_liquid_savings_definition: "asset_checking_account + asset_short_term_savings + asset_medium_term_savings + client_cash",
+
       mode_b_reserve_already_built: {
         condition: "existing_liquid_savings >= target_reserve",
         ceiling_1_formula: "total_monthly_income * 2.0 / 12",

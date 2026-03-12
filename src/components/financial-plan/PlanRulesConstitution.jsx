@@ -305,6 +305,27 @@ export const PLAN_CONSTITUTION = {
     },
 
     /**
+     * ПРАВИЛО 6.1.4.8 — available_cash при жилищна цел
+     * Статус: ✅ ПОТВЪРДЕНО
+     *
+     * Когато planning_housing_change = true AND include_housing_in_plan = true
+     * AND financing_method = "cash" OR "cash_and_loan":
+     *
+     * → available_cash се счита за ВЕЧЕ АНГАЖИРАН за жилищното самоучастие
+     *   (ще бъде използван в рамките на 2–3 години)
+     * → НЕ се добавя към investment_budget
+     * → НЕ се приспада от required_corpus (не е дългосрочен инвестиционен актив)
+     * → Просто не участва в никакви изчисления на плана
+     */
+    rule_6_1_4_8_available_cash_housing: {
+      condition: "planning_housing_change === true AND include_housing_in_plan === true",
+      available_cash_treatment: "excluded",
+      add_to_investment_budget: false,
+      deduct_from_corpus: false,
+      rationale: "Средствата ще се използват за самоучастие в рамките на 2–3 години — не са свободен инвестиционен ресурс"
+    },
+
+    /**
      * ЙЕРАРХИЯ НА ЦЕЛИТЕ (фиксирана, приоритет по ред)
      *
      * Бюджетът се разпределя последователно по тази наредба.

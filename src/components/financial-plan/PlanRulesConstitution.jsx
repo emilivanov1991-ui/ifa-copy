@@ -1364,11 +1364,15 @@ export const PLAN_CONSTITUTION = {
         include_when: "remaining_budget >= total_generali_premium (after Uniqa deducted)",
         budget_check: "remaining_budget = budget_ceiling_annual - metlife_annual_premium - uniqa_annual_premium",
         on_insufficient_budget: "skip — не се включва",
-        skip_if_employer_health_insurance: true,
-        skip_condition: "has_employer_health_insurance === true",
-        skip_rationale: "Не се дублира покритие — ако клиентът вече има работодателска здравна застраховка, Дженерали Basic не се включва в плана",
-        source_field: "FinancialAnalysisSubmission.has_employer_health_insurance",
-        employer_health_insurer_field: "FinancialAnalysisSubmission.employer_health_insurer"
+        skip_per_person: {
+          client: "has_employer_health_insurance === true",
+          partner: "partner_has_employer_health_insurance === true"
+        },
+        skip_rationale: "Изключването е индивидуално — само лицето с работодателска здравна застраховка се пропуска. Дженерали Basic не се предлага за деца.",
+        source_fields: {
+          client: "FinancialAnalysisSubmission.has_employer_health_insurance",
+          partner: "FinancialAnalysisSubmission.partner_has_employer_health_insurance"
+        }
       },
 
       // Нишови продукти — само upsale, не в стандартните планове

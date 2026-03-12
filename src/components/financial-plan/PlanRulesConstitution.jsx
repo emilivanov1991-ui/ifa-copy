@@ -936,18 +936,19 @@ export const PLAN_CONSTITUTION = {
         include_when: "budget_exhausted_for_metlife"
       },
 
-      // Следваща по приоритет след животозастраховането — включва се винаги при бюджет
+      // Следваща по приоритет след животозастраховането — включва се ако остатъкът от бюджета стига
       uniqa_zdrave_i_tsennost: {
         package: "europa",
         for_whom: "client, partner, AND all_children",
         min_age: 0,
         max_age_at_signup: 64,
         note: "По една отделна полица за клиента, партньора и всяко дете. Достъпно за възраст 0–64 г. към датата на сключване.",
-        include_when: "budget_available",
-        priority_note: "Следва веднага след животозастраховането по приоритет"
+        include_when: "remaining_budget >= total_uniqa_premium",
+        budget_check: "remaining_budget = budget_ceiling_annual - metlife_annual_premium",
+        on_insufficient_budget: "skip — не се включва, не се намалява"
       },
 
-      // Включва се винаги (ще се обнови когато анализът добие индикатор за здравно от работодател)
+      // Включва се ако остатъкът от бюджета стига след Уника
       generali_health_basic: {
         package: "basic",
         product_name: "HEALTH Line - Basic",
@@ -959,7 +960,9 @@ export const PLAN_CONSTITUTION = {
         monthly_premium_bgn: 60,
         annual_premium_bgn: 720,
         note: "По една отделна полица за клиента и партньора (не за деца). Фиксирана тарифа — не зависи от възрастта.",
-        include_when: "always_currently",
+        include_when: "remaining_budget >= total_generali_premium (after Uniqa deducted)",
+        budget_check: "remaining_budget = budget_ceiling_annual - metlife_annual_premium - uniqa_annual_premium",
+        on_insufficient_budget: "skip — не се включва",
         pending_change: "Добавяне на индикатор 'employer_health_insurance' в анализа"
       },
 

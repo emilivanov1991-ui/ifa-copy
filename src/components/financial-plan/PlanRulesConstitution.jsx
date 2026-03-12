@@ -745,7 +745,12 @@ export const PLAN_CONSTITUTION = {
       step2_term_life: {
         coverages_tariff: "Term Life (32 CI via METLIFE_PA_CRITICAL_ILLNESS_32_RATES yr10)",
         condition_to_pass: "total_term_life_annual <= budget_ceiling_annual",
-        scale_if_over_budget: true,
+        scale_if_over_budget: {
+          scalable: ["basic_life", "PTN", "CI32"],
+          fixed: ["fractures_1500", "telemedicine_15"],
+          formula: "scale_factor = (budget_ceiling_annual - 13 - 15 - cost(fractures) - cost(telemedicine)) / (cost(life) + cost(PTN) + cost(CI32))",
+          note: "Фрактурите и телемедицината се извадят от бюджета, остатъкът се разпределя пропорционално"
+        },
         apply_40pct_rule: false,
         note: "Term Life е чисто застраховане — няма инвестиционна компонента за 40% правило"
       },

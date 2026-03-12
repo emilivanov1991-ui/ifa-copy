@@ -1186,6 +1186,37 @@ export const PLAN_CONSTITUTION = {
       },
 
       /**
+       * SNAP-TO-THRESHOLD ПРАВИЛО (автоматична оптимизация нагоре)
+       * Статус: ✅ ПОТВЪРДЕНО
+       *
+       * След като нужните вноски за пенсия и образование са изчислени,
+       * ако остане свободен бюджет — проверява се дали snap до следващ праг е изгоден.
+       *
+       * УСЛОВИЕ ЗА SNAP:
+       *   gap_to_next_threshold = next_threshold - current_annual_premium
+       *   Ако gap_to_next_threshold ≤ 0.05 × investment_budget_remaining → snap автоматично
+       *
+       * Прагове за Premium Bonus: 1800, 3000, 4200 €/год.
+       * Прагове за AV Charge:     720, 960, 1200, 1500, 2400, 3600 €/год.
+       *
+       * Snap се прилага на всеки договор поотделно (клиент, партньор, всяко дете).
+       * След snap — бюджетът се преизчислява и се проверява следващият праг.
+       *
+       * Пример:
+       *   Изчислена вноска Junior: 2 950 €/год., следващ праг: 3 000 €
+       *   gap = 50 €; investment_budget_remaining = 1 500 €
+       *   50 ≤ 0.05 × 1500 = 75 → ✅ snap до 3 000 € (бонус 3% вместо 2%)
+       */
+      snap_to_threshold: {
+        applies: true,
+        condition: "gap_to_next_threshold <= 0.05 * investment_budget_remaining",
+        premium_bonus_thresholds: [1800, 3000, 4200],
+        av_charge_thresholds: [720, 960, 1200, 1500, 2400, 3600],
+        applies_per_contract: true,
+        recheck_after_snap: true
+      },
+
+      /**
        * PARTNERS INVESTMENTS
        * Статус: ✅ ПОТВЪРДЕНО — НЕ СЕ ПРЕДЛАГА
        *

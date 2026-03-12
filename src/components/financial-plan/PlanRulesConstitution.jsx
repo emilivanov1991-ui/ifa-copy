@@ -287,6 +287,13 @@ export const PLAN_CONSTITUTION = {
      */
     plan_budget_ceilings: {
       /**
+       * ВАЖНО: Формулите са ИДЕНТИЧНИ за единичен клиент и за двойка.
+       * При двойка: total_monthly_income = client_income + partner_income
+       * При двойка: monthly_balance_after_optimization = общ баланс на домакинството
+       * Не се прилага различен коефициент при двойка.
+       */
+
+      /**
        * ДВА РЕЖИМА — зависи дали резервът е вече изграден
        *
        * РЕЖИМ А (резервът НЕ е изграден):

@@ -308,10 +308,16 @@ export const PLAN_CONSTITUTION = {
         max_monthly_plan_budget: "MIN(ceiling_1, ceiling_2)"
       },
       // ДЕФИНИЦИЯ НА existing_liquid_savings:
-      // = asset_checking_account + asset_short_term_savings + asset_medium_term_savings + client_cash
-      // НЕ включва: asset_long_term_savings, mutual_funds, crypto, gold
-      // Логика: само реално достъпни и ликвидни активи (без дългосрочни инвестиции, крипто и злато)
-      existing_liquid_savings_definition: "asset_checking_account + asset_short_term_savings + asset_medium_term_savings + client_cash",
+      // При ЕДИНИЧЕН клиент:
+      //   = client_checking_account + client_savings_account + client_term_deposit + client_cash
+      // При ДВОЙКА (include_partner = true):
+      //   = (client + partner)_(checking_account + savings_account + term_deposit + cash)
+      // Полета в FinancialAnalysisSubmission:
+      //   Клиент: asset_checking_account, asset_short_term_savings, asset_medium_term_savings, client_cash
+      //   Партньор: partner_checking_account, partner_savings_book, partner_term_deposit, partner_cash
+      // НЕ включва: asset_long_term_savings, mutual_funds, crypto, gold (на нито един от двамата)
+      // Логика: резервът е общ — разходите и кредитите са общи за домакинството
+      existing_liquid_savings_definition: "SUM(client + partner): checking_account + short_term_savings + medium_term_savings + cash",
 
       mode_b_reserve_already_built: {
         condition: "existing_liquid_savings >= target_reserve",

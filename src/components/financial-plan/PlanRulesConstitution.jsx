@@ -1019,7 +1019,12 @@ export const PLAN_CONSTITUTION = {
       pension_inflation_rate: 0.03,
       pension_post_retirement_return: 0.04,
       pension_withdrawal_count: 240,
-      ul_assumed_return: 0.08,
+      ul_assumed_return: 0.08,  // 8% — стандартен за всички проекции (UL, Junior)
+      ul_fund_allocation: {
+        "Световни акции (развити пазари)": "50%",
+        "Акции развиващи се пазари": "50%",
+        "Световни ценни книжа (облигации)": "0%"
+      },
       years_to_retirement_couple: "AVERAGE(client_age, partner_age) → 65 - average",
       years_to_retirement_single: "65 - client_age"
     },

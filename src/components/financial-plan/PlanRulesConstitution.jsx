@@ -1364,7 +1364,7 @@ export const PLAN_CONSTITUTION = {
           client: "has_employer_health_insurance === true",
           partner: "partner_has_employer_health_insurance === true"
         },
-        skip_rationale: "Изключването е индивидуално — само лицето с работодателска здравна застраховка се пропуска. Дженерали Basic не се предлага за деца.",
+        skip_rationale: "Правилото е строго индивидуално: Дженерали Basic се включва само за лицата БЕЗ работодателска здравна застраховка. Примери: единичен клиент с работодателска → не се включва; двойка, двамата имат → не се включва за никого; двойка, само единият има → включва се само за другия; двойка, никой няма → включва се за двамата. Не се предлага за деца.",
         source_fields: {
           client: "FinancialAnalysisSubmission.has_employer_health_insurance",
           partner: "FinancialAnalysisSubmission.partner_has_employer_health_insurance"

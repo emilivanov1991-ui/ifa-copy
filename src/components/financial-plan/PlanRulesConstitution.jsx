@@ -705,27 +705,55 @@ export const PLAN_CONSTITUTION = {
     },
 
     /**
-     * ИЗБОР НА МЕТЛАЙФ ПРОДУКТ
+     * ИЗБОР НА МЕТЛАЙФ ПРОДУКТ — АЛГОРИТЪМ
      * Статус: ✅ ПОТВЪРДЕНО
      *
-     * Приоритет: UL > Срочен живот > ДЗИ Закрила (заместител)
+     * Приоритет: UL → Term Life → ДЗИ Закрила (заместител)
      *
-     * UL = когато остава поне 25 € месечно за инвестиции (мин. 300 € год.)
-     * Срочен живот = когато инвестиционният бюджет е < 25 € месечно
-     * ДЗИ Закрила (Платинен) = заместващ когато бюджетът е изчерпан за MetLife
+     * ⚠️ ВАЖНО: Изборът не може да стане без изчисление, защото
+     * цената на покритията е РАЗЛИЧНА при UL (40 CI) vs Term Life (32 CI).
+     * Затова се следва строга последователност:
+     *
+     * СТЪПКА 1 — Опитай UL:
+     *   а) Изчисли покритията с UL тарифи (PTN, 40 CI, фрактури 1500, телемедицина)
+     *   б) Приложи 40%-то правило за покрития (ul_coverage_sizing)
+     *   в) annualSavings = (budget_ceiling_annual - 15) / (1 + waiverRate) - totalCoverages_UL
+     *   г) Ако annualSavings / 12 ≥ 25 € → ИЗБЕРИ UL ✅ — край
+     *
+     * СТЪПКА 2 — Опитай Term Life (ако UL не се получи):
+     *   а) Преизчисли покритията с Term Life тарифи:
+     *        - Основно Живот (5 г.): net_income × 24 или мин. 3000 €
+     *        - ПТН: същата PV формула
+     *        - 32 CI (10 г.): (net_income - state_disability) × 24
+     *        - Фрактури 1500 €, Телемедицина 15 €, Адм. такса 13 €
+     *   б) Ако total_term_life_annual ≤ budget_ceiling_annual → ИЗБЕРИ Term Life ✅ — край
+     *      (При Term Life покритията се намаляват пропорционално ако надвишат бюджета,
+     *       НЕ се прилага 40%-то правило — Term Life е чисто застраховане без инвестиция)
+     *
+     * СТЪПКА 3 — ДЗИ Закрила (ако Term Life не се побира):
+     *   → ИЗБЕРИ ДЗИ Закрила Платинен за клиента и партньора ✅
+     *   → Уника и Дженерали НЕ се включват при тази стъпка
      */
     metlife_product_selection: {
-      unit_linked: {
-        condition: "monthly_investment_budget >= 25",
-        min_annual_investment: 300
+      algorithm: "sequential: UL → Term Life → DZI Zakrila",
+      step1_ul: {
+        coverages_tariff: "UL (40 CI via METLIFE_PA_SECURITY_PLUS_COEFFICIENTS)",
+        condition_to_pass: "annualSavings / 12 >= 25",
+        min_annual_savings: 300,
+        apply_40pct_rule: true
       },
-      term_life: {
-        condition: "monthly_investment_budget < 25"
+      step2_term_life: {
+        coverages_tariff: "Term Life (32 CI via METLIFE_PA_CRITICAL_ILLNESS_32_RATES yr10)",
+        condition_to_pass: "total_term_life_annual <= budget_ceiling_annual",
+        scale_if_over_budget: true,
+        apply_40pct_rule: false,
+        note: "Term Life е чисто застраховане — няма инвестиционна компонента за 40% правило"
       },
-      dzi_zakrila_substitute: {
-        condition: "budget_exhausted_no_metlife_possible",
+      step3_dzi_zakrila: {
+        condition: "term_life does not fit in budget",
         package: "platinum",
-        for_whom: "both_client_and_partner"
+        for_whom: "both_client_and_partner",
+        uniqa_and_generali: "NOT included at this step"
       }
     },
 

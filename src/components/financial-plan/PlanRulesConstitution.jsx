@@ -1071,6 +1071,58 @@ export const PLAN_CONSTITUTION = {
           excludes: "current_housing (основен дом — не се продава)"
         },
         corpus_net_formula: "MAX(0, required_corpus - fv_investments - fv_properties)"
+      },
+
+      /**
+       * ДОБРОВОЛНА ПЕНСИЯ — 3-ТИ СТЪЛБ
+       * Статус: ✅ ПОТВЪРДЕНО
+       *
+       * Проектира се до 65 г. и се приспада от required_corpus.
+       * Доходност: 3% годишно
+       *
+       * Полета от FinancialAnalysisSubmission (секция "Пенсия"):
+       *   Клиент:
+       *     - client_voluntary_pension_monthly  → месечна вноска (€)
+       *     - client_voluntary_pension_total    → обща стойност на партидата (€) = начален баланс
+       *   Партньор:
+       *     - partner_voluntary_pension_monthly → месечна вноска (€)
+       *     - partner_voluntary_pension_total   → обща стойност на партидата (€) = начален баланс
+       *
+       * Условие за включване: client_voluntary_pension === true / partner_voluntary_pension === true
+       *
+       * ФОРМУЛА (FV на анюитет + начален баланс):
+       *   fv_voluntary = FV(3%/12, years*12, -monthly_contribution, -current_balance)
+       *   // т.е. расте при 3% годишно, с редовни месечни вноски
+       *
+       * Приспада се от corpus_net:
+       *   corpus_final = MAX(0, corpus_net - fv_voluntary_client - fv_voluntary_partner)
+       */
+      voluntary_pension_deduction: {
+        annual_return: 0.03,
+        client_fields: {
+          monthly: "client_voluntary_pension_monthly",
+          balance: "client_voluntary_pension_total",
+          condition: "client_voluntary_pension === true"
+        },
+        partner_fields: {
+          monthly: "partner_voluntary_pension_monthly",
+          balance: "partner_voluntary_pension_total",
+          condition: "partner_voluntary_pension === true"
+        },
+        formula: "FV(3%/12, years*12, -monthly, -current_balance)",
+        deduction_order: "after existing_assets_deduction"
+      },
+
+      /**
+       * PARTNERS INVESTMENTS
+       * Статус: ✅ ПОТВЪРДЕНО — НЕ СЕ ПРЕДЛАГА
+       *
+       * Partners Investments НЕ се включва в никакъв автоматично генериран план.
+       * Продуктът се третира като несъществуващ за целите на плановия генератор.
+       */
+      partners_investments: {
+        include_in_plans: false,
+        role: "excluded — not offered under any circumstances"
       }
     },
 

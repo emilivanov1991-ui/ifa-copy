@@ -1358,7 +1358,10 @@ export const PLAN_CONSTITUTION = {
         include_when: "remaining_budget >= total_generali_premium (after Uniqa deducted)",
         budget_check: "remaining_budget = budget_ceiling_annual - metlife_annual_premium - uniqa_annual_premium",
         on_insufficient_budget: "skip — не се включва",
-        pending_change: "Добавяне на индикатор 'employer_health_insurance' в анализа"
+        skip_if_employer_health_insurance: true,
+        skip_condition: "has_employer_health_insurance === true",
+        skip_rationale: "Не се дублира покритие — ако клиентът вече има работодателска здравна застраховка, Дженерали Basic не се включва в плана",
+        source_field: "FinancialAnalysisSubmission.has_employer_health_insurance"
       },
 
       // Нишови продукти — само upsale, не в стандартните планове

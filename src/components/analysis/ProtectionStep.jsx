@@ -1808,68 +1808,85 @@ export default function ProtectionStep({ data, onChange, showErrors, plannerData
       </div>
 
       {/* Employer Health Insurance */}
-      <div className="bg-slate-50 rounded-xl p-6 space-y-4">
-        <div className="flex items-center justify-between">
-          <div>
-            <p className="font-medium text-slate-900">Работодателска здравна застраховка</p>
-            <p className="text-sm text-slate-500 mt-0.5">Имате ли здравна застраховка от работодателя?</p>
-          </div>
-          <div className="flex items-center gap-2">
-            <span className={cn("text-sm font-medium", !(data.has_employer_health_insurance ?? false) ? "text-red-600" : "text-slate-400")}>не</span>
-            <button
-              type="button"
-              onClick={() => {
-                const newVal = !(data.has_employer_health_insurance ?? false);
-                onChange('has_employer_health_insurance', newVal);
-                if (!newVal) onChange('employer_health_insurer', '');
-              }}
-              className={cn(
-                "w-12 h-6 rounded-full transition-colors relative",
-                (data.has_employer_health_insurance ?? false) ? "bg-green-500" : "bg-red-500"
-              )}
-            >
-              <div className={cn(
-                "w-5 h-5 bg-white rounded-full absolute top-0.5 transition-all",
-                (data.has_employer_health_insurance ?? false) ? "left-6" : "left-0.5"
-              )} />
-            </button>
-            <span className={cn("text-sm font-medium", (data.has_employer_health_insurance ?? false) ? "text-green-600" : "text-slate-400")}>да</span>
-          </div>
-        </div>
-        {data.has_employer_health_insurance && (
-          <div className="space-y-3">
-            <div className="space-y-2">
-              <Label className="text-sm">Застраховател</Label>
-              <Combobox
-                options={[
-                  { value: 'doverіe', label: 'ЗК „Доверие" АД' },
-                  { value: 'nadezhda', label: 'ЗК „Надежда" АД' },
-                  { value: 'dzi_oz', label: 'ЗК „ДЗИ – ОЗ" АД (ДЗИ)' },
-                  { value: 'euroins_health', label: 'ЗД „Евроинс – Здравноосигуряване" АД' },
-                  { value: 'medico21', label: 'ЗК „Медико-21" АД' },
-                  { value: 'zoi', label: 'ЗК Здравноосигурителен институт АД' },
-                  { value: 'dallbogg_health', label: 'ЗЕАД „Дал Богг Живот и Здраве"' },
-                  { value: 'bulstrad_health', label: 'ЗК „Булстрад"' },
-                  { value: 'obshtinska', label: 'ЗК Общинска здравно-осигурителна каса' },
-                  { value: 'fi_health', label: 'ЗК „Фи Хелт"' },
-                  { value: 'uniqa_life', label: 'ЗК „Уника Живот" АД' },
-                  { value: 'saglasie', label: 'ЗК „Съгласие"' },
-                  { value: 'generali_hospital', label: 'ЗК „Дженерали – Болнична помощ"' },
-                  { value: 'bulgaria_ins', label: 'ЗК „България Иншурънс" АД' },
-                  { value: 'unknown', label: 'Не знам, ще проверя' },
-                ]}
-                value={data.employer_health_insurer || ''}
-                onValueChange={(value) => onChange('employer_health_insurer', value)}
-                placeholder="Търси застраховател..."
-                searchPlaceholder="Търси..."
-                emptyText="Няма намерен застраховател."
-                triggerClassName="rounded-lg"
-              />
-            </div>
+      {(() => {
+        const HEALTH_INSURERS = [
+          { value: 'doverie', label: 'ЗК „Доверие" АД' },
+          { value: 'nadezhda', label: 'ЗК „Надежда" АД' },
+          { value: 'dzi_oz', label: 'ЗК „ДЗИ – ОЗ" АД (ДЗИ)' },
+          { value: 'euroins_health', label: 'ЗД „Евроинс – Здравноосигуряване" АД' },
+          { value: 'medico21', label: 'ЗК „Медико-21" АД' },
+          { value: 'zoi', label: 'ЗК Здравноосигурителен институт АД' },
+          { value: 'dallbogg_health', label: 'ЗЕАД „Дал Богг Живот и Здраве"' },
+          { value: 'bulstrad_health', label: 'ЗК „Булстрад"' },
+          { value: 'obshtinska', label: 'ЗК Общинска здравно-осигурителна каса' },
+          { value: 'fi_health', label: 'ЗК „Фи Хелт"' },
+          { value: 'uniqa_life', label: 'ЗК „Уника Живот" АД' },
+          { value: 'saglasie', label: 'ЗК „Съгласие"' },
+          { value: 'generali_hospital', label: 'ЗК „Дженерали – Болнична помощ"' },
+          { value: 'bulgaria_ins', label: 'ЗК „България Иншурънс" АД' },
+          { value: 'unknown', label: 'Не знам, ще проверя' },
+        ];
+        const clientName = [data.client_first_name, data.client_last_name].filter(Boolean).join(' ') || 'Клиент';
+        const partnerName = [data.partner_first_name, data.partner_last_name].filter(Boolean).join(' ') || 'Партньор';
 
+        const HealthInsuranceRow = ({ label, fieldHas, fieldInsurer }) => (
+          <div className="space-y-3">
+            <div className="flex items-center justify-between">
+              <p className="font-medium text-slate-800">{label}</p>
+              <div className="flex items-center gap-2">
+                <span className={cn("text-sm font-medium", !(data[fieldHas] ?? false) ? "text-red-600" : "text-slate-400")}>не</span>
+                <button
+                  type="button"
+                  onClick={() => {
+                    const newVal = !(data[fieldHas] ?? false);
+                    onChange(fieldHas, newVal);
+                    if (!newVal) onChange(fieldInsurer, '');
+                  }}
+                  className={cn("w-12 h-6 rounded-full transition-colors relative", (data[fieldHas] ?? false) ? "bg-green-500" : "bg-red-500")}
+                >
+                  <div className={cn("w-5 h-5 bg-white rounded-full absolute top-0.5 transition-all", (data[fieldHas] ?? false) ? "left-6" : "left-0.5")} />
+                </button>
+                <span className={cn("text-sm font-medium", (data[fieldHas] ?? false) ? "text-green-600" : "text-slate-400")}>да</span>
+              </div>
+            </div>
+            {data[fieldHas] && (
+              <div className="space-y-1">
+                <Label className="text-xs text-slate-500">Застраховател</Label>
+                <Combobox
+                  options={HEALTH_INSURERS}
+                  value={data[fieldInsurer] || ''}
+                  onValueChange={(value) => onChange(fieldInsurer, value)}
+                  placeholder="Търси застраховател..."
+                  searchPlaceholder="Търси..."
+                  emptyText="Няма намерен застраховател."
+                  triggerClassName="rounded-lg"
+                />
+              </div>
+            )}
           </div>
-        )}
-      </div>
+        );
+
+        return (
+          <div className="bg-slate-50 rounded-xl p-6 space-y-4">
+            <p className="font-medium text-slate-900">Работодателска здравна застраховка</p>
+            <HealthInsuranceRow
+              label={clientName}
+              fieldHas="has_employer_health_insurance"
+              fieldInsurer="employer_health_insurer"
+            />
+            {data.include_partner && (
+              <>
+                <div className="border-t border-slate-200" />
+                <HealthInsuranceRow
+                  label={partnerName}
+                  fieldHas="partner_has_employer_health_insurance"
+                  fieldInsurer="partner_employer_health_insurer"
+                />
+              </>
+            )}
+          </div>
+        );
+      })()}
 
       {/* Include income protection in plan */}
       <label className="flex items-center gap-3 p-4 rounded-xl border-2 border-blue-200 bg-blue-50 cursor-pointer">

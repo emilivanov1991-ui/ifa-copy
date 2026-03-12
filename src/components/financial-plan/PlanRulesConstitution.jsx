@@ -1341,12 +1341,8 @@ export const PLAN_CONSTITUTION = {
         include_when: "remaining_budget >= total_uniqa_premium",
         budget_check: "remaining_budget = budget_ceiling_annual - metlife_annual_premium",
         on_insufficient_budget: "skip — не се включва, не се намалява",
-        skip_per_person: {
-          client: "has_employer_health_insurance === true",
-          partner: "partner_has_employer_health_insurance === true",
-          children: "NEVER — децата ВИНАГИ получават Уника, независимо от работодателските застраховки на родителите"
-        },
-        skip_rationale: "Изключването е индивидуално — само лицето с работодателска здравна застраховка се пропуска. Децата винаги получават Уника."
+        skip_if_employer_health_insurance: false,
+        skip_rationale: "Уника Здраве и Ценност Селект НЕ е допълнително здравно застраховане — покрива критични заболявания и здравна ценност. Работодателската здравна застраховка НЕ е причина да се пропуска. Включва се ВИНАГИ за клиент, партньор и деца."
       },
 
       // Включва се ако остатъкът от бюджета стига след Уника

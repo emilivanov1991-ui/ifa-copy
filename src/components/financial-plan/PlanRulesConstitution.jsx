@@ -570,6 +570,55 @@ export const PLAN_CONSTITUTION = {
     },
 
     /**
+     * ИЗЧИСЛЯВАНЕ НА ПОКРИТИЯ ПТН И 40 ЗАБОЛЯВАНИЯ ПРИ UL
+     * Статус: ✅ ПОТВЪРДЕНО
+     *
+     * Стъпка 1 — Изчисляване по формула:
+     *   PTN = CEILING( PV(4%/12, (65-age)*12) × (net_income - state_disability) × 1.2, 100 )
+     *   CI40 = (net_income - state_disability) × 24
+     *
+     * Стъпка 2 — Проверка дали цената на покритията се побира в бюджета:
+     *   totalCoverages = cost(PTN) + cost(CI40) + cost(fractures_1500) + cost(telemedicine)
+     *   Ако totalCoverages > budget_ceiling_annual → намаляване пропорционално:
+     *     scale_factor = available_for_coverages / totalCoverages
+     *     всяко покритие *= scale_factor
+     *
+     * Стъпка 3 — ПРАВИЛО 40%: Застраховките не трябва да надвишават 40% от (застраховки + инвестиция).
+     *   Проверка: totalCoverages / (totalCoverages + annualSavings) ≤ 0.40
+     *
+     *   Тъй като annualSavings = f(totalCoverages) (вж. ul_annual_savings_formula),
+     *   максималното допустимо покритие се изчислява алгебрично:
+     *
+     *   С "Отказ от премия" (waiver включен):
+     *     C_max = 0.40 × (budget_ceiling_annual - 15) / (1 + waiverRate)
+     *     При I рисков клас: C_max = 0.40 × (budget_ceiling_annual - 15) / 1.0438
+     *
+     *   Без "Отказ от премия":
+     *     C_max = 0.40 × (budget_ceiling_annual - 15)
+     *
+     *   Ако totalCoverages > C_max → намаляване пропорционално:
+     *     scale_factor = C_max / totalCoverages
+     *     PTN *= scale_factor, CI40 *= scale_factor (закръглени до 100 €)
+     *     fractures и telemedicine са фиксирани — не се намаляват
+     *
+     * Следствие: annualSavings винаги ≥ 60% от инвестируемата база.
+     */
+    ul_coverage_sizing: {
+      ptn_formula: "CEILING( PV(4%/12, (65-age)*12) * (net_income - state_disability_benefit) * 1.2, 100 )",
+      ci40_formula: "(net_income - state_disability_benefit) * 24",
+      step2_budget_check: "scale proportionally if totalCoverages > budget",
+      step3_40pct_rule: {
+        condition: "totalCoverages / (totalCoverages + annualSavings) > 0.40",
+        c_max_with_waiver:
+          "0.40 * (budget_ceiling_annual - 15) / (1 + waiverRate)",
+        c_max_without_waiver:
+          "0.40 * (budget_ceiling_annual - 15)",
+        action: "scale PTN and CI40 proportionally to C_max; fractures and telemedicine are fixed",
+        rounding: "round to nearest 100 EUR"
+      }
+    },
+
+    /**
      * ИНТЕГРИРАНО ПОКРИТИЕ ЖИВОТ ПРИ UL (автоматичен план)
      * Статус: ✅ ПОТВЪРДЕНО
      *

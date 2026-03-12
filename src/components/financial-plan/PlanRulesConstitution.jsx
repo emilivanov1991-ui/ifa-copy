@@ -61,8 +61,11 @@ export const PLAN_CONSTITUTION = {
         coverage_basis: "full_refinanced_amount"
       },
 
-      // Избор на "най-подходящ" кредит — ПРЕДСТОИ ИЗЯСНЯВАНЕ (въпрос 1.1.3)
-      best_product_selection_criteria: "PENDING",
+      // Избор на "най-подходящ" кредит — ПРАВИЛО 1.1.3
+      // Критерий: най-ниска месечна вноска (независимо от лихвения процент)
+      // Предпочитание: оферта БЕЗ банкова застраховка живот (за да може да се добави Credit Guard)
+      // Ако всички оферти включват банкова застраховка → избира се пак най-ниската вноска
+      best_product_selection_criteria: "lowest_monthly_payment_prefer_no_bank_life_insurance",
 
       // Без оптимизация — ПРЕДСТОИ ИЗЯСНЯВАНЕ (въпрос 1.1.4)
       no_optimization_handling: "PENDING"

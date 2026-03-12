@@ -1808,17 +1808,21 @@ export default function ProtectionStep({ data, onChange, showErrors, plannerData
       </div>
 
       {/* Employer Health Insurance */}
-      <div className="bg-slate-50 rounded-xl p-6">
+      <div className="bg-slate-50 rounded-xl p-6 space-y-4">
         <div className="flex items-center justify-between">
           <div>
             <p className="font-medium text-slate-900">Работодателска здравна застраховка</p>
-            <p className="text-sm text-slate-500 mt-0.5">Имате ли групова здравна застраховка от работодателя?</p>
+            <p className="text-sm text-slate-500 mt-0.5">Имате ли здравна застраховка от работодателя?</p>
           </div>
           <div className="flex items-center gap-2">
             <span className={cn("text-sm font-medium", !(data.has_employer_health_insurance ?? false) ? "text-red-600" : "text-slate-400")}>не</span>
             <button
               type="button"
-              onClick={() => onChange('has_employer_health_insurance', !(data.has_employer_health_insurance ?? false))}
+              onClick={() => {
+                const newVal = !(data.has_employer_health_insurance ?? false);
+                onChange('has_employer_health_insurance', newVal);
+                if (!newVal) onChange('employer_health_insurer', '');
+              }}
               className={cn(
                 "w-12 h-6 rounded-full transition-colors relative",
                 (data.has_employer_health_insurance ?? false) ? "bg-green-500" : "bg-red-500"
@@ -1833,9 +1837,39 @@ export default function ProtectionStep({ data, onChange, showErrors, plannerData
           </div>
         </div>
         {data.has_employer_health_insurance && (
-          <p className="mt-3 text-sm text-amber-700 bg-amber-50 border border-amber-200 rounded-lg px-4 py-2">
-            Дженерали Health Line Basic няма да бъде включен в плана, за да не се дублира покритието.
-          </p>
+          <div className="space-y-3">
+            <div className="space-y-2">
+              <Label className="text-sm">Застраховател</Label>
+              <Combobox
+                options={[
+                  { value: 'doverіe', label: 'ЗК „Доверие" АД' },
+                  { value: 'nadezhda', label: 'ЗК „Надежда" АД' },
+                  { value: 'dzi_oz', label: 'ЗК „ДЗИ – ОЗ" АД (ДЗИ)' },
+                  { value: 'euroins_health', label: 'ЗД „Евроинс – Здравноосигуряване" АД' },
+                  { value: 'medico21', label: 'ЗК „Медико-21" АД' },
+                  { value: 'zoi', label: 'ЗК Здравноосигурителен институт АД' },
+                  { value: 'dallbogg_health', label: 'ЗЕАД „Дал Богг Живот и Здраве"' },
+                  { value: 'bulstrad_health', label: 'ЗК „Булстрад"' },
+                  { value: 'obshtinska', label: 'ЗК Общинска здравно-осигурителна каса' },
+                  { value: 'fi_health', label: 'ЗК „Фи Хелт"' },
+                  { value: 'uniqa_life', label: 'ЗК „Уника Живот" АД' },
+                  { value: 'saglasie', label: 'ЗК „Съгласие"' },
+                  { value: 'generali_hospital', label: 'ЗК „Дженерали – Болнична помощ"' },
+                  { value: 'bulgaria_ins', label: 'ЗК „България Иншурънс" АД' },
+                  { value: 'unknown', label: 'Не знам, ще проверя' },
+                ]}
+                value={data.employer_health_insurer || ''}
+                onValueChange={(value) => onChange('employer_health_insurer', value)}
+                placeholder="Търси застраховател..."
+                searchPlaceholder="Търси..."
+                emptyText="Няма намерен застраховател."
+                triggerClassName="rounded-lg"
+              />
+            </div>
+            <p className="text-sm text-amber-700 bg-amber-50 border border-amber-200 rounded-lg px-4 py-2">
+              Дженерали Health Line Basic и Уника Здраве и Ценност няма да бъдат включени в плана, за да не се дублира покритието.
+            </p>
+          </div>
         )}
       </div>
 

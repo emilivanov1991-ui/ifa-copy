@@ -917,6 +917,114 @@ export const PLAN_CONSTITUTION = {
     },
 
     /**
+     * ══════════════════════════════════════════════════════════════
+     * ИНВЕСТИЦИОННИ ЦЕЛИ — АЛГОРИТМИ ЗА КАЛКУЛАЦИЯ
+     * Статус: ✅ ПОТВЪРДЕНО
+     * ══════════════════════════════════════════════════════════════
+     *
+     * ─────────────────────────────────────────
+     * ЦЕЛ 1: ОБРАЗОВАНИЕ НА ДЕЦА (MetLife Junior)
+     * ─────────────────────────────────────────
+     * ВАЖНО: ⚠️ Целта е детето да има сумата когато навърши 20 г. (НЕ 19!)
+     *
+     * СТЪПКА 1 — Изчисли нуждата на дете:
+     *   gap_per_child = (education_goal_total - existing_education_savings) / children_count
+     *   horizon_years = 20 - child_age
+     *
+     * СТЪПКА 2 — Намери годишната вноска за Junior итеративно:
+     *   За всяка кандидат-вноска P:
+     *     - Определи premium_bonus% от premium_bonus_table (по P)
+     *     - Определи av_charge% от av_charge_table (по P)
+     *     - effective_annual_contribution = P × (1 + premium_bonus / 100)
+     *     - net_annual_return = 0.08 - av_charge / 100
+     *     - Симулирай година по година:
+     *         balance[0] = 0
+     *         balance[y] = (balance[y-1] + effective_annual_contribution) × (1 + net_annual_return)
+     *     - Провери: balance[horizon_years] >= gap_per_child
+     *
+     * СТЪПКА 3 — Snap to nearest premium bonus threshold:
+     *   Ако изчисленото P е между 1 800 и 2 999 → провери дали P ≥ 1 800 (bonus 2%)
+     *   Ако изчисленото P е близо до 3 000 (разлика < ~10%) → вдигни до 3 000 (bonus 3%)
+     *   Пример: Георги (4 г.) → изчислено 2 950 € → snap до 3 000 € за 3% бонус
+     *
+     * ─────────────────────────────────────────
+     * ЦЕЛ 2: ПЕНСИЯ (MetLife Unit Linked)
+     * ─────────────────────────────────────────
+     * ПАРАМЕТРИ (фиксирани):
+     *   retirement_age = 65
+     *   inflation_rate = 3% годишно (0.03/12 месечно = g)
+     *   post_retirement_return = 4% годишно (0.04/12 месечно = r)
+     *   withdrawal_count = 240 месеца (20 години след пенсия)
+     *
+     * СТЪПКА 1 — Нужна консумация към днешна дата:
+     *   monthly_consumption = total_monthly_income - financial_market_monthly
+     *   (т.е. само разходите за живот без ипотеки, инвестиции, спестявания)
+     *
+     * СТЪПКА 2 — Оставащи години до пенсия:
+     *   При ЕДИНИЧЕН клиент: years_to_retirement = 65 - client_age
+     *   При ДВОЙКА: years_to_retirement = 65 - AVERAGE(client_age, partner_age)
+     *
+     * СТЪПКА 3 — Очаквана държавна пенсия:
+     *   state_pension_total = SUM(client_expected_state_pension, partner_expected_state_pension)
+     *
+     * СТЪПКА 4 — Първо теглене (инфлационно към пенсия):
+     *   first_withdrawal = FV(3%/12, years_to_retirement * 12, 0, -monthly_consumption) - state_pension_total
+     *   // FV = monthly_consumption × (1 + 0.03/12)^(years * 12)
+     *
+     * СТЪПКА 5 — Нужен корпус при пенсиониране (growing annuity PV):
+     *   r = 0.04 / 12   // месечна доходност след пенсия
+     *   g = 0.03 / 12   // месечна инфлация
+     *   required_corpus = first_withdrawal / (r - g) × [1 - ((1 + g) / (1 + r))^240]
+     *
+     *   ✅ Верификация: monthly_consumption=6000€, years=32, state_pension=3478€
+     *   → first_withdrawal = 6000×(1.0025)^384 - 3478 = 11 972.50€
+     *   → corpus = 11972.50 / 0.000833 × [1 - (1.0025/1.003333)^240] ≈ 2 600 000€
+     *
+     * СТЪПКА 6 — Намери годишната UL вноска итеративно:
+     *   За клиент и партньор (всеки поотделно): target = required_corpus / 2
+     *   За всяка кандидат-вноска P:
+     *     - Определи premium_bonus% и av_charge% от таблиците
+     *     - Симулирай UL проекция до 65 г.:
+     *         effective = P × (1 + premium_bonus / 100)
+     *         net_return = assumed_return - av_charge / 100  // assumed_return = 8%
+     *         balance[y] = (balance[y-1] + effective) × (1 + net_return)
+     *     - Провери: balance[years_to_retirement] >= target
+     *   Ако е невъзможно в рамките на бюджета → доближи максимално и отбележи shortfall
+     *
+     * ─────────────────────────────────────────
+     * ОПТИМИЗАЦИЯ НА ИНВЕСТИЦИОННОТО РАЗПРЕДЕЛЕНИЕ
+     * ─────────────────────────────────────────
+     * ЛОГИКА:
+     *   1. Изчисли нужните вноски за пенсия (клиент + партньор) и образование (всяко дете)
+     *   2. Сумирай: total_investment_needed = ul_client + ul_partner + Σ(junior_per_child)
+     *   3. Ако total_investment_needed <= investment_budget_remaining:
+     *      → Използвай точно нужните суми (не е нужно да се достига таванът)
+     *   4. Ако total_investment_needed > investment_budget_remaining:
+     *      → Намали пропорционално или по приоритет:
+     *        a) Junior (образование) — намали от по-далечните хоризонти първо
+     *        b) UL (пенсия) — намали и двамата пропорционално
+     *        c) Отбележи shortfall в плана
+     *
+     * SNAP-TO-THRESHOLD ПРАВИЛО (при оптимизация нагоре):
+     *   Ако има оставащ бюджет и добавянето на разлика до следващия праг < 5% от бюджета
+     *   → Snap до следващия праг за по-добър bonus/av_charge:
+     *     Прагове за Premium Bonus: 1800, 3000, 4200 €/год.
+     *     Прагове за AV Charge: 720, 960, 1200, 1500, 2400, 3600 €/год.
+     *
+     * ASSUMED RETURN ЗА ПРОЕКЦИИ: 8% годишно (стандартен за MetLife)
+     */
+    investment_goals_algorithm: {
+      junior_target_age: 20,  // ⚠️ 20 г., НЕ 19!
+      pension_retirement_age: 65,
+      pension_inflation_rate: 0.03,
+      pension_post_retirement_return: 0.04,
+      pension_withdrawal_count: 240,
+      ul_assumed_return: 0.08,
+      years_to_retirement_couple: "AVERAGE(client_age, partner_age) → 65 - average",
+      years_to_retirement_single: "65 - client_age"
+    },
+
+    /**
      * ТАБЛИЦА Б: АДМИНИСТРАТИВНА ТАКСА ЗА УПРАВЛЕНИЕ (AV Charge)
      * Статус: ✅ ПОТВЪРДЕНО (от документ MetLife УЖ Общи условия, в сила от 02.12.2024)
      *

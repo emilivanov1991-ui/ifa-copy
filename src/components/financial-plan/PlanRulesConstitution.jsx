@@ -336,23 +336,29 @@ export const PLAN_CONSTITUTION = {
       // ДЕФИНИЦИЯ НА old_monthly_balance (преди оптимизация):
       // = total_monthly_income
       //   - SUM(expense_* полета)              → разходи за живот (храна, наем, гориво и т.н.)
+      //   - monthly_investments                → текущи редовни инвестиции на клиента
       //   - SUM(liability_*_monthly полета)    → текущи кредитни вноски
       //   - SUM(insurance_* полета)            → текущи застрахователни премии
       //
-      // ⚠️ monthly_savings_amount и monthly_investments НЕ се приспадат —
-      //    те са самият РЕЗУЛТАТ (балансът), а не отделен разход.
+      // Визуално (от схемата):
+      //   Доход
+      //   − Храна, наем, сметки и тн.   (expense_*)
+      //   − Инвестиции                  (monthly_investments)
+      //   − Заеми/Кредити               (liability_*_monthly)
+      //   − Застраховки                 (insurance_*)
+      //   ─────────────────────────────
+      //   = OLD MONTHLY BALANCE
       //
-      // Пример: доход 4 000 € − разходи 2 000 € − кредит 500 € − застраховки 100 € = 1 400 € баланс
+      // ⚠️ monthly_savings_amount НЕ се приспада отделно —
+      //    то е вторичен показател, не самостоятелна категория в схемата.
+      //
+      // Пример: доход 4 000 € − разходи 2 000 € − инвестиции 200 € − кредит 500 € − застраховки 100 € = 1 200 € баланс
       //
       // СЛЕД ОПТИМИЗАЦИЯ (кредит 500→450, застраховки 100→80):
-      // monthly_balance_after_optimization = 1 400 + 50 + 20 = 1 470 €
-      // Таван на плана (Режим А): 1 470 × 40% = 588 €
-      //
-      // Оптимизацията включва спестявания от:
-      //   1. Рефинансирани кредити (old_liabilities_monthly - new_liabilities_monthly)
-      //   2. Оптимизирани застраховки (old_insurance_monthly - new_insurance_monthly)
+      // monthly_balance_after_optimization = 1 200 + 50 + 20 = 1 270 €
+      // Таван на плана (Режим А): 1 270 × 40% = 508 €
       old_monthly_balance_formula:
-        "total_monthly_income - SUM(expense_*) - SUM(liability_*_monthly) - SUM(insurance_*)",
+        "total_monthly_income - SUM(expense_*) - monthly_investments - SUM(liability_*_monthly) - SUM(insurance_*)",
       monthly_balance_after_optimization_formula:
         "old_monthly_balance + (old_liabilities_monthly - new_liabilities_monthly) + (old_insurance_monthly - new_insurance_monthly)",
       excludes_new_loans: true,

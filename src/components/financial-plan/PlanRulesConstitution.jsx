@@ -1155,10 +1155,34 @@ export const PLAN_CONSTITUTION = {
        *   budget_for_pension   = MAX(0, investment_budget_remaining - budget_for_education)
        */
       investment_priority_on_shortfall: {
-        order: ["education_junior", "pension_ul"],
-        rationale: "По-кратък хоризонт при децата — забавянето е по-критично",
-        on_insufficient_for_education: "scale Junior proportionally across children",
-        on_insufficient_for_pension: "reduce UL proportionally for client and partner, mark shortfall"
+        /**
+         * СЦЕНАРИЙ 1 — Бюджетът не стига за пълно изпълнение на всички цели:
+         *   → Пропорционално намаляване на ВСИЧКИ цели (Junior + UL пенсия)
+         *   → И двете се включват в плана, но с по-малки вноски
+         *   → scale_factor = investment_budget_remaining / total_investment_needed
+         *   → junior_scaled = junior_needed * scale_factor (за всяко дете)
+         *   → ul_scaled = ul_needed * scale_factor (за клиент и партньор)
+         *
+         * СЦЕНАРИЙ 2 — Бюджетът е толкова малък, че не може да се направи
+         *   дори минимална вноска и за децата, и за клиентите (min = 300 €/год.):
+         *   → Приоритет: Образование (Junior) > Пенсия (UL)
+         *   → Junior се финансира първо (децата имат по-кратък хоризонт)
+         *   → UL пенсия не се включва, shortfall се отбелязва
+         *
+         * Минимална вноска за включване: 300 €/год. (25 €/месец) за всеки договор
+         */
+        scenario_1_proportional: {
+          condition: "investment_budget_remaining < total_investment_needed AND investment_budget_remaining >= min_viable_for_both",
+          action: "scale all goals proportionally",
+          formula: "scale_factor = investment_budget_remaining / total_investment_needed"
+        },
+        scenario_2_priority: {
+          condition: "investment_budget_remaining < min_viable_for_both",
+          action: "education first, then pension with remainder",
+          order: ["education_junior", "pension_ul"],
+          rationale: "При екстремно нисък бюджет — по-кратният хоризонт на децата е критичен"
+        },
+        min_annual_per_contract: 300
       },
 
       /**

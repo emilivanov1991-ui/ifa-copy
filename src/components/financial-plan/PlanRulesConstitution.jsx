@@ -270,11 +270,36 @@ export const PLAN_CONSTITUTION = {
      * ⚠️ ВАЖНО: Нови кредити НЕ се включват в тези проценти → виж Правило 6.1.4.7
      */
     plan_budget_ceilings: {
-      ceiling_1_formula: "total_monthly_income * 1.5 / 12",
-      ceiling_2_formula: "monthly_balance_after_optimization * 0.40",
+      /**
+       * ДВА РЕЖИМА — зависи дали резервът е вече изграден
+       *
+       * РЕЖИМ А (резервът НЕ е изграден):
+       *   Ceiling 1: total_monthly_income * 1.5 / 12
+       *   Ceiling 2: monthly_balance_after_optimization * 0.40
+       *   max_monthly_plan_budget = MIN(ceiling_1, ceiling_2)
+       *
+       * РЕЖИМ Б (резервът е вече изграден — existing_liquid_savings >= target_reserve):
+       *   Ceiling 1: total_monthly_income * 2.0 / 12
+       *   Ceiling 2: monthly_balance_after_optimization * 0.66
+       *   max_monthly_plan_budget = MIN(ceiling_1, ceiling_2)
+       *
+       * Условие за Режим Б: existing_liquid_savings >= 6 * (variable_expenses + new_liabilities_monthly)
+       */
+      mode_a_reserve_not_built: {
+        condition: "existing_liquid_savings < target_reserve",
+        ceiling_1_formula: "total_monthly_income * 1.5 / 12",
+        ceiling_2_formula: "monthly_balance_after_optimization * 0.40",
+        max_monthly_plan_budget: "MIN(ceiling_1, ceiling_2)"
+      },
+      mode_b_reserve_already_built: {
+        condition: "existing_liquid_savings >= target_reserve",
+        ceiling_1_formula: "total_monthly_income * 2.0 / 12",
+        ceiling_2_formula: "monthly_balance_after_optimization * 0.66",
+        max_monthly_plan_budget: "MIN(ceiling_1, ceiling_2)",
+        note: "По-висок таван при вече изграден резерв — клиентът може да поеме по-голям ангажимент"
+      },
       monthly_balance_after_optimization_formula:
         "old_monthly_balance + (old_liabilities_monthly - new_liabilities_monthly)",
-      max_monthly_plan_budget: "MIN(ceiling_1, ceiling_2)",
       excludes_new_loans: true,
       reference_for_loans: "Rule 6.1.4.7"
     },

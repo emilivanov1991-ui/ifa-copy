@@ -906,8 +906,62 @@ export const PLAN_CONSTITUTION = {
       },
       child_protection_agreement: {
         include: true
+      },
+      budget_integration: {
+        insurance_coverages: "calculated_together_with_ul_or_term_life_in_step1",
+        investment_component: "combined_with_ul_annual_savings_for_optimization",
+        note: "Инвестиционната вноска за Junior се разглежда заедно с UL инвестицията на клиент/партньор за целите на премийния бонус и таксата управление",
+        premium_bonus_applies: true,
+        av_charge_applies: true
       }
     },
+
+    /**
+     * ТАБЛИЦА Б: АДМИНИСТРАТИВНА ТАКСА ЗА УПРАВЛЕНИЕ (AV Charge)
+     * Статус: ✅ ПОТВЪРДЕНО (от документ MetLife УЖ Общи условия, в сила от 02.12.2024)
+     *
+     * Изчислява се като % от стойността на инвестиционната сметка (годишно)
+     * Прилага се ПО ДОГОВОР (клиент, партньор и junior — всеки поотделно)
+     *
+     * Годишна премия (€)  →  AV Charge (% годишно от сметката)
+     *   300  – 719   →  2.00%
+     *   720  – 959   →  1.75%
+     *   960  – 1199  →  1.50%
+     *   1200 – 1499  →  1.25%
+     *   1500 – 2399  →  1.00%
+     *   2400 – 3599  →  0.75%
+     *   3600+        →  0.50%
+     */
+    av_charge_table: [
+      { annual_premium_from: 300,  annual_premium_to: 719,  rate_pct: 2.00 },
+      { annual_premium_from: 720,  annual_premium_to: 959,  rate_pct: 1.75 },
+      { annual_premium_from: 960,  annual_premium_to: 1199, rate_pct: 1.50 },
+      { annual_premium_from: 1200, annual_premium_to: 1499, rate_pct: 1.25 },
+      { annual_premium_from: 1500, annual_premium_to: 2399, rate_pct: 1.00 },
+      { annual_premium_from: 2400, annual_premium_to: 3599, rate_pct: 0.75 },
+      { annual_premium_from: 3600, annual_premium_to: null, rate_pct: 0.50 }
+    ],
+
+    /**
+     * ТАБЛИЦА В: ПРЕМИЕН БОНУС
+     * Статус: ✅ ПОТВЪРДЕНО (от документ MetLife УЖ Общи условия, в сила от 02.12.2024)
+     *
+     * % от премията/вноската по основния договор, с който MetLife увеличава инвестиционната сметка
+     * Прилага се ПО ДОГОВОР (клиент, партньор и junior — всеки поотделно)
+     *
+     * Годишна премия (€)  →  Премиен бонус (% от годишната вноска)
+     *   1200 – 1799  →  1%
+     *   1800 – 2999  →  2%
+     *   3000 – 4199  →  3%
+     *   4200+        →  4%
+     *   (под 1200 €  →  0% — без бонус)
+     */
+    premium_bonus_table: [
+      { annual_premium_from: 1200, annual_premium_to: 1799, bonus_pct: 1 },
+      { annual_premium_from: 1800, annual_premium_to: 2999, bonus_pct: 2 },
+      { annual_premium_from: 3000, annual_premium_to: 4199, bonus_pct: 3 },
+      { annual_premium_from: 4200, annual_premium_to: null, bonus_pct: 4 }
+    ],
 
     /**
      * КРЕДИТ ГАРД — ПРАВИЛА

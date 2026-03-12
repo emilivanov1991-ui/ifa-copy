@@ -1340,7 +1340,10 @@ export const PLAN_CONSTITUTION = {
         note: "По една отделна полица за клиента, партньора и всяко дете. Достъпно за възраст 0–64 г. към датата на сключване.",
         include_when: "remaining_budget >= total_uniqa_premium",
         budget_check: "remaining_budget = budget_ceiling_annual - metlife_annual_premium",
-        on_insufficient_budget: "skip — не се включва, не се намалява"
+        on_insufficient_budget: "skip — не се включва, не се намалява",
+        skip_if_employer_health_insurance: true,
+        skip_condition: "has_employer_health_insurance === true",
+        skip_rationale: "Не се дублира покритие — ако клиентът вече има работодателска здравна застраховка, Уника Здраве и Ценност не се включва в плана"
       },
 
       // Включва се ако остатъкът от бюджета стига след Уника

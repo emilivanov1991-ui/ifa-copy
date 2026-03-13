@@ -1059,6 +1059,15 @@ export default function ProtectionStep({ data, onChange, showErrors, plannerData
                           required
                         />
                       </div>
+                      <div className="space-y-2 sm:col-span-2">
+                        <Label className="text-sm">Месечна сума по застраховката (€)</Label>
+                        <Input
+                          type="number" min="0"
+                          value={data.car_3_casco_monthly ?? ''}
+                          onChange={(e) => onChange('car_3_casco_monthly', e.target.value === '' ? '' : parseFloat(e.target.value))}
+                          className="rounded-lg w-40" placeholder="0"
+                        />
+                      </div>
                     </div>
                   )}
                 </div>

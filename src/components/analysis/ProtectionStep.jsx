@@ -845,6 +845,15 @@ export default function ProtectionStep({ data, onChange, showErrors, plannerData
                       triggerClassName={`rounded-lg ${data.has_car_2 && isFieldInvalid(data.car_2_go_insurer) ? 'border-red-500 bg-red-50' : ''}`}
                     />
                   </div>
+                  <div className="space-y-2">
+                    <Label className="text-sm">Месечна сума по застраховката (€)</Label>
+                    <Input
+                      type="number" min="0"
+                      value={data.car_2_go_monthly ?? ''}
+                      onChange={(e) => onChange('car_2_go_monthly', e.target.value === '' ? '' : parseFloat(e.target.value))}
+                      className="rounded-lg w-40" placeholder="0"
+                    />
+                  </div>
                 </div>
 
                 {/* Car 2 Casco */}

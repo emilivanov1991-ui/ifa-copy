@@ -117,6 +117,24 @@ export default function FinancialFlowStep({ data, onChange, showErrors, plannerD
     }
   }, [data.current_mortgage_monthly_payment, data.current_mortgage_remaining, data.current_mortgage_remaining_years, data.current_mortgage_interest_rate, data.liability_mortgage_monthly, data.liability_mortgage_remaining, data.liability_mortgage_remaining_months, data.liability_mortgage_interest_rate]);
 
+  // Auto-populate insurance_civil from GO monthly sums
+  useEffect(() => {
+    const go1 = data.has_car_1 ? (data.car_1_go_monthly || 0) : 0;
+    const go2 = data.has_car_2 ? (data.car_2_go_monthly || 0) : 0;
+    const go3 = data.has_car_3 ? (data.car_3_go_monthly || 0) : 0;
+    const total = go1 + go2 + go3;
+    if (total > 0) onChange('insurance_civil', total);
+  }, [data.has_car_1, data.car_1_go_monthly, data.has_car_2, data.car_2_go_monthly, data.has_car_3, data.car_3_go_monthly]);
+
+  // Auto-populate insurance_casco from Casco monthly sums
+  useEffect(() => {
+    const c1 = data.has_car_1 && data.car_1_has_casco ? (data.car_1_casco_monthly || 0) : 0;
+    const c2 = data.has_car_2 && data.car_2_has_casco ? (data.car_2_casco_monthly || 0) : 0;
+    const c3 = data.has_car_3 && data.car_3_has_casco ? (data.car_3_casco_monthly || 0) : 0;
+    const total = c1 + c2 + c3;
+    if (total > 0) onChange('insurance_casco', total);
+  }, [data.has_car_1, data.car_1_has_casco, data.car_1_casco_monthly, data.has_car_2, data.car_2_has_casco, data.car_2_casco_monthly, data.has_car_3, data.car_3_has_casco, data.car_3_casco_monthly]);
+
   // Auto-populate insurance_property from property insurance monthly sums
   useEffect(() => {
     const p1 = data.property_1_has_insurance ? (data.property_1_insurance_monthly || 0) : 0;

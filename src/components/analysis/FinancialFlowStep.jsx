@@ -117,6 +117,21 @@ export default function FinancialFlowStep({ data, onChange, showErrors, plannerD
     }
   }, [data.current_mortgage_monthly_payment, data.current_mortgage_remaining, data.current_mortgage_remaining_years, data.current_mortgage_interest_rate, data.liability_mortgage_monthly, data.liability_mortgage_remaining, data.liability_mortgage_remaining_months, data.liability_mortgage_interest_rate]);
 
+  // Auto-populate insurance_property from property insurance monthly sums
+  useEffect(() => {
+    const p1 = data.property_1_has_insurance ? (data.property_1_insurance_monthly || 0) : 0;
+    const p2 = data.has_property_2 && data.property_2_has_insurance ? (data.property_2_insurance_monthly || 0) : 0;
+    const p3 = data.has_property_3 && data.property_3_has_insurance ? (data.property_3_insurance_monthly || 0) : 0;
+    const total = p1 + p2 + p3;
+    if (total > 0) {
+      onChange('insurance_property', total);
+    }
+  }, [
+    data.property_1_has_insurance, data.property_1_insurance_monthly,
+    data.has_property_2, data.property_2_has_insurance, data.property_2_insurance_monthly,
+    data.has_property_3, data.property_3_has_insurance, data.property_3_insurance_monthly
+  ]);
+
   // Auto-populate fields with default 0 if undefined
   useEffect(() => {
     // Client income fields

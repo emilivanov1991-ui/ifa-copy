@@ -118,8 +118,8 @@ export default function InstinctHomeCalculator({ initialData = {}, onSave, analy
 
         <TabsContent value="comparison" className="mt-6">
           <InstinctHomePackageComparison 
-            customSum={customSum}
-            onCustomSumChange={setCustomSum}
+            customSumEUR={customSum}
+            onCustomSumEURChange={setCustomSum}
           />
         </TabsContent>
 

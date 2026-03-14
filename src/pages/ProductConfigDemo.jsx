@@ -255,15 +255,7 @@ export default function ProductConfigDemo() {
               </TabsContent>
 
               <TabsContent value="casco">
-                <DZICascoCalculator 
-                  carData={{
-                    brand: 'BMW',
-                    model: 'X5',
-                    year: 2020,
-                    valueEUR: 45000,
-                    hasCasco: false
-                  }}
-                />
+                <DZICascoCalculator />
               </TabsContent>
 
               <TabsContent value="go">

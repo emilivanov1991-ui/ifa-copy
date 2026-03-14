@@ -21,28 +21,30 @@ import InstinctHomePackageComparison from './InstinctHomePackageComparison';
 
 export default function InstinctHomeCalculator({ initialData = {}, onSave, analysisId, clientId }) {
   const [saving, setSaving] = useState(false);
-  const [customSum, setCustomSum] = useState(500000);
+  const [customSum, setCustomSum] = useState(76530); // ~150000 BGN in EUR
   const [formData, setFormData] = useState({
     clientName: initialData.clientName || '',
     address: initialData.address || '',
     packageType: initialData.packageType || 'Пакет 2',
-    customSum: initialData.customSum || 100000,
-    currency: initialData.currency || 'BGN',
+    customSumEUR: initialData.customSumEUR || 51020, // ~100000 BGN in EUR
     includeSport: initialData.includeSport || false,
     includeRelocation: initialData.includeRelocation || false
   });
+  
+  const toEUR = (bgn) => Math.round(bgn / 1.96);
 
-  // Calculate premium
+  // Calculate premium (custom sum stored in EUR, converted to BGN for engine)
   const result = useMemo(() => {
     const options = {
       includeSport: formData.includeSport,
       includeRelocation: formData.includeRelocation
     };
     if (formData.packageType === 'Персонализиран') {
-      return calculateInstinctHomePremium(formData.customSum, 'custom', options);
+      const bgnSum = Math.round(formData.customSumEUR * 1.96);
+      return calculateInstinctHomePremium(bgnSum, 'custom', options);
     }
     return calculateInstinctHomePremium(0, formData.packageType, options);
-  }, [formData.packageType, formData.customSum, formData.includeSport, formData.includeRelocation]);
+  }, [formData.packageType, formData.customSumEUR, formData.includeSport, formData.includeRelocation]);
 
   // Get coverage details
   const coverageDetails = useMemo(() => {
@@ -68,9 +70,9 @@ export default function InstinctHomeCalculator({ initialData = {}, onSave, analy
         product_name: 'Закрила на дома',
         product_type: 'property_insurance',
         beneficiary_name: formData.clientName,
-        monthly_premium: formData.currency === 'EUR' ? result.monthlyPremiumEUR : result.monthlyPremiumBGN,
-        annual_premium: formData.currency === 'EUR' ? result.annualPremiumEUR : result.annualPremiumBGN,
-        coverage_amount: result.sumInsured,
+        monthly_premium: result.monthlyPremiumEUR,
+        annual_premium: result.annualPremiumEUR,
+        coverage_amount: toEUR(result.sumInsured),
         offer_status: 'generated',
         ai_recommendation_reason: `Имуществена застраховка ${formData.packageType} - всички рискове`
       });
@@ -164,9 +166,9 @@ export default function InstinctHomeCalculator({ initialData = {}, onSave, analy
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="Пакет 1">Пакет 1 (50,000 EUR)</SelectItem>
-                    <SelectItem value="Пакет 2">Пакет 2 (100,000 EUR)</SelectItem>
-                    <SelectItem value="Пакет 3">Пакет 3 (150,000 EUR)</SelectItem>
+                    <SelectItem value="Пакет 1">Пакет 1 (25,510 €)</SelectItem>
+                    <SelectItem value="Пакет 2">Пакет 2 (51,020 €)</SelectItem>
+                    <SelectItem value="Пакет 3">Пакет 3 (76,531 €)</SelectItem>
                     <SelectItem value="Персонализиран">Персонализиран</SelectItem>
                   </SelectContent>
                 </Select>
@@ -174,34 +176,21 @@ export default function InstinctHomeCalculator({ initialData = {}, onSave, analy
 
               {formData.packageType === 'Персонализиран' && (
                 <div>
-                  <Label>Застрахователна сума (BGN)</Label>
+                  <Label>Застрахователна сума (EUR)</Label>
                   <Input 
                     type="number"
-                    value={formData.customSum}
-                    onChange={(e) => handleInputChange('customSum', parseInt(e.target.value) || 0)}
-                    min={50000}
-                    max={500000}
-                    step={1000}
+                    value={formData.customSumEUR}
+                    onChange={(e) => handleInputChange('customSumEUR', parseInt(e.target.value) || 0)}
+                    min={25510}
+                    max={255102}
+                    step={500}
                     className="mt-2"
                   />
                   <p className="text-xs text-slate-500 mt-1">
-                    От 50,000 до 500,000 BGN (≈ 25,500 до 255,000 EUR)
+                    От 25,510 до 255,102 €
                   </p>
                 </div>
               )}
-
-              <div>
-                <Label>Валута за показване</Label>
-                <Select value={formData.currency} onValueChange={(v) => handleInputChange('currency', v)}>
-                  <SelectTrigger className="mt-2">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="BGN">BGN (Лева)</SelectItem>
-                    <SelectItem value="EUR">EUR (Евро)</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
 
               <div className="space-y-2 pt-2 border-t">
                 <div className="flex items-center gap-2">
@@ -251,16 +240,10 @@ export default function InstinctHomeCalculator({ initialData = {}, onSave, analy
                   <div className="bg-gradient-to-br from-purple-50 to-purple-100 rounded-xl p-6 border border-purple-200">
                     <p className="text-sm text-slate-600 mb-2">Годишна премия</p>
                     <p className="text-4xl font-bold text-purple-600">
-                      {formData.currency === 'EUR' 
-                        ? `${result.annualPremiumEUR.toFixed(2)} €`
-                        : `${result.annualPremiumBGN.toFixed(2)} лв`
-                      }
+                      {result.annualPremiumEUR.toFixed(2)} €
                     </p>
                     <p className="text-sm text-slate-500 mt-2">
-                      или {formData.currency === 'EUR' 
-                        ? `${result.monthlyPremiumEUR} €/месец`
-                        : `${result.monthlyPremiumBGN} лв/месец`
-                      }
+                      или {result.monthlyPremiumEUR} €/месец
                     </p>
                   </div>
 
@@ -271,16 +254,16 @@ export default function InstinctHomeCalculator({ initialData = {}, onSave, analy
                       <div className="text-center p-3 bg-white rounded-lg">
                         <p className="text-xs text-slate-500 mb-1">Недвижимо имущество</p>
                         <p className="text-lg font-bold text-blue-600">
-                          {result.immovable?.toLocaleString() || 0} <span className="text-sm">BGN</span>
-                        </p>
-                        <p className="text-xs text-slate-400">85%</p>
-                      </div>
-                      <div className="text-center p-3 bg-white rounded-lg">
-                        <p className="text-xs text-slate-500 mb-1">Движимо имущество</p>
-                        <p className="text-lg font-bold text-purple-600">
-                          {result.movable?.toLocaleString() || 0} <span className="text-sm">BGN</span>
-                        </p>
-                        <p className="text-xs text-slate-400">15%</p>
+                           {toEUR(result.immovable || 0).toLocaleString()} <span className="text-sm">€</span>
+                          </p>
+                          <p className="text-xs text-slate-400">85%</p>
+                        </div>
+                        <div className="text-center p-3 bg-white rounded-lg">
+                          <p className="text-xs text-slate-500 mb-1">Движимо имущество</p>
+                          <p className="text-lg font-bold text-purple-600">
+                            {toEUR(result.movable || 0).toLocaleString()} <span className="text-sm">€</span>
+                          </p>
+                          <p className="text-xs text-slate-400">15%</p>
                       </div>
                     </div>
                   </div>
@@ -289,12 +272,7 @@ export default function InstinctHomeCalculator({ initialData = {}, onSave, analy
                   <div className="space-y-2 text-sm border-t pt-4">
                     <div className="flex justify-between">
                       <span className="text-slate-600">Застрахователна сума:</span>
-                      <span className="font-medium">
-                        {result.sumInsured.toLocaleString()} BGN
-                        <span className="text-xs text-slate-400 ml-1">
-                          (≈ {Math.round(result.sumInsured / EUR_BGN_RATE).toLocaleString()} EUR)
-                        </span>
-                      </span>
+                      <span className="font-medium">{toEUR(result.sumInsured).toLocaleString()} €</span>
                     </div>
                     <div className="flex justify-between">
                       <span className="text-slate-600">Пакет:</span>
@@ -314,61 +292,61 @@ export default function InstinctHomeCalculator({ initialData = {}, onSave, analy
           {result?.eligible && result?.coverages && (
             <Card className="shadow-lg">
               <CardHeader className="bg-gradient-to-r from-green-50 to-blue-50 py-4">
-                <CardTitle className="text-base text-green-800 font-semibold">Лимити на покритие (BGN)</CardTitle>
+                <CardTitle className="text-base text-green-800 font-semibold">Лимити на покритие (€)</CardTitle>
               </CardHeader>
               <CardContent className="pt-4">
                 <div className="space-y-2 text-xs">
                   {/* Пожар */}
                   <div className="grid grid-cols-3 gap-2 py-1.5 border-b items-center">
                     <span className="text-slate-700 font-medium">Пожар:</span>
-                    <span className="text-right text-blue-600">{Math.round(result.coverages.fire_immovable || 0).toLocaleString()}</span>
-                    <span className="text-right text-purple-600">{Math.round(result.coverages.fire_movable || 0).toLocaleString()}</span>
+                    <span className="text-right text-blue-600">{toEUR(result.coverages.fire_immovable || 0).toLocaleString()} €</span>
+                    <span className="text-right text-purple-600">{toEUR(result.coverages.fire_movable || 0).toLocaleString()} €</span>
                   </div>
                   
                   {/* Вода */}
                   <div className="grid grid-cols-3 gap-2 py-1.5 border-b items-center">
                     <span className="text-slate-700 font-medium">Вода:</span>
-                    <span className="text-right text-blue-600">{Math.round(result.coverages.water_immovable || 0).toLocaleString()}</span>
-                    <span className="text-right text-purple-600">{Math.round(result.coverages.water_movable || 0).toLocaleString()}</span>
+                    <span className="text-right text-blue-600">{toEUR(result.coverages.water_immovable || 0).toLocaleString()} €</span>
+                    <span className="text-right text-purple-600">{toEUR(result.coverages.water_movable || 0).toLocaleString()} €</span>
                   </div>
                   
                   {/* Земетресение */}
                   <div className="grid grid-cols-3 gap-2 py-1.5 border-b items-center">
                     <span className="text-slate-700 font-medium">Земетресение:</span>
-                    <span className="text-right text-blue-600">{Math.round(result.coverages.earthquake_immovable || 0).toLocaleString()}</span>
-                    <span className="text-right text-purple-600">{Math.round(result.coverages.earthquake_movable || 0).toLocaleString()}</span>
+                    <span className="text-right text-blue-600">{toEUR(result.coverages.earthquake_immovable || 0).toLocaleString()} €</span>
+                    <span className="text-right text-purple-600">{toEUR(result.coverages.earthquake_movable || 0).toLocaleString()} €</span>
                   </div>
                   
                   {/* Злоумишлени действия */}
                   <div className="grid grid-cols-3 gap-2 py-1.5 border-b items-center">
                     <span className="text-slate-700 font-medium">Вандализъм:</span>
-                    <span className="text-right text-blue-600">{Math.round(result.coverages.vandalism_immovable || 0).toLocaleString()}</span>
-                    <span className="text-right text-purple-600">{Math.round(result.coverages.vandalism_movable || 0).toLocaleString()}</span>
+                    <span className="text-right text-blue-600">{toEUR(result.coverages.vandalism_immovable || 0).toLocaleString()} €</span>
+                    <span className="text-right text-purple-600">{toEUR(result.coverages.vandalism_movable || 0).toLocaleString()} €</span>
                   </div>
                   
                   {/* Стъкла */}
                   <div className="grid grid-cols-3 gap-2 py-1.5 border-b items-center">
                     <span className="text-slate-700 font-medium">Стъкла:</span>
-                    <span className="text-right text-blue-600">{(result.coverages.glass_immovable || 0).toLocaleString()}</span>
-                    <span className="text-right text-purple-600">{(result.coverages.glass_movable || 0).toLocaleString()}</span>
+                    <span className="text-right text-blue-600">{toEUR(result.coverages.glass_immovable || 0).toLocaleString()} €</span>
+                    <span className="text-right text-purple-600">{toEUR(result.coverages.glass_movable || 0).toLocaleString()} €</span>
                   </div>
                   
                   {/* Кражба */}
                   <div className="grid grid-cols-3 gap-2 py-1.5 border-b items-center">
                     <span className="text-slate-700 font-medium">Кражба (общо):</span>
-                    <span className="text-right font-semibold col-span-2">{Math.round(result.coverages.theft || 0).toLocaleString()}</span>
+                    <span className="text-right font-semibold col-span-2">{toEUR(result.coverages.theft || 0).toLocaleString()} €</span>
                   </div>
                   
                   {/* Гражданска отговорност */}
                   <div className="grid grid-cols-3 gap-2 py-1.5 border-b items-center">
                     <span className="text-slate-700 font-medium">ГО:</span>
-                    <span className="text-right font-semibold col-span-2">{(result.coverages.liability || 0).toLocaleString()}</span>
+                    <span className="text-right font-semibold col-span-2">{toEUR(result.coverages.liability || 0).toLocaleString()} €</span>
                   </div>
                   
                   {/* Временно настаняване */}
                   <div className="grid grid-cols-3 gap-2 py-1.5 items-center">
                     <span className="text-slate-700 font-medium">Настаняване:</span>
-                    <span className="text-right font-semibold col-span-2">{(result.coverages.temporary_accommodation || 0).toLocaleString()}</span>
+                    <span className="text-right font-semibold col-span-2">{toEUR(result.coverages.temporary_accommodation || 0).toLocaleString()} €</span>
                   </div>
                   
                   {/* Legend */}

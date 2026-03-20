@@ -605,6 +605,14 @@ export const PLAN_CONSTITUTION = {
       //   - SUM(liability_*_monthly полета)    → текущи кредитни вноски
       //   - SUM(insurance_* полета)            → текущи застрахователни премии
       //
+      // ВАЖНО: SUM(insurance_*) включва ВСИЧКИ полета:
+      //   insurance_life, insurance_property, insurance_movable, insurance_household,
+      //   insurance_civil, insurance_casco, insurance_other
+      // Тези са обобщени суми въведени от клиента в секция "Финансов поток".
+      // НЕ се смесват с car_X_go_monthly / car_X_casco_monthly / property_X_insurance_monthly
+      // (тези са от секция "Защита на собствеността" и се използват САМО в Правила 1.8 и 1.9).
+      // Няма двойно броене — полетата са независими.
+      //
       // Визуално (от схемата):
       //   Доход
       //   − Храна, наем, сметки и тн.   (expense_*)

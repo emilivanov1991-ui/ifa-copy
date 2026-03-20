@@ -606,12 +606,21 @@ export const PLAN_CONSTITUTION = {
       //   - SUM(insurance_* полета)            → текущи застрахователни премии
       //
       // ВАЖНО: SUM(insurance_*) включва ВСИЧКИ полета:
-      //   insurance_life, insurance_property, insurance_movable, insurance_household,
+      //   insurance_life, insurance_property, insurance_movable,
       //   insurance_civil, insurance_casco, insurance_other
-      // Тези са обобщени суми въведени от клиента в секция "Финансов поток".
-      // НЕ се смесват с car_X_go_monthly / car_X_casco_monthly / property_X_insurance_monthly
-      // (тези са от секция "Защита на собствеността" и се използват САМО в Правила 1.8 и 1.9).
-      // Няма двойно броене — полетата са независими.
+      //
+      // Тези полета са AUTO-POPULATED от Финансовия поток (FinancialFlowStep):
+      //   insurance_civil    = SUM(car_X_go_monthly)           ← от "Защита на собствеността"
+      //   insurance_casco    = SUM(car_X_casco_monthly)        ← от "Защита на собствеността"
+      //   insurance_property = SUM(property_X_insurance_monthly) ← от "Защита на собствеността"
+      //
+      // Следователно: car_X_go_monthly ≡ insurance_civil (агрегирано)
+      //               car_X_casco_monthly ≡ insurance_casco (агрегирано)
+      //               property_X_insurance_monthly ≡ insurance_property (агрегирано)
+      //
+      // За Правила 1.8 и 1.9: сравнението се прави на ниво car_X / property_X поотделно
+      // (защото ДЗИ офертата е различна за всяко МПС/имот), но общият ефект (delta)
+      // коригира insurance_civil, insurance_casco и insurance_property в old_monthly_balance.
       //
       // Визуално (от схемата):
       //   Доход

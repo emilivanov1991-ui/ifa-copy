@@ -259,6 +259,271 @@ export const PLAN_CONSTITUTION = {
         note: "Препоръчва се погасяване от свободния месечен остатък — без рефинансиране"
       }
     },
+
+    /**
+     * ПРАВИЛО 1.8: Оптимизация на застраховки за МПС (ГО и КАСКО)
+     * Статус: ✅ ПОТВЪРДЕНО
+     *
+     * Прилага се за всеки автомобил (car_1, car_2, car_3) поотделно.
+     * Изчислява се месечната вноска по ДЗИ тарифите и се сравнява с текущата.
+     * Нетният ефект (insurance_delta) коригира monthly_balance_after_optimization.
+     *
+     * ─────────────────────────────────────────
+     * 1.8.А — ГРАЖДАНСКА ОТГОВОРНОСТ (ГО)
+     * ─────────────────────────────────────────
+     * Калкулатор: DZIGOCalculator (components/products/DZIGOCalculator)
+     * Полета от анализа: car_X_go_monthly (текуща месечна сума по ГО)
+     *
+     * Сценарии:
+     *   1. Клиентът ИМА ГО, плаща ПОВЕЧЕ от ДЗИ:
+     *      → delta = car_X_go_monthly - dzi_go_monthly (положителна)
+     *      → Действие: +delta към monthly_balance_after_optimization
+     *      → Извод: „Спестявате X €/месец при преминаване към ДЗИ ГО"
+     *
+     *   2. Клиентът ИМА ГО, плаща РАВНО или по-малко от ДЗИ:
+     *      → delta = 0 (нищо не се променя)
+     *      → Не се предлага смяна — ДЗИ не е по-изгодна
+     *
+     *   3. Клиентът НЯМА ГО (car_X_go_monthly = 0 или null):
+     *      → delta = -dzi_go_monthly (отрицателна)
+     *      → Действие: -dzi_go_monthly от monthly_balance_after_optimization
+     *      → Извод: „Задължително — добавя се ГО застраховка X €/месец"
+     *
+     * ─────────────────────────────────────────
+     * 1.8.Б — КАСКО
+     * ─────────────────────────────────────────
+     * Калкулатор: DZICascoCalculator → calculateDZICascoOffer()
+     * Полета от анализа: car_X_value (EUR), car_X_year, car_X_casco_monthly
+     * Праг за препоръка: car_X_value > 5,000 € (под прага — КАСКО не се препоръчва)
+     *
+     * Сценарии:
+     *   0. car_X_value <= 5,000 €:
+     *      → Пропуска се изцяло — каско не е препоръчително за евтини коли
+     *
+     *   1. car_X_value > 5,000 € AND клиентът ИМА КАСКО, плаща ПОВЕЧЕ от ДЗИ:
+     *      → delta = car_X_casco_monthly - dzi_casco_monthly (положителна)
+     *      → Действие: +delta към monthly_balance_after_optimization
+     *
+     *   2. car_X_value > 5,000 € AND клиентът ИМА КАСКО, плаща РАВНО или по-малко:
+     *      → delta = 0
+     *
+     *   3. car_X_value > 5,000 € AND клиентът НЯМА КАСКО:
+     *      → delta = -dzi_casco_monthly (отрицателна)
+     *      → Действие: -dzi_casco_monthly от monthly_balance_after_optimization
+     *      → Извод: „Препоръчваме КАСКО — добавя X €/месец към разходите"
+     *
+     * ─────────────────────────────────────────
+     * ОБОБЩЕНА ФОРМУЛА ЗА МПС:
+     * ─────────────────────────────────────────
+     *   car_insurance_delta = SUM(go_delta_car_1..3) + SUM(casco_delta_car_1..3)
+     *   monthly_balance_after_optimization += car_insurance_delta
+     */
+    car_insurance_optimization: {
+      applies_to: ["car_1", "car_2", "car_3"],
+      applies_when: "has_car_X === true",
+
+      go: {
+        calculator: "DZIGOCalculator",
+        source_field_current_monthly: "car_X_go_monthly",
+        scenario_has_go_cheaper: {
+          condition: "car_X_go_monthly > 0 AND car_X_go_monthly > dzi_go_monthly",
+          delta_formula: "car_X_go_monthly - dzi_go_monthly",
+          effect: "positive — added to monthly_balance_after_optimization"
+        },
+        scenario_has_go_same_or_more_expensive: {
+          condition: "car_X_go_monthly > 0 AND car_X_go_monthly <= dzi_go_monthly",
+          delta_formula: "0",
+          effect: "no change"
+        },
+        scenario_no_go: {
+          condition: "car_X_go_monthly === 0 OR car_X_go_monthly === null",
+          delta_formula: "-dzi_go_monthly",
+          effect: "negative — deducted from monthly_balance_after_optimization",
+          note: "ГО е задължителна — добавя се като нов разход"
+        }
+      },
+
+      casco: {
+        calculator: "DZICascoCalculator → calculateDZICascoOffer()",
+        casco_threshold_eur: 5000,
+        source_field_current_monthly: "car_X_casco_monthly",
+        scenario_below_threshold: {
+          condition: "car_X_value <= 5000",
+          action: "skip — каско не се препоръчва за автомобили под 5 000 €",
+          delta_formula: "0"
+        },
+        scenario_has_casco_cheaper: {
+          condition: "car_X_value > 5000 AND car_X_casco_monthly > 0 AND car_X_casco_monthly > dzi_casco_monthly",
+          delta_formula: "car_X_casco_monthly - dzi_casco_monthly",
+          effect: "positive — added to monthly_balance_after_optimization"
+        },
+        scenario_has_casco_same_or_more_expensive: {
+          condition: "car_X_value > 5000 AND car_X_casco_monthly > 0 AND car_X_casco_monthly <= dzi_casco_monthly",
+          delta_formula: "0",
+          effect: "no change"
+        },
+        scenario_no_casco: {
+          condition: "car_X_value > 5000 AND (car_X_casco_monthly === 0 OR car_X_casco_monthly === null)",
+          delta_formula: "-dzi_casco_monthly",
+          effect: "negative — deducted from monthly_balance_after_optimization",
+          note: "Препоръчваме КАСКО — добавя се като нов разход"
+        }
+      },
+
+      net_delta_formula: "car_insurance_delta = SUM(go_delta + casco_delta) for all cars"
+    },
+
+    /**
+     * ПРАВИЛО 1.9: Оптимизация на имотно застраховане
+     * Статус: ✅ ПОТВЪРДЕНО
+     *
+     * Прилага се за:
+     *   А) Текущото жилище (current_housing)
+     *   Б) Допълнителни имоти (property_1, property_2, property_3)
+     *
+     * ─────────────────────────────────────────
+     * 1.9.А — ТЕКУЩО ЖИЛИЩЕ (current_housing)
+     * ─────────────────────────────────────────
+     * Калкулатор: InstinctHomeCalculator (Instinct Home, ДЗИ)
+     * Входни данни: current_housing_value (EUR), current_housing_movable_value (EUR)
+     *
+     * ИЗКЛЮЧЕНИЯ (пропуска се изцяло):
+     *   - current_housing = "rented" → наем — не предлагаме имотна застраховка
+     *   - current_housing = "subrented" → пак наем
+     *   - current_housing = "with_parents" → не е собствен имот
+     *   - current_housing = "owned" AND current_housing_has_mortgage = true
+     *     → Банката изисква задължително имотно застраховане — ние не се намесваме.
+     *       Вместо това се прилага Правило 1.1 (ипотечна оптимизация) с Credit Guard.
+     *
+     * Активни сценарии (само при current_housing = "owned" AND has_mortgage = false):
+     *   1. Има застраховка, плаща ПОВЕЧЕ от Instinct Home:
+     *      → delta = current_housing_insurance_monthly - instinct_home_monthly (положителна)
+     *      → Действие: +delta към monthly_balance_after_optimization
+     *
+     *   2. Има застраховка, плаща РАВНО или по-малко:
+     *      → delta = 0
+     *
+     *   3. НЯМА застраховка:
+     *      → delta = -instinct_home_monthly (отрицателна)
+     *      → Добавя се оферта + цена като нов разход
+     *
+     * Полета от анализа:
+     *   - current_housing_value           → стойност на имота (EUR)
+     *   - current_housing_movable_value   → движимо имущество (EUR)
+     *   - has_property_insurance          → boolean (има ли застраховка)
+     *   - insurance_property              → текуща месечна сума (от Финансов поток → Застраховки)
+     *
+     * ─────────────────────────────────────────
+     * 1.9.Б — ДОПЪЛНИТЕЛНИ ИМОТИ (property_1..3)
+     * ─────────────────────────────────────────
+     * Същата логика като 1.9.А, но без изключения за ипотека/наем.
+     * Тези имоти са собственост — ВСИЧКИ се проверяват.
+     *
+     * Полета от анализа (за property_X):
+     *   - property_X_value               → стойност на имота (EUR)
+     *   - property_X_movable_value        → движимо имущество (EUR)
+     *   - property_X_has_insurance        → boolean
+     *   - property_X_insurance_monthly   → текуща месечна сума (EUR)
+     *
+     * Сценарии (идентични с 1.9.А):
+     *   1. Има застраховка, плаща ПОВЕЧЕ → +delta
+     *   2. Има застраховка, РАВНО/по-малко → 0
+     *   3. НЯМА застраховка → -instinct_home_monthly
+     *
+     * ─────────────────────────────────────────
+     * ОБОБЩЕНА ФОРМУЛА ЗА ИМОТИ:
+     * ─────────────────────────────────────────
+     *   property_insurance_delta = delta_current_housing + SUM(delta_property_1..3)
+     *   monthly_balance_after_optimization += property_insurance_delta
+     */
+    property_insurance_optimization: {
+      calculator: "InstinctHomeCalculator",
+      source_file: "components/financial-plan/InstinctHomeCalculator",
+
+      current_housing: {
+        skip_conditions: [
+          "current_housing === 'rented'",
+          "current_housing === 'subrented'",
+          "current_housing === 'with_parents'",
+          "current_housing === 'owned' AND current_housing_has_mortgage === true"
+        ],
+        mortgage_note: "При ипотека — банката задължително изисква имотна застраховка. Не се намесваме в нея. Прилага се само Правило 1.1 с Credit Guard.",
+        active_when: "current_housing === 'owned' AND current_housing_has_mortgage === false",
+        source_fields: {
+          property_value: "current_housing_value",
+          movable_value: "current_housing_movable_value",
+          has_insurance: "has_property_insurance",
+          current_monthly: "insurance_property"
+        },
+        scenario_has_insurance_cheaper: {
+          condition: "has_property_insurance === true AND insurance_property > instinct_home_monthly",
+          delta_formula: "insurance_property - instinct_home_monthly",
+          effect: "positive"
+        },
+        scenario_has_insurance_same_or_expensive: {
+          condition: "has_property_insurance === true AND insurance_property <= instinct_home_monthly",
+          delta_formula: "0"
+        },
+        scenario_no_insurance: {
+          condition: "has_property_insurance === false OR has_property_insurance === null",
+          delta_formula: "-instinct_home_monthly",
+          effect: "negative — added as new cost"
+        }
+      },
+
+      additional_properties: {
+        applies_to: ["property_1", "property_2", "property_3"],
+        applies_when: "has_property_X === true",
+        no_mortgage_exception: true,
+        note: "Допълнителните имоти са собственост — нямат изключения за ипотека/наем.",
+        source_fields: {
+          property_value: "property_X_value",
+          movable_value: "property_X_movable_value",
+          has_insurance: "property_X_has_insurance",
+          current_monthly: "property_X_insurance_monthly"
+        },
+        scenario_has_insurance_cheaper: {
+          condition: "property_X_has_insurance === true AND property_X_insurance_monthly > instinct_home_monthly",
+          delta_formula: "property_X_insurance_monthly - instinct_home_monthly",
+          effect: "positive"
+        },
+        scenario_has_insurance_same_or_expensive: {
+          condition: "property_X_has_insurance === true AND property_X_insurance_monthly <= instinct_home_monthly",
+          delta_formula: "0"
+        },
+        scenario_no_insurance: {
+          condition: "property_X_has_insurance === false OR property_X_has_insurance === null",
+          delta_formula: "-instinct_home_monthly",
+          effect: "negative — added as new cost"
+        }
+      },
+
+      net_delta_formula: "property_insurance_delta = delta_current_housing + SUM(delta_property_1..3)"
+    },
+
+    /**
+     * ОБОБЩЕНА ФОРМУЛА — ЗАСТРАХОВАТЕЛНА ОПТИМИЗАЦИЯ
+     * Статус: ✅ ПОТВЪРДЕНО
+     *
+     * Нетният ефект от Правила 1.8 и 1.9 заедно:
+     *   total_insurance_optimization_delta = car_insurance_delta + property_insurance_delta
+     *
+     * Крайна формула за monthly_balance_after_optimization:
+     *   monthly_balance_after_optimization =
+     *     old_monthly_balance
+     *     + (old_liabilities_monthly - new_liabilities_monthly)   ← кредитна оптимизация (1.1–1.7)
+     *     + total_insurance_optimization_delta                     ← застрахователна оптимизация (1.8–1.9)
+     *
+     * ⚠️ ВАЖНО: Делтата може да е ОТРИЦАТЕЛНА (добавяме нова застраховка) или
+     * ПОЛОЖИТЕЛНА (клиентът спестява при преминаване към ДЗИ/Instinct Home).
+     * В двата случая влиза директно в monthly_balance_after_optimization.
+     */
+    insurance_optimization_summary: {
+      total_delta_formula: "total_insurance_optimization_delta = car_insurance_delta + property_insurance_delta",
+      monthly_balance_formula:
+        "monthly_balance_after_optimization = old_monthly_balance + (old_liabilities_monthly - new_liabilities_monthly) + total_insurance_optimization_delta",
+      note: "Делтата се прилага ПРЕДИ изчисляване на таваните на плана (ceiling_1 и ceiling_2)"
+    },
   },
 
   // ──────────────────────────────────────────────────────────

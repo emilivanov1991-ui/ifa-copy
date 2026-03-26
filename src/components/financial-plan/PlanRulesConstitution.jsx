@@ -1446,7 +1446,11 @@ export const PLAN_CONSTITUTION = {
       // ВАЖНО: 8% НЕ е груб линеен процент — използва се директно чрез MetLifeULCalculator.projection,
       // която симулира реалните такси: AV charge (getAVCharge), COI (getMonthlyMortalityRate),
       // investible premium rate (getInvestiblePremiumRate), premium bonus (getPremiumBonus).
-      // За намиране на нужната годишна вноска се итерира P докато accountValue[age=65] >= target_corpus.
+      // За намиране на нужната годишна вноска се използва БИНАРНО ТЪРСЕНЕ:
+      //   low = 300 (минимум), high = budget_ceiling_annual
+      //   ~20 итерации докато |accountValue[age=65] - target| < 1 €
+      // Причина: compound interest прави връзката P→corpus нелинейна — линейна апроксимация
+      // дава грешки до 10-20% при дълги хоризонти (млади клиенти).
       // След пенсия парите се преместват в нискорискови активи (облигации) → post_retirement_return = 4%.
       ul_fund_allocation: {
         "Световни акции (развити пазари)": "50%",

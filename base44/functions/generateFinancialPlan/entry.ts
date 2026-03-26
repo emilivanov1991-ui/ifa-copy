@@ -31,6 +31,98 @@ const PREMIUM_BONUS_TABLE = [
 // КОНСТАНТИ (от FinancialPlanConstants / PLAN_CONSTITUTION)
 // ──────────────────────────────────────────────────────────
 
+// ── TERM LIFE BASIC RATES (TERM_LIFE_BASIC_RATES от FinancialPlanConstants) ──
+// тарифа на 1000 € покритие по възраст и срок (5 год.)
+const TERM_LIFE_BASIC_RATES = {
+  18:{5:3.91},19:{5:3.96},20:{5:4},21:{5:4.04},22:{5:4.09},23:{5:4.1},
+  24:{5:4.13},25:{5:4.14},26:{5:4.15},27:{5:4.16},28:{5:4.22},29:{5:4.3},
+  30:{5:4.38},31:{5:4.49},32:{5:4.61},33:{5:4.77},34:{5:4.9},35:{5:5.08},
+  36:{5:5.32},37:{5:5.55},38:{5:5.78},39:{5:6.11},40:{5:6.55},41:{5:6.97},
+  42:{5:7.51},43:{5:8.16},44:{5:8.79},45:{5:9.3},46:{5:9.99},47:{5:10.68},
+  48:{5:11.38},49:{5:12.22},50:{5:13.24},51:{5:14.1},52:{5:15.22},53:{5:16.24},
+  54:{5:17.5},55:{5:18.86},56:{5:20.29},57:{5:21.57},58:{5:23.19},59:{5:24.55},
+  60:{5:26.09},61:{5:27.57},62:{5:29.57},63:{5:31.39},64:{5:33.6},65:{5:35.75},
+};
+
+// ── TERM LIFE 32 CI RATES (yr10 от METLIFE_PA_CRITICAL_ILLNESS_32_RATES) ──
+// тарифа на 1000 € покритие при 10 г. срок
+const CI32_RATES_YR10 = {
+  18:1.85,19:1.85,20:1.85,21:1.85,22:1.85,23:1.85,24:1.85,25:1.85,
+  26:3.19,27:3.19,28:3.19,29:3.19,30:3.19,
+  31:6.23,32:6.23,33:6.23,34:6.23,35:6.23,
+  36:9.57,37:9.57,38:9.57,39:9.57,40:9.57,
+  41:16,42:16,43:16,44:16,45:16,
+  46:25.47,47:25.47,48:25.47,49:25.47,50:25.47,
+  51:38.07,52:38.07,53:38.07,54:38.07,55:38.07,
+  56:46.34,57:46.34,58:46.34,59:46.34,60:46.34,
+};
+// 32 CI yr5 rates (за > 55 г. няма yr10)
+const CI32_RATES_YR5 = {
+  18:1.4,19:1.4,20:1.4,21:1.4,22:1.4,23:1.4,24:1.4,25:1.4,
+  26:2.35,27:2.35,28:2.35,29:2.35,30:2.35,
+  31:4.63,32:4.63,33:4.63,34:4.63,35:4.63,
+  36:7.24,37:7.24,38:7.24,39:7.24,40:7.24,
+  41:12.31,42:12.31,43:12.31,44:12.31,45:12.31,
+  46:20.45,47:20.45,48:20.45,49:20.45,50:20.45,
+  51:31.79,52:31.79,53:31.79,54:31.79,55:31.79,
+  56:46.34,57:46.34,58:46.34,59:46.34,60:46.34,
+};
+
+// ── DZI ZAKRILA PLATINUM (от DZIZakrilaCalculator + FinancialPlanConstants) ──
+const DZI_ZAKRILA_PLATINUM_MONTHLY = 30; // EUR (конституция: Платинен пакет)
+const DZI_ZAKRILA_MIN_AGE = 16;
+const DZI_ZAKRILA_MAX_AGE = 69;
+
+// ── METLIFE CREDIT GUARD BASIC RATES (от FinancialPlanConstants) ──
+// Тарифа за €100,000 покритие по [възраст][срок]
+// (съкратена версия само за нужните диапазони)
+const CG_BASIC_RATES = {
+  18:{5:147,10:147,15:147,20:147,25:147,30:147},
+  19:{5:147,10:147,15:147,20:147,25:147,30:147},
+  20:{5:147,10:147,15:147,20:147,25:147,30:147},
+  21:{5:147,10:147,15:147,20:147,25:147,30:147},
+  22:{5:147,10:147,15:147,20:147,25:147,30:147},
+  23:{5:147,10:147,15:147,20:147,25:147,30:147},
+  24:{5:147,10:147,15:147,20:147,25:147,30:147},
+  25:{5:147,10:147,15:147,20:147,25:147,30:160},
+  26:{5:147,10:147,15:147,20:147,25:147,30:160},
+  27:{5:147,10:147,15:147,20:147,25:147,30:160},
+  28:{5:147,10:147,15:147,20:147,25:160,30:172},
+  29:{5:147,10:147,15:147,20:147,25:160,30:184},
+  30:{5:160,10:160,15:160,20:160,25:172,30:184},
+  31:{5:160,10:160,15:160,20:172,25:184,30:196},
+  32:{5:172,10:172,15:172,20:184,25:196,30:209},
+  33:{5:172,10:172,15:172,20:184,25:209,30:221},
+  34:{5:184,10:184,15:184,20:196,25:209,30:233},
+  35:{5:184,10:184,15:196,20:209,25:233,30:245},
+  36:{5:196,10:196,15:209,20:221,25:245,30:270},
+  37:{5:209,10:209,15:221,20:233,25:258,30:282},
+  38:{5:221,10:221,15:233,20:258,25:282,30:306},
+  39:{5:233,10:233,15:245,20:270,25:294,30:319},
+  40:{5:245,10:245,15:270,20:294,25:319,30:343},
+  41:{5:245,10:258,15:282,20:306,25:331},
+  42:{5:270,10:282,15:306,20:331,25:368},
+  43:{5:294,10:306,15:331,20:355,25:392},
+  44:{5:306,10:331,15:355,20:392,25:417},
+  45:{5:331,10:355,15:392,20:417,25:453},
+  46:{5:355,10:380,15:417,20:453},
+  47:{5:392,10:417,15:453,20:490},
+  48:{5:417,10:441,15:490,20:515},
+  49:{5:453,10:478,15:515,20:551},
+  50:{5:466,10:502,15:551,20:588},
+  51:{5:502,10:539,15:588},
+  52:{5:539,10:576,15:637},
+  53:{5:576,10:625,15:674},
+  54:{5:600,10:661,15:723},
+  55:{5:637,10:698,15:772},
+  56:{5:686,10:759},
+  57:{5:710,10:796},
+  58:{5:784,10:882},
+  59:{5:833,10:931},
+  60:{5:918,10:1016},
+  61:{5:967},62:{5:1029},63:{5:1102},64:{5:1188},65:{5:1273},
+};
+
 // METLIFE PA Security Plus Coefficients (40 CI)
 const CI40_COEFF = {
   18:225.73,19:218.82,20:212.31,21:206.19,22:200.40,23:194.55,
@@ -94,6 +186,118 @@ const getUniqaMonthly = (age) => {
   return null; // 65+ → not eligible per constitution (max age 64)
 };
 const nextSnapThreshold = (annual) => SNAP_THRESHOLDS.find(t => t > annual) || null;
+
+// ── TERM LIFE HELPERS ──
+const getTermLifeBasicRate = (age) => {
+  const clampedAge = Math.min(Math.max(Math.floor(age), 18), 65);
+  // find nearest age key
+  const keys = Object.keys(TERM_LIFE_BASIC_RATES).map(Number).sort((a,b)=>a-b);
+  let sel = keys[0];
+  for (const k of keys) { if (k <= clampedAge) sel = k; else break; }
+  return TERM_LIFE_BASIC_RATES[sel]?.[5] || 5;
+};
+const getCI32Rate = (age) => {
+  const clampedAge = Math.min(Math.max(Math.floor(age), 18), 60);
+  // prefer yr10, fallback yr5 for > 55
+  return (clampedAge <= 55 ? CI32_RATES_YR10[clampedAge] : CI32_RATES_YR5[clampedAge]) || CI32_RATES_YR5[60];
+};
+
+// Calculates Term Life annual premium for one person
+// Constitution: basic_life = net_income*24 (if child<18 | mortgage | income_share>55%), else 3000
+// PTD: same PV formula; CI32 (10yr term): (net_income - disability)*24; fractures 1500; telemedicine 15; admin 13
+const buildTermLifePremium = (age, netIncome, grossIncome, hasChild, hasMortgage, hasPartner, isMainEarner) => {
+  const disability = statDisabilityBenefit(grossIncome);
+  const months = (65 - age) * 12;
+
+  // Basic life coverage
+  const fullCoverageCondition = hasChild || hasMortgage || (hasPartner && isMainEarner);
+  const basicLifeCoverage = fullCoverageCondition ? Math.max(0, netIncome) * 24 : 3000;
+
+  // PTD coverage
+  const ptdCoverage = Math.ceil(pvAnnuity(0.04 / 12, months) * Math.max(0, netIncome - disability) * 1.2 / 100) * 100;
+
+  // CI32 coverage
+  const ci32Coverage = Math.ceil(Math.max(0, netIncome - disability) * 24 / 100) * 100;
+
+  // Cost components
+  const basicLifeRate = getTermLifeBasicRate(age);
+  const ptdRate = RISK_CLASS_1.pi;
+  const fracturesRate = RISK_CLASS_1.fracturesAndBurns;
+  const ci32Rate = getCI32Rate(age);
+
+  const basicLifeCost = (basicLifeCoverage / 1000) * basicLifeRate;
+  const ptdCost = ptdCoverage > 0 ? (ptdCoverage / 1000) * ptdRate : 0;
+  const fracturesCost = (1500 / 1000) * fracturesRate;
+  const ci32Cost = ci32Coverage > 0 ? (ci32Coverage / 1000) * ci32Rate : 0;
+  const telemedicineCost = 15;
+  const adminFee = 13;
+
+  const totalAnnual = basicLifeCost + ptdCost + fracturesCost + ci32Cost + telemedicineCost + adminFee;
+
+  return {
+    totalAnnual,
+    basicLifeCoverage,
+    ptdCoverage,
+    ci32Coverage,
+    fractures: 1500,
+  };
+};
+
+// Scale term life coverages proportionally to fit within budget
+const scaleTermLifeToFit = (tl, budgetAnnual) => {
+  // Fixed components
+  const fixedCost = (1500 / 1000) * RISK_CLASS_1.fracturesAndBurns + 15 + 13; // fractures + telemedicine + admin
+  const availableForScalable = Math.max(0, budgetAnnual - fixedCost);
+  if (availableForScalable <= 0) return null; // cannot fit even fixed costs
+
+  const age = tl._age || 35; // passed through
+  const basicLifeRate = getTermLifeBasicRate(age);
+  const ptdRate = RISK_CLASS_1.pi;
+  const ci32Rate = getCI32Rate(age);
+
+  const basicLifeCost = (tl.basicLifeCoverage / 1000) * basicLifeRate;
+  const ptdCost = tl.ptdCoverage > 0 ? (tl.ptdCoverage / 1000) * ptdRate : 0;
+  const ci32Cost = tl.ci32Coverage > 0 ? (tl.ci32Coverage / 1000) * ci32Rate : 0;
+  const scalableCost = basicLifeCost + ptdCost + ci32Cost;
+
+  if (scalableCost <= 0) return { ...tl, totalAnnual: fixedCost };
+
+  const scaleFactor = Math.min(1, availableForScalable / scalableCost);
+  const scaledBasicLife = Math.round(tl.basicLifeCoverage * scaleFactor / 100) * 100;
+  const scaledPtd = Math.round(tl.ptdCoverage * scaleFactor / 100) * 100;
+  const scaledCi32 = Math.round(tl.ci32Coverage * scaleFactor / 100) * 100;
+
+  const newTotal = (scaledBasicLife/1000)*basicLifeRate + (scaledPtd/1000)*ptdRate + (scaledCi32/1000)*ci32Rate + fixedCost;
+  return {
+    ...tl,
+    basicLifeCoverage: scaledBasicLife,
+    ptdCoverage: scaledPtd,
+    ci32Coverage: scaledCi32,
+    totalAnnual: newTotal,
+  };
+};
+
+// ── CREDIT GUARD HELPER ──
+const calcCreditGuardMonthly = (age, loanAmount, termYears) => {
+  if (!loanAmount || loanAmount <= 0 || age < 18 || age + termYears > 70) return null;
+  const ageKeys = Object.keys(CG_BASIC_RATES).map(Number).sort((a,b)=>a-b);
+  let selAge = null;
+  for (const k of ageKeys) { if (k <= age) selAge = k; else break; }
+  if (!selAge) return null;
+
+  const termOptions = [5, 10, 15, 20, 25, 30];
+  const availableTerms = termOptions.filter(t => CG_BASIC_RATES[selAge]?.[t] !== undefined && CG_BASIC_RATES[selAge]?.[t] !== null);
+  if (!availableTerms.length) return null;
+
+  // Find nearest available term
+  let selTerm = availableTerms[0];
+  for (const t of availableTerms) { if (t <= termYears) selTerm = t; }
+  if (!selTerm || !CG_BASIC_RATES[selAge]?.[selTerm]) return null;
+
+  const ratePerHundredK = CG_BASIC_RATES[selAge][selTerm];
+  const annualPremium = (loanAmount / 100000) * ratePerHundredK;
+  return Math.round((annualPremium / 12) * 100) / 100;
+};
 
 // ──────────────────────────────────────────────────────────
 // FINANCIAL MATH
@@ -365,8 +569,23 @@ Deno.serve(async (req) => {
     if (cAnnualSavings) cAnnualSavings = snapSavings(cAnnualSavings, budgetAnnual);
     if (pAnnualSavings) pAnnualSavings = snapSavings(pAnnualSavings, budgetAnnual);
 
-    // ── СТЪПКА 1/2/3: UL vs TERM LIFE SELECTION ──
-    // Determine product type: UL if annualSavings/12 >= 25, else Term Life
+    // ── ПОМОЩНИ ДАННИ ЗА PRODUCT SELECTION ──
+    const hasChildUnder18 = (() => {
+      for (let i = 1; i <= (a.children_count || 0); i++) {
+        const bd = a[`child_${i}_birthdate`];
+        if (!bd) continue;
+        const childAge = Math.floor((Date.now() - new Date(bd)) / (365.25 * 24 * 60 * 60 * 1000));
+        if (childAge < 18) return true;
+      }
+      return false;
+    })();
+    const hasMortgage = (a.liability_mortgage_monthly || 0) > 0;
+    const totalHouseholdIncome = totalIncome;
+    const clientIncomeShare = totalHouseholdIncome > 0 ? clientNet / totalHouseholdIncome : 1;
+    const partnerIncomeShare = totalHouseholdIncome > 0 ? partnerNet / totalHouseholdIncome : 0;
+
+    // ── СТЪПКА 1/2/3: UL vs TERM LIFE vs DZI ZAKRILA SELECTION ──
+    // Конституция: Step 1 → UL (annualSavings/12 >= 25), Step 2 → Term Life, Step 3 → DZI Zakrila
     const clientUsesUL  = cAnnualSavings && cAnnualSavings / 12 >= 25;
     const partnerUsesUL = pAnnualSavings && pAnnualSavings / 12 >= 25;
 
@@ -516,6 +735,159 @@ Deno.serve(async (req) => {
             },
             premium_bonus: getPremiumBonus(juniorSavings),
             management_fee: getAVCharge(juniorSavings),
+          },
+        });
+      }
+    }
+
+    // ── СТЪПКА 2: TERM LIFE — за клиент (ако UL не е избран) ──
+    if (cAge < 65 && !clientUsesUL) {
+      const tlClient = buildTermLifePremium(cAge, clientNet, clientGross, hasChildUnder18, hasMortgage, includePartner, clientIncomeShare > 0.55);
+      tlClient._age = cAge;
+      const tlClientBudget = remainingMonthlyBudget * 12;
+
+      let tlFinal = tlClient;
+      if (tlClient.totalAnnual > tlClientBudget) {
+        tlFinal = scaleTermLifeToFit(tlClient, tlClientBudget);
+      }
+
+      if (tlFinal && tlFinal.totalAnnual <= tlClientBudget && tlFinal.totalAnnual > 0) {
+        const monthly = Math.round((tlFinal.totalAnnual / 12) * 100) / 100;
+        addProduct({
+          product_type: 'term_life',
+          provider: 'MetLife',
+          product_name: 'MetLife Срочен Живот',
+          beneficiary: 'partner1',
+          beneficiary_name: `${a.client_first_name||''} ${a.client_last_name||''}`.trim(),
+          beneficiary_age: cAge,
+          term_years: 5,
+          monthly_premium: monthly,
+          total_premium: monthly * 12,
+          coverage_amount: tlFinal.basicLifeCoverage,
+          is_active: true,
+          details: {
+            coverages: {
+              basicLifeCoverage: tlFinal.basicLifeCoverage,
+              ptdCoverage: tlFinal.ptdCoverage,
+              ci32Coverage: tlFinal.ci32Coverage,
+              fracturesCoverage: 1500,
+              telemedicine: true,
+            },
+          },
+        });
+      } else if (cAge >= DZI_ZAKRILA_MIN_AGE && cAge <= DZI_ZAKRILA_MAX_AGE && remainingMonthlyBudget >= DZI_ZAKRILA_PLATINUM_MONTHLY) {
+        // ── СТЪПКА 3: DZI ZAKRILA PLATINUM fallback ──
+        addProduct({
+          product_type: 'personal_accident',
+          provider: 'ДЗИ',
+          product_name: 'ДЗИ Закрила — Платинен пакет',
+          beneficiary: 'partner1',
+          beneficiary_name: `${a.client_first_name||''} ${a.client_last_name||''}`.trim(),
+          beneficiary_age: cAge,
+          monthly_premium: DZI_ZAKRILA_PLATINUM_MONTHLY,
+          total_premium: DZI_ZAKRILA_PLATINUM_MONTHLY * 12,
+          coverage_amount: 50000,
+          is_active: true,
+          details: {
+            plan: 'Platinum',
+            note: 'Резервен продукт — бюджетът не позволява MetLife',
+            coverages: {
+              death_accident: 50000, death_rta: 75000,
+              disability_accident: 50000, disability_rta: 75000,
+              fractures_burns: 20000, hospital_daily: 100,
+            },
+          },
+        });
+      }
+    }
+
+    // ── СТЪПКА 2: TERM LIFE — за партньор (ако UL не е избран) ──
+    if (includePartner && pAge < 65 && !partnerUsesUL) {
+      const tlPartner = buildTermLifePremium(pAge, partnerNet, partnerGross, hasChildUnder18, hasMortgage, true, partnerIncomeShare > 0.55);
+      tlPartner._age = pAge;
+      const tlPartnerBudget = remainingMonthlyBudget * 12;
+
+      let tlPFinal = tlPartner;
+      if (tlPartner.totalAnnual > tlPartnerBudget) {
+        tlPFinal = scaleTermLifeToFit(tlPartner, tlPartnerBudget);
+      }
+
+      if (tlPFinal && tlPFinal.totalAnnual <= tlPartnerBudget && tlPFinal.totalAnnual > 0) {
+        const monthlyP = Math.round((tlPFinal.totalAnnual / 12) * 100) / 100;
+        addProduct({
+          product_type: 'term_life',
+          provider: 'MetLife',
+          product_name: 'MetLife Срочен Живот',
+          beneficiary: 'partner2',
+          beneficiary_name: `${a.partner_first_name||''} ${a.partner_last_name||''}`.trim(),
+          beneficiary_age: pAge,
+          term_years: 5,
+          monthly_premium: monthlyP,
+          total_premium: monthlyP * 12,
+          coverage_amount: tlPFinal.basicLifeCoverage,
+          is_active: true,
+          details: {
+            coverages: {
+              basicLifeCoverage: tlPFinal.basicLifeCoverage,
+              ptdCoverage: tlPFinal.ptdCoverage,
+              ci32Coverage: tlPFinal.ci32Coverage,
+              fracturesCoverage: 1500,
+              telemedicine: true,
+            },
+          },
+        });
+      } else if (pAge >= DZI_ZAKRILA_MIN_AGE && pAge <= DZI_ZAKRILA_MAX_AGE && remainingMonthlyBudget >= DZI_ZAKRILA_PLATINUM_MONTHLY) {
+        // ── СТЪПКА 3: DZI ZAKRILA PLATINUM fallback за партньор ──
+        addProduct({
+          product_type: 'personal_accident',
+          provider: 'ДЗИ',
+          product_name: 'ДЗИ Закрила — Платинен пакет',
+          beneficiary: 'partner2',
+          beneficiary_name: `${a.partner_first_name||''} ${a.partner_last_name||''}`.trim(),
+          beneficiary_age: pAge,
+          monthly_premium: DZI_ZAKRILA_PLATINUM_MONTHLY,
+          total_premium: DZI_ZAKRILA_PLATINUM_MONTHLY * 12,
+          coverage_amount: 50000,
+          is_active: true,
+          details: {
+            plan: 'Platinum',
+            note: 'Резервен продукт — бюджетът не позволява MetLife',
+            coverages: {
+              death_accident: 50000, death_rta: 75000,
+              disability_accident: 50000, disability_rta: 75000,
+              fractures_burns: 20000, hospital_daily: 100,
+            },
+          },
+        });
+      }
+    }
+
+    // ── МЕТЛАЙФ CREDIT GUARD — при ипотека/рефинансирани кредити ──
+    // Конституция правило 1.1: при оптимизация на ипотека → Credit Guard върху рефинансираната сума
+    // Тъй като оптимизацията се прави в презентацията (не тук), добавяме Credit Guard върху съществуващата ипотека
+    const mortgageBalance = a.liability_mortgage_remaining || 0;
+    const mortgageTermYears = a.liability_mortgage_remaining_months ? Math.ceil(a.liability_mortgage_remaining_months / 12) : 20;
+    if (mortgageBalance >= 10000 && hasMortgage && cAge < 65) {
+      const cgTerm = Math.min(mortgageTermYears, 70 - cAge, 30);
+      const cgMonthly = calcCreditGuardMonthly(cAge, mortgageBalance, cgTerm);
+      if (cgMonthly && cgMonthly > 0 && remainingMonthlyBudget >= cgMonthly) {
+        addProduct({
+          product_type: 'term_life',
+          provider: 'MetLife',
+          product_name: 'MetLife Credit Guard — Основен пакет',
+          beneficiary: 'partner1',
+          beneficiary_name: `${a.client_first_name||''} ${a.client_last_name||''}`.trim(),
+          beneficiary_age: cAge,
+          term_years: cgTerm,
+          monthly_premium: cgMonthly,
+          total_premium: cgMonthly * 12,
+          coverage_amount: mortgageBalance,
+          is_active: true,
+          details: {
+            note: 'Защита на ипотечния кредит',
+            loan_balance: mortgageBalance,
+            loan_term_years: cgTerm,
+            package: 'Основен',
           },
         });
       }

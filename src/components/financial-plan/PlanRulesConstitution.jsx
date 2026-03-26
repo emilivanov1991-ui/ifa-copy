@@ -1488,6 +1488,33 @@ export const PLAN_CONSTITUTION = {
       years_to_retirement_single: "same algorithm: try client_retirement_age, fallback to 65",
 
       /**
+       * РАЗПРЕДЕЛЕНИЕ НА КОРПУСА ПРИ ДВОЙКА
+       * Статус: ✅ ПОТВЪРДЕНО (В91, 2026-03-26)
+       *
+       * СТЪПКА 1 — Изчисли индивидуален корпус за всеки:
+       *   corpus_client  = изчислен с хоризонта и държавната пенсия на КЛИЕНТА
+       *   corpus_partner = изчислен с хоризонта и държавната пенсия на ПАРТНЬОРА
+       *   (различни хоризонти при различни желани пенсионни възрасти)
+       *
+       * СТЪПКА 2 — Сумирай и раздели поравно:
+       *   total_corpus = corpus_client + corpus_partner
+       *   target_per_person = total_corpus / 2
+       *
+       * СТЪПКА 3 — Намери UL вноска за всеки с бинарно търсене:
+       *   За клиента: вноска която постига target_per_person за НЕГОВИЯ хоризонт
+       *   За партньора: вноска която постига target_per_person за НЕЙНИЯ/НЕГОВИЯ хоризонт
+       *
+       * Логика: справедливо разпределение — всеки носи равна отговорност за
+       * общото пенсионно бъдеще, независимо от дохода.
+       */
+      corpus_distribution_couple: {
+        step1: "calculate individual corpus per person (own horizon + own state_pension)",
+        step2: "total_corpus = corpus_client + corpus_partner; target_per_person = total_corpus / 2",
+        step3: "binary search UL premium per person to reach target_per_person within own horizon",
+        rationale: "Equal responsibility — split 50/50 regardless of individual income"
+      },
+
+      /**
        * СЪЩЕСТВУВАЩИ АКТИВИ — ПРИСПАДАНЕ ОТ ПЕНСИОННИЯ КОРПУС
        * Статус: ✅ ПОТВЪРДЕНО
        *

@@ -542,19 +542,24 @@ Deno.serve(async (req) => {
     const targetPerPerson = includePartner ? corpusNet / 2 : corpusNet;
 
     // ── НАМИРАНЕ НА UL ВНОСКИ (binary search) ──
-    // client UL
-    let cAnnualSavings = null;
+    // client UL — ВИНАГИ се опитваме
+    let cAnnualSavings = 300; // мин. вноска
     if (cYears > 0 && budgetAnnual >= 300) {
-      cAnnualSavings = findAnnualSavingsForTarget(targetPerPerson, cYears, budgetAnnual);
-      if (cAnnualSavings === null) cAnnualSavings = budgetAnnual; // shortfall — use max
+      const targetUL = findAnnualSavingsForTarget(targetPerPerson, cYears, budgetAnnual);
+      if (targetUL !== null) {
+        cAnnualSavings = targetUL;
+      }
     }
-    // partner UL (allocated from remaining budget after client)
+    // partner UL
     let pAnnualSavings = null;
     if (includePartner && pYears > 0 && partnerNet > 0) {
+      pAnnualSavings = 300; // мин. вноска
       // Client and partner each get their own policy; budget split equally
       const pBudget = budgetAnnual; // each person gets full budget ceiling (they're separate contracts)
-      pAnnualSavings = findAnnualSavingsForTarget(targetPerPerson, pYears, pBudget);
-      if (pAnnualSavings === null) pAnnualSavings = pBudget;
+      const targetULPartner = findAnnualSavingsForTarget(targetPerPerson, pYears, pBudget);
+      if (targetULPartner !== null) {
+        pAnnualSavings = targetULPartner;
+      }
     }
 
     // ── SNAP-TO-THRESHOLD (PLAN_CONSTITUTION snap_to_threshold) ──
@@ -641,23 +646,52 @@ Deno.serve(async (req) => {
     }
 
     // ── РЕЗЕРВИРАНЕ НА ИНВЕСТИЦИОНЕН БЮДЖЕТ (преди добавяне на продукти) ──
-    // Приоритет по конституция: Деца > Пенсия
+    // Приоритет по конституция: Деца > Пенсия (ВИНАГИ се опитваме за деца, дори минимално)
     let investmentBudgetRemaining = budgetAnnual;
     let juniorBudgetAllocated = 0;
     let ulBudgetAllocated = 0;
 
-    // Стъпка 1: изчисли нужните вноски за ВСИЧКИ ЦЕЛИТЕ
-    const juniorNeededTotal = juniorSavingsByChild.reduce((s, j) => s + j.juniorSavings, 0);
     const ulNeededTotal = (cAnnualSavings || 0) + (pAnnualSavings || 0);
+    const juniorNeededTotal = juniorSavingsByChild.reduce((s, j) => s + j.juniorSavings, 0);
     const totalInvestmentNeeded = juniorNeededTotal + ulNeededTotal;
 
-    // Стъпка 2: ПРИОРИТЕТ ПЪРВО ДЕЦА, ПОСЛЕ ПЕНСИЯ
-    if (totalInvestmentNeeded > investmentBudgetRemaining) {
-      // Недостатъчен общ бюджет
-      if (juniorNeededTotal <= investmentBudgetRemaining) {
-        // Достатъчно за деца, остатъкът за пенсия
+    // Стъпка 1: Проверка дали можем да финансираме Junior (минимум 300€/год)
+    const minJuniorBudgetAnnual = 300 * Math.max(1, juniorSavingsByChild.length);
+    const canAffordMinJunior = investmentBudgetRemaining >= minJuniorBudgetAnnual;
+
+    if (!canAffordMinJunior && juniorSavingsByChild.length > 0) {
+      // Бюджета е твърде малък дори за минимум Junior — прескачаме Junior
+      juniorBudgetAllocated = 0;
+      ulBudgetAllocated = investmentBudgetRemaining;
+      // UL със пълния бюджет
+      if (ulNeededTotal > 0 && investmentBudgetRemaining > 0) {
+        const ulScale = investmentBudgetRemaining / ulNeededTotal;
+        if (cAnnualSavings) cAnnualSavings *= ulScale;
+        if (pAnnualSavings) pAnnualSavings *= ulScale;
+      } else {
+        cAnnualSavings = 0;
+        pAnnualSavings = 0;
+      }
+    } else if (canAffordMinJunior && juniorSavingsByChild.length > 0) {
+      // Достатъчен бюджет за Junior — дей максимум което е възможно
+      if (totalInvestmentNeeded <= investmentBudgetRemaining) {
+        // Хватает за всичко точно
         juniorBudgetAllocated = juniorNeededTotal;
-        ulBudgetAllocated = investmentBudgetRemaining - juniorNeededTotal;
+        ulBudgetAllocated = ulNeededTotal;
+      } else {
+        // Недостатъчно общо — приоритет Junior, остатък UL
+        juniorBudgetAllocated = investmentBudgetRemaining * 0.70; // 70% за деца
+        ulBudgetAllocated = investmentBudgetRemaining * 0.30;     // 30% за пенсия
+
+        // Масштабирай Junior към алокирания бюджет
+        if (juniorNeededTotal > 0) {
+          const juniorScale = juniorBudgetAllocated / juniorNeededTotal;
+          for (let i = 0; i < juniorSavingsByChild.length; i++) {
+            juniorSavingsByChild[i].juniorSavings = Math.max(300, Math.round(juniorSavingsByChild[i].juniorSavings * juniorScale));
+          }
+        }
+
+        // Масштабирай UL към остатъка
         if (ulNeededTotal > 0 && ulBudgetAllocated > 0) {
           const ulScale = ulBudgetAllocated / ulNeededTotal;
           if (cAnnualSavings) cAnnualSavings *= ulScale;
@@ -666,22 +700,10 @@ Deno.serve(async (req) => {
           cAnnualSavings = 0;
           pAnnualSavings = 0;
         }
-      } else {
-        // Недостатъчно дори за деца — намали пропорционално всичко
-        const scaleFactor = investmentBudgetRemaining / totalInvestmentNeeded;
-        juniorBudgetAllocated = juniorNeededTotal * scaleFactor;
-        ulBudgetAllocated = ulNeededTotal * scaleFactor;
-
-        for (let i = 0; i < juniorSavingsByChild.length; i++) {
-          juniorSavingsByChild[i].juniorSavings *= scaleFactor;
-        }
-        if (cAnnualSavings) cAnnualSavings *= scaleFactor;
-        if (pAnnualSavings) pAnnualSavings *= scaleFactor;
       }
     } else {
-      // Достатъчен бюджет за всичко — алокирай точно нужното
-      juniorBudgetAllocated = juniorNeededTotal;
-      ulBudgetAllocated = ulNeededTotal;
+      // Няма деца — весь бюджет за пенсия
+      ulBudgetAllocated = investmentBudgetRemaining;
     }
 
     // КРИТИЧНО: Оставащ бюджет за защита = общ месячен таван МИНУС (инвестиции / 12)

@@ -1,11 +1,11 @@
 /**
  * ============================================================
- *   ФИНАНСОВ ПЛАН — КОНСТИТУЦИЯ НА ПРАВИЛАТА (v0.3)
+ *   ФИНАНСОВ ПЛАН — КОНСТИТУЦИЯ НА ПРАВИЛАТА (v0.4)
  *
  * ⚠️ ВАЛУТА: ВСИЧКИ СУМИ В ПЛАНА, АНАЛИЗА И ФИНАНСОВИЯ ПЛАН СА В ЕВРО (€).
  *    От 01.01.2026 българският лев е заменен с евро.
  *    Не се прилага конвертиране BGN→EUR. Всички полета се третират директно като EUR.
- *   Последна актуализация: 2026-03-11
+ *   Последна актуализация: 2026-03-26
  * ============================================================
  *
  * Този файл е живият документ с бизнес правилата за генериране
@@ -1662,13 +1662,32 @@ export const PLAN_CONSTITUTION = {
        */
       snap_to_threshold: {
         applies: true,
-        condition: "gap_to_next_threshold <= 0.05 * investment_budget_remaining",
+        /**
+         * АЛГОРИТЪМ (Вариант В — ✅ ПОТВЪРДЕНО 2026-03-26):
+         *
+         * СТЪПКА A — Per-contract (за всеки договор поотделно):
+         *   1. Намери P с бинарно търсене (~20 итерации)
+         *   2. Намери следващия праг над P (от premium_bonus_thresholds + av_charge_thresholds)
+         *   3. Изчисли gap = next_threshold - P
+         *   4. Ако gap <= 0.05 × investment_budget_remaining → маркирай договора за snap
+         *
+         * СТЪПКА B — Финална проверка на общия бюджет:
+         *   5. Сумирай всички маркирани snap-ове: total_snap = SUM(gap_per_contract)
+         *   6. Ако total_snap <= investment_budget_remaining → ВСИЧКИ snap-ват ✅
+         *      Ако total_snap > investment_budget_remaining → НИКОЙ не snap-ва ❌
+         *      (не се избира частично — всичко или нищо)
+         *
+         * Защо "всичко или нищо":
+         *   - Избягва субективност при избор кой snap-ва
+         *   - 5%-ният филтър в Стъпка A вече гарантира, че само "близки" прагове влизат
+         *   - На практика edge cases са редки
+         */
+        condition_per_contract: "gap_to_next_threshold <= 0.05 * investment_budget_remaining",
         premium_bonus_thresholds: [1800, 3000, 4200],
         av_charge_thresholds: [720, 960, 1200, 1500, 2400, 3600],
         applies_per_contract: true,
-        application_order: "simultaneous",
+        application_order: "simultaneous — all or nothing",
         simultaneous_constraint: "SUM(all_snaps) <= investment_budget_remaining",
-        note: "Snap се проверява едновременно за всички договори. Ако общият snap надвишава оставащия бюджет — нито един snap не се прилага (не се избира частично).",
         recheck_after_snap: true
       },
 

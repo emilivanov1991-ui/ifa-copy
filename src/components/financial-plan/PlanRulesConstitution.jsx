@@ -1809,6 +1809,14 @@ export const PLAN_CONSTITUTION = {
         for_whom: "client, partner, AND all_children",
         min_age: 0,
         max_age_at_signup: 64,
+        // ✅ ПОТВЪРДЕНО (В88, 2026-03-26):
+        // Максимална възраст при сключване: 64 г. (включително).
+        // При 65+ г. → лицето е НЕДОПУСТИМО и Уника се пропуска само за него.
+        // Логика: ако клиентът е 65+, но партньорът е 60 → партньорът получава Уника (поредното правило продължава).
+        // Ако и двамата са 65+ → Уника не се включва изобщо.
+        // Деца: практически винаги под 64 г. — но ако child_age > 64 (невъзможно) → пропуска се.
+        // Източник: UNIQA_HEALTH_VALUE_RULES.max_age = 64 (UniqaHealthValueConstants.jsx)
+        age_eligibility_check: "age <= 64 — skip person if age > 64",
         note: "По една отделна полица за клиента, партньора и всяко дете. Достъпно за възраст 0–64 г. към датата на сключване.",
         // ✅ ПОТВЪРДЕНО (В81+В82, 2026-03-26):
         // remaining_budget = budget_ceiling_annual - ul_client_total - ul_partner_total - SUM(junior_per_child)

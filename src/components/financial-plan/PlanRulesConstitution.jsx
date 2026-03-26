@@ -1810,6 +1810,31 @@ export const PLAN_CONSTITUTION = {
 
 };
 
-// Таблиците и пакетните продукти са в отделен файл за управление на размера:
-// → components/financial-plan/PlanRulesProductTables.jsx
+// ──────────────────────────────────────────────────────────
+// ЕДИННА ТОЧКА ЗА ВХОД — за генератора на финансов план
+// ──────────────────────────────────────────────────────────
+//
+// ⚠️ ВАЖНО: ВИНАГИ импортирай PLAN_RULES (не PLAN_CONSTITUTION директно).
+// PLAN_RULES обединява конституцията + таблиците в един обект.
+// Така генераторът никога не може да пропусне нито един файл.
+//
+// Използване:
+//   import { PLAN_RULES } from '@/components/financial-plan/PlanRulesConstitution';
+//   const budget = PLAN_RULES.strategic_allocation.plan_budget_ceilings...
+//   const avCharge = PLAN_RULES.product_rules.av_charge_table
+//   const packages = PLAN_RULES.product_rules.package_products
+//
 export { PLAN_PRODUCT_TABLES } from './PlanRulesProductTables';
+import { PLAN_PRODUCT_TABLES } from './PlanRulesProductTables';
+
+export const PLAN_RULES = {
+  ...PLAN_CONSTITUTION,
+  product_rules: {
+    ...PLAN_CONSTITUTION.product_rules,
+    av_charge_table:       PLAN_PRODUCT_TABLES.av_charge_table,
+    premium_bonus_table:   PLAN_PRODUCT_TABLES.premium_bonus_table,
+    credit_guard:          PLAN_PRODUCT_TABLES.credit_guard,
+    package_products_order: PLAN_PRODUCT_TABLES.package_products_order,
+    package_products:      PLAN_PRODUCT_TABLES.package_products,
+  }
+};

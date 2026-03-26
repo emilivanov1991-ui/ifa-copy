@@ -1,3 +1,6 @@
+// ⚠️ ВАЖНО: Логиката на плана се изчислява в backend функция generateFinancialPlan.
+// Правилата са дефинирани в PLAN_RULES (PlanRulesConstitution + PlanRulesProductTables).
+// НИКОГА не пиши бизнес логика директно тук — само UI.
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";

@@ -1,3 +1,6 @@
+// ⚠️ ВАЖНО: Бизнес правилата са в PLAN_RULES (PlanRulesConstitution + PlanRulesProductTables).
+// TODO: calculatePlan() трябва да се замени с извикване на generateFinancialPlan backend функция,
+// която имплементира конституцията изцяло. Текущата логика е placeholder.
 import React, { useState, useMemo } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";

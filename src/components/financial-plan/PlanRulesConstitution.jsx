@@ -1692,6 +1692,51 @@ export const PLAN_CONSTITUTION = {
       },
 
       /**
+       * СМЯНА НА ВТОРИ ПЕНСИОНЕН СТЪЛБ (УПФ)
+       * Статус: ✅ ПОТВЪРДЕНО (В89, 2026-03-26)
+       *
+       * Прилага се за клиент И партньор поотделно.
+       *
+       * УСЛОВИЕ ЗА ВКЛЮЧВАНЕ (и двете трябва да са изпълнени):
+       *   1. client_pillar_2 === true  (или partner_pillar_2 === true)
+       *   2. client_pension_fund !== "УПФ „ОББ" ЕАД"
+       *      (включително "Да се провери допълнително" → третира се като различен фонд)
+       *
+       * ДЕЙСТВИЕ:
+       *   → Препоръчва се смяна на фонда към УПФ "ОББ" ЕАД
+       *   → Включва се като отделна препоръка в плана (не е месечен разход)
+       *
+       * Полета от FinancialAnalysisSubmission:
+       *   Клиент:
+       *     - client_pillar_2         → boolean
+       *     - client_pension_fund     → string (име на фонда)
+       *   Партньор:
+       *     - partner_pillar_2        → boolean
+       *     - partner_pension_fund    → string (ime на фонда)
+       *
+       * Специален случай — "Да се провери допълнително":
+       *   → Третира се като различен фонд → смяната се препоръчва
+       *   → В плана се добавя бележка: "Необходимо е да се провери текущия фонд преди смяна"
+       */
+      pillar_2_fund_switch: {
+        applies_to: ["client", "partner"],
+        condition: {
+          has_pillar_2: "client_pillar_2 === true OR partner_pillar_2 === true",
+          wrong_fund: "pension_fund !== 'УПФ „ОББ" ЕАД'",
+          includes_check_later: true,
+          check_later_value: "Да се провери допълнително",
+          check_later_note: "Третира се като различен фонд — смяната се препоръчва с бележка за проверка"
+        },
+        target_fund: "УПФ „ОББ" ЕАД",
+        action: "recommend_fund_switch",
+        cost_type: "none — не е месечен разход, еднократна административна процедура",
+        source_fields: {
+          client: { has_pillar_2: "client_pillar_2", fund: "client_pension_fund" },
+          partner: { has_pillar_2: "partner_pillar_2", fund: "partner_pension_fund" }
+        }
+      },
+
+      /**
        * PARTNERS INVESTMENTS
        * Статус: ✅ ПОТВЪРДЕНО — НЕ СЕ ПРЕДЛАГА
        *

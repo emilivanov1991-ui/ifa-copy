@@ -1312,6 +1312,55 @@ export const PLAN_CONSTITUTION = {
     },
 
     /**
+     * ПРАВИЛО В96 — УНИКА И ДЖЕНЕРАЛИ В ПЛАНА
+     * Статус: ✅ ПОТВЪРДЕНО (2026-03-26)
+     *
+     * УНИКА ЗДРАВЕ И ЦЕННОСТ СЕЛЕКТ (план "Европа"):
+     *   Включва се: ВИНАГИ когато има достатъчен бюджет в цел 1 (Защита на дохода)
+     *   Покритие: Лечение при критични заболявания (40 тежки заболявания)
+     *   За кого: Клиент + Партньор + всяко дете с индивидуална полица
+     *   Условие: нито едно
+     *
+     * ДЖЕНЕРАЛИ HEALTH LINE BASIC:
+     *   Включва се: ВИНАГИ когато има достатъчен бюджет СЛЕД Уника
+     *              И само ако НЯМА работодателска застраховка
+     *   Покритие: Допълнително здравно застраховане
+     *   За кого: Клиент + Партньор (деца НЕ)
+     *   Условия:
+     *     1. has_employer_health_insurance === false (клиент)
+     *     2. partner_has_employer_health_insurance === false (партньор)
+     *   Логика: Ако партньорът вече има работодателска застраховка → неговата Дженерали не се включва
+     *           Ако и двамата нямат → и двамата получават Дженерали
+     *           Ако поне един няма но няма бюджет → Дженерали не се включва за никой
+     *
+     * ПРИОРИТЕТ В БЮДЖЕТА:
+     *   1. Уника (винаги първо)
+     *   2. Дженерали (второ, ако остава бюджет)
+     *   3. Остальни продукти (Term Life, UL и т.н.)
+     */
+    uniqa_dzenali_inclusion: {
+      uniqa_health_value: {
+        condition: "always_if_budget_available",
+        priority: 1,
+        inclusion_for_client: true,
+        inclusion_for_partner: true,
+        inclusion_for_children: true,
+        coverage_type: "critical_illness (40 diseases)",
+        plan: "europa",
+        note: "Не зависи от работодателска застраховка — винаги се предлага"
+      },
+      generali_health_basic: {
+        condition: "always_if_budget_after_uniqa AND no_employer_health_insurance",
+        priority: 2,
+        inclusion_for_client: "has_employer_health_insurance === false",
+        inclusion_for_partner: "partner_has_employer_health_insurance === false",
+        inclusion_for_children: false,
+        coverage_type: "supplementary_health",
+        per_person_logic: "Всеки партньор се проверява поотделно — ако един има работодателска, той не получава Дженерали, другият — получава"
+      }
+    },
+
+    /**
      * ══════════════════════════════════════════════════════════════
      * ИНВЕСТИЦИОННИ ЦЕЛИ — АЛГОРИТМИ ЗА КАЛКУЛАЦИЯ
      * Статус: ✅ ПОТВЪРДЕНО

@@ -1353,7 +1353,10 @@ export const PLAN_CONSTITUTION = {
      *
      * СТЪПКА 1 — Нужна консумация към днешна дата:
      *   monthly_consumption = total_monthly_income - financial_market_monthly
-     *   (т.е. само разходите за живот без ипотеки, инвестиции, спестявания)
+     *
+     *   financial_market_monthly = SUM(liability_*_monthly) + monthly_investments + SUM(insurance_*)
+     *   (т.е. всичко което НЕ е разход за живот: кредити + инвестиции + застраховки)
+     *   Остават само разходите за живот (expense_* полета) — именно те трябва да се покрият при пенсия.
      *
      * СТЪПКА 2 — Оставащи години до пенсия:
      *   При ЕДИНИЧЕН клиент: years_to_retirement = 65 - client_age

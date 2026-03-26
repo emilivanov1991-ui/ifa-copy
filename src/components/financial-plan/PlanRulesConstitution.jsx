@@ -1810,14 +1810,20 @@ export const PLAN_CONSTITUTION = {
         min_age: 0,
         max_age_at_signup: 64,
         note: "По една отделна полица за клиента, партньора и всяко дете. Достъпно за възраст 0–64 г. към датата на сключване.",
-        include_when: "remaining_budget >= total_uniqa_premium",
         // ✅ ПОТВЪРДЕНО (В81+В82, 2026-03-26):
         // remaining_budget = budget_ceiling_annual - ul_client_total - ul_partner_total - SUM(junior_per_child)
         // Всички MetLife договори от Стъпка 1 се приспадат изцяло (пълна премия на всеки договор).
         // ul_total = annualSavings + totalCoverages + adminFee(15) + premiumWaiver (за всеки договор поотделно)
         // При Term Life: remaining_budget = budget_ceiling_annual - term_life_client - term_life_partner - SUM(junior_per_child)
         budget_check: "remaining_budget = budget_ceiling_annual - SUM(all_metlife_step1_premiums)",
-        on_insufficient_budget: "skip — не се включва, не се намалява",
+        // ✅ ПОТВЪРДЕНО (В83, 2026-03-26):
+        // Уника се включва ПОРЕДНО: клиент → партньор → деца (по ред на възраст)
+        // Всяка полица се проверява поотделно дали се побира в оставащия бюджет.
+        // Ако за клиента стига, но за партньора не → клиентът получава Уника, партньорът не.
+        // Ако за клиент и партньор стига, но само за 1 дете → само то получава Уника.
+        include_order: ["client", "partner", "child_1", "child_2", "child_3", "child_4", "child_5"],
+        include_when: "remaining_budget >= uniqa_premium_for_this_person (checked per person sequentially)",
+        on_insufficient_budget: "skip remaining persons — не се намалява, не се заменя",
         skip_if_employer_health_insurance: false,
         skip_rationale: "Уника Здраве и Ценност Селект НЕ е допълнително здравно застраховане — покрива критични заболявания и здравна ценност. Работодателската здравна застраховка НЕ е причина да се пропуска. Включва се ВИНАГИ за клиент, партньор и деца."
       },

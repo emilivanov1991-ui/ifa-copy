@@ -1845,9 +1845,14 @@ export const PLAN_CONSTITUTION = {
         monthly_premium_bgn: 60,
         annual_premium_bgn: 720,
         note: "По една отделна полица за клиента и партньора (не за деца). Фиксирана тарифа — не зависи от възрастта.",
-        include_when: "remaining_budget >= total_generali_premium (after Uniqa deducted)",
+        // ✅ ПОТВЪРДЕНО (В85, 2026-03-26):
+        // Дженерали Basic е "всичко или нищо" за двамата заедно:
+        //   remaining_budget >= SUM(generali_client + generali_partner) → включват се и двамата
+        //   Ако не стига → НИКОЙ не получава Дженерали
+        // (Изключение: ако единият е пропуснат заради работодателска застраховка → проверката е само за другия)
+        include_when: "remaining_budget >= SUM(generali_premiums_for_eligible_persons)",
         budget_check: "remaining_budget = budget_ceiling_annual - metlife_annual_premium - uniqa_annual_premium",
-        on_insufficient_budget: "skip — не се включва",
+        on_insufficient_budget: "skip ALL eligible persons — не се включва частично",
         skip_per_person: {
           client: "has_employer_health_insurance === true",
           partner: "partner_has_employer_health_insurance === true"

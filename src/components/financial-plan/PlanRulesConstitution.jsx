@@ -1448,8 +1448,35 @@ export const PLAN_CONSTITUTION = {
         "Акции развиващи се пазари": "50%",
         "Световни ценни книжа (облигации)": "0%"
       },
-      years_to_retirement_couple: "AVERAGE(client_age, partner_age) → 65 - average",
-      years_to_retirement_single: "65 - client_age",
+      /**
+       * ОПРЕДЕЛЯНЕ НА ХОРИЗОНТА (за всеки партньор поотделно)
+       * Статус: ✅ ПОТВЪРДЕНО
+       *
+       * Алгоритъмът се прилага ИНДИВИДУАЛНО за клиента и партньора.
+       * При двойка единият може да ползва желаната си възраст, другият да падне на 65.
+       *
+       * СЦЕНАРИЙ А — Желана пенсионна възраст (desired_retirement_age < 65):
+       *   horizon_years    = desired_retirement_age - current_age   // по-кратък хоризонт
+       *   withdrawal_years = 85 - desired_retirement_age            // по-дълъг период за харчене
+       *   state_pension    = 67 € (социална — преди 65 г. няма право на редовна пенсия)
+       *   → Изчисли required_corpus_A с тези параметри
+       *   → Провери дали UL вноската за corpus_A / 2 се побира в бюджета
+       *
+       * СЦЕНАРИЙ Б — Fallback към 65 г.:
+       *   horizon_years    = 65 - current_age
+       *   withdrawal_years = 85 - 65 = 20 г. (240 месеца)
+       *   state_pension    = MIN(MAX(gross × 0.45, 347), 1739)   // нормална формула
+       *   → required_corpus_B (винаги по-благоприятен от A)
+       *
+       * ИЗБОР:
+       *   Ако corpus_A може да се финансира в рамките на бюджета → Сценарий А ✅
+       *   Иначе → Сценарий Б (65 г.) ✅
+       *
+       * ⚠️ При desired_retirement_age === 65 → директно Сценарий Б (без проверка на А)
+       */
+      years_to_retirement_algorithm: "per_person: try desired_retirement_age first, fallback to 65",
+      years_to_retirement_couple: "applied per person individually — not averaged",
+      years_to_retirement_single: "same algorithm: try client_retirement_age, fallback to 65",
 
       /**
        * СЪЩЕСТВУВАЩИ АКТИВИ — ПРИСПАДАНЕ ОТ ПЕНСИОННИЯ КОРПУС

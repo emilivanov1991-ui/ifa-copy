@@ -1544,19 +1544,42 @@ export const PLAN_CONSTITUTION = {
        *   → property_2_value (has_property_2 = true), property_3_value (has_property_3 = true)
        */
       existing_assets_deduction: {
+        /**
+         * ТРЕТИРАНЕ НА АКТИВИ ПРИ ДВОЙКА
+         * Статус: ✅ ПОТВЪРДЕНО (В92, 2026-03-26)
+         *
+         * ВСИЧКИ активи (клиент + партньор) се сумират ОБЩО и се приспадат
+         * от total_corpus ПРЕДИ разделянето 50/50.
+         *
+         * Последователност:
+         *   1. Изчисли corpus_client и corpus_partner индивидуално (В91)
+         *   2. total_corpus = corpus_client + corpus_partner
+         *   3. Изчисли fv_всички_активи (общо за домакинството)
+         *   4. corpus_net = MAX(0, total_corpus - fv_всички_активи)
+         *   5. target_per_person = corpus_net / 2
+         *   6. Бинарно търсене на UL вноска за всеки спрямо target_per_person и НЕГОВИЯ хоризонт
+         *
+         * Логика: активите са ОБЩИ за домакинството — не се знае чии са.
+         * Приспадат се преди разпределението, за да се избегне двойно отчитане.
+         */
+        couple_assets_treatment: "pool_all_assets_then_deduct_from_total_corpus_before_50_50_split",
+
         financial_investments: {
           fields: ["asset_medium_term_savings", "asset_long_term_savings"],
+          couple_note: "Сумират се активите на ДВАМАТА (клиент + партньор) в общ пул",
           annual_return: 0.05,
-          formula: "FV = value × (1.05)^years_to_retirement"
+          formula: "FV = (client_value + partner_value) × (1.05)^years_to_retirement",
+          years_for_couple: "AVERAGE(client_years_to_retirement, partner_years_to_retirement)"
         },
         secondary_properties: {
           fields: ["property_2_value", "property_3_value"],
           condition: ["has_property_2 === true", "has_property_3 === true"],
           annual_growth: 0.03,
           formula: "FV = value × (1.03)^years_to_retirement",
-          excludes: "current_housing (основен дом — не се продава)"
+          excludes: "current_housing (основен дом — не се продава)",
+          years_for_couple: "AVERAGE(client_years_to_retirement, partner_years_to_retirement)"
         },
-        corpus_net_formula: "MAX(0, required_corpus - fv_investments - fv_properties)"
+        corpus_net_formula: "MAX(0, total_corpus - fv_investments - fv_properties - fv_voluntary_pensions)"
       },
 
       /**
@@ -1781,192 +1804,12 @@ export const PLAN_CONSTITUTION = {
         include_in_plans: false,
         role: "excluded — not offered under any circumstances"
       }
-    },
-
-    /**
-     * ТАБЛИЦА Б: АДМИНИСТРАТИВНА ТАКСА ЗА УПРАВЛЕНИЕ (AV Charge)
-     * Статус: ✅ ПОТВЪРДЕНО (от документ MetLife УЖ Общи условия, в сила от 02.12.2024)
-     *
-     * Изчислява се като % от стойността на инвестиционната сметка (годишно)
-     * Прилага се ПО ДОГОВОР (клиент, партньор и junior — всеки поотделно)
-     *
-     * Годишна премия (€)  →  AV Charge (% годишно от сметката)
-     *   300  – 719   →  2.00%
-     *   720  – 959   →  1.75%
-     *   960  – 1199  →  1.50%
-     *   1200 – 1499  →  1.25%
-     *   1500 – 2399  →  1.00%
-     *   2400 – 3599  →  0.75%
-     *   3600+        →  0.50%
-     */
-    av_charge_table: [
-      { annual_premium_from: 300,  annual_premium_to: 719,  rate_pct: 2.00 },
-      { annual_premium_from: 720,  annual_premium_to: 959,  rate_pct: 1.75 },
-      { annual_premium_from: 960,  annual_premium_to: 1199, rate_pct: 1.50 },
-      { annual_premium_from: 1200, annual_premium_to: 1499, rate_pct: 1.25 },
-      { annual_premium_from: 1500, annual_premium_to: 2399, rate_pct: 1.00 },
-      { annual_premium_from: 2400, annual_premium_to: 3599, rate_pct: 0.75 },
-      { annual_premium_from: 3600, annual_premium_to: null, rate_pct: 0.50 }
-    ],
-
-    /**
-     * ТАБЛИЦА В: ПРЕМИЕН БОНУС
-     * Статус: ✅ ПОТВЪРДЕНО (от документ MetLife УЖ Общи условия, в сила от 02.12.2024)
-     *
-     * % от премията/вноската по основния договор, с който MetLife увеличава инвестиционната сметка
-     * Прилага се ПО ДОГОВОР (клиент, партньор и junior — всеки поотделно)
-     *
-     * Годишна премия (€)  →  Премиен бонус (% от годишната вноска)
-     *   1200 – 1799  →  1%
-     *   1800 – 2999  →  2%
-     *   3000 – 4199  →  3%
-     *   4200+        →  4%
-     *   (под 1200 €  →  0% — без бонус)
-     */
-    premium_bonus_table: [
-      { annual_premium_from: 1200, annual_premium_to: 1799, bonus_pct: 1 },
-      { annual_premium_from: 1800, annual_premium_to: 2999, bonus_pct: 2 },
-      { annual_premium_from: 3000, annual_premium_to: 4199, bonus_pct: 3 },
-      { annual_premium_from: 4200, annual_premium_to: null, bonus_pct: 4 }
-    ],
-
-    /**
-     * КРЕДИТ ГАРД — ПРАВИЛА
-     * Статус: ✅ ПОТВЪРДЕНО
-     *
-     * Отделна полица за ВСЕКИ кредит (различни суми и срокове).
-     * Цел: (вноска без банкова застраховка живот + Credit Guard) < (вноска с банкова застраховка)
-     * Важи при нови кредити, рефинансиране и съществуващи кредити.
-     */
-    credit_guard: {
-      one_policy_per_loan: true,
-      coverage_amount: "outstanding_balance_per_loan",
-      term: "remaining_months_per_loan",
-      package: "extended",
-      applies_to: ["new_mortgage", "refinanced_loans", "existing_loans"],
-      optimization_check:
-        "payment_without_bank_insurance + credit_guard_premium < payment_with_bank_insurance"
-    },
-
-    /**
-     * ПАКЕТНИ ПРОДУКТИ
-     * Статус: ✅ ПОТВЪРДЕНО
-     */
-    /**
-     * РЕД НА ВКЛЮЧВАНЕ НА ПАКЕТНИТЕ ПРОДУКТИ
-     * Статус: ✅ ПОТВЪРДЕНО
-     *
-     * 1. Всички MetLife покрития (за клиента и партньора) — живот, трайна нетрудоспособност,
-     *    тежки заболявания, фрактури и изгаряния, телемедицина, waiver of premium
-     * 2. Уника Здраве и Ценност (клиент + партньор + деца)
-     * 3. Дженерали Basic (клиент + партньор)
-     *
-     * Ако бюджетът се изчерпи на стъпка 1 → MetLife се заменя с ДЗИ Закрила (Платинен)
-     * и Уника / Дженерали не се включват.
-     * Ако бюджетът се изчерпи на стъпка 2 → Дженерали не се включва.
-     */
-    package_products_order: [
-      { step: 1, product: "metlife_ul_or_term_life", for_whom: "client_and_partner" },
-      { step: 1, product: "metlife_junior", for_whom: "children_age_lte_11", note: "Заедно с другите MetLife покрития — Стъпка 1" },
-      { step: 2, product: "uniqa_zdrave_i_tsennost", for_whom: "client_partner_and_children" },
-      { step: 3, product: "generali_health_basic", for_whom: "client_and_partner" }
-    ],
-
-    package_products: {
-
-      // Заместващ продукт на MetLife при изчерпан бюджет
-      dzi_zakrila: {
-        package: "platinum",
-        for_whom: "both_client_and_partner",
-        role: "metlife_substitute",
-        include_when: "budget_exhausted_for_metlife"
-      },
-
-      // Следваща по приоритет след животозастраховането — включва се ако остатъкът от бюджета стига
-      uniqa_zdrave_i_tsennost: {
-        package: "europa",
-        for_whom: "client, partner, AND all_children",
-        min_age: 0,
-        max_age_at_signup: 64,
-        // ✅ ПОТВЪРДЕНО (В88, 2026-03-26):
-        // Максимална възраст при сключване: 64 г. (включително).
-        // При 65+ г. → лицето е НЕДОПУСТИМО и Уника се пропуска само за него.
-        // Логика: ако клиентът е 65+, но партньорът е 60 → партньорът получава Уника (поредното правило продължава).
-        // Ако и двамата са 65+ → Уника не се включва изобщо.
-        // Деца: практически винаги под 64 г. — но ако child_age > 64 (невъзможно) → пропуска се.
-        // Източник: UNIQA_HEALTH_VALUE_RULES.max_age = 64 (UniqaHealthValueConstants.jsx)
-        age_eligibility_check: "age <= 64 — skip person if age > 64",
-        note: "По една отделна полица за клиента, партньора и всяко дете. Достъпно за възраст 0–64 г. към датата на сключване.",
-        // ✅ ПОТВЪРДЕНО (В81+В82, 2026-03-26):
-        // remaining_budget = budget_ceiling_annual - ul_client_total - ul_partner_total - SUM(junior_per_child)
-        // Всички MetLife договори от Стъпка 1 се приспадат изцяло (пълна премия на всеки договор).
-        // ul_total = annualSavings + totalCoverages + adminFee(15) + premiumWaiver (за всеки договор поотделно)
-        // При Term Life: remaining_budget = budget_ceiling_annual - term_life_client - term_life_partner - SUM(junior_per_child)
-        budget_check: "remaining_budget = budget_ceiling_annual - SUM(all_metlife_step1_premiums)",
-        // ✅ ПОТВЪРДЕНО (В83+В84, 2026-03-26):
-        // Уника се включва по следната логика:
-        //   1. Клиент: проверява се поотделно — ако стига → включва се
-        //   2. Партньор: проверява се поотделно от оставащия бюджет — ако стига → включва се
-        //   3. Деца (като ГРУПА): SUM(uniqa_per_child) за ВСИЧКИ деца се проверява наведнъж.
-        //      Ако оставащият бюджет >= SUM(всички деца) → всички деца получават Уника.
-        //      Ако не стига за всички деца → НИКОЕ дете не получава Уника (не се включва частично).
-        // Редът на проверка: клиент → партньор → деца (група)
-        include_order: ["client", "partner", "children_as_group"],
-        include_when_adults: "remaining_budget >= uniqa_premium_for_this_person (per person)",
-        include_when_children: "remaining_budget >= SUM(uniqa_per_child for ALL children)",
-        on_insufficient_budget_adults: "skip this person, continue to next",
-        on_insufficient_budget_children: "skip ALL children — не се включва частично за някои деца",
-        skip_if_employer_health_insurance: false,
-        // ✅ ПОТВЪРДЕНО (В87, 2026-03-26):
-        // Уника Здраве и Ценност Селект НЕ е допълнително здравно застраховане —
-        // покрива критични заболявания и здравна ценност, което е различно от
-        // стандартната работодателска здравна застраховка.
-        // → Включва се ВИНАГИ за клиент, партньор и деца, независимо дали имат работодателска застраховка.
-        skip_rationale: "Уника Здраве и Ценност Селект покрива критични заболявания и здравна ценност — не е заместима от работодателска здравна застраховка. Включва се ВИНАГИ."
-      },
-
-      // Включва се ако остатъкът от бюджета стига след Уника
-      generali_health_basic: {
-        package: "basic",
-        product_name: "HEALTH Line - Basic",
-        for_whom: "client_and_partner_only",
-        min_age: 18,
-        max_age_at_signup: 70,
-        currency: "BGN",
-        flat_rate: true,
-        monthly_premium_bgn: 60,
-        annual_premium_bgn: 720,
-        note: "По една отделна полица за клиента и партньора (не за деца). Фиксирана тарифа — не зависи от възрастта.",
-        // ✅ ПОТВЪРДЕНО (В85+В86, 2026-03-26):
-        // Дженерали Basic е "всичко или нищо" само за ДОПУСТИМИТЕ лица (без работодателска застраховка):
-        //   eligible_persons = [client if !has_employer_health_insurance, partner if !partner_has_employer_health_insurance]
-        //   Ако remaining_budget >= SUM(generali_premiums за eligible_persons) → включват се всички допустими
-        //   Ако не стига → НИКОЕ допустимо лице не получава Дженерали
-        //
-        // Примери:
-        //   - Клиент има работодателска, партньор няма → eligible = [партньор] → проверява се само неговата полица
-        //   - И двамата нямат → eligible = [клиент, партньор] → проверява се сумата на двете
-        //   - И двамата имат → eligible = [] → Дженерали не се включва изобщо
-        include_when: "remaining_budget >= SUM(generali_premiums_for_eligible_persons)",
-        budget_check: "remaining_budget = budget_ceiling_annual - metlife_annual_premium - uniqa_annual_premium",
-        on_insufficient_budget: "skip ALL eligible persons — не се включва частично",
-        skip_per_person: {
-          client: "has_employer_health_insurance === true",
-          partner: "partner_has_employer_health_insurance === true"
-        },
-        skip_rationale: "Правилото е строго индивидуално: Дженерали Basic се включва само за лицата БЕЗ работодателска здравна застраховка. Примери: единичен клиент с работодателска → не се включва; двойка, двамата имат → не се включва за никого; двойка, само единият има → включва се само за другия; двойка, никой няма → включва се за двамата. Не се предлага за деца.",
-        source_fields: {
-          client: "FinancialAnalysisSubmission.has_employer_health_insurance",
-          partner: "FinancialAnalysisSubmission.partner_has_employer_health_insurance"
-        }
-      },
-
-      // Нишови продукти — само upsale, не в стандартните планове
-      metlife_grija:    { include_in_plans: false, role: "niche_upsale_only" },
-      metlife_medica:   { include_in_plans: false, role: "niche_upsale_only" },
-      dzi_best_doctors: { include_in_plans: false, role: "niche_upsale_only" }
     }
 
   }
 
 };
+
+// Таблиците и пакетните продукти са в отделен файл за управление на размера:
+// → components/financial-plan/PlanRulesProductTables.jsx
+export { PLAN_PRODUCT_TABLES } from './PlanRulesProductTables';

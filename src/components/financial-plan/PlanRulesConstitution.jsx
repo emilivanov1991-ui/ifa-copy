@@ -1362,21 +1362,34 @@ export const PLAN_CONSTITUTION = {
      *   При ЕДИНИЧЕН клиент: years_to_retirement = 65 - client_age
      *   При ДВОЙКА: years_to_retirement = 65 - AVERAGE(client_age, partner_age)
      *
-     * СТЪПКА 3 — Очаквана държавна пенсия:
-     *   state_pension_total = SUM(client_expected_state_pension, partner_expected_state_pension)
+     * СТЪПКА 3 — Очаквана държавна пенсия (ДНЕШНА стойност):
+     *   При ЕДИНИЧЕН клиент: state_pension_today = client_expected_state_pension
+     *   При ДВОЙКА: state_pension_today = client_expected_state_pension + partner_expected_state_pension
      *
-     * СТЪПКА 4 — Първо теглене (инфлационно към пенсия):
-     *   first_withdrawal = FV(3%/12, years_to_retirement * 12, 0, -monthly_consumption) - state_pension_total
-     *   // FV = monthly_consumption × (1 + 0.03/12)^(years * 12)
+     * СТЪПКА 4 — Проектиране на нуждата и пенсията до пенсионна дата (при 3% инфлация):
+     *   // И двете се умножават по ЕДИН И СЪЩ инфлационен фактор → правилно сравнение в бъдещи пари
+     *   inflation_factor = (1 + 0.03/12)^(years_to_retirement * 12)
+     *
+     *   future_consumption = monthly_consumption × inflation_factor
+     *   future_state_pension = state_pension_today × inflation_factor
+     *
+     *   // Пенсионният gap = нуждата при пенсия МИНУС проектираната държавна пенсия
+     *   pension_gap = future_consumption - future_state_pension
+     *
+     *   ⚠️ ВАЖНО: Не се изважда днешната стойност на пенсията от бъдещата нужда.
+     *   И двата потока се проектират до пенсионна дата при 3% инфлация преди сравнение.
      *
      * СТЪПКА 5 — Нужен корпус при пенсиониране (growing annuity PV):
      *   r = 0.04 / 12   // месечна доходност след пенсия
      *   g = 0.03 / 12   // месечна инфлация
-     *   required_corpus = first_withdrawal / (r - g) × [1 - ((1 + g) / (1 + r))^240]
+     *   required_corpus = pension_gap / (r - g) × [1 - ((1 + g) / (1 + r))^240]
      *
-     *   ✅ Верификация: monthly_consumption=6000€, years=32, state_pension=3478€
-     *   → first_withdrawal = 6000×(1.0025)^384 - 3478 = 11 972.50€
-     *   → corpus = 11972.50 / 0.000833 × [1 - (1.0025/1.003333)^240] ≈ 2 600 000€
+     *   ✅ Верификация: monthly_consumption=6000€, years=32, state_pension_today=3478€
+     *   → inflation_factor = (1.0025)^384 ≈ 2.599
+     *   → future_consumption = 6000 × 2.599 = 15 594 €
+     *   → future_state_pension = 3478 × 2.599 = 9 039 €
+     *   → pension_gap = 15 594 - 9 039 = 6 555 €/месец
+     *   → corpus = 6555 / 0.000833 × [1 - (1.0025/1.003333)^240] ≈ 1 420 000 €
      *
      * СТЪПКА 6 — Намери годишната UL вноска итеративно:
      *   За клиент и партньор (всеки поотделно): target = required_corpus / 2

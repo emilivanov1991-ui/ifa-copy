@@ -56,7 +56,6 @@ import ClientPortal from './pages/ClientPortal';
 import ConsultantPortal from './pages/ConsultantPortal';
 import Contact from './pages/Contact';
 import FinancialAnalysis from './pages/FinancialAnalysis';
-import FinancialPlanCreate from './pages/FinancialPlanCreate';
 import FinancialPlanView from './pages/FinancialPlanView';
 import FinancialPlanner from './pages/FinancialPlanner';
 import Home from './pages/Home';
@@ -77,7 +76,6 @@ export const PAGES = {
     "ConsultantPortal": ConsultantPortal,
     "Contact": Contact,
     "FinancialAnalysis": FinancialAnalysis,
-    "FinancialPlanCreate": FinancialPlanCreate,
     "FinancialPlanView": FinancialPlanView,
     "FinancialPlanner": FinancialPlanner,
     "Home": Home,

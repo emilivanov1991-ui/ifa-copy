@@ -27,7 +27,6 @@ import { base44 } from '@/api/base44Client';
 import { toast } from 'sonner';
 import { useNavigate } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
-import FinancialPlanGeneratorV2 from '../financial-plan/FinancialPlanGeneratorV2';
 import AutoPlanGenerator from '../financial-plan/AutoPlanGenerator';
 import AnalysisDetailView from '../consultant/AnalysisDetailView';
 

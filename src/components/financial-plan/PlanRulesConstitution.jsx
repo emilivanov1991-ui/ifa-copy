@@ -1811,12 +1811,12 @@ export const PLAN_CONSTITUTION = {
         max_age_at_signup: 64,
         note: "По една отделна полица за клиента, партньора и всяко дете. Достъпно за възраст 0–64 г. към датата на сключване.",
         include_when: "remaining_budget >= total_uniqa_premium",
-        // ✅ ПОТВЪРДЕНО (В81, 2026-03-26):
-        // remaining_budget = budget_ceiling_annual - ul_total_annual (пълната UL премия)
-        // ul_total_annual = annualSavings + totalCoverages + adminFee(15) + premiumWaiver
-        // Целият UL договор се третира като едно цяло спрямо бюджета.
-        // При Term Life: remaining_budget = budget_ceiling_annual - term_life_total_annual
-        budget_check: "remaining_budget = budget_ceiling_annual - metlife_total_annual_premium",
+        // ✅ ПОТВЪРДЕНО (В81+В82, 2026-03-26):
+        // remaining_budget = budget_ceiling_annual - ul_client_total - ul_partner_total - SUM(junior_per_child)
+        // Всички MetLife договори от Стъпка 1 се приспадат изцяло (пълна премия на всеки договор).
+        // ul_total = annualSavings + totalCoverages + adminFee(15) + premiumWaiver (за всеки договор поотделно)
+        // При Term Life: remaining_budget = budget_ceiling_annual - term_life_client - term_life_partner - SUM(junior_per_child)
+        budget_check: "remaining_budget = budget_ceiling_annual - SUM(all_metlife_step1_premiums)",
         on_insufficient_budget: "skip — не се включва, не се намалява",
         skip_if_employer_health_insurance: false,
         skip_rationale: "Уника Здраве и Ценност Селект НЕ е допълнително здравно застраховане — покрива критични заболявания и здравна ценност. Работодателската здравна застраховка НЕ е причина да се пропуска. Включва се ВИНАГИ за клиент, партньор и деца."

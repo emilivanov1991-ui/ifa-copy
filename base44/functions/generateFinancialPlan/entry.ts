@@ -589,23 +589,36 @@ Deno.serve(async (req) => {
 
     // Calculate children needs FIRST (за snap calculation) — ПРЕМЕСТЕНА ДЕКЛАРАЦИЯ
     const childrenCount = a.children_count || 0;
+    const childrenAges = a.children_ages || [];  // Масив със възрастите на детелата
+    const childrenNames = a.children_names || [];  // Масив със имена
     const totalEdGoal = (a.children_education_costs||0) + (a.children_start_life_costs||0) + (a.children_wedding_costs||0);
     const existingEdSavings = a.children_current_savings || 0;
+    const educationGap = Math.max(0, totalEdGoal - existingEdSavings);  // ОБЩИЯ gap, НЕ по дете
 
     const juniorSavingsByChild = [];
-    for (let i = 1; i <= childrenCount; i++) {
-      const childBirthdate = a[`child_${i}_birthdate`];
-      if (!childBirthdate) continue;
-      const childAge = Math.floor((Date.now() - new Date(childBirthdate)) / (365.25 * 24 * 60 * 60 * 1000));
+    for (let i = 0; i < childrenAges.length; i++) {
+      const childAge = Math.floor(childrenAges[i]);
       if (childAge > 11) continue;
       const horizon = 20 - childAge;
-      if (horizon <= 0) continue;
-      const totalEdGoal = (a.children_education_costs||0) + (a.children_start_life_costs||0) + (a.children_wedding_costs||0);
-      const existingEdSavings = a.children_current_savings || 0;
-      const gapPerChild = Math.max(0, (totalEdGoal - existingEdSavings) / Math.max(1, childrenCount));
+      if (horizon < 1) continue;
+
+      // КРИТИЧНО: Разпредели образователния gap пропорционално по хоризонт на всяко дете
+      // По-малко дете (по-дълъг хоризонт) = по-малка годишна вноска
+      const horizonSum = (() => {
+        let sum = 0;
+        for (let j = 0; j < childrenAges.length; j++) {
+          const age = Math.floor(childrenAges[j]);
+          if (age > 11) continue;
+          sum += Math.max(0, 20 - age);
+        }
+        return sum;
+      })();
+
+      const horizonShare = horizonSum > 0 ? horizon / horizonSum : 1 / Math.max(1, childrenCount);
+      const gapForThisChild = educationGap * horizonShare;
 
       const findJuniorSavings = (target, budgAnnual) => {
-        if (target <= 0) return 1200;
+        if (target <= 0) return 300;  // минимум
         let lo = 300, hi = budgAnnual;
         for (let iter = 0; iter < 40; iter++) {
           const mid = (lo + hi) / 2;
@@ -615,8 +628,8 @@ Deno.serve(async (req) => {
         }
         return Math.max(300, hi);
       };
-      const jSav = findJuniorSavings(gapPerChild, budgetAnnual);
-      juniorSavingsByChild.push({ childAge, horizon, gapPerChild, juniorSavings: jSav });
+      const jSav = findJuniorSavings(gapForThisChild, budgetAnnual);
+      juniorSavingsByChild.push({ childIdx: i, childAge, childName: childrenNames[i], horizon, gapForThisChild, juniorSavings: jSav });
     }
 
     // Apply snap-to-threshold BEFORE allocating budget
@@ -627,42 +640,57 @@ Deno.serve(async (req) => {
       juniorSavingsByChild[i].juniorSavings = snapResult.jSavings[i];
     }
 
-    // ── РАЗПРЕДЕЛЕНИЕ НА БЮДЖЕТ: ПРИОРИТЕТ Junior ПЪРВО (PLAN_CONSTITUTION investment_priority_on_shortfall) ──
+    // ── РЕЗЕРВИРАНЕ НА ИНВЕСТИЦИОНЕН БЮДЖЕТ (преди добавяне на продукти) ──
+    // Приоритет по конституция: Деца > Пенсия
     let investmentBudgetRemaining = budgetAnnual;
     let juniorBudgetAllocated = 0;
     let ulBudgetAllocated = 0;
 
-    // Стъпка 1: изчисли нужните вноски за ALL целите
+    // Стъпка 1: изчисли нужните вноски за ВСИЧКИ ЦЕЛИТЕ
     const juniorNeededTotal = juniorSavingsByChild.reduce((s, j) => s + j.juniorSavings, 0);
     const ulNeededTotal = (cAnnualSavings || 0) + (pAnnualSavings || 0);
     const totalInvestmentNeeded = juniorNeededTotal + ulNeededTotal;
 
-    // Стъпка 2: приоритет Junior
+    // Стъпка 2: ПРИОРИТЕТ ПЪРВО ДЕЦА, ПОСЛЕ ПЕНСИЯ
     if (totalInvestmentNeeded > investmentBudgetRemaining) {
-      // Недостатъчен бюджет — разпределяй пропорционално
-      const scaleFactor = investmentBudgetRemaining / totalInvestmentNeeded;
-      juniorBudgetAllocated = juniorNeededTotal * scaleFactor;
-      ulBudgetAllocated = ulNeededTotal * scaleFactor;
+      // Недостатъчен общ бюджет
+      if (juniorNeededTotal <= investmentBudgetRemaining) {
+        // Достатъчно за деца, остатъкът за пенсия
+        juniorBudgetAllocated = juniorNeededTotal;
+        ulBudgetAllocated = investmentBudgetRemaining - juniorNeededTotal;
+        if (ulNeededTotal > 0 && ulBudgetAllocated > 0) {
+          const ulScale = ulBudgetAllocated / ulNeededTotal;
+          if (cAnnualSavings) cAnnualSavings *= ulScale;
+          if (pAnnualSavings) pAnnualSavings *= ulScale;
+        } else {
+          cAnnualSavings = 0;
+          pAnnualSavings = 0;
+        }
+      } else {
+        // Недостатъчно дори за деца — намали пропорционално всичко
+        const scaleFactor = investmentBudgetRemaining / totalInvestmentNeeded;
+        juniorBudgetAllocated = juniorNeededTotal * scaleFactor;
+        ulBudgetAllocated = ulNeededTotal * scaleFactor;
 
-      // Намали Junior и UL пропорционално
-      for (let i = 0; i < juniorSavingsByChild.length; i++) {
-        juniorSavingsByChild[i].juniorSavings *= scaleFactor;
+        for (let i = 0; i < juniorSavingsByChild.length; i++) {
+          juniorSavingsByChild[i].juniorSavings *= scaleFactor;
+        }
+        if (cAnnualSavings) cAnnualSavings *= scaleFactor;
+        if (pAnnualSavings) pAnnualSavings *= scaleFactor;
       }
-      if (cAnnualSavings) cAnnualSavings *= scaleFactor;
-      if (pAnnualSavings) pAnnualSavings *= scaleFactor;
     } else {
-      // Достатъчен бюджет — алокирай точно нужното
+      // Достатъчен бюджет за всичко — алокирай точно нужното
       juniorBudgetAllocated = juniorNeededTotal;
       ulBudgetAllocated = ulNeededTotal;
     }
-    investmentBudgetRemaining -= (juniorBudgetAllocated + ulBudgetAllocated);
+
+    // КРИТИЧНО: Оставащ бюджет за защита = общ месячен таван МИНУС (инвестиции / 12)
+    const protectionBudgetMonthly = maxMonthlyBudget - ((juniorBudgetAllocated + ulBudgetAllocated) / 12);
 
     // ── ПОМОЩНИ ДАННИ ЗА PRODUCT SELECTION ──
     const hasChildUnder18 = (() => {
-      for (let i = 1; i <= (a.children_count || 0); i++) {
-        const bd = a[`child_${i}_birthdate`];
-        if (!bd) continue;
-        const childAge = Math.floor((Date.now() - new Date(bd)) / (365.25 * 24 * 60 * 60 * 1000));
+      for (let i = 0; i < childrenAges.length; i++) {
+        const childAge = Math.floor(childrenAges[i]);
         if (childAge < 18) return true;
       }
       return false;
@@ -679,7 +707,7 @@ Deno.serve(async (req) => {
 
     const planProducts = [];
     let totalMonthlyPremium = 0;
-    let remainingMonthlyBudget = maxMonthlyBudget;
+    let remainingMonthlyBudget = protectionBudgetMonthly;  // УЖЕ резервиран за инвестиции
 
     const addProduct = (product) => {
       planProducts.push(product);
@@ -759,47 +787,12 @@ Deno.serve(async (req) => {
       });
     }
 
-    // ── MetLife JUNIOR (деца ≤ 11) — СТЪПКА 1, пропорционално разделяне по нужда ──
-    // Изчисли пропорционално разделяне на Junior по възраст (хоризонт)
-    let juniorTotalNeeded = 0;
-    const juniorByChild = [];
+    // ── MetLife JUNIOR (деца ≤ 11) — ДОБАВЯНЕ КЪМ ПЛАНА С РЕЗЕРВИРАН БЮДЖЕТ ──
+    if (juniorSavingsByChild.length > 0) {
+      const juniorTotalNeeded = juniorSavingsByChild.reduce((s, j) => s + j.juniorSavings, 0);
+      const scale = juniorBudgetAllocated > 0 && juniorTotalNeeded > 0 ? juniorBudgetAllocated / juniorTotalNeeded : 1;
 
-    for (let i = 1; i <= childrenCount; i++) {
-      const childBirthdate = a[`child_${i}_birthdate`];
-      if (!childBirthdate) continue;
-      const childAge = Math.floor((Date.now() - new Date(childBirthdate)) / (365.25 * 24 * 60 * 60 * 1000));
-      if (childAge > 11) continue;
-      const horizon = 20 - childAge;
-      if (horizon <= 0) continue;
-
-      const childName = a[`child_${i}_name`] || `Дете ${i}`;
-
-      // Всяко дете има различна нужда по възраст (по-малко дете = по-дълъг хоризонт = по-малка вноска)
-      // Индивидуална целева сума (не разделена на всички)
-      const targetPerChild = (totalEdGoal - existingEdSavings) / Math.max(1, childrenCount);
-
-      const findJuniorSavings = (target, budgAnnual) => {
-        if (target <= 0) return 300; // min
-        let lo = 300, hi = budgAnnual;
-        for (let iter = 0; iter < 40; iter++) {
-          const mid = (lo + hi) / 2;
-          const val = projectUL(mid, horizon);
-          if (val >= target) hi = mid;
-          else lo = mid;
-        }
-        return Math.max(300, hi);
-      };
-
-      const jSav = findJuniorSavings(targetPerChild, budgetAnnual);
-      juniorByChild.push({ childIdx: i, childAge, childName, horizon, targetPerChild, juniorSavings: jSav });
-      juniorTotalNeeded += jSav;
-    }
-
-    // Разпредели Junior бюджет (вече определен преди от primoritet)
-    if (juniorByChild.length > 0) {
-      const scale = juniorBudgetAllocated > 0 ? juniorBudgetAllocated / juniorTotalNeeded : 0;
-
-      for (const child of juniorByChild) {
+      for (const child of juniorSavingsByChild) {
         let scaledJuniorSavings = Math.max(300, Math.round(child.juniorSavings * scale));
 
         // Junior coverages (fixed per constitution)
@@ -815,8 +808,8 @@ Deno.serve(async (req) => {
             product_type: 'ul_investment',
             provider: 'MetLife',
             product_name: 'MetLife Джуниър',
-            beneficiary: `child${child.childIdx}`,
-            beneficiary_name: child.childName,
+            beneficiary: `child${child.childIdx + 1}`,
+            beneficiary_name: child.childName || `Дете ${child.childIdx + 1}`,
             beneficiary_age: child.childAge,
             term_years: child.horizon,
             strategy: 'dynamic',
@@ -826,7 +819,7 @@ Deno.serve(async (req) => {
             is_active: true,
             details: {
               annual_savings: scaledJuniorSavings,
-              target_education_gap: Math.round(child.targetPerChild),
+              target_education_gap: Math.round(child.gapForThisChild),
               coverage_scalefactor: scale,
               coverages: {
                 fractures: jFractures,
@@ -1034,13 +1027,11 @@ Deno.serve(async (req) => {
 
     // Children Uniqa — ВСИЧКО ИЛИ НИЩО (PLAN_CONSTITUTION rule_v96 uniqa_dzenali_inclusion)
     const childrenUniqaCosts = [];
-    for (let i = 1; i <= childrenCount; i++) {
-      const childBirthdate = a[`child_${i}_birthdate`];
-      if (!childBirthdate) continue;
-      const childAge = Math.floor((Date.now() - new Date(childBirthdate)) / (365.25 * 24 * 60 * 60 * 1000));
+    for (let i = 0; i < childrenAges.length; i++) {
+      const childAge = Math.floor(childrenAges[i]);
       if (childAge > 64) continue;
       const uniqaChild = getUniqaMonthly(childAge);
-      if (uniqaChild !== null) childrenUniqaCosts.push({ childIdx: i, childAge, uniqaChild, childName: a[`child_${i}_name`] || `Дете ${i}` });
+      if (uniqaChild !== null) childrenUniqaCosts.push({ childIdx: i, childAge, uniqaChild, childName: childrenNames[i] || `Дете ${i + 1}` });
     }
     const totalChildrenUniqaCost = childrenUniqaCosts.reduce((s, c) => s + c.uniqaChild, 0);
 

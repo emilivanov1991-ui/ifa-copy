@@ -1443,6 +1443,11 @@ export const PLAN_CONSTITUTION = {
       pension_post_retirement_return: 0.04,
       pension_withdrawal_count: 240,
       ul_assumed_return: 0.08,  // 8% — стандартен за всички проекции (UL, Junior)
+      // ВАЖНО: 8% НЕ е груб линеен процент — използва се директно чрез MetLifeULCalculator.projection,
+      // която симулира реалните такси: AV charge (getAVCharge), COI (getMonthlyMortalityRate),
+      // investible premium rate (getInvestiblePremiumRate), premium bonus (getPremiumBonus).
+      // За намиране на нужната годишна вноска се итерира P докато accountValue[age=65] >= target_corpus.
+      // След пенсия парите се преместват в нискорискови активи (облигации) → post_retirement_return = 4%.
       ul_fund_allocation: {
         "Световни акции (развити пазари)": "50%",
         "Акции развиващи се пазари": "50%",

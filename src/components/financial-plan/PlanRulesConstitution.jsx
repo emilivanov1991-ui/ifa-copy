@@ -1733,8 +1733,15 @@ export const PLAN_CONSTITUTION = {
         source_fields: {
           client: { has_pillar_2: "client_pillar_2", fund: "client_pension_fund" },
           partner: { has_pillar_2: "partner_pillar_2", fund: "partner_pension_fund" }
-        }
-      },
+        },
+        // ⏳ PENDING — ДИЗАЙН ЗАДАЧА (презентация на финансовия план):
+        //   Отделен слайд за смяна на II. стълб:
+        //   - Защо УПФ "ОББ" ЕАД (сравнение с пазара, предимства)
+        //   - Как се прехвърля (стъпки, срок, административна процедура)
+        //   - При "Да се провери допълнително" → допълнителна бележка за проверка
+        //   Слайдът се включва САМО ако поне един от двамата (клиент/партньор) отговаря на условието.
+        presentation_slide: "PENDING — отделен слайд в FinancialPlanPresentation"
+        },
 
       /**
        * PARTNERS INVESTMENTS

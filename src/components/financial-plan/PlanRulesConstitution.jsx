@@ -1816,14 +1816,19 @@ export const PLAN_CONSTITUTION = {
         // ul_total = annualSavings + totalCoverages + adminFee(15) + premiumWaiver (за всеки договор поотделно)
         // При Term Life: remaining_budget = budget_ceiling_annual - term_life_client - term_life_partner - SUM(junior_per_child)
         budget_check: "remaining_budget = budget_ceiling_annual - SUM(all_metlife_step1_premiums)",
-        // ✅ ПОТВЪРДЕНО (В83, 2026-03-26):
-        // Уника се включва ПОРЕДНО: клиент → партньор → деца (по ред на възраст)
-        // Всяка полица се проверява поотделно дали се побира в оставащия бюджет.
-        // Ако за клиента стига, но за партньора не → клиентът получава Уника, партньорът не.
-        // Ако за клиент и партньор стига, но само за 1 дете → само то получава Уника.
-        include_order: ["client", "partner", "child_1", "child_2", "child_3", "child_4", "child_5"],
-        include_when: "remaining_budget >= uniqa_premium_for_this_person (checked per person sequentially)",
-        on_insufficient_budget: "skip remaining persons — не се намалява, не се заменя",
+        // ✅ ПОТВЪРДЕНО (В83+В84, 2026-03-26):
+        // Уника се включва по следната логика:
+        //   1. Клиент: проверява се поотделно — ако стига → включва се
+        //   2. Партньор: проверява се поотделно от оставащия бюджет — ако стига → включва се
+        //   3. Деца (като ГРУПА): SUM(uniqa_per_child) за ВСИЧКИ деца се проверява наведнъж.
+        //      Ако оставащият бюджет >= SUM(всички деца) → всички деца получават Уника.
+        //      Ако не стига за всички деца → НИКОЕ дете не получава Уника (не се включва частично).
+        // Редът на проверка: клиент → партньор → деца (група)
+        include_order: ["client", "partner", "children_as_group"],
+        include_when_adults: "remaining_budget >= uniqa_premium_for_this_person (per person)",
+        include_when_children: "remaining_budget >= SUM(uniqa_per_child for ALL children)",
+        on_insufficient_budget_adults: "skip this person, continue to next",
+        on_insufficient_budget_children: "skip ALL children — не се включва частично за някои деца",
         skip_if_employer_health_insurance: false,
         skip_rationale: "Уника Здраве и Ценност Селект НЕ е допълнително здравно застраховане — покрива критични заболявания и здравна ценност. Работодателската здравна застраховка НЕ е причина да се пропуска. Включва се ВИНАГИ за клиент, партньор и деца."
       },

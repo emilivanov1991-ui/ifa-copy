@@ -587,7 +587,11 @@ Deno.serve(async (req) => {
       return { cSav, pSav, jSavings };
     };
 
-    // Calculate children needs FIRST (для snap calculation)
+    // Calculate children needs FIRST (за snap calculation) — ПРЕМЕСТЕНА ДЕКЛАРАЦИЯ
+    const childrenCount = a.children_count || 0;
+    const totalEdGoal = (a.children_education_costs||0) + (a.children_start_life_costs||0) + (a.children_wedding_costs||0);
+    const existingEdSavings = a.children_current_savings || 0;
+
     const juniorSavingsByChild = [];
     for (let i = 1; i <= childrenCount; i++) {
       const childBirthdate = a[`child_${i}_birthdate`];
@@ -756,10 +760,6 @@ Deno.serve(async (req) => {
     }
 
     // ── MetLife JUNIOR (деца ≤ 11) — СТЪПКА 1, пропорционално разделяне по нужда ──
-    const childrenCount = a.children_count || 0;
-    const totalEdGoal = (a.children_education_costs||0) + (a.children_start_life_costs||0) + (a.children_wedding_costs||0);
-    const existingEdSavings = a.children_current_savings || 0;
-
     // Изчисли пропорционално разделяне на Junior по възраст (хоризонт)
     let juniorTotalNeeded = 0;
     const juniorByChild = [];

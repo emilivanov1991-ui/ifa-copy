@@ -1358,6 +1358,11 @@ export const PLAN_CONSTITUTION = {
      *   (т.е. всичко което НЕ е разход за живот: кредити + инвестиции + застраховки)
      *   Остават само разходите за живот (expense_* полета) — именно те трябва да се покрият при пенсия.
      *
+     *   ⚠️ При ДВОЙКА: финансовият поток е ОБЩ за домакинството — полетата НЕ са разделени на двама.
+     *   → total_monthly_income = client_net_income + partner_net_income
+     *   → financial_market_monthly = общите liability_*_monthly + monthly_investments + insurance_* (домакинството)
+     *   → monthly_consumption = разходите за живот на цялото домакинство (expense_* полета)
+     *
      * СТЪПКА 2 — Оставащи години до пенсия:
      *   При ЕДИНИЧЕН клиент: years_to_retirement = 65 - client_age
      *   При ДВОЙКА: years_to_retirement = 65 - AVERAGE(client_age, partner_age)

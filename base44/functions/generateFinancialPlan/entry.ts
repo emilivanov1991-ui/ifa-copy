@@ -495,8 +495,8 @@ const getMonthlyMortality = (age) => {
 // Включва: investible premium rate, premium bonus, AV charge, COI, policy fee
 // ──────────────────────────────────────────────────────────
 
-// Стандартно Junior face amount (MetLife Джуниър интегрирано покритие Живот)
-const JUNIOR_FACE_AMOUNT = 5000; // EUR — стандартно за MetLife Джуниър
+// MetLife Детство няма интегрирано покритие Живот — face amount = 0 → COI = 0 (без смъртностна такса)
+const JUNIOR_FACE_AMOUNT = 0;
 
 // Версия с правилно начална възраст
 const projectULFull = (annualSavings, startAge, yearsToRetirement, assumedReturn = 0.08, faceAmount = 2500) => {

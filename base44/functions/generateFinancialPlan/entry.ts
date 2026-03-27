@@ -665,6 +665,164 @@ const scaleTermLifeToFit = (tl, age, budgetAnnual) => {
   return { ...tl, basicLifeCoverage: scaledBasicLife, ptdCoverage: scaledPtd, ci32Coverage: scaledCi32, totalAnnual: newTotal };
 };
 
+// ============================================================
+// METLIFE ГРИЖА (MetLife Care) — пълни константи и логика
+// Идентични с MetLifeCareCalculator.jsx + FinancialPlanConstants
+// ============================================================
+
+// Пакети покрития — идентични с ML_CARE_PACKAGES в MetLifeCareCalculator
+const ML_CARE_PACKAGES = {
+  'Бронзов':      { disability: 10000,  ptd: 10000,  ci40: 10000,  cancer: 10000,  inSitu: 5000  },
+  'Сребърен':     { disability: 25000,  ptd: 25000,  ci40: 25000,  cancer: 25000,  inSitu: 12500 },
+  'Златен':       { disability: 50000,  ptd: 50000,  ci40: 50000,  cancer: 50000,  inSitu: 25000 },
+  'Платинен':     { disability: 100000, ptd: 100000, ci40: 100000, cancer: 100000, inSitu: 50000 },
+};
+
+// Тарифи по възраст — идентични с METLIFE_CARE_AGE_RATES от FinancialPlanConstants (rate per 1000 EUR)
+const METLIFE_CARE_AGE_RATES = {
+  18: { disability: 2.82,  ci40: 4.43,  cancer: 3.84,  inSitu: 4.55328  },
+  19: { disability: 2.94,  ci40: 4.57,  cancer: 3.97,  inSitu: 4.61448  },
+  20: { disability: 2.94,  ci40: 4.71,  cancer: 4.09,  inSitu: 4.70016  },
+  21: { disability: 3.06,  ci40: 4.85,  cancer: 4.21,  inSitu: 4.77360  },
+  22: { disability: 3.06,  ci40: 4.99,  cancer: 4.33,  inSitu: 4.87152  },
+  23: { disability: 3.18,  ci40: 5.14,  cancer: 4.46,  inSitu: 4.98168  },
+  24: { disability: 3.18,  ci40: 5.30,  cancer: 4.60,  inSitu: 5.09184  },
+  25: { disability: 3.30,  ci40: 5.47,  cancer: 4.74,  inSitu: 5.21424  },
+  26: { disability: 3.30,  ci40: 5.64,  cancer: 4.90,  inSitu: 5.33664  },
+  27: { disability: 3.43,  ci40: 5.84,  cancer: 5.06,  inSitu: 5.47128  },
+  28: { disability: 3.55,  ci40: 6.03,  cancer: 5.23,  inSitu: 5.63040  },
+  29: { disability: 3.67,  ci40: 6.24,  cancer: 5.40,  inSitu: 5.78952  },
+  30: { disability: 3.79,  ci40: 6.46,  cancer: 5.59,  inSitu: 5.94864  },
+  31: { disability: 3.92,  ci40: 6.70,  cancer: 5.79,  inSitu: 6.12000  },
+  32: { disability: 4.04,  ci40: 6.95,  cancer: 6.01,  inSitu: 6.30360  },
+  33: { disability: 4.16,  ci40: 7.22,  cancer: 6.24,  inSitu: 6.49944  },
+  34: { disability: 4.41,  ci40: 7.50,  cancer: 6.49,  inSitu: 6.71976  },
+  35: { disability: 4.53,  ci40: 7.81,  cancer: 6.74,  inSitu: 6.95232  },
+  36: { disability: 4.77,  ci40: 8.14,  cancer: 7.04,  inSitu: 7.18488  },
+  37: { disability: 5.02,  ci40: 8.51,  cancer: 7.34,  inSitu: 7.45416  },
+  38: { disability: 5.26,  ci40: 8.89,  cancer: 7.67,  inSitu: 7.73568  },
+  39: { disability: 5.51,  ci40: 9.30,  cancer: 8.03,  inSitu: 8.04168  },
+  40: { disability: 5.75,  ci40: 9.74,  cancer: 8.41,  inSitu: 8.34768  },
+  41: { disability: 6.00,  ci40: 10.21, cancer: 8.81,  inSitu: 8.65368  },
+  42: { disability: 6.24,  ci40: 10.71, cancer: 9.23,  inSitu: 8.95968  },
+  43: { disability: 6.61,  ci40: 11.24, cancer: 9.68,  inSitu: 9.25344  },
+  44: { disability: 6.98,  ci40: 11.80, cancer: 10.17, inSitu: 9.54720  },
+  45: { disability: 7.34,  ci40: 12.39, cancer: 10.67, inSitu: 9.86544  },
+  46: { disability: 7.71,  ci40: 13.01, cancer: 11.20, inSitu: 10.24488 },
+  47: { disability: 8.20,  ci40: 13.66, cancer: 11.76, inSitu: 10.66104 },
+  48: { disability: 8.57,  ci40: 14.35, cancer: 12.34, inSitu: 11.11392 },
+  49: { disability: 9.18,  ci40: 15.07, cancer: 12.96, inSitu: 11.60352 },
+  50: { disability: 9.67,  ci40: 15.85, cancer: 13.62, inSitu: 12.15432 },
+  51: { disability: 10.28, ci40: 16.65, cancer: 14.31, inSitu: 12.77856 },
+  52: { disability: 10.89, ci40: 17.52, cancer: 15.06, inSitu: 13.43952 },
+  53: { disability: 11.51, ci40: 18.45, cancer: 15.85, inSitu: 14.14944 },
+  54: { disability: 12.12, ci40: 19.50, cancer: 16.73, inSitu: 14.89608 },
+  55: { disability: 12.85, ci40: 20.69, cancer: 17.74, inSitu: 15.83856 },
+  56: { disability: 13.71, ci40: 21.59, cancer: 18.53, inSitu: 16.70760 },
+  57: { disability: 14.57, ci40: 22.77, cancer: 19.54, inSitu: 17.79696 },
+  58: { disability: 15.67, ci40: 24.05, cancer: 20.59, inSitu: 19.00872 },
+  59: { disability: 16.65, ci40: 25.57, cancer: 21.89, inSitu: 20.51424 },
+  60: { disability: 18.12, ci40: 27.37, cancer: 23.43, inSitu: 22.31352 },
+  61: { disability: 18.60, ci40: 27.72, cancer: 23.72, inSitu: 22.90104 },
+  62: { disability: 19.34, ci40: 28.09, cancer: 24.03, inSitu: 23.47632 },
+  63: { disability: 20.20, ci40: 28.62, cancer: 24.53, inSitu: 24.21072 },
+  64: { disability: 21.42, ci40: 30.06, cancer: 25.70, inSitu: 25.52040 },
+  65: { disability: 23.75, ci40: 32.08, cancer: 27.42, inSitu: 27.52776 },
+};
+
+// PI (PTD) rate за рисков клас 1 — от METLIFE_PA_RISK_CLASSES[1].pi = 1.5
+const ML_CARE_PTD_RATE_CLASS1 = 1.5;
+
+// Правила за допустимост — от MetLifeCareCalculator (age constraints per coverage)
+const ML_CARE_RULES = {
+  min_age: 18,
+  max_age_disability: 65,    // ТЗР >50%
+  max_age_ptd: 65,           // ПТН от злополука (имплицитно свързано)
+  max_age_ci40: 65,          // 40 тежки заболявания
+  max_age_cancer: 69,        // Злокачествени новообразувания
+  max_age_inSitu: 64,        // Карцином ин ситу
+  max_age_telemedicine: 64,  // Телемедицина
+  min_annual_premium: 50,    // Минимална годишна премия €
+  min_disability_coverage: 3000,
+  insurance_tax: 0.02,       // 2% данък върху застрахователната премия
+  semi_annual_factor: 0.51,  // 51% от годишната за 6-месечно плащане
+  quarterly_factor: 0.26,    // 26% от годишната за 3-месечно плащане
+};
+
+/**
+ * Изчислява MetLife Грижа годишна премия (с данък 2%)
+ * Идентична логика с MetLifeCareCalculator.jsx
+ * @param {number} age
+ * @param {object} coverages — { disability, ptd, ci40, cancer, inSitu }
+ * @param {boolean} includeTelemedicine
+ * @param {number} riskClass — 1, 2 или 3
+ * @returns {{ annualPremium, monthlyPremium, netPremium, insuranceTax, breakdown }}
+ */
+const calcMLCarePremium = (age, coverages, includeTelemedicine = true, riskClass = 1) => {
+  const ageRates = METLIFE_CARE_AGE_RATES[Math.min(Math.max(Math.floor(age), 18), 65)];
+  let netPremium = 0;
+  const breakdown = {};
+
+  // ТЗР над 50% (заболяване и злополука) — rate per 1000, мин. 3000 €
+  if (coverages.disability > 0 && age <= ML_CARE_RULES.max_age_disability) {
+    const prem = (coverages.disability / 1000) * ageRates.disability;
+    breakdown.disability = { coverage: coverages.disability, rate: ageRates.disability, premium: prem };
+    netPremium += prem;
+  }
+
+  // Пълна/Частична ТН от злополука — PI rate по рисков клас
+  // Рисков клас 1: 1.5, 2: 2.5, 3: 4.0 (от METLIFE_PA_RISK_CLASSES)
+  const piRates = { 1: 1.5, 2: 2.5, 3: 4.0 };
+  const ptdRate = piRates[riskClass] || 1.5;
+  if (coverages.ptd > 0 && age <= ML_CARE_RULES.max_age_ptd) {
+    const prem = (coverages.ptd / 1000) * ptdRate;
+    breakdown.ptd = { coverage: coverages.ptd, rate: ptdRate, premium: prem };
+    netPremium += prem;
+  }
+
+  // 40 Тежки Заболявания — допустима 18-65
+  if (coverages.ci40 > 0 && age >= 18 && age <= ML_CARE_RULES.max_age_ci40) {
+    const prem = (coverages.ci40 / 1000) * ageRates.ci40;
+    breakdown.ci40 = { coverage: coverages.ci40, rate: ageRates.ci40, premium: prem };
+    netPremium += prem;
+  }
+
+  // Злокачествени новообразувания — допустима 18-69
+  if (coverages.cancer > 0 && age >= 18 && age <= ML_CARE_RULES.max_age_cancer) {
+    const prem = (coverages.cancer / 1000) * ageRates.cancer;
+    breakdown.cancer = { coverage: coverages.cancer, rate: ageRates.cancer, premium: prem };
+    netPremium += prem;
+  }
+
+  // Карцином ин ситу — допустима 18-64
+  if (coverages.inSitu > 0 && age >= 18 && age <= ML_CARE_RULES.max_age_inSitu) {
+    const prem = (coverages.inSitu / 1000) * ageRates.inSitu;
+    breakdown.inSitu = { coverage: coverages.inSitu, rate: ageRates.inSitu, premium: prem };
+    netPremium += prem;
+  }
+
+  // Телемедицина — 15 €, допустима до 64 г.
+  if (includeTelemedicine && age <= ML_CARE_RULES.max_age_telemedicine) {
+    breakdown.telemedicine = { coverage: 'Включено', premium: 15 };
+    netPremium += 15;
+  }
+
+  // 2% застрахователен данък
+  const insuranceTax = netPremium * ML_CARE_RULES.insurance_tax;
+  const annualPremium = netPremium + insuranceTax;
+
+  return {
+    annualPremium: Math.round(annualPremium * 100) / 100,
+    monthlyPremium: Math.round((annualPremium / 12) * 100) / 100,
+    semiAnnualPremium: Math.round(annualPremium * ML_CARE_RULES.semi_annual_factor * 100) / 100,
+    quarterlyPremium: Math.round(annualPremium * ML_CARE_RULES.quarterly_factor * 100) / 100,
+    netPremium: Math.round(netPremium * 100) / 100,
+    insuranceTax: Math.round(insuranceTax * 100) / 100,
+    breakdown,
+    eligible: annualPremium >= ML_CARE_RULES.min_annual_premium,
+  };
+};
+
 // ──────────────────────────────────────────────────────────
 // MAIN HANDLER
 // ──────────────────────────────────────────────────────────
@@ -1272,6 +1430,92 @@ Deno.serve(async (req) => {
           coverage_amount: 2242300,
           is_active: true,
           details: { plan: 'Europa', currency: 'EUR' },
+        });
+      }
+    }
+
+    // ── СТЪПКА 2.5: MetLife Грижа — Сребърен пакет по подразбиране ──
+    // Правила: клиент 18-65, отделно за партньор ако е включен
+    // Пакет: Сребърен { disability:25000, ptd:25000, ci40:25000, cancer:25000, inSitu:12500 }
+    // Включва Телемедицина ако < 65 г.
+    const mlCarePkg = ML_CARE_PACKAGES['Сребърен'];
+
+    if (cAge >= 18 && cAge <= 65) {
+      const mlCareClient = calcMLCarePremium(
+        cAge,
+        { disability: mlCarePkg.disability, ptd: mlCarePkg.ptd, ci40: mlCarePkg.ci40, cancer: mlCarePkg.cancer, inSitu: mlCarePkg.inSitu },
+        cAge <= 64, // telemedicine
+        1           // рисков клас 1 по подразбиране
+      );
+      if (mlCareClient.eligible && remainingMonthlyBudget >= mlCareClient.monthlyPremium) {
+        addProduct({
+          product_type: 'health_insurance',
+          provider: 'MetLife',
+          product_name: 'MetLife Грижа — Сребърен пакет',
+          beneficiary: 'partner1',
+          beneficiary_name: `${a.client_first_name||''} ${a.client_last_name||''}`.trim(),
+          beneficiary_age: cAge,
+          monthly_premium: mlCareClient.monthlyPremium,
+          total_premium: mlCareClient.annualPremium,
+          coverage_amount: mlCarePkg.disability,
+          is_active: true,
+          details: {
+            package: 'Сребърен',
+            risk_class: 1,
+            currency: 'EUR',
+            insurance_tax_2pct: true,
+            net_premium: mlCareClient.netPremium,
+            coverages: {
+              disability_over_50pct: mlCarePkg.disability,
+              ptd_accident: mlCarePkg.ptd,
+              critical_illness_40: mlCarePkg.ci40,
+              cancer: mlCarePkg.cancer,
+              carcinoma_in_situ: cAge <= 64 ? mlCarePkg.inSitu : 0,
+              telemedicine: cAge <= 64,
+            },
+            semi_annual: mlCareClient.semiAnnualPremium,
+            quarterly: mlCareClient.quarterlyPremium,
+          },
+        });
+      }
+    }
+
+    if (includePartner && pAge >= 18 && pAge <= 65) {
+      const mlCarePartner = calcMLCarePremium(
+        pAge,
+        { disability: mlCarePkg.disability, ptd: mlCarePkg.ptd, ci40: mlCarePkg.ci40, cancer: mlCarePkg.cancer, inSitu: mlCarePkg.inSitu },
+        pAge <= 64,
+        1
+      );
+      if (mlCarePartner.eligible && remainingMonthlyBudget >= mlCarePartner.monthlyPremium) {
+        addProduct({
+          product_type: 'health_insurance',
+          provider: 'MetLife',
+          product_name: 'MetLife Грижа — Сребърен пакет',
+          beneficiary: 'partner2',
+          beneficiary_name: `${a.partner_first_name||''} ${a.partner_last_name||''}`.trim(),
+          beneficiary_age: pAge,
+          monthly_premium: mlCarePartner.monthlyPremium,
+          total_premium: mlCarePartner.annualPremium,
+          coverage_amount: mlCarePkg.disability,
+          is_active: true,
+          details: {
+            package: 'Сребърен',
+            risk_class: 1,
+            currency: 'EUR',
+            insurance_tax_2pct: true,
+            net_premium: mlCarePartner.netPremium,
+            coverages: {
+              disability_over_50pct: mlCarePkg.disability,
+              ptd_accident: mlCarePkg.ptd,
+              critical_illness_40: mlCarePkg.ci40,
+              cancer: mlCarePkg.cancer,
+              carcinoma_in_situ: pAge <= 64 ? mlCarePkg.inSitu : 0,
+              telemedicine: pAge <= 64,
+            },
+            semi_annual: mlCarePartner.semiAnnualPremium,
+            quarterly: mlCarePartner.quarterlyPremium,
+          },
         });
       }
     }

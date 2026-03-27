@@ -1,25 +1,123 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.23';
 
 // ============================================================
-// generateFinancialPlan — v2.0
+// generateFinancialPlan — v3.0
 //
-// Следва стриктно PLAN_RULES (PlanRulesConstitution + PlanRulesProductTables).
-// Всички магически числа са взети от конституцията.
+// Използва ТОЧНО СЪЩИТЕ тарифи и формули като ProductConfigDemo калкулаторите.
+// Всички суми са в EUR (BGN е заменен с EUR от 01.01.2026).
 // ============================================================
 
 // ──────────────────────────────────────────────────────────
-// ТАБЛИЦИ (от PlanRulesProductTables)
+// ТАРИФИ — от FinancialPlanConstants (ТОЧНИ копия)
 // ──────────────────────────────────────────────────────────
+
+// TERM_LIFE_BASIC_RATES — тарифа на 1000€ покритие по възраст и срок
+const TERM_LIFE_BASIC_RATES = {
+  15:{5:3.65,10:3.6,15:3.69,20:3.66,25:3.85,30:4.19},
+  16:{5:3.74,10:3.66,15:3.75,20:3.73,25:3.95,30:4.34},
+  17:{5:3.82,10:3.73,15:3.79,20:3.8,25:4.05,30:4.5},
+  18:{5:3.91,10:3.78,15:3.85,20:3.87,25:4.15,30:4.68},
+  19:{5:3.96,10:3.82,15:3.9,20:3.95,25:4.27,30:4.88},
+  20:{5:4,10:3.84,15:3.94,20:4.02,25:4.41,30:5.07},
+  21:{5:4.04,10:3.87,15:3.99,20:4.12,25:4.57,30:5.3},
+  22:{5:4.09,10:3.9,15:4.05,20:4.22,25:4.75,30:5.55},
+  23:{5:4.1,10:3.94,15:4.13,20:4.33,25:4.95,30:5.82},
+  24:{5:4.13,10:3.99,15:4.2,20:4.47,25:5.18,30:6.13},
+  25:{5:4.14,10:4.03,15:4.29,20:4.63,25:5.4,30:6.46},
+  26:{5:4.15,10:4.09,15:4.41,20:4.83,25:5.68,30:6.82},
+  27:{5:4.16,10:4.16,15:4.52,20:5.04,25:5.98,30:7.22},
+  28:{5:4.22,10:4.27,15:4.67,20:5.3,25:6.32,30:7.64},
+  29:{5:4.3,10:4.37,15:4.84,20:5.59,25:6.69,30:8.13},
+  30:{5:4.38,10:4.5,15:5.06,20:5.88,25:7.11,30:8.66},
+  31:{5:4.49,10:4.67,15:5.32,20:6.23,25:7.54,30:9.22},
+  32:{5:4.61,10:4.84,15:5.6,20:6.61,25:8.04,30:9.81},
+  33:{5:4.77,10:5.04,15:5.93,20:7.03,25:8.56,30:10.45},
+  34:{5:4.9,10:5.26,15:6.29,20:7.5,25:9.15,30:11.12},
+  35:{5:5.08,10:5.56,15:6.65,20:8.01,25:9.8,30:11.86},
+  36:{5:5.32,10:5.9,15:7.09,20:8.55,25:10.47,30:12.6},
+  37:{5:5.55,10:6.27,15:7.56,20:9.16,25:11.18,30:13.45},
+  38:{5:5.78,10:6.7,15:8.07,20:9.79,25:11.95,30:14.31},
+  39:{5:6.11,10:7.18,15:8.65,20:10.52,25:12.77,30:15.26},
+  40:{5:6.55,10:7.64,15:9.28,20:11.31,25:13.66,30:16.26},
+  41:{5:6.97,10:8.19,15:9.92,20:12.12,25:14.55,30:17.33},
+  42:{5:7.51,10:8.8,15:10.67,20:12.99,25:15.56,30:18.49},
+  43:{5:8.16,10:9.47,15:11.44,20:13.94,25:16.62,30:19.73},
+  44:{5:8.79,10:10.2,15:12.32,20:14.92,25:17.75,30:21.05},
+  45:{5:9.3,10:10.95,15:13.24,20:15.97,25:18.92,30:22.45},
+  46:{5:9.99,10:11.71,15:14.19,20:17.02,25:20.19,30:23.98},
+  47:{5:10.68,10:12.6,15:15.18,20:18.21,25:21.56,30:25.52},
+  48:{5:11.38,10:13.45,15:16.24,20:19.42,25:23,30:27.15},
+  49:{5:12.22,10:14.48,15:17.35,20:20.74,25:24.56,30:28.9},
+  50:{5:13.24,10:15.65,15:18.61,20:22.16,25:26.26,30:30.8},
+  51:{5:14.1,10:16.77,15:19.81,20:23.66,25:28.08,30:null},
+  52:{5:15.22,10:17.95,15:21.2,20:25.29,25:29.95,30:null},
+  53:{5:16.24,10:19.24,15:22.61,20:27.04,25:31.92,30:null},
+  54:{5:17.5,10:20.53,15:24.13,20:28.9,25:34.04,30:null},
+  55:{5:18.86,10:21.97,15:25.73,20:30.9,25:36.32,30:null},
+  56:{5:20.29,10:23.4,15:27.51,20:33.14,25:null,30:null},
+  57:{5:21.57,10:25,15:29.38,20:35.36,25:null,30:null},
+  58:{5:23.19,10:26.69,15:31.46,20:37.79,25:null,30:null},
+  59:{5:24.55,10:28.43,15:33.6,20:40.35,25:null,30:null},
+  60:{5:26.09,10:30.22,15:35.93,20:43.12,25:null,30:null},
+  61:{5:27.57,10:32.28,15:38.57,20:null,25:null,30:null},
+  62:{5:29.57,10:34.57,15:41.28,20:null,25:null,30:null},
+  63:{5:31.39,10:37.02,15:44.16,20:null,25:null,30:null},
+  64:{5:33.6,10:39.76,15:47.37,20:null,25:null,30:null},
+  65:{5:35.75,10:42.71,15:50.86,20:null,25:null,30:null},
+};
+
+// METLIFE_PA_CRITICAL_ILLNESS_32_RATES — тарифа на 1000€ по възраст и срок
+const CI32_RATES = {
+  18:{yr5:1.4,yr10:1.85},19:{yr5:1.4,yr10:1.85},20:{yr5:1.4,yr10:1.85},
+  21:{yr5:1.4,yr10:1.85},22:{yr5:1.4,yr10:1.85},23:{yr5:1.4,yr10:1.85},
+  24:{yr5:1.4,yr10:1.85},25:{yr5:1.4,yr10:1.85},
+  26:{yr5:2.35,yr10:3.19},27:{yr5:2.35,yr10:3.19},28:{yr5:2.35,yr10:3.19},
+  29:{yr5:2.35,yr10:3.19},30:{yr5:2.35,yr10:3.19},
+  31:{yr5:4.63,yr10:6.23},32:{yr5:4.63,yr10:6.23},33:{yr5:4.63,yr10:6.23},
+  34:{yr5:4.63,yr10:6.23},35:{yr5:4.63,yr10:6.23},
+  36:{yr5:7.24,yr10:9.57},37:{yr5:7.24,yr10:9.57},38:{yr5:7.24,yr10:9.57},
+  39:{yr5:7.24,yr10:9.57},40:{yr5:7.24,yr10:9.57},
+  41:{yr5:12.31,yr10:16},42:{yr5:12.31,yr10:16},43:{yr5:12.31,yr10:16},
+  44:{yr5:12.31,yr10:16},45:{yr5:12.31,yr10:16},
+  46:{yr5:20.45,yr10:25.47},47:{yr5:20.45,yr10:25.47},48:{yr5:20.45,yr10:25.47},
+  49:{yr5:20.45,yr10:25.47},50:{yr5:20.45,yr10:25.47},
+  51:{yr5:31.79,yr10:38.07},52:{yr5:31.79,yr10:38.07},53:{yr5:31.79,yr10:38.07},
+  54:{yr5:31.79,yr10:38.07},55:{yr5:31.79,yr10:38.07},
+  56:{yr5:46.34,yr10:null},57:{yr5:46.34,yr10:null},58:{yr5:46.34,yr10:null},
+  59:{yr5:46.34,yr10:null},60:{yr5:46.34,yr10:null},
+};
+
+// METLIFE_PA_SECURITY_PLUS_COEFFICIENTS — коефициент за 40 тежки заболявания
+const CI40_COEFFICIENTS = {
+  18:225.733634311512,19:218.818380743982,20:212.314225053079,21:206.185567010309,
+  22:200.400801603206,23:194.552529182879,24:188.679245283019,25:182.815356489945,
+  26:177.304964539007,27:171.232876712329,28:165.837479270315,29:160.25641025641,
+  30:154.798761609907,31:149.253731343284,32:143.884892086331,33:138.504155124654,
+  34:133.333333333333,35:128.040973111396,36:122.850122850123,37:117.508813160987,
+  38:112.485939257593,39:107.52688172043,40:102.669404517454,41:97.9431929480901,
+  42:93.3706816059757,43:88.9679715302491,44:84.7457627118644,45:80.7102502017756,
+  46:76.8639508070715,47:73.2064421669107,48:69.6864111498258,49:66.35700066357,
+  50:63.0914826498423,51:60.0600600600601,52:57.0776255707763,53:54.2005420054201,
+  54:51.2820512820513,55:48.3325277912035,56:46.3177396943029,57:43.917435221783,
+  58:41.5800415800416,59:39.1083300743058,60:36.5363536719035,61:36.0750360750361,
+  62:35.5998576005696,63:34.9406009783368,64:33.2667997338656,65:31.1720698254364,
+};
+
+// METLIFE_PA_RISK_CLASSES (рисков клас 1)
+const RISK_CLASS_1 = { pi: 1.5, fracturesAndBurns: 16, accidentalDeath: 1.5 };
+
+// AV Charge от PlanRulesProductTables (точни прагове)
 const AV_CHARGE_TABLE = [
-  { from: 300,  to: 719,  rate: 0.020 },
+  { from: 300,  to: 719,  rate: 0.0200 },
   { from: 720,  to: 959,  rate: 0.0175 },
-  { from: 960,  to: 1199, rate: 0.015 },
+  { from: 960,  to: 1199, rate: 0.0150 },
   { from: 1200, to: 1499, rate: 0.0125 },
-  { from: 1500, to: 2399, rate: 0.010 },
+  { from: 1500, to: 2399, rate: 0.0100 },
   { from: 2400, to: 3599, rate: 0.0075 },
-  { from: 3600, to: null, rate: 0.005 },
+  { from: 3600, to: null, rate: 0.0050 },
 ];
 
+// Premium Bonus от PlanRulesProductTables (точни прагове)
 const PREMIUM_BONUS_TABLE = [
   { from: 1200, to: 1799, bonus: 0.01 },
   { from: 1800, to: 2999, bonus: 0.02 },
@@ -27,55 +125,7 @@ const PREMIUM_BONUS_TABLE = [
   { from: 4200, to: null, bonus: 0.04 },
 ];
 
-// ──────────────────────────────────────────────────────────
-// КОНСТАНТИ (от FinancialPlanConstants / PLAN_CONSTITUTION)
-// ──────────────────────────────────────────────────────────
-
-// ── TERM LIFE BASIC RATES (TERM_LIFE_BASIC_RATES от FinancialPlanConstants) ──
-// тарифа на 1000 € покритие по възраст и срок (5 год.)
-const TERM_LIFE_BASIC_RATES = {
-  18:{5:3.91},19:{5:3.96},20:{5:4},21:{5:4.04},22:{5:4.09},23:{5:4.1},
-  24:{5:4.13},25:{5:4.14},26:{5:4.15},27:{5:4.16},28:{5:4.22},29:{5:4.3},
-  30:{5:4.38},31:{5:4.49},32:{5:4.61},33:{5:4.77},34:{5:4.9},35:{5:5.08},
-  36:{5:5.32},37:{5:5.55},38:{5:5.78},39:{5:6.11},40:{5:6.55},41:{5:6.97},
-  42:{5:7.51},43:{5:8.16},44:{5:8.79},45:{5:9.3},46:{5:9.99},47:{5:10.68},
-  48:{5:11.38},49:{5:12.22},50:{5:13.24},51:{5:14.1},52:{5:15.22},53:{5:16.24},
-  54:{5:17.5},55:{5:18.86},56:{5:20.29},57:{5:21.57},58:{5:23.19},59:{5:24.55},
-  60:{5:26.09},61:{5:27.57},62:{5:29.57},63:{5:31.39},64:{5:33.6},65:{5:35.75},
-};
-
-// ── TERM LIFE 32 CI RATES (yr10 от METLIFE_PA_CRITICAL_ILLNESS_32_RATES) ──
-// тарифа на 1000 € покритие при 10 г. срок
-const CI32_RATES_YR10 = {
-  18:1.85,19:1.85,20:1.85,21:1.85,22:1.85,23:1.85,24:1.85,25:1.85,
-  26:3.19,27:3.19,28:3.19,29:3.19,30:3.19,
-  31:6.23,32:6.23,33:6.23,34:6.23,35:6.23,
-  36:9.57,37:9.57,38:9.57,39:9.57,40:9.57,
-  41:16,42:16,43:16,44:16,45:16,
-  46:25.47,47:25.47,48:25.47,49:25.47,50:25.47,
-  51:38.07,52:38.07,53:38.07,54:38.07,55:38.07,
-  56:46.34,57:46.34,58:46.34,59:46.34,60:46.34,
-};
-// 32 CI yr5 rates (за > 55 г. няма yr10)
-const CI32_RATES_YR5 = {
-  18:1.4,19:1.4,20:1.4,21:1.4,22:1.4,23:1.4,24:1.4,25:1.4,
-  26:2.35,27:2.35,28:2.35,29:2.35,30:2.35,
-  31:4.63,32:4.63,33:4.63,34:4.63,35:4.63,
-  36:7.24,37:7.24,38:7.24,39:7.24,40:7.24,
-  41:12.31,42:12.31,43:12.31,44:12.31,45:12.31,
-  46:20.45,47:20.45,48:20.45,49:20.45,50:20.45,
-  51:31.79,52:31.79,53:31.79,54:31.79,55:31.79,
-  56:46.34,57:46.34,58:46.34,59:46.34,60:46.34,
-};
-
-// ── DZI ZAKRILA PLATINUM (от DZIZakrilaCalculator + FinancialPlanConstants) ──
-const DZI_ZAKRILA_PLATINUM_MONTHLY = 30; // EUR (конституция: Платинен пакет)
-const DZI_ZAKRILA_MIN_AGE = 16;
-const DZI_ZAKRILA_MAX_AGE = 69;
-
-// ── METLIFE CREDIT GUARD BASIC RATES (от FinancialPlanConstants) ──
-// Тарифа за €100,000 покритие по [възраст][срок]
-// (съкратена версия само за нужните диапазони)
+// METLIFE_CREDIT_GUARD_BASIC_RATES — точни от FinancialPlanConstants
 const CG_BASIC_RATES = {
   18:{5:147,10:147,15:147,20:147,25:147,30:147},
   19:{5:147,10:147,15:147,20:147,25:147,30:147},
@@ -115,287 +165,137 @@ const CG_BASIC_RATES = {
   53:{5:576,10:625,15:674},
   54:{5:600,10:661,15:723},
   55:{5:637,10:698,15:772},
-  56:{5:686,10:759},
-  57:{5:710,10:796},
-  58:{5:784,10:882},
-  59:{5:833,10:931},
-  60:{5:918,10:1016},
+  56:{5:686,10:759},57:{5:710,10:796},58:{5:784,10:882},
+  59:{5:833,10:931},60:{5:918,10:1016},
   61:{5:967},62:{5:1029},63:{5:1102},64:{5:1188},65:{5:1273},
 };
 
-// METLIFE PA Security Plus Coefficients (40 CI)
-const CI40_COEFF = {
-  18:225.73,19:218.82,20:212.31,21:206.19,22:200.40,23:194.55,
-  24:188.68,25:182.82,26:177.30,27:171.23,28:165.84,29:160.26,
-  30:154.80,31:149.25,32:143.88,33:138.50,34:133.33,35:128.04,
-  36:122.85,37:117.51,38:112.49,39:107.53,40:102.67,41:97.94,
-  42:93.37,43:88.97,44:84.75,45:80.71,46:76.86,47:73.21,
-  48:69.69,49:66.36,50:63.09,51:60.06,52:57.08,53:54.20,
-  54:51.28,55:48.33,56:46.32,57:43.92,58:41.58,59:39.11,
-  60:36.54,61:36.08,62:35.60,63:34.94,64:33.27,65:31.17,
+// УНИКА тарифи — от UniqaHealthValueConstants (точни)
+// Всичко в EUR (от 01.01.2026)
+const UNIQA_EUROPA_TARIFFS = {
+  '0-17':  { monthly: 6.48,  annual: 74.04  },
+  '18-30': { monthly: 12.54, annual: 143.32 },
+  '31-40': { monthly: 13.71, annual: 156.64 },
+  '41-45': { monthly: 16.48, annual: 188.32 },
+  '46-50': { monthly: 20.02, annual: 228.80 },
+  '51-55': { monthly: 24.71, annual: 282.36 },
+  '56-60': { monthly: 30.50, annual: 348.60 },
+  '61-65': { monthly: 37.40, annual: 427.43 },
 };
 
-// METLIFE PA Risk Class 1 rates (pi = PTD per 1000, fracturesAndBurns per 1000)
-const RISK_CLASS_1 = { pi: 1.5, fracturesAndBurns: 16 };
+// Дженерали Basic — фиксирана тарифа в EUR (от 01.01.2026, преди: 60 BGN/месец)
+const GENERALI_BASIC_MONTHLY_EUR = 60; // EUR (беше BGN, вече EUR)
+const GENERALI_BASIC_ANNUAL_EUR = 720;
 
-// Uniqa Health Value Select — Plan Europa — monthly premiums by age group
-const UNIQA_EUROPA_MONTHLY = {
-  '0-17': 6.48, '18-30': 12.54, '31-40': 13.71, '41-45': 16.48,
-  '46-50': 20.02, '51-55': 24.71, '56-60': 30.50, '61-64': 37.40,
+// ДЗИ Закрила — Платинен пакет (EUR, беше BGN)
+const DZI_ZAKRILA_PLATINUM = {
+  monthly: 30,  // EUR (беше 30 BGN)
+  annual: 360,
+  coverages: {
+    deathAccident: 50000, deathRTA: 75000,
+    disabilityAccident: 50000, disabilityRTA: 75000,
+    fracturesAndBurns: 20000, hospitalDaily: 100
+  }
 };
 
-// Generali Health Line Basic — flat rate (BGN→EUR: /1.95583)
-const GENERALI_BASIC_MONTHLY_EUR = 60 / 1.95583; // ≈ 30.68 €
-
-// UL integrated life coverage multipliers (PLAN_CONSTITUTION product_rules.metlife_unit_linked)
-const UL_LIFE_MULTIPLIERS = [
-  { maxAge: 25, mult: 30 },
-  { maxAge: 35, mult: 20 },
-  { maxAge: 45, mult: 15 },
-  { maxAge: 55, mult: 10 },
-  { maxAge: 65, mult: 6 },
-];
-
-// Premium bonus / AV charge thresholds for snap-to-threshold
-const SNAP_THRESHOLDS = [720, 960, 1200, 1500, 1800, 2400, 3000, 3600, 4200];
+// METLIFE_PA_CHILD_COVERAGES — фрактури за Junior
+const CHILD_FRACTURES_RATE = 33; // per 1000 EUR (от METLIFE_PA_CHILD_COVERAGES.brokenBonesAndBurns)
+const CHILD_FRACTURES_AMOUNT = 750; // EUR (конституция: по-висока от двете опции)
 
 // ──────────────────────────────────────────────────────────
-// LOOKUP HELPERS
+// LOOKUP HELPERS (точни — съответстват на FinancialPlanConstants)
 // ──────────────────────────────────────────────────────────
-const getAVCharge = (annual) => {
-  for (const row of AV_CHARGE_TABLE) if (annual >= row.from && (row.to === null || annual <= row.to)) return row.rate;
+
+const getAVCharge = (annualPremium) => {
+  for (const row of AV_CHARGE_TABLE) {
+    if (annualPremium >= row.from && (row.to === null || annualPremium <= row.to)) return row.rate;
+  }
   return 0.02;
 };
-const getPremiumBonus = (annual) => {
-  for (const row of PREMIUM_BONUS_TABLE) if (annual >= row.from && (row.to === null || annual <= row.to)) return row.bonus;
+
+const getPremiumBonus = (annualPremium) => {
+  for (const row of PREMIUM_BONUS_TABLE) {
+    if (annualPremium >= row.from && (row.to === null || annualPremium <= row.to)) return row.bonus;
+  }
   return 0;
 };
+
+const getTermLifeBasicRate = (age, termYears = 5) => {
+  const ageKeys = Object.keys(TERM_LIFE_BASIC_RATES).map(Number).sort((a,b)=>a-b);
+  let selAge = ageKeys[0];
+  for (const k of ageKeys) { if (k <= age) selAge = k; else break; }
+  return TERM_LIFE_BASIC_RATES[selAge]?.[termYears] || TERM_LIFE_BASIC_RATES[selAge]?.[5] || 5;
+};
+
+const getCI32Rate = (age, termYears = 10) => {
+  const clampedAge = Math.min(Math.max(Math.floor(age), 18), 60);
+  const rates = CI32_RATES[clampedAge];
+  if (!rates) return CI32_RATES[60].yr5;
+  if (termYears >= 10 && rates.yr10) return rates.yr10;
+  return rates.yr5;
+};
+
+const getCI40Coefficient = (age) => {
+  return CI40_COEFFICIENTS[Math.min(Math.max(Math.floor(age), 18), 65)] || 50;
+};
+
+const getUniqaMonthly = (age) => {
+  if (age > 64) return null;
+  if (age <= 17) return UNIQA_EUROPA_TARIFFS['0-17'].monthly;
+  if (age <= 30) return UNIQA_EUROPA_TARIFFS['18-30'].monthly;
+  if (age <= 40) return UNIQA_EUROPA_TARIFFS['31-40'].monthly;
+  if (age <= 45) return UNIQA_EUROPA_TARIFFS['41-45'].monthly;
+  if (age <= 50) return UNIQA_EUROPA_TARIFFS['46-50'].monthly;
+  if (age <= 55) return UNIQA_EUROPA_TARIFFS['51-55'].monthly;
+  if (age <= 60) return UNIQA_EUROPA_TARIFFS['56-60'].monthly;
+  if (age <= 65) return UNIQA_EUROPA_TARIFFS['61-65'].monthly;
+  return null;
+};
+
 const getULLifeMultiplier = (age) => {
-  for (const r of UL_LIFE_MULTIPLIERS) if (age <= r.maxAge) return r.mult;
+  if (age <= 30) return 30;
+  if (age <= 35) return 20;
+  if (age <= 45) return 15;
+  if (age <= 55) return 10;
   return 6;
 };
-const getUniqaMonthly = (age) => {
-  if (age <= 17) return UNIQA_EUROPA_MONTHLY['0-17'];
-  if (age <= 30) return UNIQA_EUROPA_MONTHLY['18-30'];
-  if (age <= 40) return UNIQA_EUROPA_MONTHLY['31-40'];
-  if (age <= 45) return UNIQA_EUROPA_MONTHLY['41-45'];
-  if (age <= 50) return UNIQA_EUROPA_MONTHLY['46-50'];
-  if (age <= 55) return UNIQA_EUROPA_MONTHLY['51-55'];
-  if (age <= 60) return UNIQA_EUROPA_MONTHLY['56-60'];
-  if (age <= 64) return UNIQA_EUROPA_MONTHLY['61-64'];
-  return null; // 65+ → not eligible per constitution (max age 64)
-};
-const nextSnapThreshold = (annual) => SNAP_THRESHOLDS.find(t => t > annual) || null;
 
-// ── TERM LIFE HELPERS ──
-const getTermLifeBasicRate = (age) => {
-  const clampedAge = Math.min(Math.max(Math.floor(age), 18), 65);
-  // find nearest age key
-  const keys = Object.keys(TERM_LIFE_BASIC_RATES).map(Number).sort((a,b)=>a-b);
-  let sel = keys[0];
-  for (const k of keys) { if (k <= clampedAge) sel = k; else break; }
-  return TERM_LIFE_BASIC_RATES[sel]?.[5] || 5;
-};
-const getCI32Rate = (age) => {
-  const clampedAge = Math.min(Math.max(Math.floor(age), 18), 60);
-  // prefer yr10, fallback yr5 for > 55
-  return (clampedAge <= 55 ? CI32_RATES_YR10[clampedAge] : CI32_RATES_YR5[clampedAge]) || CI32_RATES_YR5[60];
-};
-
-// Calculates Term Life annual premium for one person
-// Constitution: basic_life = net_income*24 (if child<18 | mortgage | income_share>55%), else 3000
-// PTD: same PV formula; CI32 (10yr term): (net_income - disability)*24; fractures 1500; telemedicine 15; admin 13
-const buildTermLifePremium = (age, netIncome, grossIncome, hasChild, hasMortgage, hasPartner, isMainEarner) => {
-  const disability = statDisabilityBenefit(grossIncome);
-  const months = (65 - age) * 12;
-
-  // Basic life coverage
-  const fullCoverageCondition = hasChild || hasMortgage || (hasPartner && isMainEarner);
-  const basicLifeCoverage = fullCoverageCondition ? Math.max(0, netIncome) * 24 : 3000;
-
-  // PTD coverage
-  const ptdCoverage = Math.ceil(pvAnnuity(0.04 / 12, months) * Math.max(0, netIncome - disability) * 1.2 / 100) * 100;
-
-  // CI32 coverage
-  const ci32Coverage = Math.ceil(Math.max(0, netIncome - disability) * 24 / 100) * 100;
-
-  // Cost components
-  const basicLifeRate = getTermLifeBasicRate(age);
-  const ptdRate = RISK_CLASS_1.pi;
-  const fracturesRate = RISK_CLASS_1.fracturesAndBurns;
-  const ci32Rate = getCI32Rate(age);
-
-  const basicLifeCost = (basicLifeCoverage / 1000) * basicLifeRate;
-  const ptdCost = ptdCoverage > 0 ? (ptdCoverage / 1000) * ptdRate : 0;
-  const fracturesCost = (1500 / 1000) * fracturesRate;
-  const ci32Cost = ci32Coverage > 0 ? (ci32Coverage / 1000) * ci32Rate : 0;
-  const telemedicineCost = 15;
-  const adminFee = 13;
-
-  const totalAnnual = basicLifeCost + ptdCost + fracturesCost + ci32Cost + telemedicineCost + adminFee;
-
-  return {
-    totalAnnual,
-    basicLifeCoverage,
-    ptdCoverage,
-    ci32Coverage,
-    fractures: 1500,
-  };
-};
-
-// Scale term life coverages proportionally to fit within budget
-const scaleTermLifeToFit = (tl, budgetAnnual) => {
-  // Fixed components
-  const fixedCost = (1500 / 1000) * RISK_CLASS_1.fracturesAndBurns + 15 + 13; // fractures + telemedicine + admin
-  const availableForScalable = Math.max(0, budgetAnnual - fixedCost);
-  if (availableForScalable <= 0) return null; // cannot fit even fixed costs
-
-  const age = tl._age || 35; // passed through
-  const basicLifeRate = getTermLifeBasicRate(age);
-  const ptdRate = RISK_CLASS_1.pi;
-  const ci32Rate = getCI32Rate(age);
-
-  const basicLifeCost = (tl.basicLifeCoverage / 1000) * basicLifeRate;
-  const ptdCost = tl.ptdCoverage > 0 ? (tl.ptdCoverage / 1000) * ptdRate : 0;
-  const ci32Cost = tl.ci32Coverage > 0 ? (tl.ci32Coverage / 1000) * ci32Rate : 0;
-  const scalableCost = basicLifeCost + ptdCost + ci32Cost;
-
-  if (scalableCost <= 0) return { ...tl, totalAnnual: fixedCost };
-
-  const scaleFactor = Math.min(1, availableForScalable / scalableCost);
-  const scaledBasicLife = Math.round(tl.basicLifeCoverage * scaleFactor / 100) * 100;
-  const scaledPtd = Math.round(tl.ptdCoverage * scaleFactor / 100) * 100;
-  const scaledCi32 = Math.round(tl.ci32Coverage * scaleFactor / 100) * 100;
-
-  const newTotal = (scaledBasicLife/1000)*basicLifeRate + (scaledPtd/1000)*ptdRate + (scaledCi32/1000)*ci32Rate + fixedCost;
-  return {
-    ...tl,
-    basicLifeCoverage: scaledBasicLife,
-    ptdCoverage: scaledPtd,
-    ci32Coverage: scaledCi32,
-    totalAnnual: newTotal,
-  };
-};
-
-// ── CREDIT GUARD HELPER ──
-const calcCreditGuardMonthly = (age, loanAmount, termYears) => {
+const getCreditGuardMonthly = (age, loanAmount, termYears) => {
   if (!loanAmount || loanAmount <= 0 || age < 18 || age + termYears > 70) return null;
   const ageKeys = Object.keys(CG_BASIC_RATES).map(Number).sort((a,b)=>a-b);
   let selAge = null;
   for (const k of ageKeys) { if (k <= age) selAge = k; else break; }
   if (!selAge) return null;
-
-  const termOptions = [5, 10, 15, 20, 25, 30];
-  const availableTerms = termOptions.filter(t => CG_BASIC_RATES[selAge]?.[t] !== undefined && CG_BASIC_RATES[selAge]?.[t] !== null);
-  if (!availableTerms.length) return null;
-
-  // Find nearest available term
-  let selTerm = availableTerms[0];
-  for (const t of availableTerms) { if (t <= termYears) selTerm = t; }
-  if (!selTerm || !CG_BASIC_RATES[selAge]?.[selTerm]) return null;
-
+  const termOptions = [5,10,15,20,25,30].filter(t => CG_BASIC_RATES[selAge]?.[t] !== undefined && CG_BASIC_RATES[selAge]?.[t] !== null);
+  if (!termOptions.length) return null;
+  let selTerm = termOptions[0];
+  for (const t of termOptions) { if (t <= termYears) selTerm = t; }
   const ratePerHundredK = CG_BASIC_RATES[selAge][selTerm];
-  const annualPremium = (loanAmount / 100000) * ratePerHundredK;
-  return Math.round((annualPremium / 12) * 100) / 100;
+  if (!ratePerHundredK) return null;
+  return Math.round((loanAmount / 100000) * ratePerHundredK / 12 * 100) / 100;
 };
 
-// ──────────────────────────────────────────────────────────
-// FINANCIAL MATH
-// ──────────────────────────────────────────────────────────
-const calcMonthlyPayment = (principal, annualRatePct, years) => {
-  const r = annualRatePct / 12 / 100;
-  const n = years * 12;
-  if (r === 0) return principal / n;
-  return principal * r * Math.pow(1 + r, n) / (Math.pow(1 + r, n) - 1);
-};
+const SNAP_THRESHOLDS = [720, 960, 1200, 1500, 1800, 2400, 3000, 3600, 4200];
+const nextSnapThreshold = (annual) => SNAP_THRESHOLDS.find(t => t > annual) || null;
 
-// PV of annuity-due for PTD: PV(4%/12, months) * (net_income - state_disability) * 1.2
+// ──────────────────────────────────────────────────────────
+// ФИНАНСОВА МАТЕМАТИКА
+// ──────────────────────────────────────────────────────────
+
 const pvAnnuity = (monthlyRate, months) => {
   if (monthlyRate === 0) return months;
   return (1 - Math.pow(1 + monthlyRate, -months)) / monthlyRate;
 };
 
-// State disability benefit (PLAN_CONSTITUTION product_rules.state_disability_benefit)
 const statDisabilityBenefit = (grossIncome) => Math.min(grossIncome * 0.50, 1055.82);
 
-// Gross from net (PLAN_CONSTITUTION product_rules.investment_goals_algorithm state_pension)
 const netToGross = (net) => {
   if (net <= 1638.60) return net * 1.28869;
   return net / 0.9 + 291;
 };
 
-// Expected state pension
 const calcStatePension = (gross) => Math.min(Math.max(gross * 0.45, 347), 1739);
 
-// ──────────────────────────────────────────────────────────
-// UL PREMIUM BUILDER (PLAN_CONSTITUTION premium_calculation)
-// annualSavings: known. Returns total annual premium.
-// ──────────────────────────────────────────────────────────
-const buildULAnnualPremium = (annualSavings, age, netIncome, grossIncome, includeWaiver = true) => {
-  const disability = statDisabilityBenefit(grossIncome);
-  const months = (65 - age) * 12;
-
-  // PTD coverage
-  const ptdCoverage = Math.ceil(pvAnnuity(0.04 / 12, months) * Math.max(0, netIncome - disability) * 1.2 / 100) * 100;
-
-  // CI40 coverage
-  const ci40Coverage = Math.ceil(Math.max(0, netIncome - disability) * 24 / 100) * 100;
-
-  // Fractures 1500 fixed
-  const fractures = 1500;
-
-  // Compute coverage costs
-  let coverageCost = 0;
-  if (ptdCoverage > 0) coverageCost += (ptdCoverage / 1000) * RISK_CLASS_1.pi;
-  coverageCost += (fractures / 1000) * RISK_CLASS_1.fracturesAndBurns;
-  const coeff = CI40_COEFF[age] || CI40_COEFF[65];
-  if (ci40Coverage > 0 && coeff) coverageCost += ci40Coverage / coeff;
-  coverageCost += 15; // telemedicine
-
-  // 40% rule: coverageCost / (coverageCost + annualSavings) <= 0.40
-  // → max coverage cost = 0.40 * (annualSavings + coverageCost) → solve → C_max
-  // With waiver: using approximation without waiver first, then apply
-  // C_max = 0.40 * (budget - 15) / (1 + waiverRate) — used later in sizing
-  // Here we just compute total
-  let waiverCost = 0;
-  if (includeWaiver && age <= 55) {
-    waiverCost = (annualSavings + coverageCost) * 0.0438;
-  }
-
-  const totalAnnual = annualSavings + coverageCost + waiverCost + 15; // +15 admin fee
-
-  return {
-    totalAnnual,
-    annualSavings,
-    coverageCost,
-    waiverCost,
-    ptdCoverage,
-    ci40Coverage,
-    fractures,
-    integratedLife: Math.min(annualSavings * getULLifeMultiplier(age), 15000),
-    premiumBonus: getPremiumBonus(annualSavings),
-    avCharge: getAVCharge(annualSavings),
-  };
-};
-
-// ──────────────────────────────────────────────────────────
-// UL PROJECTION (from annualSavings, using MetLife exact model)
-// ──────────────────────────────────────────────────────────
-const projectUL = (annualSavings, yearsToRetirement, assumedReturn = 0.08) => {
-  const bonus = getPremiumBonus(annualSavings);
-  const avCharge = getAVCharge(annualSavings);
-  const effectiveContrib = annualSavings * (1 + bonus);
-  const netReturn = assumedReturn - avCharge;
-  let balance = 0;
-  for (let y = 0; y < yearsToRetirement; y++) {
-    balance = (balance + effectiveContrib) * (1 + netReturn);
-  }
-  return Math.round(balance);
-};
-
-// ──────────────────────────────────────────────────────────
-// FV helper
-// ──────────────────────────────────────────────────────────
 const fvLumpSum = (pv, annualRate, years) => pv * Math.pow(1 + annualRate, years);
 const fvAnnuity = (monthlyContrib, annualRate, years) => {
   const r = annualRate / 12;
@@ -405,22 +305,164 @@ const fvAnnuity = (monthlyContrib, annualRate, years) => {
 };
 
 // ──────────────────────────────────────────────────────────
-// BINARY SEARCH for annualSavings
+// UL ПРОЕКЦИЯ — точен MetLife модел
+// Използва AV charge, premium bonus, investible premium rate
 // ──────────────────────────────────────────────────────────
-const findAnnualSavingsForTarget = (target, yearsToRetirement, budgetAnnual, minSavings = 300) => {
+
+const projectUL = (annualSavings, yearsToRetirement, assumedReturn = 0.08) => {
+  if (yearsToRetirement <= 0 || annualSavings <= 0) return 0;
+  const bonus = getPremiumBonus(annualSavings);
+  const avCharge = getAVCharge(annualSavings);
+  const netReturn = assumedReturn - avCharge;
+
+  let balance = 0;
+  for (let y = 1; y <= yearsToRetirement; y++) {
+    // Investible premium rate: year 1 = 30%, year 2 = 60%, year 3+ = 100%
+    const investibleRate = y === 1 ? 0.30 : y === 2 ? 0.60 : 1.00;
+    const effectiveContrib = annualSavings * investibleRate * (1 + (y === 1 ? bonus : 0));
+    balance = (balance + effectiveContrib) * (1 + netReturn);
+  }
+  return Math.round(balance);
+};
+
+// Бинарно търсене за годишна вноска която постига target
+const findAnnualSavingsForTarget = (target, yearsToRetirement, maxBudget, minSavings = 300) => {
   if (target <= 0) return 0;
-  let lo = minSavings, hi = budgetAnnual;
+  if (yearsToRetirement <= 0) return null;
+  let lo = minSavings, hi = maxBudget;
   for (let i = 0; i < 40; i++) {
     const mid = (lo + hi) / 2;
     if (projectUL(mid, yearsToRetirement) >= target) hi = mid;
     else lo = mid;
   }
-  return hi > budgetAnnual ? null : hi; // null = cannot reach target within budget
+  return hi > maxBudget ? null : Math.max(minSavings, hi);
+};
+
+// ──────────────────────────────────────────────────────────
+// ИЗЧИСЛЯВАНЕ НА UL ПОКРИТИЯ (от MetLifeULCalculator + конституция)
+// ──────────────────────────────────────────────────────────
+
+const calcULCoverages = (age, netIncome, grossIncome) => {
+  const disability = statDisabilityBenefit(grossIncome > 0 ? grossIncome : netToGross(netIncome));
+  const months = (65 - age) * 12;
+  const ptdCoverage = Math.ceil(pvAnnuity(0.04 / 12, months) * Math.max(0, netIncome - disability) * 1.2 / 100) * 100;
+  const ci40Coverage = Math.ceil(Math.max(0, netIncome - disability) * 24 / 100) * 100;
+
+  const ptdCost = ptdCoverage > 0 ? (ptdCoverage / 1000) * RISK_CLASS_1.pi : 0;
+  const fracturesCost = (1500 / 1000) * RISK_CLASS_1.fracturesAndBurns; // 1500 * 16/1000 = 24€
+  const ci40Coef = getCI40Coefficient(age);
+  const ci40Cost = ci40Coverage > 0 && ci40Coef > 0 ? ci40Coverage / ci40Coef : 0;
+  const telemedicineCost = 15;
+
+  return {
+    ptdCoverage, ptdCost,
+    fractures: 1500, fracturesCost,
+    ci40Coverage, ci40Cost,
+    telemedicineCost,
+    totalCoveragesCost: ptdCost + fracturesCost + ci40Cost + telemedicineCost,
+  };
+};
+
+// Изчисляване на UL годишна премия от annualSavings
+const buildULAnnualPremium = (annualSavings, age, netIncome, grossIncome, includeWaiver = true) => {
+  const cov = calcULCoverages(age, netIncome, grossIncome);
+  let totalCoveragesCost = cov.totalCoveragesCost;
+
+  let waiverCost = 0;
+  if (includeWaiver && age <= 55) {
+    // waiverRate = 0.0438 за рисков клас 1 (от METLIFE_PA_PREMIUM_WAIVER)
+    waiverCost = (annualSavings + totalCoveragesCost) * 0.0438;
+  }
+
+  const totalAnnual = annualSavings + totalCoveragesCost + waiverCost + 15; // 15€ admin fee
+  const integratedLife = Math.min(annualSavings * getULLifeMultiplier(age), 15000);
+
+  return {
+    totalAnnual,
+    annualSavings,
+    coveragesCost: totalCoveragesCost,
+    waiverCost,
+    ptdCoverage: cov.ptdCoverage,
+    ci40Coverage: cov.ci40Coverage,
+    fractures: cov.fractures,
+    integratedLife,
+    premiumBonus: getPremiumBonus(annualSavings),
+    avCharge: getAVCharge(annualSavings),
+  };
+};
+
+// ──────────────────────────────────────────────────────────
+// ИЗЧИСЛЯВАНЕ НА TERM LIFE ПОКРИТИЯ (от MetLifeTermLifeCalculator + конституция)
+// Admin fee = 13€ (НЕ 15€ — различно от UL!)
+// ──────────────────────────────────────────────────────────
+
+const buildTermLifePremium = (age, netIncome, grossIncome, hasChildUnder18, hasMortgage, hasPartner, isMainEarner) => {
+  const disability = statDisabilityBenefit(grossIncome > 0 ? grossIncome : netToGross(netIncome));
+  const months = (65 - age) * 12;
+
+  // Основно покритие живот (5г.)
+  const fullCoverageCondition = hasChildUnder18 || hasMortgage || (hasPartner && isMainEarner);
+  const basicLifeCoverage = fullCoverageCondition ? Math.max(0, netIncome) * 24 : 3000;
+
+  // ПТН от злополука
+  const ptdCoverage = Math.ceil(pvAnnuity(0.04 / 12, months) * Math.max(0, netIncome - disability) * 1.2 / 100) * 100;
+
+  // 32 тежки заболявания (10г.) — НЕ 40!
+  const ci32Coverage = Math.ceil(Math.max(0, netIncome - disability) * 24 / 100) * 100;
+
+  // Цени на покритията
+  const basicLifeRate = getTermLifeBasicRate(age, 5);
+  const basicLifeCost = (basicLifeCoverage / 1000) * basicLifeRate;
+  const ptdCost = ptdCoverage > 0 ? (ptdCoverage / 1000) * RISK_CLASS_1.pi : 0;
+  const ci32Rate = age < 60 ? getCI32Rate(age, 10) : getCI32Rate(age, 5);
+  const ci32Cost = ci32Coverage > 0 && age < 60 ? (ci32Coverage / 1000) * ci32Rate : 0;
+  const fracturesCost = (1500 / 1000) * RISK_CLASS_1.fracturesAndBurns; // rate=16, amount=1500
+  const telemedicineCost = 15;
+  const adminFee = 13; // ⚠️ Term Life = 13€, UL = 15€
+
+  const totalAnnual = basicLifeCost + ptdCost + ci32Cost + fracturesCost + telemedicineCost + adminFee;
+
+  return {
+    totalAnnual,
+    basicLifeCoverage, basicLifeCost,
+    ptdCoverage, ptdCost,
+    ci32Coverage, ci32Cost,
+    fractures: 1500, fracturesCost,
+  };
+};
+
+// Мащабиране на Term Life в рамките на бюджет (пропорционално за scalable, fixed остава)
+const scaleTermLifeToFit = (tl, age, budgetAnnual) => {
+  const adminFee = 13;
+  const fixedCost = (1500 / 1000) * RISK_CLASS_1.fracturesAndBurns + 15 + adminFee;
+  const availableForScalable = Math.max(0, budgetAnnual - fixedCost);
+  if (availableForScalable <= 0) return null;
+
+  const basicRate = getTermLifeBasicRate(age, 5);
+  const ci32Rate = age < 60 ? getCI32Rate(age, 10) : getCI32Rate(age, 5);
+
+  const basicCost = (tl.basicLifeCoverage / 1000) * basicRate;
+  const ptdCost = tl.ptdCoverage > 0 ? (tl.ptdCoverage / 1000) * RISK_CLASS_1.pi : 0;
+  const ci32Cost = tl.ci32Coverage > 0 ? (tl.ci32Coverage / 1000) * ci32Rate : 0;
+  const scalableCost = basicCost + ptdCost + ci32Cost;
+
+  if (scalableCost <= 0) return { ...tl, totalAnnual: fixedCost };
+
+  const scaleFactor = Math.min(1, availableForScalable / scalableCost);
+  const scaledBasicLife = Math.round(tl.basicLifeCoverage * scaleFactor / 100) * 100;
+  const scaledPtd = Math.round(tl.ptdCoverage * scaleFactor / 100) * 100;
+  const scaledCi32 = Math.round(tl.ci32Coverage * scaleFactor / 100) * 100;
+
+  const newTotal = (scaledBasicLife/1000)*basicRate + (scaledPtd/1000)*RISK_CLASS_1.pi +
+                   (scaledCi32/1000)*ci32Rate + fixedCost;
+
+  return { ...tl, basicLifeCoverage: scaledBasicLife, ptdCoverage: scaledPtd, ci32Coverage: scaledCi32, totalAnnual: newTotal };
 };
 
 // ──────────────────────────────────────────────────────────
 // MAIN HANDLER
 // ──────────────────────────────────────────────────────────
+
 Deno.serve(async (req) => {
   try {
     const base44 = createClientFromRequest(req);
@@ -442,7 +484,9 @@ Deno.serve(async (req) => {
     const partnerNet  = includePartner ? (a.partner_net_income || 0) : 0;
     const partnerGross= includePartner ? (a.partner_gross_income || 0) : 0;
     const totalIncome = clientNet + partnerNet
-      + (a.client_other_monthly_income || 0) + (a.client_13th_salary || 0) / 12 + (a.client_other_annual_income || 0) / 12
+      + (a.client_other_monthly_income || 0)
+      + (a.client_13th_salary || 0) / 12
+      + (a.client_other_annual_income || 0) / 12
       + (includePartner ? (a.partner_other_monthly_income || 0) : 0)
       + (includePartner ? (a.partner_13th_salary || 0) / 12 : 0)
       + (includePartner ? (a.partner_other_annual_income || 0) / 12 : 0);
@@ -465,12 +509,8 @@ Deno.serve(async (req) => {
 
     const monthlyInvestments = a.monthly_investments || 0;
 
-    // ── OLD MONTHLY BALANCE (PLAN_CONSTITUTION strategic_allocation.plan_budget_ceilings) ──
+    // ── МЕСЕЧЕН БАЛАНС (стар) ──
     const oldMonthlyBalance = totalIncome - variableExpenses - monthlyInvestments - currentLiabilitiesMonthly - currentInsuranceMonthly;
-
-    // ── ОПТИМИЗАЦИЯ (simplified — кредити и застраховки) ──
-    // За целите на таваните: предполагаме оптимизация = 0 промяна (консервативен подход)
-    // Пълната оптимизация е в отделния слайд на презентацията
     const monthlyBalanceAfterOpt = oldMonthlyBalance;
 
     // ── РЕЗЕРВ ──
@@ -483,14 +523,12 @@ Deno.serve(async (req) => {
     const targetReserve = 6 * (variableExpenses + currentLiabilitiesMonthly);
     const reserveAlreadyBuilt = existingLiquid >= targetReserve;
 
-    // ── ТАВАНИ НА ПЛАНА (PLAN_CONSTITUTION plan_budget_ceilings) ──
+    // ── ТАВАНИ (РЕЖИМ А/Б) ──
     let ceiling1, ceiling2;
     if (reserveAlreadyBuilt) {
-      // Режим Б
       ceiling1 = totalIncome * 2.0 / 12;
       ceiling2 = monthlyBalanceAfterOpt * 0.66;
     } else {
-      // Режим А
       ceiling1 = totalIncome * 1.5 / 12;
       ceiling2 = monthlyBalanceAfterOpt * 0.40;
     }
@@ -498,14 +536,14 @@ Deno.serve(async (req) => {
     const budgetAnnual = maxMonthlyBudget * 12;
 
     // ── ВЪЗРАСТИ И ХОРИЗОНТИ ──
-    const cAge = a.client_age || 35;
-    const pAge = includePartner ? (a.partner_age || 35) : 0;
-    const cRetAge = a.client_retirement_age || 65;
-    const pRetAge = includePartner ? (a.partner_retirement_age || 65) : 65;
-    const cYears = Math.max(0, Math.min(cRetAge, 65) - cAge);
-    const pYears = includePartner ? Math.max(0, Math.min(pRetAge, 65) - pAge) : 0;
+    const cAge = Math.floor(a.client_age || 35);
+    const pAge = includePartner ? Math.floor(a.partner_age || 35) : 0;
+    const cRetAge = Math.min(a.client_retirement_age || 65, 65);
+    const pRetAge = includePartner ? Math.min(a.partner_retirement_age || 65, 65) : 65;
+    const cYears = Math.max(0, cRetAge - cAge);
+    const pYears = includePartner ? Math.max(0, pRetAge - pAge) : 0;
 
-    // ── АКТИВИ ЗА ПРИСПАДАНЕ ОТ КОРПУС (PLAN_CONSTITUTION existing_assets_deduction) ──
+    // ── СЪЩЕСТВУВАЩИ АКТИВИ — ПРИСПАДАНЕ ОТ КОРПУС ──
     const avgYears = includePartner ? (cYears + pYears) / 2 : cYears;
     const fvFinancialAssets = fvLumpSum(
       (a.asset_medium_term_savings||0) + (a.asset_long_term_savings||0), 0.05, avgYears
@@ -522,214 +560,159 @@ Deno.serve(async (req) => {
       fvAnnuity(cVolPensionMonthly, 0.03, cYears) + fvLumpSum(cVolPensionBalance, 0.03, cYears) +
       fvAnnuity(pVolPensionMonthly, 0.03, pYears) + fvLumpSum(pVolPensionBalance, 0.03, pYears);
 
-    // ── ПЕНСИОНЕН КОРПУС (PLAN_CONSTITUTION investment_goals_algorithm pension) ──
+    // ── ПЕНСИОНЕН КОРПУС ──
     const calcCorpus = (netInc, grossInc, yearsToRet, desiredRetAge) => {
-      const monthlyConsumption = variableExpenses; // домакинство — само веднъж
       const g = 0.03 / 12;
       const r = 0.04 / 12;
       const stPension = desiredRetAge < 65 ? 67 : calcStatePension(grossInc > 0 ? grossInc : netToGross(netInc));
-      const futureConsumption = monthlyConsumption * Math.pow(1 + g, yearsToRet * 12);
+      const futureConsumption = variableExpenses * Math.pow(1 + g, yearsToRet * 12);
       const pensionGap = Math.max(0, futureConsumption - stPension);
+      if (pensionGap <= 0) return 0;
       const corpus = pensionGap / (r - g) * (1 - Math.pow((1 + g) / (1 + r), 240));
       return Math.max(0, corpus);
     };
 
-    // При двойка: corpus се изчислява поотделно, сумира се, после се приспадат активи, после 50/50
-    const corpusClient  = calcCorpus(clientNet,  clientGross,  cYears, cRetAge);
+    const corpusClient  = calcCorpus(clientNet, clientGross, cYears, cRetAge);
     const corpusPartner = includePartner ? calcCorpus(partnerNet, partnerGross, pYears, pRetAge) : 0;
     const totalCorpus = corpusClient + corpusPartner;
     const corpusNet = Math.max(0, totalCorpus - fvFinancialAssets - fvProperties - fvVolPension);
     const targetPerPerson = includePartner ? corpusNet / 2 : corpusNet;
 
-    // ── НАМИРАНЕ НА UL ВНОСКИ (binary search) ──
-    // client UL — ВИНАГИ се опитваме
-    let cAnnualSavings = 300; // мин. вноска
+    // ── НАМИРАНЕ НА UL ВНОСКИ ──
+    let cAnnualSavings = 300;
     if (cYears > 0 && budgetAnnual >= 300) {
-      const targetUL = findAnnualSavingsForTarget(targetPerPerson, cYears, budgetAnnual);
-      if (targetUL !== null) {
-        cAnnualSavings = targetUL;
-      }
+      const t = findAnnualSavingsForTarget(targetPerPerson, cYears, budgetAnnual);
+      if (t !== null) cAnnualSavings = t;
     }
-    // partner UL
     let pAnnualSavings = null;
     if (includePartner && pYears > 0 && partnerNet > 0) {
-      pAnnualSavings = 300; // мин. вноска
-      // Client and partner each get their own policy; budget split equally
-      const pBudget = budgetAnnual; // each person gets full budget ceiling (they're separate contracts)
-      const targetULPartner = findAnnualSavingsForTarget(targetPerPerson, pYears, pBudget);
-      if (targetULPartner !== null) {
-        pAnnualSavings = targetULPartner;
-      }
+      pAnnualSavings = 300;
+      const t = findAnnualSavingsForTarget(targetPerPerson, pYears, budgetAnnual);
+      if (t !== null) pAnnualSavings = t;
     }
 
-    // ── SNAP-TO-THRESHOLD (PLAN_CONSTITUTION snap_to_threshold) ──
-    // Алгоритъм В: per-contract snap, всичко или нищо
-    const trySnapToThreshold = (cSav, pSav, jSavings, investBudgetAnnual) => {
-      const snaps = [];
-
-      // Per-contract snap check
-      if (cSav) {
-        const next = nextSnapThreshold(cSav);
-        if (next && next - cSav <= 0.05 * investBudgetAnnual) snaps.push(next - cSav);
-      }
-      if (pSav) {
-        const next = nextSnapThreshold(pSav);
-        if (next && next - pSav <= 0.05 * investBudgetAnnual) snaps.push(next - pSav);
-      }
-      // Junior per-child snap
-      for (const js of jSavings) {
-        const next = nextSnapThreshold(js);
-        if (next && next - js <= 0.05 * investBudgetAnnual) snaps.push(next - js);
-      }
-
-      const totalSnapNeeded = snaps.reduce((a, b) => a + b, 0);
-      if (totalSnapNeeded <= investBudgetAnnual) {
-        // All or nothing — apply all snaps
-        if (cSav) cSav = nextSnapThreshold(cSav) || cSav;
-        if (pSav) pSav = nextSnapThreshold(pSav) || pSav;
-        jSavings = jSavings.map(js => nextSnapThreshold(js) || js);
-      }
-      return { cSav, pSav, jSavings };
-    };
-
-    // Calculate children needs FIRST (за snap calculation) — ПРЕМЕСТЕНА ДЕКЛАРАЦИЯ
+    // ── ДЕЦА — Junior (≤ 11 г.) ──
     const childrenCount = a.children_count || 0;
-    const childrenAges = a.children_ages || [];  // Масив със възрастите на детелата
-    const childrenNames = a.children_names || [];  // Масив със имена
-    const totalEdGoal = (a.children_education_costs||0) + (a.children_start_life_costs||0) + (a.children_wedding_costs||0);
+    const childrenAges = a.children_ages || [];
+    const childrenNames = a.children_names || [];
+    const totalEdGoal = (a.children_education_costs||0)+(a.children_start_life_costs||0)+(a.children_wedding_costs||0);
     const existingEdSavings = a.children_current_savings || 0;
-    const educationGap = Math.max(0, totalEdGoal - existingEdSavings);  // ОБЩИЯ gap, НЕ по дете
+    const educationGap = Math.max(0, totalEdGoal - existingEdSavings);
 
     const juniorSavingsByChild = [];
+    const eligibleChildrenForHorizon = childrenAges.filter(age => Math.floor(age) <= 11 && (20 - Math.floor(age)) >= 1);
+    const totalHorizonSum = eligibleChildrenForHorizon.reduce((s, age) => s + (20 - Math.floor(age)), 0);
+
     for (let i = 0; i < childrenAges.length; i++) {
       const childAge = Math.floor(childrenAges[i]);
       if (childAge > 11) continue;
       const horizon = 20 - childAge;
       if (horizon < 1) continue;
 
-      // КРИТИЧНО: Разпредели образователния gap пропорционално по хоризонт на всяко дете
-      // По-малко дете (по-дълъг хоризонт) = по-малка годишна вноска
-      const horizonSum = (() => {
-        let sum = 0;
-        for (let j = 0; j < childrenAges.length; j++) {
-          const age = Math.floor(childrenAges[j]);
-          if (age > 11) continue;
-          sum += Math.max(0, 20 - age);
-        }
-        return sum;
-      })();
-
-      const horizonShare = horizonSum > 0 ? horizon / horizonSum : 1 / Math.max(1, childrenCount);
+      const horizonShare = totalHorizonSum > 0 ? horizon / totalHorizonSum : 1;
       const gapForThisChild = educationGap * horizonShare;
 
-      const findJuniorSavings = (target, budgAnnual) => {
-        if (target <= 0) return 300;  // минимум
-        let lo = 300, hi = budgAnnual;
+      const findJuniorSavings = (target, budg) => {
+        if (target <= 0) return 300;
+        let lo = 300, hi = budg;
         for (let iter = 0; iter < 40; iter++) {
           const mid = (lo + hi) / 2;
-          const val = projectUL(mid, horizon);
-          if (val >= target) hi = mid;
+          if (projectUL(mid, horizon) >= target) hi = mid;
           else lo = mid;
         }
         return Math.max(300, hi);
       };
-      const jSav = findJuniorSavings(gapForThisChild, budgetAnnual);
-      juniorSavingsByChild.push({ childIdx: i, childAge, childName: childrenNames[i], horizon, gapForThisChild, juniorSavings: jSav });
+
+      juniorSavingsByChild.push({
+        childIdx: i, childAge,
+        childName: childrenNames[i] || `Дете ${i + 1}`,
+        horizon, gapForThisChild,
+        juniorSavings: findJuniorSavings(gapForThisChild, budgetAnnual),
+      });
     }
 
-    // Apply snap-to-threshold BEFORE allocating budget
-    const snapResult = trySnapToThreshold(cAnnualSavings, pAnnualSavings, juniorSavingsByChild.map(j => j.juniorSavings), budgetAnnual);
+    // ── SNAP-TO-THRESHOLD (всичко или нищо) ──
+    const trySnap = (cSav, pSav, jSavArr, budg) => {
+      const snaps = [];
+      const checkSnap = (sav) => {
+        const next = nextSnapThreshold(sav);
+        if (next && next - sav <= 0.05 * budg) return next - sav;
+        return null;
+      };
+      if (cSav) { const s = checkSnap(cSav); if (s) snaps.push({ type: 'c', gap: s }); }
+      if (pSav) { const s = checkSnap(pSav); if (s) snaps.push({ type: 'p', gap: s }); }
+      jSavArr.forEach((js, idx) => { const s = checkSnap(js); if (s) snaps.push({ type: 'j', idx, gap: s }); });
+
+      const totalGap = snaps.reduce((a, b) => a + b.gap, 0);
+      if (totalGap <= budg) {
+        // Apply all snaps
+        snaps.forEach(snap => {
+          if (snap.type === 'c') cSav = nextSnapThreshold(cSav) || cSav;
+          if (snap.type === 'p') pSav = nextSnapThreshold(pSav) || pSav;
+          if (snap.type === 'j') jSavArr[snap.idx] = nextSnapThreshold(jSavArr[snap.idx]) || jSavArr[snap.idx];
+        });
+      }
+      return { cSav, pSav, jSavArr };
+    };
+
+    const jSavArray = juniorSavingsByChild.map(j => j.juniorSavings);
+    const snapResult = trySnap(cAnnualSavings, pAnnualSavings, jSavArray, budgetAnnual);
     cAnnualSavings = snapResult.cSav;
     pAnnualSavings = snapResult.pSav;
-    for (let i = 0; i < juniorSavingsByChild.length; i++) {
-      juniorSavingsByChild[i].juniorSavings = snapResult.jSavings[i];
-    }
+    juniorSavingsByChild.forEach((j, i) => { j.juniorSavings = snapResult.jSavArr[i]; });
 
-    // ── РЕЗЕРВИРАНЕ НА ИНВЕСТИЦИОНЕН БЮДЖЕТ (преди добавяне на продукти) ──
-    // Приоритет по конституция: Деца > Пенсия (ВИНАГИ се опитваме за деца, дори минимално)
+    // ── БЮДЖЕТНО РАЗПРЕДЕЛЕНИЕ ──
     let investmentBudgetRemaining = budgetAnnual;
+    const ulNeededTotal = (cAnnualSavings || 0) + (pAnnualSavings || 0);
+    const juniorNeededTotal = juniorSavingsByChild.reduce((s, j) => s + j.juniorSavings, 0);
+    const totalInvestmentNeeded = ulNeededTotal + juniorNeededTotal;
+    const minJuniorBudgetAnnual = 300 * Math.max(1, juniorSavingsByChild.length);
+    const canAffordMinJunior = juniorSavingsByChild.length === 0 || investmentBudgetRemaining >= minJuniorBudgetAnnual;
+
     let juniorBudgetAllocated = 0;
     let ulBudgetAllocated = 0;
 
-    const ulNeededTotal = (cAnnualSavings || 0) + (pAnnualSavings || 0);
-    const juniorNeededTotal = juniorSavingsByChild.reduce((s, j) => s + j.juniorSavings, 0);
-    const totalInvestmentNeeded = juniorNeededTotal + ulNeededTotal;
-
-    // Стъпка 1: Проверка дали можем да финансираме Junior (минимум 300€/год)
-    const minJuniorBudgetAnnual = 300 * Math.max(1, juniorSavingsByChild.length);
-    const canAffordMinJunior = investmentBudgetRemaining >= minJuniorBudgetAnnual;
-
-    if (!canAffordMinJunior && juniorSavingsByChild.length > 0) {
-      // Бюджета е твърде малък дори за минимум Junior — прескачаме Junior
-      juniorBudgetAllocated = 0;
+    if (juniorSavingsByChild.length === 0) {
       ulBudgetAllocated = investmentBudgetRemaining;
-      // UL със пълния бюджет
-      if (ulNeededTotal > 0 && investmentBudgetRemaining > 0) {
-        const ulScale = investmentBudgetRemaining / ulNeededTotal;
-        if (cAnnualSavings) cAnnualSavings *= ulScale;
-        if (pAnnualSavings) pAnnualSavings *= ulScale;
+    } else if (!canAffordMinJunior) {
+      ulBudgetAllocated = investmentBudgetRemaining;
+    } else if (totalInvestmentNeeded <= investmentBudgetRemaining) {
+      juniorBudgetAllocated = juniorNeededTotal;
+      ulBudgetAllocated = ulNeededTotal;
+    } else {
+      juniorBudgetAllocated = investmentBudgetRemaining * 0.70;
+      ulBudgetAllocated = investmentBudgetRemaining * 0.30;
+      if (juniorNeededTotal > 0) {
+        const scale = juniorBudgetAllocated / juniorNeededTotal;
+        juniorSavingsByChild.forEach(j => { j.juniorSavings = Math.max(300, Math.round(j.juniorSavings * scale)); });
+      }
+      if (ulNeededTotal > 0 && ulBudgetAllocated > 0) {
+        const scale = ulBudgetAllocated / ulNeededTotal;
+        if (cAnnualSavings) cAnnualSavings *= scale;
+        if (pAnnualSavings) pAnnualSavings *= scale;
       } else {
         cAnnualSavings = 0;
-        pAnnualSavings = 0;
+        pAnnualSavings = null;
       }
-    } else if (canAffordMinJunior && juniorSavingsByChild.length > 0) {
-      // Достатъчен бюджет за Junior — дей максимум което е възможно
-      if (totalInvestmentNeeded <= investmentBudgetRemaining) {
-        // Хватает за всичко точно
-        juniorBudgetAllocated = juniorNeededTotal;
-        ulBudgetAllocated = ulNeededTotal;
-      } else {
-        // Недостатъчно общо — приоритет Junior, остатък UL
-        juniorBudgetAllocated = investmentBudgetRemaining * 0.70; // 70% за деца
-        ulBudgetAllocated = investmentBudgetRemaining * 0.30;     // 30% за пенсия
-
-        // Масштабирай Junior към алокирания бюджет
-        if (juniorNeededTotal > 0) {
-          const juniorScale = juniorBudgetAllocated / juniorNeededTotal;
-          for (let i = 0; i < juniorSavingsByChild.length; i++) {
-            juniorSavingsByChild[i].juniorSavings = Math.max(300, Math.round(juniorSavingsByChild[i].juniorSavings * juniorScale));
-          }
-        }
-
-        // Масштабирай UL към остатъка
-        if (ulNeededTotal > 0 && ulBudgetAllocated > 0) {
-          const ulScale = ulBudgetAllocated / ulNeededTotal;
-          if (cAnnualSavings) cAnnualSavings *= ulScale;
-          if (pAnnualSavings) pAnnualSavings *= ulScale;
-        } else {
-          cAnnualSavings = 0;
-          pAnnualSavings = 0;
-        }
-      }
-    } else {
-      // Няма деца — весь бюджет за пенсия
-      ulBudgetAllocated = investmentBudgetRemaining;
     }
 
-    // КРИТИЧНО: Оставащ бюджет за защита = общ месячен таван МИНУС (инвестиции / 12)
+    // Оставащ бюджет за защита (след инвестиции)
     const protectionBudgetMonthly = maxMonthlyBudget - ((juniorBudgetAllocated + ulBudgetAllocated) / 12);
 
-    // ── ПОМОЩНИ ДАННИ ЗА PRODUCT SELECTION ──
-    const hasChildUnder18 = (() => {
-      for (let i = 0; i < childrenAges.length; i++) {
-        const childAge = Math.floor(childrenAges[i]);
-        if (childAge < 18) return true;
-      }
-      return false;
-    })();
+    // ── ПОМОЩНИ ДАННИ ──
+    const hasChildUnder18 = childrenAges.some(age => Math.floor(age) < 18);
     const hasMortgage = (a.liability_mortgage_monthly || 0) > 0;
     const totalHouseholdIncome = totalIncome;
     const clientIncomeShare = totalHouseholdIncome > 0 ? clientNet / totalHouseholdIncome : 1;
     const partnerIncomeShare = totalHouseholdIncome > 0 ? partnerNet / totalHouseholdIncome : 0;
 
-    // ── СТЪПКА 1/2/3: UL vs TERM LIFE vs DZI ZAKRILA SELECTION ──
-    // Конституция: Step 1 → UL (annualSavings/12 >= 25), Step 2 → Term Life, Step 3 → DZI Zakrila
+    // UL условие: annualSavings/12 >= 25€
     const clientUsesUL  = cAnnualSavings && cAnnualSavings / 12 >= 25;
     const partnerUsesUL = pAnnualSavings && pAnnualSavings / 12 >= 25;
 
     const planProducts = [];
     let totalMonthlyPremium = 0;
-    let remainingMonthlyBudget = protectionBudgetMonthly;  // УЖЕ резервиран за инвестиции
+    let remainingMonthlyBudget = protectionBudgetMonthly;
 
     const addProduct = (product) => {
       planProducts.push(product);
@@ -737,7 +720,7 @@ Deno.serve(async (req) => {
       remainingMonthlyBudget -= product.monthly_premium || 0;
     };
 
-    // ── CLIENT MetLife UL ──
+    // ── СТЪПКА 1A: MetLife UL за клиент ──
     if (cAge < 65 && clientUsesUL && cAnnualSavings >= 300) {
       const ul = buildULAnnualPremium(cAnnualSavings, cAge, clientNet, clientGross, cAge <= 55);
       const monthly = Math.round((ul.totalAnnual / 12) * 100) / 100;
@@ -756,7 +739,7 @@ Deno.serve(async (req) => {
         expected_value: projectUL(cAnnualSavings, cYears),
         is_active: true,
         details: {
-          annual_savings: cAnnualSavings,
+          annual_savings: Math.round(cAnnualSavings),
           coverages: {
             integratedLifeCoverage: ul.integratedLife,
             ptdCoverage: ul.ptdCoverage,
@@ -765,15 +748,15 @@ Deno.serve(async (req) => {
             telemedicine: true,
             premiumWaiver: cAge <= 55,
           },
-          premium_bonus: ul.premiumBonus,
-          management_fee: ul.avCharge,
-          total_invested: Math.round(cAnnualSavings * cYears),
+          premium_bonus_pct: Math.round(ul.premiumBonus * 100),
+          av_charge_pct: Math.round(ul.avCharge * 10000) / 100,
           target_corpus: Math.round(targetPerPerson),
+          projected_value_at_retirement: projectUL(cAnnualSavings, cYears),
         },
       });
     }
 
-    // ── PARTNER MetLife UL ──
+    // ── СТЪПКА 1B: MetLife UL за партньор ──
     if (includePartner && pAge < 65 && partnerUsesUL && pAnnualSavings >= 300) {
       const ulP = buildULAnnualPremium(pAnnualSavings, pAge, partnerNet, partnerGross, pAge <= 55);
       const monthlyP = Math.round((ulP.totalAnnual / 12) * 100) / 100;
@@ -792,7 +775,7 @@ Deno.serve(async (req) => {
         expected_value: projectUL(pAnnualSavings, pYears),
         is_active: true,
         details: {
-          annual_savings: pAnnualSavings,
+          annual_savings: Math.round(pAnnualSavings),
           coverages: {
             integratedLifeCoverage: ulP.integratedLife,
             ptdCoverage: ulP.ptdCoverage,
@@ -801,28 +784,31 @@ Deno.serve(async (req) => {
             telemedicine: true,
             premiumWaiver: pAge <= 55,
           },
-          premium_bonus: ulP.premiumBonus,
-          management_fee: ulP.avCharge,
-          total_invested: Math.round(pAnnualSavings * pYears),
+          premium_bonus_pct: Math.round(ulP.premiumBonus * 100),
+          av_charge_pct: Math.round(ulP.avCharge * 10000) / 100,
           target_corpus: Math.round(targetPerPerson),
+          projected_value_at_retirement: projectUL(pAnnualSavings, pYears),
         },
       });
     }
 
-    // ── MetLife JUNIOR (деца ≤ 11) — ДОБАВЯНЕ КЪМ ПЛАНА С РЕЗЕРВИРАН БЮДЖЕТ ──
+    // ── СТЪПКА 1C: MetLife Junior (деца ≤ 11) ──
     if (juniorSavingsByChild.length > 0) {
       const juniorTotalNeeded = juniorSavingsByChild.reduce((s, j) => s + j.juniorSavings, 0);
       const scale = juniorBudgetAllocated > 0 && juniorTotalNeeded > 0 ? juniorBudgetAllocated / juniorTotalNeeded : 1;
 
       for (const child of juniorSavingsByChild) {
-        let scaledJuniorSavings = Math.max(300, Math.round(child.juniorSavings * scale));
+        const scaledSavings = Math.max(300, Math.round(child.juniorSavings * scale));
 
-        // Junior coverages (fixed per constitution)
-        const jFractures = 750;
-        const jProtectionCoef = cAge <= 55 ? 0.0438 : 0;
-        const jCoveragesCost = (jFractures / 1000) * RISK_CLASS_1.fracturesAndBurns;
-        const jProtection = (scaledJuniorSavings + jCoveragesCost) * jProtectionCoef;
-        const jTotalAnnual = scaledJuniorSavings + jCoveragesCost + jProtection + 15;
+        // Junior покрития: фрактури 750€ по ТАРИФА 33/1000 (METLIFE_PA_CHILD_COVERAGES)
+        const jFracturesCost = (CHILD_FRACTURES_AMOUNT / 1000) * CHILD_FRACTURES_RATE; // 750/1000*33 = 24.75€
+        // Child Protection Agreement: (savings + coverages) * coefficient_of_policyholder_age
+        const policyholderAge = Math.min(cAge, 55);
+        const childProtectionCoeff = policyholderAge <= 55 ? 0.0438 : 0; // METLIFE_CHILD_PROTECTION_COEFFICIENTS
+        const jProtectionBase = scaledSavings + jFracturesCost;
+        const jProtectionCost = jProtectionBase * childProtectionCoeff;
+        const jAdminFee = 15;
+        const jTotalAnnual = scaledSavings + jFracturesCost + jProtectionCost + jAdminFee;
         const jMonthly = Math.round((jTotalAnnual / 12) * 100) / 100;
 
         if (jMonthly > 0) {
@@ -831,42 +817,42 @@ Deno.serve(async (req) => {
             provider: 'MetLife',
             product_name: 'MetLife Джуниър',
             beneficiary: `child${child.childIdx + 1}`,
-            beneficiary_name: child.childName || `Дете ${child.childIdx + 1}`,
+            beneficiary_name: child.childName,
             beneficiary_age: child.childAge,
             term_years: child.horizon,
             strategy: 'dynamic',
             monthly_premium: jMonthly,
             total_premium: jMonthly * 12,
-            expected_value: projectUL(scaledJuniorSavings, child.horizon),
+            expected_value: projectUL(scaledSavings, child.horizon),
             is_active: true,
             details: {
-              annual_savings: scaledJuniorSavings,
+              annual_savings: scaledSavings,
               target_education_gap: Math.round(child.gapForThisChild),
-              coverage_scalefactor: scale,
               coverages: {
-                fractures: jFractures,
-                child_protection_agreement: true,
+                fractures: CHILD_FRACTURES_AMOUNT,
+                fractures_rate_per_1000: CHILD_FRACTURES_RATE,
+                child_protection_agreement: policyholderAge <= 55,
+                child_protection_coefficient: childProtectionCoeff,
               },
-              premium_bonus: getPremiumBonus(scaledJuniorSavings),
-              management_fee: getAVCharge(scaledJuniorSavings),
+              premium_bonus_pct: Math.round(getPremiumBonus(scaledSavings) * 100),
+              av_charge_pct: Math.round(getAVCharge(scaledSavings) * 10000) / 100,
             },
           });
         }
       }
     }
 
-    // ── СТЪПКА 2: TERM LIFE — за клиент (ако UL не е избран) ──
+    // ── СТЪПКА 2: Term Life (ако UL не е избран за клиент) ──
     if (cAge < 65 && !clientUsesUL) {
-      const tlClient = buildTermLifePremium(cAge, clientNet, clientGross, hasChildUnder18, hasMortgage, includePartner, clientIncomeShare > 0.55);
-      tlClient._age = cAge;
-      const tlClientBudget = remainingMonthlyBudget * 12;
+      const tl = buildTermLifePremium(cAge, clientNet, clientGross, hasChildUnder18, hasMortgage, includePartner, clientIncomeShare > 0.55);
+      const tlBudget = remainingMonthlyBudget * 12;
 
-      let tlFinal = tlClient;
-      if (tlClient.totalAnnual > tlClientBudget) {
-        tlFinal = scaleTermLifeToFit(tlClient, tlClientBudget);
+      let tlFinal = tl;
+      if (tl.totalAnnual > tlBudget) {
+        tlFinal = scaleTermLifeToFit(tl, cAge, tlBudget);
       }
 
-      if (tlFinal && tlFinal.totalAnnual <= tlClientBudget && tlFinal.totalAnnual > 0) {
+      if (tlFinal && tlFinal.totalAnnual <= tlBudget + 0.01 && tlFinal.totalAnnual > 0) {
         const monthly = Math.round((tlFinal.totalAnnual / 12) * 100) / 100;
         addProduct({
           product_type: 'term_life',
@@ -881,17 +867,20 @@ Deno.serve(async (req) => {
           coverage_amount: tlFinal.basicLifeCoverage,
           is_active: true,
           details: {
+            admin_fee: 13,
             coverages: {
               basicLifeCoverage: tlFinal.basicLifeCoverage,
               ptdCoverage: tlFinal.ptdCoverage,
               ci32Coverage: tlFinal.ci32Coverage,
+              ci32TermYears: 10,
               fracturesCoverage: 1500,
+              fractures_rate_per_1000: RISK_CLASS_1.fracturesAndBurns,
               telemedicine: true,
             },
           },
         });
-      } else if (cAge >= DZI_ZAKRILA_MIN_AGE && cAge <= DZI_ZAKRILA_MAX_AGE && remainingMonthlyBudget >= DZI_ZAKRILA_PLATINUM_MONTHLY) {
-        // ── СТЪПКА 3: DZI ZAKRILA PLATINUM fallback ──
+      } else if (cAge >= 16 && cAge <= 69 && remainingMonthlyBudget >= DZI_ZAKRILA_PLATINUM.monthly) {
+        // ── СТЪПКА 3: ДЗИ Закрила Платинен fallback ──
         addProduct({
           product_type: 'personal_accident',
           provider: 'ДЗИ',
@@ -899,35 +888,26 @@ Deno.serve(async (req) => {
           beneficiary: 'partner1',
           beneficiary_name: `${a.client_first_name||''} ${a.client_last_name||''}`.trim(),
           beneficiary_age: cAge,
-          monthly_premium: DZI_ZAKRILA_PLATINUM_MONTHLY,
-          total_premium: DZI_ZAKRILA_PLATINUM_MONTHLY * 12,
-          coverage_amount: 50000,
+          monthly_premium: DZI_ZAKRILA_PLATINUM.monthly,
+          total_premium: DZI_ZAKRILA_PLATINUM.annual,
+          coverage_amount: DZI_ZAKRILA_PLATINUM.coverages.deathAccident,
           is_active: true,
-          details: {
-            plan: 'Platinum',
-            note: 'Резервен продукт — бюджетът не позволява MetLife',
-            coverages: {
-              death_accident: 50000, death_rta: 75000,
-              disability_accident: 50000, disability_rta: 75000,
-              fractures_burns: 20000, hospital_daily: 100,
-            },
-          },
+          details: { plan: 'Platinum', currency: 'EUR', coverages: DZI_ZAKRILA_PLATINUM.coverages },
         });
       }
     }
 
-    // ── СТЪПКА 2: TERM LIFE — за партньор (ако UL не е избран) ──
+    // ── СТЪПКА 2: Term Life за партньор (ако UL не е избран) ──
     if (includePartner && pAge < 65 && !partnerUsesUL) {
-      const tlPartner = buildTermLifePremium(pAge, partnerNet, partnerGross, hasChildUnder18, hasMortgage, true, partnerIncomeShare > 0.55);
-      tlPartner._age = pAge;
-      const tlPartnerBudget = remainingMonthlyBudget * 12;
+      const tlP = buildTermLifePremium(pAge, partnerNet, partnerGross, hasChildUnder18, hasMortgage, true, partnerIncomeShare > 0.55);
+      const tlBudgetP = remainingMonthlyBudget * 12;
 
-      let tlPFinal = tlPartner;
-      if (tlPartner.totalAnnual > tlPartnerBudget) {
-        tlPFinal = scaleTermLifeToFit(tlPartner, tlPartnerBudget);
+      let tlPFinal = tlP;
+      if (tlP.totalAnnual > tlBudgetP) {
+        tlPFinal = scaleTermLifeToFit(tlP, pAge, tlBudgetP);
       }
 
-      if (tlPFinal && tlPFinal.totalAnnual <= tlPartnerBudget && tlPFinal.totalAnnual > 0) {
+      if (tlPFinal && tlPFinal.totalAnnual <= tlBudgetP + 0.01 && tlPFinal.totalAnnual > 0) {
         const monthlyP = Math.round((tlPFinal.totalAnnual / 12) * 100) / 100;
         addProduct({
           product_type: 'term_life',
@@ -942,17 +922,19 @@ Deno.serve(async (req) => {
           coverage_amount: tlPFinal.basicLifeCoverage,
           is_active: true,
           details: {
+            admin_fee: 13,
             coverages: {
               basicLifeCoverage: tlPFinal.basicLifeCoverage,
               ptdCoverage: tlPFinal.ptdCoverage,
               ci32Coverage: tlPFinal.ci32Coverage,
+              ci32TermYears: 10,
               fracturesCoverage: 1500,
+              fractures_rate_per_1000: RISK_CLASS_1.fracturesAndBurns,
               telemedicine: true,
             },
           },
         });
-      } else if (pAge >= DZI_ZAKRILA_MIN_AGE && pAge <= DZI_ZAKRILA_MAX_AGE && remainingMonthlyBudget >= DZI_ZAKRILA_PLATINUM_MONTHLY) {
-        // ── СТЪПКА 3: DZI ZAKRILA PLATINUM fallback за партньор ──
+      } else if (pAge >= 16 && pAge <= 69 && remainingMonthlyBudget >= DZI_ZAKRILA_PLATINUM.monthly) {
         addProduct({
           product_type: 'personal_accident',
           provider: 'ДЗИ',
@@ -960,31 +942,21 @@ Deno.serve(async (req) => {
           beneficiary: 'partner2',
           beneficiary_name: `${a.partner_first_name||''} ${a.partner_last_name||''}`.trim(),
           beneficiary_age: pAge,
-          monthly_premium: DZI_ZAKRILA_PLATINUM_MONTHLY,
-          total_premium: DZI_ZAKRILA_PLATINUM_MONTHLY * 12,
-          coverage_amount: 50000,
+          monthly_premium: DZI_ZAKRILA_PLATINUM.monthly,
+          total_premium: DZI_ZAKRILA_PLATINUM.annual,
+          coverage_amount: DZI_ZAKRILA_PLATINUM.coverages.deathAccident,
           is_active: true,
-          details: {
-            plan: 'Platinum',
-            note: 'Резервен продукт — бюджетът не позволява MetLife',
-            coverages: {
-              death_accident: 50000, death_rta: 75000,
-              disability_accident: 50000, disability_rta: 75000,
-              fractures_burns: 20000, hospital_daily: 100,
-            },
-          },
+          details: { plan: 'Platinum', currency: 'EUR', coverages: DZI_ZAKRILA_PLATINUM.coverages },
         });
       }
     }
 
-    // ── МЕТЛАЙФ CREDIT GUARD — при ипотека/рефинансирани кредити ──
-    // Конституция правило 1.1: при оптимизация на ипотека → Credit Guard върху рефинансираната сума
-    // Тъй като оптимизацията се прави в презентацията (не тук), добавяме Credit Guard върху съществуващата ипотека
+    // ── MetLife Credit Guard (при ипотека) ──
     const mortgageBalance = a.liability_mortgage_remaining || 0;
     const mortgageTermYears = a.liability_mortgage_remaining_months ? Math.ceil(a.liability_mortgage_remaining_months / 12) : 20;
     if (mortgageBalance >= 10000 && hasMortgage && cAge < 65) {
       const cgTerm = Math.min(mortgageTermYears, 70 - cAge, 30);
-      const cgMonthly = calcCreditGuardMonthly(cAge, mortgageBalance, cgTerm);
+      const cgMonthly = getCreditGuardMonthly(cAge, mortgageBalance, cgTerm);
       if (cgMonthly && cgMonthly > 0 && remainingMonthlyBudget >= cgMonthly) {
         addProduct({
           product_type: 'term_life',
@@ -999,21 +971,21 @@ Deno.serve(async (req) => {
           coverage_amount: mortgageBalance,
           is_active: true,
           details: {
-            note: 'Защита на ипотечния кредит',
             loan_balance: mortgageBalance,
             loan_term_years: cgTerm,
             package: 'Основен',
+            rate_per_100k: CG_BASIC_RATES[Math.min(cAge, 65)]?.[Math.min(cgTerm, 30)] || null,
           },
         });
       }
     }
 
-    // ── СТЪПКА 2: УНИКА (constitution package_products.uniqa_zdrave_i_tsennost) ──
-    // Client (max age 64)
+    // ── СТЪПКА 2: УНИКА Здраве и ценност Селект — клиент ──
+    // Точни тарифи от UniqaHealthValueConstants (EUR от 01.01.2026)
     const uniqaMonthlyClient = getUniqaMonthly(cAge);
     if (uniqaMonthlyClient !== null && cAge <= 64 && remainingMonthlyBudget >= uniqaMonthlyClient) {
       addProduct({
-        product_type: 'health_insurance',
+        product_type: 'critical_illness',
         provider: 'УНИКА',
         product_name: 'Здраве и Ценност Селект — План Европа',
         beneficiary: 'partner1',
@@ -1023,16 +995,16 @@ Deno.serve(async (req) => {
         total_premium: uniqaMonthlyClient * 12,
         coverage_amount: 2242300,
         is_active: true,
-        details: { plan: 'Europa', note: 'Критични заболявания — не замества от работодателска застраховка' },
+        details: { plan: 'Europa', currency: 'EUR', daily_benefit_eur: 135 },
       });
     }
 
-    // Partner Uniqa (if present and ≤ 64)
+    // ── УНИКА за партньор ──
     if (includePartner) {
       const uniqaMonthlyPartner = getUniqaMonthly(pAge);
       if (uniqaMonthlyPartner !== null && pAge <= 64 && remainingMonthlyBudget >= uniqaMonthlyPartner) {
         addProduct({
-          product_type: 'health_insurance',
+          product_type: 'critical_illness',
           provider: 'УНИКА',
           product_name: 'Здраве и Ценност Селект — План Европа',
           beneficiary: 'partner2',
@@ -1042,42 +1014,42 @@ Deno.serve(async (req) => {
           total_premium: uniqaMonthlyPartner * 12,
           coverage_amount: 2242300,
           is_active: true,
-          details: { plan: 'Europa', note: 'Критични заболявания' },
+          details: { plan: 'Europa', currency: 'EUR', daily_benefit_eur: 135 },
         });
       }
     }
 
-    // Children Uniqa — ВСИЧКО ИЛИ НИЩО (PLAN_CONSTITUTION rule_v96 uniqa_dzenali_inclusion)
+    // ── УНИКА за деца — всичко или нищо ──
     const childrenUniqaCosts = [];
     for (let i = 0; i < childrenAges.length; i++) {
       const childAge = Math.floor(childrenAges[i]);
       if (childAge > 64) continue;
       const uniqaChild = getUniqaMonthly(childAge);
-      if (uniqaChild !== null) childrenUniqaCosts.push({ childIdx: i, childAge, uniqaChild, childName: childrenNames[i] || `Дете ${i + 1}` });
+      if (uniqaChild !== null) {
+        childrenUniqaCosts.push({ childIdx: i, childAge, uniqaChild, childName: childrenNames[i] || `Дете ${i + 1}` });
+      }
     }
     const totalChildrenUniqaCost = childrenUniqaCosts.reduce((s, c) => s + c.uniqaChild, 0);
-
     if (totalChildrenUniqaCost > 0 && remainingMonthlyBudget >= totalChildrenUniqaCost) {
-      // Достатъчен бюджет за ВСИЧКИ деца → добавя ВСИЧКИ
       for (const child of childrenUniqaCosts) {
         addProduct({
-          product_type: 'health_insurance',
+          product_type: 'critical_illness',
           provider: 'УНИКА',
           product_name: 'Здраве и Ценност Селект — План Европа',
-          beneficiary: `child${child.childIdx}`,
+          beneficiary: `child${child.childIdx + 1}`,
           beneficiary_name: child.childName,
           beneficiary_age: child.childAge,
           monthly_premium: child.uniqaChild,
           total_premium: child.uniqaChild * 12,
+          coverage_amount: 2242300,
           is_active: true,
-          details: { plan: 'Europa' },
+          details: { plan: 'Europa', currency: 'EUR' },
         });
       }
     }
-    // Ако няма достатъчно за ВСИЧКИ → НИТО ЕДИН не се добавя
 
-    // ── СТЪПКА 3: ДЖЕНЕРАЛИ BASIC (constitution package_products.generali_health_basic) ──
-    // Only for persons WITHOUT employer health insurance; flat rate; all or nothing
+    // ── СТЪПКА 3: Дженерали Basic — само за лица БЕЗ работодателска застраховка ──
+    // Фиксирана тарифа 60€/месец (EUR от 01.01.2026, беше 60 BGN)
     const clientNeedsGenerali = !a.has_employer_health_insurance && cAge >= 18 && cAge <= 70;
     const partnerNeedsGenerali = includePartner && !a.partner_has_employer_health_insurance && pAge >= 18 && pAge <= 70;
     const generaliTotal = (clientNeedsGenerali ? GENERALI_BASIC_MONTHLY_EUR : 0) + (partnerNeedsGenerali ? GENERALI_BASIC_MONTHLY_EUR : 0);
@@ -1092,9 +1064,9 @@ Deno.serve(async (req) => {
           beneficiary_name: `${a.client_first_name||''} ${a.client_last_name||''}`.trim(),
           beneficiary_age: cAge,
           monthly_premium: GENERALI_BASIC_MONTHLY_EUR,
-          total_premium: GENERALI_BASIC_MONTHLY_EUR * 12,
+          total_premium: GENERALI_BASIC_ANNUAL_EUR,
           is_active: true,
-          details: { plan: 'Basic', note: 'Без работодателска здравна застраховка' },
+          details: { plan: 'Basic', currency: 'EUR', flat_rate: true },
         });
       }
       if (partnerNeedsGenerali) {
@@ -1106,19 +1078,16 @@ Deno.serve(async (req) => {
           beneficiary_name: `${a.partner_first_name||''} ${a.partner_last_name||''}`.trim(),
           beneficiary_age: pAge,
           monthly_premium: GENERALI_BASIC_MONTHLY_EUR,
-          total_premium: GENERALI_BASIC_MONTHLY_EUR * 12,
+          total_premium: GENERALI_BASIC_ANNUAL_EUR,
           is_active: true,
-          details: { plan: 'Basic', note: 'Без работодателска здравна застраховка' },
+          details: { plan: 'Basic', currency: 'EUR', flat_rate: true },
         });
       }
     }
 
-    // ── II СТЪЛБ: СМЯНА КЪМ ОББ УПФ (constitution pillar_2_fund_switch) ──
+    // ── II СТЪЛБ: СМЯНА КЪМ ОББ УПФ ──
     const OBB_FUND = 'УПФ „ОББ" ЕАД';
-    const clientNeedsPillar2Switch = a.client_pillar_2 && a.client_pension_fund !== OBB_FUND;
-    const partnerNeedsPillar2Switch = includePartner && a.partner_pillar_2 && a.partner_pension_fund !== OBB_FUND;
-
-    if (clientNeedsPillar2Switch) {
+    if (a.client_pillar_2 && a.client_pension_fund !== OBB_FUND) {
       addProduct({
         product_type: 'pension_plan',
         provider: 'ОББ УПФ',
@@ -1130,13 +1099,12 @@ Deno.serve(async (req) => {
         total_premium: 0,
         is_active: true,
         details: {
-          note: 'Еднократна административна процедура — без допълнителни разходи',
           from_fund: a.client_pension_fund,
-          needs_verification: a.client_pension_fund === 'Да се провери допълнително',
+          note: 'Еднократна административна процедура — без допълнителни разходи',
         },
       });
     }
-    if (partnerNeedsPillar2Switch) {
+    if (includePartner && a.partner_pillar_2 && a.partner_pension_fund !== OBB_FUND) {
       addProduct({
         product_type: 'pension_plan',
         provider: 'ОББ УПФ',
@@ -1148,26 +1116,14 @@ Deno.serve(async (req) => {
         total_premium: 0,
         is_active: true,
         details: {
-          note: 'Еднократна административна процедура — без допълнителни разходи',
           from_fund: a.partner_pension_fund,
-          needs_verification: a.partner_pension_fund === 'Да се провери допълнително',
+          note: 'Еднократна административна процедура — без допълнителни разходи',
         },
       });
     }
 
     // ── ОБОБЩЕНИЕ ──
-    const clientLaborCapital = (() => {
-      let lc = 0, inc = clientNet * 12;
-      for (let y = 0; y < cYears; y++) { lc += inc; inc *= 1.03; }
-      return lc;
-    })();
-    const partnerLaborCapital = (() => {
-      if (!includePartner) return 0;
-      let lc = 0, inc = partnerNet * 12;
-      for (let y = 0; y < pYears; y++) { lc += inc; inc *= 1.03; }
-      return lc;
-    })();
-    const taxReliefAnnual = planProducts.filter(p => p.monthly_premium > 0)
+    const taxReliefAnnual = planProducts.filter(p => (p.monthly_premium || 0) > 0)
       .reduce((s, p) => s + (p.total_premium || 0), 0) * 0.10;
 
     // ── ЗАПИС В БД ──
@@ -1183,8 +1139,8 @@ Deno.serve(async (req) => {
       total_monthly_income: totalIncome,
       total_monthly_expenses: variableExpenses,
       available_for_investment: monthlyBalanceAfterOpt,
-      protection_need_p1: Math.round(clientLaborCapital * 0.5),
-      protection_need_p2: includePartner ? Math.round(partnerLaborCapital * 0.5) : 0,
+      protection_need_p1: Math.round(corpusClient * 0.5),
+      protection_need_p2: includePartner ? Math.round(corpusPartner * 0.5) : 0,
       reserve_need: targetReserve,
       pension_gap_p1: Math.round(targetPerPerson),
       pension_gap_p2: includePartner ? Math.round(targetPerPerson) : 0,
@@ -1193,14 +1149,18 @@ Deno.serve(async (req) => {
       total_coverage: planProducts.reduce((s, p) => s + (p.coverage_amount || 0), 0),
       total_expected_value: planProducts.reduce((s, p) => s + (p.expected_value || 0), 0),
       notes: JSON.stringify({
-        version: '2.0',
+        version: '3.0',
         constitution_based: true,
+        tariffs_source: 'FinancialPlanConstants + UniqaHealthValueConstants (exact match)',
+        currency: 'EUR (all products, BGN replaced from 01.01.2026)',
         ceilings: { ceiling1: Math.round(ceiling1), ceiling2: Math.round(ceiling2), maxMonthlyBudget: Math.round(maxMonthlyBudget) },
         reserve_mode: reserveAlreadyBuilt ? 'B' : 'A',
         total_corpus: Math.round(totalCorpus),
         corpus_net: Math.round(corpusNet),
         target_per_person: Math.round(targetPerPerson),
         fv_assets: Math.round(fvFinancialAssets + fvProperties + fvVolPension),
+        generali_monthly_eur: GENERALI_BASIC_MONTHLY_EUR,
+        dzi_zakrila_platinum_monthly_eur: DZI_ZAKRILA_PLATINUM.monthly,
       }),
     };
 
@@ -1223,30 +1183,28 @@ Deno.serve(async (req) => {
         coverage_amount: product.coverage_amount,
         expected_value: product.expected_value,
         offer_status: 'generated',
-        ai_recommendation_reason: 'Генериран по PLAN_RULES v2.0 (PlanRulesConstitution)',
+        ai_recommendation_reason: 'Генериран по PLAN_RULES v3.0 — точни тарифи от ProductConfigDemo калкулатори',
       });
     }
 
     return Response.json({
       success: true,
       plan_id: savedPlan.id,
+      version: '3.0',
       summary: {
-        total_monthly_premium: totalMonthlyPremium,
+        total_monthly_premium: Math.round(totalMonthlyPremium * 100) / 100,
         total_products: planProducts.length,
-        recommended_frequency: 'annual',
-        labor_capital_total: Math.round(clientLaborCapital + partnerLaborCapital),
-        tax_relief_annual: Math.round(taxReliefAnnual),
         corpus_net: Math.round(corpusNet),
         target_per_person: Math.round(targetPerPerson),
         reserve_mode: reserveAlreadyBuilt ? 'B' : 'A',
         budget_ceiling_monthly: Math.round(maxMonthlyBudget),
+        tax_relief_annual: Math.round(taxReliefAnnual),
       },
       products: planProducts,
-      optimizations: [],
     });
 
   } catch (error) {
-    console.error('generateFinancialPlan error:', error);
+    console.error('generateFinancialPlan v3.0 error:', error);
     return Response.json({ error: error.message, stack: error.stack }, { status: 500 });
   }
 });

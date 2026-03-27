@@ -380,7 +380,7 @@ const projectUL = (annualSavings, yearsToRetirement, assumedReturn = 0.08, faceA
 };
 
 // Версия с правилно начална възраст
-const projectULFull = (annualSavings, startAge, yearsToRetirement, assumedReturn = 0.08, faceAmount = 20000) => {
+const projectULFull = (annualSavings, startAge, yearsToRetirement, assumedReturn = 0.08, faceAmount = 2500) => {
   if (yearsToRetirement <= 0 || annualSavings <= 0) return 0;
 
   const premiumBonus = getPremiumBonus(annualSavings);
@@ -412,7 +412,7 @@ const projectULFull = (annualSavings, startAge, yearsToRetirement, assumedReturn
 };
 
 // Бинарно търсене за годишна вноска която постига target
-const findAnnualSavingsForTarget = (target, startAge, yearsToRetirement, maxBudget, minSavings = 300, faceAmount = 20000) => {
+const findAnnualSavingsForTarget = (target, startAge, yearsToRetirement, maxBudget, minSavings = 300, faceAmount = 2500) => {
   if (target <= 0) return 0;
   if (yearsToRetirement <= 0) return null;
   let lo = minSavings, hi = maxBudget;
@@ -461,7 +461,7 @@ const buildULAnnualPremium = (annualSavings, age, netIncome, grossIncome, includ
   }
 
   const totalAnnual = annualSavings + totalCoveragesCost + waiverCost + 15; // 15€ admin fee
-  const integratedLife = Math.min(annualSavings * getULLifeMultiplier(age), 15000);
+  const integratedLife = 2500; // Стандартно интегрирано покритие — идентично с MetLifeULCalculator
 
   return {
     totalAnnual,
@@ -665,17 +665,16 @@ Deno.serve(async (req) => {
     const targetPerPerson = includePartner ? corpusNet / 2 : corpusNet;
 
     // ── НАМИРАНЕ НА UL ВНОСКИ ──
-    const cFaceAmount = Math.min(cAnnualSavings * (cAge <= 25 ? 30 : cAge <= 35 ? 20 : cAge <= 45 ? 15 : cAge <= 55 ? 10 : 6), 15000);
+    const UL_FACE_AMOUNT = 2500; // Стандартно интегрирано покритие — идентично с MetLifeULCalculator
     let cAnnualSavings = 300;
     if (cYears > 0 && budgetAnnual >= 300) {
-      const t = findAnnualSavingsForTarget(targetPerPerson, cAge, cYears, budgetAnnual, 300, cFaceAmount);
+      const t = findAnnualSavingsForTarget(targetPerPerson, cAge, cYears, budgetAnnual, 300, UL_FACE_AMOUNT);
       if (t !== null) cAnnualSavings = t;
     }
-    const pFaceAmount = includePartner ? Math.min(300 * (pAge <= 25 ? 30 : pAge <= 35 ? 20 : pAge <= 45 ? 15 : pAge <= 55 ? 10 : 6), 15000) : 15000;
     let pAnnualSavings = null;
     if (includePartner && pYears > 0 && partnerNet > 0) {
       pAnnualSavings = 300;
-      const t = findAnnualSavingsForTarget(targetPerPerson, pAge, pYears, budgetAnnual, 300, pFaceAmount);
+      const t = findAnnualSavingsForTarget(targetPerPerson, pAge, pYears, budgetAnnual, 300, UL_FACE_AMOUNT);
       if (t !== null) pAnnualSavings = t;
     }
 
@@ -824,7 +823,7 @@ Deno.serve(async (req) => {
         monthly_premium: monthly,
         total_premium: monthly * 12,
         coverage_amount: ul.integratedLife,
-        expected_value: projectULFull(cAnnualSavings, cAge, cYears, 0.08, ul.integratedLife),
+        expected_value: projectULFull(cAnnualSavings, cAge, cYears, 0.08, UL_FACE_AMOUNT),
         is_active: true,
         details: {
           annual_savings: Math.round(cAnnualSavings),
@@ -839,7 +838,7 @@ Deno.serve(async (req) => {
           premium_bonus_pct: Math.round(ul.premiumBonus * 100),
           av_charge_pct: Math.round(ul.avCharge * 10000) / 100,
           target_corpus: Math.round(targetPerPerson),
-          projected_value_at_retirement: projectULFull(cAnnualSavings, cAge, cYears, 0.08, ul.integratedLife),
+          projected_value_at_retirement: projectULFull(cAnnualSavings, cAge, cYears, 0.08, UL_FACE_AMOUNT),
         },
       });
     }
@@ -860,7 +859,7 @@ Deno.serve(async (req) => {
         monthly_premium: monthlyP,
         total_premium: monthlyP * 12,
         coverage_amount: ulP.integratedLife,
-        expected_value: projectULFull(pAnnualSavings, pAge, pYears, 0.08, ulP.integratedLife),
+        expected_value: projectULFull(pAnnualSavings, pAge, pYears, 0.08, UL_FACE_AMOUNT),
         is_active: true,
         details: {
           annual_savings: Math.round(pAnnualSavings),
@@ -875,7 +874,7 @@ Deno.serve(async (req) => {
           premium_bonus_pct: Math.round(ulP.premiumBonus * 100),
           av_charge_pct: Math.round(ulP.avCharge * 10000) / 100,
           target_corpus: Math.round(targetPerPerson),
-          projected_value_at_retirement: projectULFull(pAnnualSavings, pAge, pYears, 0.08, ulP.integratedLife),
+          projected_value_at_retirement: projectULFull(pAnnualSavings, pAge, pYears, 0.08, UL_FACE_AMOUNT),
         },
       });
     }

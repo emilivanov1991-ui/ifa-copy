@@ -495,37 +495,8 @@ const getMonthlyMortality = (age) => {
 // Включва: investible premium rate, premium bonus, AV charge, COI, policy fee
 // ──────────────────────────────────────────────────────────
 
-const projectUL = (annualSavings, yearsToRetirement, assumedReturn = 0.08, faceAmount = 20000) => {
-  if (yearsToRetirement <= 0 || annualSavings <= 0) return 0;
-
-  const premiumBonus = getPremiumBonus(annualSavings);
-  const avChargeRate = getAVCharge(annualSavings);
-  const monthlyReturn = assumedReturn / 12;
-  const policyFeeMonthly = 15 / 12;
-
-  let accountValue = 0;
-
-  for (let year = 1; year <= yearsToRetirement; year++) {
-    const currentAge = 33 + year - 1; // placeholder — будем подавать начальный возраст ниже
-    const investibleRate = year === 1 ? 0.30 : year === 2 ? 0.60 : 1.00;
-    const monthlyPremium = annualSavings / 12;
-
-    for (let month = 1; month <= 12; month++) {
-      let investible = monthlyPremium * investibleRate;
-      // Bonus only on first payment (month 1, year 1)
-      if (year === 1 && month === 1) {
-        investible += annualSavings * premiumBonus;
-      }
-      accountValue += investible;
-      accountValue *= (1 + monthlyReturn);
-      const avCharge = accountValue * (avChargeRate / 12);
-      const coi = accountValue * getMonthlyMortality(currentAge) * (faceAmount / 1000);
-      accountValue -= (avCharge + coi + policyFeeMonthly);
-      accountValue = Math.max(0, accountValue);
-    }
-  }
-  return Math.round(accountValue);
-};
+// Стандартно Junior face amount (MetLife Джуниър интегрирано покритие Живот)
+const JUNIOR_FACE_AMOUNT = 5000; // EUR — стандартно за MetLife Джуниър
 
 // Версия с правилно начална възраст
 const projectULFull = (annualSavings, startAge, yearsToRetirement, assumedReturn = 0.08, faceAmount = 2500) => {
@@ -604,8 +575,9 @@ const buildULAnnualPremium = (annualSavings, age, netIncome, grossIncome, includ
 
   let waiverCost = 0;
   if (includeWaiver && age <= 55) {
-    // waiverRate = 0.0438 за рисков клас 1 (от METLIFE_PA_PREMIUM_WAIVER)
-    waiverCost = (annualSavings + totalCoveragesCost) * 0.0438;
+    // Коефициент 0.043799 от METLIFE_PA_PREMIUM_WAIVER[1].coefficient (рисков клас 1)
+    // Идентично с MetLifeULCalculator: waiverRate = riskClass === 1 ? 0.0438 : ...
+    waiverCost = (annualSavings + totalCoveragesCost) * 0.043799;
   }
 
   const totalAnnual = annualSavings + totalCoveragesCost + waiverCost + 15; // 15€ admin fee
@@ -847,12 +819,13 @@ Deno.serve(async (req) => {
       const horizonShare = totalHorizonSum > 0 ? horizon / totalHorizonSum : 1;
       const gapForThisChild = educationGap * horizonShare;
 
+      // Бинарно търсене за Junior — с правилна детска начална възраст и JUNIOR_FACE_AMOUNT
       const findJuniorSavings = (target, budg) => {
         if (target <= 0) return 300;
         let lo = 300, hi = budg;
         for (let iter = 0; iter < 40; iter++) {
           const mid = (lo + hi) / 2;
-          if (projectUL(mid, horizon) >= target) hi = mid;
+          if (projectULFull(mid, childAge, horizon, 0.08, JUNIOR_FACE_AMOUNT) >= target) hi = mid;
           else lo = mid;
         }
         return Math.max(300, hi);
@@ -1058,7 +1031,7 @@ Deno.serve(async (req) => {
             strategy: 'dynamic',
             monthly_premium: jMonthly,
             total_premium: jMonthly * 12,
-            expected_value: projectULFull(scaledSavings, child.childAge, child.horizon, 0.08, 5000),
+            expected_value: projectULFull(scaledSavings, child.childAge, child.horizon, 0.08, JUNIOR_FACE_AMOUNT),
             is_active: true,
             details: {
             annual_savings: scaledSavings,

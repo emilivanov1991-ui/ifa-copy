@@ -125,49 +125,71 @@ const PREMIUM_BONUS_TABLE = [
   { from: 4200, to: null, bonus: 0.04 },
 ];
 
-// METLIFE_CREDIT_GUARD_BASIC_RATES — точни от FinancialPlanConstants
-const CG_BASIC_RATES = {
-  18:{5:147,10:147,15:147,20:147,25:147,30:147},
-  19:{5:147,10:147,15:147,20:147,25:147,30:147},
-  20:{5:147,10:147,15:147,20:147,25:147,30:147},
-  21:{5:147,10:147,15:147,20:147,25:147,30:147},
-  22:{5:147,10:147,15:147,20:147,25:147,30:147},
-  23:{5:147,10:147,15:147,20:147,25:147,30:147},
-  24:{5:147,10:147,15:147,20:147,25:147,30:147},
-  25:{5:147,10:147,15:147,20:147,25:147,30:160},
-  26:{5:147,10:147,15:147,20:147,25:147,30:160},
-  27:{5:147,10:147,15:147,20:147,25:147,30:160},
-  28:{5:147,10:147,15:147,20:147,25:160,30:172},
-  29:{5:147,10:147,15:147,20:147,25:160,30:184},
-  30:{5:160,10:160,15:160,20:160,25:172,30:184},
-  31:{5:160,10:160,15:160,20:172,25:184,30:196},
-  32:{5:172,10:172,15:172,20:184,25:196,30:209},
-  33:{5:172,10:172,15:172,20:184,25:209,30:221},
-  34:{5:184,10:184,15:184,20:196,25:209,30:233},
-  35:{5:184,10:184,15:196,20:209,25:233,30:245},
-  36:{5:196,10:196,15:209,20:221,25:245,30:270},
-  37:{5:209,10:209,15:221,20:233,25:258,30:282},
-  38:{5:221,10:221,15:233,20:258,25:282,30:306},
-  39:{5:233,10:233,15:245,20:270,25:294,30:319},
-  40:{5:245,10:245,15:270,20:294,25:319,30:343},
-  41:{5:245,10:258,15:282,20:306,25:331},
-  42:{5:270,10:282,15:306,20:331,25:368},
-  43:{5:294,10:306,15:331,20:355,25:392},
-  44:{5:306,10:331,15:355,20:392,25:417},
-  45:{5:331,10:355,15:392,20:417,25:453},
-  46:{5:355,10:380,15:417,20:453},
-  47:{5:392,10:417,15:453,20:490},
-  48:{5:417,10:441,15:490,20:515},
-  49:{5:453,10:478,15:515,20:551},
-  50:{5:466,10:502,15:551,20:588},
-  51:{5:502,10:539,15:588},
-  52:{5:539,10:576,15:637},
-  53:{5:576,10:625,15:674},
-  54:{5:600,10:661,15:723},
-  55:{5:637,10:698,15:772},
-  56:{5:686,10:759},57:{5:710,10:796},58:{5:784,10:882},
-  59:{5:833,10:931},60:{5:918,10:1016},
-  61:{5:967},62:{5:1029},63:{5:1102},64:{5:1188},65:{5:1273},
+// ============================================================
+// METLIFE CREDIT GUARD — пълна тарифна таблица
+// Идентична с MetLifeCreditGuardConstants.js (CREDIT_GUARD_TARIFF)
+// Структура: age → term → { basic, extended } — премия за 100,000 EUR покритие
+// Правила: min_age=18, max_age=65, age+term<=65, min_sum=10000, max_sum=500000
+// Налични срокове: 5, 10, 15, 20, 25, 30, 35 (по наличност за дадена възраст)
+// ============================================================
+const CG_TARIFF = {
+  18: { 35:{basic:147,extended:172}, 30:{basic:147,extended:172}, 25:{basic:147,extended:172}, 20:{basic:147,extended:172}, 15:{basic:147,extended:172}, 10:{basic:147,extended:172}, 5:{basic:147,extended:172} },
+  19: { 35:{basic:147,extended:184}, 30:{basic:147,extended:184}, 25:{basic:147,extended:184}, 20:{basic:147,extended:184}, 15:{basic:147,extended:184}, 10:{basic:147,extended:184}, 5:{basic:147,extended:184} },
+  20: { 35:{basic:147,extended:184}, 30:{basic:147,extended:184}, 25:{basic:147,extended:184}, 20:{basic:147,extended:184}, 15:{basic:147,extended:184}, 10:{basic:147,extended:184}, 5:{basic:147,extended:184} },
+  21: { 35:{basic:147,extended:184}, 30:{basic:147,extended:184}, 25:{basic:147,extended:184}, 20:{basic:147,extended:184}, 15:{basic:147,extended:184}, 10:{basic:147,extended:184}, 5:{basic:147,extended:184} },
+  22: { 35:{basic:147,extended:184}, 30:{basic:147,extended:184}, 25:{basic:147,extended:184}, 20:{basic:147,extended:184}, 15:{basic:147,extended:184}, 10:{basic:147,extended:184}, 5:{basic:147,extended:184} },
+  23: { 35:{basic:160,extended:196}, 30:{basic:147,extended:184}, 25:{basic:147,extended:184}, 20:{basic:147,extended:184}, 15:{basic:147,extended:184}, 10:{basic:147,extended:184}, 5:{basic:147,extended:184} },
+  24: { 35:{basic:160,extended:196}, 30:{basic:147,extended:184}, 25:{basic:147,extended:184}, 20:{basic:147,extended:184}, 15:{basic:147,extended:184}, 10:{basic:147,extended:184}, 5:{basic:147,extended:184} },
+  25: { 35:{basic:172,extended:209}, 30:{basic:160,extended:184}, 25:{basic:147,extended:184}, 20:{basic:147,extended:184}, 15:{basic:147,extended:184}, 10:{basic:147,extended:184}, 5:{basic:147,extended:184} },
+  26: { 35:{basic:172,extended:221}, 30:{basic:160,extended:196}, 25:{basic:147,extended:184}, 20:{basic:147,extended:184}, 15:{basic:147,extended:184}, 10:{basic:147,extended:184}, 5:{basic:147,extended:184} },
+  27: { 35:{basic:184,extended:221}, 30:{basic:160,extended:209}, 25:{basic:147,extended:184}, 20:{basic:147,extended:184}, 15:{basic:147,extended:184}, 10:{basic:147,extended:184}, 5:{basic:147,extended:184} },
+  28: { 35:{basic:184,extended:233}, 30:{basic:172,extended:209}, 25:{basic:160,extended:196}, 20:{basic:147,extended:184}, 15:{basic:147,extended:184}, 10:{basic:147,extended:184}, 5:{basic:147,extended:184} },
+  29: { 35:{basic:196,extended:245}, 30:{basic:184,extended:221}, 25:{basic:160,extended:196}, 20:{basic:147,extended:184}, 15:{basic:147,extended:184}, 10:{basic:147,extended:184}, 5:{basic:147,extended:184} },
+  30: { 35:{basic:209,extended:270}, 30:{basic:184,extended:233}, 25:{basic:172,extended:209}, 20:{basic:160,extended:196}, 15:{basic:160,extended:184}, 10:{basic:160,extended:184}, 5:{basic:160,extended:184} },
+  31: { 35:{basic:221,extended:282}, 30:{basic:196,extended:258}, 25:{basic:184,extended:221}, 20:{basic:172,extended:209}, 15:{basic:160,extended:184}, 10:{basic:160,extended:184}, 5:{basic:160,extended:184} },
+  32: { 35:{basic:233,extended:306}, 30:{basic:209,extended:270}, 25:{basic:196,extended:245}, 20:{basic:184,extended:221}, 15:{basic:172,extended:196}, 10:{basic:172,extended:196}, 5:{basic:172,extended:196} },
+  33: { 35:{basic:245,extended:331}, 30:{basic:221,extended:294}, 25:{basic:209,extended:258}, 20:{basic:184,extended:233}, 15:{basic:172,extended:209}, 10:{basic:172,extended:209}, 5:{basic:172,extended:209} },
+  34: { 35:{basic:258,extended:355}, 30:{basic:233,extended:306}, 25:{basic:209,extended:270}, 20:{basic:196,extended:245}, 15:{basic:184,extended:233}, 10:{basic:184,extended:209}, 5:{basic:184,extended:209} },
+  35: { 35:{basic:282,extended:380}, 30:{basic:245,extended:331}, 25:{basic:233,extended:294}, 20:{basic:209,extended:270}, 15:{basic:196,extended:245}, 10:{basic:184,extended:221}, 5:{basic:184,extended:221} },
+  36: { 30:{basic:270,extended:355}, 25:{basic:245,extended:319}, 20:{basic:221,extended:282}, 15:{basic:209,extended:258}, 10:{basic:196,extended:233}, 5:{basic:196,extended:233} },
+  37: { 30:{basic:282,extended:392}, 25:{basic:258,extended:343}, 20:{basic:233,extended:306}, 15:{basic:221,extended:282}, 10:{basic:209,extended:258}, 5:{basic:209,extended:245} },
+  38: { 30:{basic:306,extended:417}, 25:{basic:282,extended:368}, 20:{basic:258,extended:331}, 15:{basic:233,extended:306}, 10:{basic:221,extended:282}, 5:{basic:221,extended:270} },
+  39: { 30:{basic:319,extended:453}, 25:{basic:294,extended:404}, 20:{basic:270,extended:355}, 15:{basic:245,extended:331}, 10:{basic:233,extended:294}, 5:{basic:233,extended:294} },
+  40: { 30:{basic:343,extended:490}, 25:{basic:319,extended:429}, 20:{basic:294,extended:380}, 15:{basic:270,extended:355}, 10:{basic:245,extended:319}, 5:{basic:245,extended:306} },
+  41: { 25:{basic:331,extended:466}, 20:{basic:306,extended:417}, 15:{basic:282,extended:380}, 10:{basic:258,extended:343}, 5:{basic:245,extended:319} },
+  42: { 25:{basic:368,extended:502}, 20:{basic:331,extended:453}, 15:{basic:306,extended:417}, 10:{basic:282,extended:368}, 5:{basic:270,extended:343} },
+  43: { 25:{basic:392,extended:551}, 20:{basic:355,extended:490}, 15:{basic:331,extended:453}, 10:{basic:306,extended:404}, 5:{basic:294,extended:368} },
+  44: { 25:{basic:417,extended:600}, 20:{basic:392,extended:539}, 15:{basic:355,extended:490}, 10:{basic:331,extended:441}, 5:{basic:306,extended:404} },
+  45: { 25:{basic:453,extended:649}, 20:{basic:417,extended:588}, 15:{basic:392,extended:539}, 10:{basic:355,extended:478}, 5:{basic:331,extended:429} },
+  46: { 20:{basic:453,extended:637}, 15:{basic:417,extended:588}, 10:{basic:380,extended:527}, 5:{basic:355,extended:466} },
+  47: { 20:{basic:490,extended:698}, 15:{basic:453,extended:637}, 10:{basic:417,extended:576}, 5:{basic:392,extended:515} },
+  48: { 20:{basic:515,extended:747}, 15:{basic:490,extended:686}, 10:{basic:441,extended:625}, 5:{basic:417,extended:564} },
+  49: { 20:{basic:551,extended:821}, 15:{basic:515,extended:747}, 10:{basic:478,extended:686}, 5:{basic:453,extended:612} },
+  50: { 20:{basic:588,extended:882}, 15:{basic:551,extended:808}, 10:{basic:502,extended:735}, 5:{basic:466,extended:661} },
+  51: { 15:{basic:588,extended:882}, 10:{basic:539,extended:796}, 5:{basic:502,extended:710} },
+  52: { 15:{basic:637,extended:955}, 10:{basic:576,extended:857}, 5:{basic:539,extended:772} },
+  53: { 15:{basic:674,extended:1029}, 10:{basic:625,extended:931}, 5:{basic:576,extended:833} },
+  54: { 15:{basic:723,extended:1114}, 10:{basic:661,extended:1004}, 5:{basic:600,extended:894} },
+  55: { 15:{basic:772,extended:1212}, 10:{basic:698,extended:1090}, 5:{basic:637,extended:955} },
+  56: { 10:{basic:759,extended:1176}, 5:{basic:686,extended:1029} },
+  57: { 10:{basic:796,extended:1273}, 5:{basic:710,extended:1102} },
+  58: { 10:{basic:882,extended:1408}, 5:{basic:784,extended:1237} },
+  59: { 10:{basic:931,extended:1530}, 5:{basic:833,extended:1335} },
+  60: { 10:{basic:1016,extended:1677}, 5:{basic:918,extended:1469} },
+  61: { 5:{basic:967,extended:1579} },
+  62: { 5:{basic:1029,extended:1714} },
+  63: { 5:{basic:1102,extended:1861} },
+  64: { 5:{basic:1188,extended:2045} },
+  65: { 5:{basic:1273,extended:2228} },
+};
+
+const CG_RULES = {
+  min_age: 18,
+  max_age: 65,
+  min_sum: 10000,
+  max_sum: 500000,
+  reference_sum: 100000, // тарифите са за 100,000 EUR
+  available_terms: [5, 10, 15, 20, 25, 30, 35],
 };
 
 // УНИКА тарифи — от UniqaHealthValueConstants (точни)
@@ -260,19 +282,30 @@ const getULLifeMultiplier = (age) => {
   return 6;
 };
 
-const getCreditGuardMonthly = (age, loanAmount, termYears) => {
-  if (!loanAmount || loanAmount <= 0 || age < 18 || age + termYears > 70) return null;
-  const ageKeys = Object.keys(CG_BASIC_RATES).map(Number).sort((a,b)=>a-b);
-  let selAge = null;
-  for (const k of ageKeys) { if (k <= age) selAge = k; else break; }
-  if (!selAge) return null;
-  const termOptions = [5,10,15,20,25,30].filter(t => CG_BASIC_RATES[selAge]?.[t] !== undefined && CG_BASIC_RATES[selAge]?.[t] !== null);
-  if (!termOptions.length) return null;
-  let selTerm = termOptions[0];
-  for (const t of termOptions) { if (t <= termYears) selTerm = t; }
-  const ratePerHundredK = CG_BASIC_RATES[selAge][selTerm];
+// Изчислява месечна премия Credit Guard (Основен пакет) по пълната тарифа
+// Логика: намери точна възраст (без interpolation), после най-дълъг наличен срок <= termYears
+// age+term не трябва да надвишава CG_RULES.max_age (65)
+const getCreditGuardMonthly = (age, loanAmount, termYears, packageType = 'basic') => {
+  if (!loanAmount || loanAmount <= 0) return null;
+  if (age < CG_RULES.min_age || age > CG_RULES.max_age) return null;
+  if (loanAmount < CG_RULES.min_sum || loanAmount > CG_RULES.max_sum) return null;
+  if (age + termYears > CG_RULES.max_age) return null;
+
+  const ageData = CG_TARIFF[age];
+  if (!ageData) return null;
+
+  // Намираме най-дългия наличен срок, който е <= termYears
+  const availableTerms = CG_RULES.available_terms
+    .filter(t => ageData[t] !== undefined && t <= termYears)
+    .sort((a, b) => b - a); // низходящо — искаме най-дългия
+  if (!availableTerms.length) return null;
+
+  const selTerm = availableTerms[0];
+  const ratePerHundredK = ageData[selTerm][packageType];
   if (!ratePerHundredK) return null;
-  return Math.round((loanAmount / 100000) * ratePerHundredK / 12 * 100) / 100;
+
+  const annualPremium = (loanAmount / CG_RULES.reference_sum) * ratePerHundredK;
+  return Math.round(annualPremium / 12 * 100) / 100;
 };
 
 const SNAP_THRESHOLDS = [720, 960, 1200, 1500, 1800, 2400, 3000, 3600, 4200];
@@ -1039,31 +1072,51 @@ Deno.serve(async (req) => {
     }
 
     // ── MetLife Credit Guard (при ипотека) ──
+    // ── MetLife Credit Guard (при ипотека) ──
+    // Правила: age 18–65, age+term <= 65, sum 10k–500k, пакет Основен по подразбиране
     const mortgageBalance = a.liability_mortgage_remaining || 0;
-    const mortgageTermYears = a.liability_mortgage_remaining_months ? Math.ceil(a.liability_mortgage_remaining_months / 12) : 20;
-    if (mortgageBalance >= 10000 && hasMortgage && cAge < 65) {
-      const cgTerm = Math.min(mortgageTermYears, 70 - cAge, 30);
-      const cgMonthly = getCreditGuardMonthly(cAge, mortgageBalance, cgTerm);
-      if (cgMonthly && cgMonthly > 0 && remainingMonthlyBudget >= cgMonthly) {
-        addProduct({
-          product_type: 'term_life',
-          provider: 'MetLife',
-          product_name: 'MetLife Credit Guard — Основен пакет',
-          beneficiary: 'partner1',
-          beneficiary_name: `${a.client_first_name||''} ${a.client_last_name||''}`.trim(),
-          beneficiary_age: cAge,
-          term_years: cgTerm,
-          monthly_premium: cgMonthly,
-          total_premium: cgMonthly * 12,
-          coverage_amount: mortgageBalance,
-          is_active: true,
-          details: {
-            loan_balance: mortgageBalance,
-            loan_term_years: cgTerm,
-            package: 'Основен',
-            rate_per_100k: CG_BASIC_RATES[Math.min(cAge, 65)]?.[Math.min(cgTerm, 30)] || null,
-          },
-        });
+    const mortgageTermMonths = a.liability_mortgage_remaining_months || 0;
+    const mortgageTermYears = mortgageTermMonths > 0 ? Math.ceil(mortgageTermMonths / 12) : 20;
+    if (
+      mortgageBalance >= CG_RULES.min_sum &&
+      mortgageBalance <= CG_RULES.max_sum &&
+      hasMortgage &&
+      cAge >= CG_RULES.min_age &&
+      cAge <= CG_RULES.max_age
+    ) {
+      // Максималният допустим срок: age+term <= 65 И срокът на кредита
+      const maxAllowedTerm = CG_RULES.max_age - cAge;
+      const cgTerm = Math.min(mortgageTermYears, maxAllowedTerm);
+      if (cgTerm >= 5) { // минимум 5 години срок
+        const cgMonthly = getCreditGuardMonthly(cAge, mortgageBalance, cgTerm, 'basic');
+        if (cgMonthly && cgMonthly > 0 && remainingMonthlyBudget >= cgMonthly) {
+          // Открий кой точно срок бе избран за детайлите
+          const ageData = CG_TARIFF[cAge] || {};
+          const chosenTerm = CG_RULES.available_terms
+            .filter(t => ageData[t] !== undefined && t <= cgTerm)
+            .sort((a, b) => b - a)[0];
+          addProduct({
+            product_type: 'term_life',
+            provider: 'MetLife',
+            product_name: 'MetLife Credit Guard — Основен пакет',
+            beneficiary: 'partner1',
+            beneficiary_name: `${a.client_first_name||''} ${a.client_last_name||''}`.trim(),
+            beneficiary_age: cAge,
+            term_years: chosenTerm || cgTerm,
+            monthly_premium: cgMonthly,
+            total_premium: cgMonthly * 12,
+            coverage_amount: mortgageBalance,
+            is_active: true,
+            details: {
+              loan_balance: mortgageBalance,
+              loan_term_years: chosenTerm || cgTerm,
+              package: 'Основен',
+              coverages: ['Смърт', 'Трайна загуба на работоспособност'],
+              rate_per_100k: ageData[chosenTerm]?.basic || null,
+              reference_sum: CG_RULES.reference_sum,
+            },
+          });
+        }
       }
     }
 

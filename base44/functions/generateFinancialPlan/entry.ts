@@ -305,34 +305,120 @@ const fvAnnuity = (monthlyContrib, annualRate, years) => {
 };
 
 // ──────────────────────────────────────────────────────────
-// UL ПРОЕКЦИЯ — точен MetLife модел
-// Използва AV charge, premium bonus, investible premium rate
+// MORTALITY TABLE — от FinancialPlanConstants (blended 80% male / 20% female)
 // ──────────────────────────────────────────────────────────
 
-const projectUL = (annualSavings, yearsToRetirement, assumedReturn = 0.08) => {
-  if (yearsToRetirement <= 0 || annualSavings <= 0) return 0;
-  const bonus = getPremiumBonus(annualSavings);
-  const avCharge = getAVCharge(annualSavings);
-  const netReturn = assumedReturn - avCharge;
+const MORTALITY_QX = {
+  0:{m:10.4667,f:8.3265},1:{m:0.8631,f:0.8105},15:{m:0.4320,f:0.2681},
+  16:{m:0.5632,f:0.3168},17:{m:0.6590,f:0.3991},18:{m:0.7820,f:0.4778},
+  19:{m:0.9968,f:0.3351},20:{m:0.9754,f:0.3689},21:{m:0.9902,f:0.3905},
+  22:{m:1.1783,f:0.3851},23:{m:1.1208,f:0.3416},24:{m:1.2253,f:0.3714},
+  25:{m:1.1798,f:0.4777},26:{m:1.2803,f:0.5026},27:{m:1.2603,f:0.2587},
+  28:{m:1.2194,f:0.5889},29:{m:1.2426,f:0.5133},30:{m:1.2442,f:0.6015},
+  31:{m:1.3015,f:0.6550},32:{m:1.5494,f:0.5586},33:{m:1.6410,f:0.7463},
+  34:{m:1.6169,f:0.9297},35:{m:1.8178,f:0.8255},36:{m:1.9444,f:1.0409},
+  37:{m:2.3805,f:1.0218},38:{m:2.2935,f:1.2077},39:{m:2.5608,f:1.2746},
+  40:{m:3.1639,f:1.2941},41:{m:3.2109,f:1.3436},42:{m:3.6103,f:1.5150},
+  43:{m:4.1226,f:1.8807},44:{m:4.9154,f:2.1087},45:{m:5.4322,f:2.4594},
+  46:{m:6.0691,f:2.6197},47:{m:7.0983,f:2.9067},48:{m:7.5943,f:2.9493},
+  49:{m:7.5754,f:3.4800},50:{m:9.2432,f:3.4757},51:{m:9.8708,f:3.8075},
+  52:{m:11.0132,f:4.1138},53:{m:12.1581,f:4.7100},54:{m:13.1207,f:5.4055},
+  55:{m:13.7477,f:5.8224},56:{m:16.0129,f:5.8155},57:{m:16.4340,f:6.5164},
+  58:{m:19.0146,f:7.2625},59:{m:20.7628,f:7.4624},60:{m:21.6724,f:7.7226},
+  61:{m:22.9264,f:8.5540},62:{m:25.2898,f:9.3900},63:{m:26.2972,f:10.5458},
+  64:{m:28.9558,f:11.5530},65:{m:29.2752,f:12.1736},66:{m:33.3520,f:14.5268},
+  67:{m:34.5356,f:15.8754},68:{m:37.8817,f:17.1907},69:{m:39.6470,f:20.2289},
+  70:{m:43.5827,f:22.0645},75:{m:67.1646,f:40.3518},80:{m:99.7261,f:75.4640},
+};
 
-  let balance = 0;
-  for (let y = 1; y <= yearsToRetirement; y++) {
-    // Investible premium rate: year 1 = 30%, year 2 = 60%, year 3+ = 100%
-    const investibleRate = y === 1 ? 0.30 : y === 2 ? 0.60 : 1.00;
-    const effectiveContrib = annualSavings * investibleRate * (1 + (y === 1 ? bonus : 0));
-    balance = (balance + effectiveContrib) * (1 + netReturn);
+const getMonthlyMortality = (age) => {
+  const a = Math.min(Math.max(Math.floor(age), 0), 80);
+  // Find nearest age in table
+  let closest = 0;
+  for (const k of Object.keys(MORTALITY_QX).map(Number).sort((a,b)=>a-b)) {
+    if (k <= a) closest = k;
   }
-  return Math.round(balance);
+  const q = MORTALITY_QX[closest] || MORTALITY_QX[0];
+  return (q.m * 0.8 + q.f * 0.2) / 1000 / 12;
+};
+
+// ──────────────────────────────────────────────────────────
+// UL ПРОЕКЦИЯ — точна месечна симулация (идентична с MetLifeULCalculator)
+// Включва: investible premium rate, premium bonus, AV charge, COI, policy fee
+// ──────────────────────────────────────────────────────────
+
+const projectUL = (annualSavings, yearsToRetirement, assumedReturn = 0.08, faceAmount = 20000) => {
+  if (yearsToRetirement <= 0 || annualSavings <= 0) return 0;
+
+  const premiumBonus = getPremiumBonus(annualSavings);
+  const avChargeRate = getAVCharge(annualSavings);
+  const monthlyReturn = assumedReturn / 12;
+  const policyFeeMonthly = 15 / 12;
+
+  let accountValue = 0;
+
+  for (let year = 1; year <= yearsToRetirement; year++) {
+    const currentAge = 33 + year - 1; // placeholder — будем подавать начальный возраст ниже
+    const investibleRate = year === 1 ? 0.30 : year === 2 ? 0.60 : 1.00;
+    const monthlyPremium = annualSavings / 12;
+
+    for (let month = 1; month <= 12; month++) {
+      let investible = monthlyPremium * investibleRate;
+      // Bonus only on first payment (month 1, year 1)
+      if (year === 1 && month === 1) {
+        investible += annualSavings * premiumBonus;
+      }
+      accountValue += investible;
+      accountValue *= (1 + monthlyReturn);
+      const avCharge = accountValue * (avChargeRate / 12);
+      const coi = accountValue * getMonthlyMortality(currentAge) * (faceAmount / 1000);
+      accountValue -= (avCharge + coi + policyFeeMonthly);
+      accountValue = Math.max(0, accountValue);
+    }
+  }
+  return Math.round(accountValue);
+};
+
+// Версия с правилно начална възраст
+const projectULFull = (annualSavings, startAge, yearsToRetirement, assumedReturn = 0.08, faceAmount = 20000) => {
+  if (yearsToRetirement <= 0 || annualSavings <= 0) return 0;
+
+  const premiumBonus = getPremiumBonus(annualSavings);
+  const avChargeRate = getAVCharge(annualSavings);
+  const monthlyReturn = assumedReturn / 12;
+  const policyFeeMonthly = 15 / 12;
+
+  let accountValue = 0;
+
+  for (let year = 1; year <= yearsToRetirement; year++) {
+    const currentAge = startAge + year - 1;
+    const investibleRate = year === 1 ? 0.30 : year === 2 ? 0.60 : 1.00;
+    const monthlyPremium = annualSavings / 12;
+
+    for (let month = 1; month <= 12; month++) {
+      let investible = monthlyPremium * investibleRate;
+      if (year === 1 && month === 1) {
+        investible += annualSavings * premiumBonus;
+      }
+      accountValue += investible;
+      accountValue *= (1 + monthlyReturn);
+      const avCharge = accountValue * (avChargeRate / 12);
+      const coi = accountValue * getMonthlyMortality(currentAge) * (faceAmount / 1000);
+      accountValue -= (avCharge + coi + policyFeeMonthly);
+      accountValue = Math.max(0, accountValue);
+    }
+  }
+  return Math.round(accountValue);
 };
 
 // Бинарно търсене за годишна вноска която постига target
-const findAnnualSavingsForTarget = (target, yearsToRetirement, maxBudget, minSavings = 300) => {
+const findAnnualSavingsForTarget = (target, startAge, yearsToRetirement, maxBudget, minSavings = 300, faceAmount = 20000) => {
   if (target <= 0) return 0;
   if (yearsToRetirement <= 0) return null;
   let lo = minSavings, hi = maxBudget;
   for (let i = 0; i < 40; i++) {
     const mid = (lo + hi) / 2;
-    if (projectUL(mid, yearsToRetirement) >= target) hi = mid;
+    if (projectULFull(mid, startAge, yearsToRetirement, 0.08, faceAmount) >= target) hi = mid;
     else lo = mid;
   }
   return hi > maxBudget ? null : Math.max(minSavings, hi);
@@ -579,15 +665,17 @@ Deno.serve(async (req) => {
     const targetPerPerson = includePartner ? corpusNet / 2 : corpusNet;
 
     // ── НАМИРАНЕ НА UL ВНОСКИ ──
+    const cFaceAmount = Math.min(cAnnualSavings * (cAge <= 25 ? 30 : cAge <= 35 ? 20 : cAge <= 45 ? 15 : cAge <= 55 ? 10 : 6), 15000);
     let cAnnualSavings = 300;
     if (cYears > 0 && budgetAnnual >= 300) {
-      const t = findAnnualSavingsForTarget(targetPerPerson, cYears, budgetAnnual);
+      const t = findAnnualSavingsForTarget(targetPerPerson, cAge, cYears, budgetAnnual, 300, cFaceAmount);
       if (t !== null) cAnnualSavings = t;
     }
+    const pFaceAmount = includePartner ? Math.min(300 * (pAge <= 25 ? 30 : pAge <= 35 ? 20 : pAge <= 45 ? 15 : pAge <= 55 ? 10 : 6), 15000) : 15000;
     let pAnnualSavings = null;
     if (includePartner && pYears > 0 && partnerNet > 0) {
       pAnnualSavings = 300;
-      const t = findAnnualSavingsForTarget(targetPerPerson, pYears, budgetAnnual);
+      const t = findAnnualSavingsForTarget(targetPerPerson, pAge, pYears, budgetAnnual, 300, pFaceAmount);
       if (t !== null) pAnnualSavings = t;
     }
 
@@ -736,7 +824,7 @@ Deno.serve(async (req) => {
         monthly_premium: monthly,
         total_premium: monthly * 12,
         coverage_amount: ul.integratedLife,
-        expected_value: projectUL(cAnnualSavings, cYears),
+        expected_value: projectULFull(cAnnualSavings, cAge, cYears, 0.08, ul.integratedLife),
         is_active: true,
         details: {
           annual_savings: Math.round(cAnnualSavings),
@@ -751,7 +839,7 @@ Deno.serve(async (req) => {
           premium_bonus_pct: Math.round(ul.premiumBonus * 100),
           av_charge_pct: Math.round(ul.avCharge * 10000) / 100,
           target_corpus: Math.round(targetPerPerson),
-          projected_value_at_retirement: projectUL(cAnnualSavings, cYears),
+          projected_value_at_retirement: projectULFull(cAnnualSavings, cAge, cYears, 0.08, ul.integratedLife),
         },
       });
     }
@@ -772,7 +860,7 @@ Deno.serve(async (req) => {
         monthly_premium: monthlyP,
         total_premium: monthlyP * 12,
         coverage_amount: ulP.integratedLife,
-        expected_value: projectUL(pAnnualSavings, pYears),
+        expected_value: projectULFull(pAnnualSavings, pAge, pYears, 0.08, ulP.integratedLife),
         is_active: true,
         details: {
           annual_savings: Math.round(pAnnualSavings),
@@ -787,7 +875,7 @@ Deno.serve(async (req) => {
           premium_bonus_pct: Math.round(ulP.premiumBonus * 100),
           av_charge_pct: Math.round(ulP.avCharge * 10000) / 100,
           target_corpus: Math.round(targetPerPerson),
-          projected_value_at_retirement: projectUL(pAnnualSavings, pYears),
+          projected_value_at_retirement: projectULFull(pAnnualSavings, pAge, pYears, 0.08, ulP.integratedLife),
         },
       });
     }
@@ -823,7 +911,7 @@ Deno.serve(async (req) => {
             strategy: 'dynamic',
             monthly_premium: jMonthly,
             total_premium: jMonthly * 12,
-            expected_value: projectUL(scaledSavings, child.horizon),
+            expected_value: projectULFull(scaledSavings, child.childAge, child.horizon, 0.08, 5000),
             is_active: true,
             details: {
               annual_savings: scaledSavings,

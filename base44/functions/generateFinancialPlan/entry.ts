@@ -106,23 +106,29 @@ const CI40_COEFFICIENTS = {
 // METLIFE_PA_RISK_CLASSES (рисков клас 1)
 const RISK_CLASS_1 = { pi: 1.5, fracturesAndBurns: 16, accidentalDeath: 1.5 };
 
-// AV Charge от PlanRulesProductTables (точни прагове)
+// AV % Charge — идентична с METLIFE_UL_AV_CHARGES.regular_premium от FinancialPlanConstants
+// Структура: annual premium → charge rate
+// Прагове: 300(2%), 720(1.75%), 960(1.5%), 1200(1.25%), 1500(1%), 2400(0.75%), 3600(0.5%), 4800(0.5%), 6000(0.5%)
 const AV_CHARGE_TABLE = [
-  { from: 300,  to: 719,  rate: 0.0200 },
-  { from: 720,  to: 959,  rate: 0.0175 },
-  { from: 960,  to: 1199, rate: 0.0150 },
-  { from: 1200, to: 1499, rate: 0.0125 },
-  { from: 1500, to: 2399, rate: 0.0100 },
-  { from: 2400, to: 3599, rate: 0.0075 },
-  { from: 3600, to: null, rate: 0.0050 },
+  { from: 300,  annual: 300,  rate: 0.0200 },
+  { from: 720,  annual: 720,  rate: 0.0175 },
+  { from: 960,  annual: 960,  rate: 0.0150 },
+  { from: 1200, annual: 1200, rate: 0.0125 },
+  { from: 1500, annual: 1500, rate: 0.0100 },
+  { from: 2400, annual: 2400, rate: 0.0075 },
+  { from: 3600, annual: 3600, rate: 0.0050 },
+  { from: 4800, annual: 4800, rate: 0.0050 },
+  { from: 6000, annual: 6000, rate: 0.0050 },
 ];
 
-// Premium Bonus от PlanRulesProductTables (точни прагове)
+// Premium Bonus — идентична с METLIFE_UL_PREMIUM_BONUS.regular_premium от FinancialPlanConstants
+// Структура: from (inclusive), to (exclusive) → bonus rate
 const PREMIUM_BONUS_TABLE = [
-  { from: 1200, to: 1799, bonus: 0.01 },
-  { from: 1800, to: 2999, bonus: 0.02 },
-  { from: 3000, to: 4199, bonus: 0.03 },
-  { from: 4200, to: null, bonus: 0.04 },
+  { from: 0,    to: 1200,    bonus: 0 },
+  { from: 1200, to: 1800,    bonus: 0.01 },
+  { from: 1800, to: 3000,    bonus: 0.02 },
+  { from: 3000, to: 4200,    bonus: 0.03 },
+  { from: 4200, to: Infinity, bonus: 0.04 },
 ];
 
 // ============================================================
@@ -220,24 +226,51 @@ const DZI_ZAKRILA_PLATINUM = {
   }
 };
 
-// METLIFE_PA_CHILD_COVERAGES — фрактури за Junior
-const CHILD_FRACTURES_RATE = 33; // per 1000 EUR (от METLIFE_PA_CHILD_COVERAGES.brokenBonesAndBurns)
-const CHILD_FRACTURES_AMOUNT = 750; // EUR (конституция: по-висока от двете опции)
+// METLIFE_PA_CHILD_COVERAGES — фрактури за Junior (от FinancialPlanConstants)
+// brokenBonesAndBurns: { per: 1000, rate: 33 }
+const CHILD_FRACTURES_RATE = 33; // per 1000 EUR
+const CHILD_FRACTURES_AMOUNT = 750; // EUR
+
+// Child Protection Agreement коефициенти по възраст на застраховащия
+// Идентични с METLIFE_CHILD_PROTECTION_COEFFICIENTS от FinancialPlanConstants
+// Валидни за застраховащи на възраст 18-55 г.
+const CHILD_PROTECTION_COEFFICIENTS = {
+  18:0.0438, 19:0.0438, 20:0.0438, 21:0.0438, 22:0.0438,
+  23:0.0438, 24:0.0438, 25:0.0438, 26:0.0438, 27:0.0438,
+  28:0.0438, 29:0.0438, 30:0.0438,
+  31:0.044,  32:0.044,  33:0.044,  34:0.044,  35:0.044,
+  36:0.045,  37:0.045,  38:0.045,  39:0.045,  40:0.045,
+  41:0.048,  42:0.048,  43:0.048,  44:0.048,  45:0.048,
+  46:0.052,  47:0.052,  48:0.052,  49:0.052,  50:0.052,
+  51:0.058,  52:0.058,  53:0.058,  54:0.058,  55:0.058,
+};
+
+// Идентично с getChildProtectionCoefficient от FinancialPlanConstants
+const getChildProtectionCoefficient = (policyholderAge) => {
+  if (policyholderAge < 18 || policyholderAge > 55) return null;
+  return CHILD_PROTECTION_COEFFICIENTS[policyholderAge] || 0.044;
+};
 
 // ──────────────────────────────────────────────────────────
 // LOOKUP HELPERS (точни — съответстват на FinancialPlanConstants)
 // ──────────────────────────────────────────────────────────
 
+// Идентично с getAVCharge(annualPremium, false) от FinancialPlanConstants
+// Итерира отзад напред — взима последния ред, чийто праг е <= annualPremium
 const getAVCharge = (annualPremium) => {
+  let rate = AV_CHARGE_TABLE[0].rate;
   for (const row of AV_CHARGE_TABLE) {
-    if (annualPremium >= row.from && (row.to === null || annualPremium <= row.to)) return row.rate;
+    if (annualPremium >= row.from) rate = row.rate;
+    else break;
   }
-  return 0.02;
+  return rate;
 };
 
+// Идентично с getPremiumBonus(annualPremium, false) от FinancialPlanConstants
+// Прага е "from <= premium < to" (to е exclusive) — точно като frontend логиката
 const getPremiumBonus = (annualPremium) => {
   for (const row of PREMIUM_BONUS_TABLE) {
-    if (annualPremium >= row.from && (row.to === null || annualPremium <= row.to)) return row.bonus;
+    if (annualPremium >= row.from && annualPremium < row.to) return row.bonus;
   }
   return 0;
 };
@@ -338,40 +371,122 @@ const fvAnnuity = (monthlyContrib, annualRate, years) => {
 };
 
 // ──────────────────────────────────────────────────────────
-// MORTALITY TABLE — от FinancialPlanConstants (blended 80% male / 20% female)
+// СМЪРТНОСТНА ТАБЛИЦА — Bulgarian 2008-2010 (qx per 1000)
+// Идентична с FinancialPlanConstants.METLIFE_MORTALITY_TABLES
+// Пълна таблица от cal! — всички възрасти 0-101
+// Тегла: male_weight=0.8, female_weight=0.2
 // ──────────────────────────────────────────────────────────
 
 const MORTALITY_QX = {
-  0:{m:10.4667,f:8.3265},1:{m:0.8631,f:0.8105},15:{m:0.4320,f:0.2681},
-  16:{m:0.5632,f:0.3168},17:{m:0.6590,f:0.3991},18:{m:0.7820,f:0.4778},
-  19:{m:0.9968,f:0.3351},20:{m:0.9754,f:0.3689},21:{m:0.9902,f:0.3905},
-  22:{m:1.1783,f:0.3851},23:{m:1.1208,f:0.3416},24:{m:1.2253,f:0.3714},
-  25:{m:1.1798,f:0.4777},26:{m:1.2803,f:0.5026},27:{m:1.2603,f:0.2587},
-  28:{m:1.2194,f:0.5889},29:{m:1.2426,f:0.5133},30:{m:1.2442,f:0.6015},
-  31:{m:1.3015,f:0.6550},32:{m:1.5494,f:0.5586},33:{m:1.6410,f:0.7463},
-  34:{m:1.6169,f:0.9297},35:{m:1.8178,f:0.8255},36:{m:1.9444,f:1.0409},
-  37:{m:2.3805,f:1.0218},38:{m:2.2935,f:1.2077},39:{m:2.5608,f:1.2746},
-  40:{m:3.1639,f:1.2941},41:{m:3.2109,f:1.3436},42:{m:3.6103,f:1.5150},
-  43:{m:4.1226,f:1.8807},44:{m:4.9154,f:2.1087},45:{m:5.4322,f:2.4594},
-  46:{m:6.0691,f:2.6197},47:{m:7.0983,f:2.9067},48:{m:7.5943,f:2.9493},
-  49:{m:7.5754,f:3.4800},50:{m:9.2432,f:3.4757},51:{m:9.8708,f:3.8075},
-  52:{m:11.0132,f:4.1138},53:{m:12.1581,f:4.7100},54:{m:13.1207,f:5.4055},
-  55:{m:13.7477,f:5.8224},56:{m:16.0129,f:5.8155},57:{m:16.4340,f:6.5164},
-  58:{m:19.0146,f:7.2625},59:{m:20.7628,f:7.4624},60:{m:21.6724,f:7.7226},
-  61:{m:22.9264,f:8.5540},62:{m:25.2898,f:9.3900},63:{m:26.2972,f:10.5458},
-  64:{m:28.9558,f:11.5530},65:{m:29.2752,f:12.1736},66:{m:33.3520,f:14.5268},
-  67:{m:34.5356,f:15.8754},68:{m:37.8817,f:17.1907},69:{m:39.6470,f:20.2289},
-  70:{m:43.5827,f:22.0645},75:{m:67.1646,f:40.3518},80:{m:99.7261,f:75.4640},
+  0:   {m:10.4667,  f:8.3265},
+  1:   {m:0.8631,   f:0.8105},
+  2:   {m:0.2755,   f:0.4431},
+  3:   {m:0.4692,   f:0.2624},
+  4:   {m:0.3255,   f:0.1807},
+  5:   {m:0.4914,   f:0.1928},
+  6:   {m:0.3448,   f:0.2442},
+  7:   {m:0.2900,   f:0.2166},
+  8:   {m:0.2470,   f:0.1696},
+  9:   {m:0.3493,   f:0.2300},
+  10:  {m:0.1934,   f:0.2031},
+  11:  {m:0.3457,   f:0.1327},
+  12:  {m:0.3490,   f:0.3376},
+  13:  {m:0.3329,   f:0.2078},
+  14:  {m:0.3901,   f:0.2413},
+  15:  {m:0.4320,   f:0.2681},
+  16:  {m:0.5632,   f:0.3168},
+  17:  {m:0.6590,   f:0.3991},
+  18:  {m:0.7820,   f:0.4778},
+  19:  {m:0.9968,   f:0.3351},
+  20:  {m:0.9754,   f:0.3689},
+  21:  {m:0.9902,   f:0.3905},
+  22:  {m:1.1783,   f:0.3851},
+  23:  {m:1.1208,   f:0.3416},
+  24:  {m:1.2253,   f:0.3714},
+  25:  {m:1.1798,   f:0.4777},
+  26:  {m:1.2803,   f:0.5026},
+  27:  {m:1.2603,   f:0.2587},
+  28:  {m:1.2194,   f:0.5889},
+  29:  {m:1.2426,   f:0.5133},
+  30:  {m:1.2442,   f:0.6015},
+  31:  {m:1.3015,   f:0.6550},
+  32:  {m:1.5494,   f:0.5586},
+  33:  {m:1.6410,   f:0.7463},
+  34:  {m:1.6169,   f:0.9297},
+  35:  {m:1.8178,   f:0.8255},
+  36:  {m:1.9444,   f:1.0409},
+  37:  {m:2.3805,   f:1.0218},
+  38:  {m:2.2935,   f:1.2077},
+  39:  {m:2.5608,   f:1.2746},
+  40:  {m:3.1639,   f:1.2941},
+  41:  {m:3.2109,   f:1.3436},
+  42:  {m:3.6103,   f:1.5150},
+  43:  {m:4.1226,   f:1.8807},
+  44:  {m:4.9154,   f:2.1087},
+  45:  {m:5.4322,   f:2.4594},
+  46:  {m:6.0691,   f:2.6197},
+  47:  {m:7.0983,   f:2.9067},
+  48:  {m:7.5943,   f:2.9493},
+  49:  {m:7.5754,   f:3.4800},
+  50:  {m:9.2432,   f:3.4757},
+  51:  {m:9.8708,   f:3.8075},
+  52:  {m:11.0132,  f:4.1138},
+  53:  {m:12.1581,  f:4.7100},
+  54:  {m:13.1207,  f:5.4055},
+  55:  {m:13.7477,  f:5.8224},
+  56:  {m:16.0129,  f:5.8155},
+  57:  {m:16.4340,  f:6.5164},
+  58:  {m:19.0146,  f:7.2625},
+  59:  {m:20.7628,  f:7.4624},
+  60:  {m:21.6724,  f:7.7226},
+  61:  {m:22.9264,  f:8.5540},
+  62:  {m:25.2898,  f:9.3900},
+  63:  {m:26.2972,  f:10.5458},
+  64:  {m:28.9558,  f:11.5530},
+  65:  {m:29.2752,  f:12.1736},
+  66:  {m:33.3520,  f:14.5268},
+  67:  {m:34.5356,  f:15.8754},
+  68:  {m:37.8817,  f:17.1907},
+  69:  {m:39.6470,  f:20.2289},
+  70:  {m:43.5827,  f:22.0645},
+  71:  {m:47.3724,  f:24.4109},
+  72:  {m:51.2416,  f:28.5485},
+  73:  {m:55.1131,  f:32.7378},
+  74:  {m:59.9414,  f:37.0256},
+  75:  {m:67.1646,  f:40.3518},
+  76:  {m:68.0905,  f:45.7826},
+  77:  {m:73.6347,  f:50.4993},
+  78:  {m:80.2822,  f:59.1184},
+  79:  {m:88.9190,  f:66.9391},
+  80:  {m:99.7261,  f:75.4640},
+  81:  {m:106.2297, f:85.9931},
+  82:  {m:122.5261, f:99.5399},
+  83:  {m:136.4101, f:109.8312},
+  84:  {m:143.9972, f:121.1751},
+  85:  {m:159.6668, f:132.4886},
+  86:  {m:160.8118, f:148.9731},
+  87:  {m:178.4595, f:165.2472},
+  88:  {m:192.4168, f:177.0625},
+  89:  {m:208.5408, f:185.4915},
+  90:  {m:211.2843, f:187.2073},
+  91:  {m:203.0417, f:192.2067},
+  92:  {m:232.0867, f:240.8233},
+  93:  {m:314.4137, f:318.7339},
+  94:  {m:323.8744, f:316.9338},
+  95:  {m:294.3396, f:290.9826},
+  96:  {m:317.1806, f:304.2045},
+  97:  {m:382.6087, f:344.0736},
+  98:  {m:401.3722, f:396.0067},
+  99:  {m:455.3314, f:411.6788},
+  100: {m:434.0278, f:457.0384},
+  101: {m:1000,     f:1000},
 };
 
+// Идентично с getBlendedMortalityRate + getMonthlyMortalityRate от FinancialPlanConstants
+// Тегла: 0.8 мъже / 0.2 жени — точно като METLIFE_MORTALITY_TABLES.male_weight/female_weight
 const getMonthlyMortality = (age) => {
-  const a = Math.min(Math.max(Math.floor(age), 0), 80);
-  // Find nearest age in table
-  let closest = 0;
-  for (const k of Object.keys(MORTALITY_QX).map(Number).sort((a,b)=>a-b)) {
-    if (k <= a) closest = k;
-  }
-  const q = MORTALITY_QX[closest] || MORTALITY_QX[0];
+  const a = Math.min(Math.max(Math.floor(age), 0), 101);
+  const q = MORTALITY_QX[a] || MORTALITY_QX[101];
   return (q.m * 0.8 + q.f * 0.2) / 1000 / 12;
 };
 
@@ -923,8 +1038,8 @@ Deno.serve(async (req) => {
         // Junior покрития: фрактури 750€ по ТАРИФА 33/1000 (METLIFE_PA_CHILD_COVERAGES)
         const jFracturesCost = (CHILD_FRACTURES_AMOUNT / 1000) * CHILD_FRACTURES_RATE; // 750/1000*33 = 24.75€
         // Child Protection Agreement: (savings + coverages) * coefficient_of_policyholder_age
-        const policyholderAge = Math.min(cAge, 55);
-        const childProtectionCoeff = policyholderAge <= 55 ? 0.0438 : 0; // METLIFE_CHILD_PROTECTION_COEFFICIENTS
+        // Коефициентите са по точна таблица CHILD_PROTECTION_COEFFICIENTS (18-55г.)
+        const childProtectionCoeff = getChildProtectionCoefficient(cAge) || 0;
         const jProtectionBase = scaledSavings + jFracturesCost;
         const jProtectionCost = jProtectionBase * childProtectionCoeff;
         const jAdminFee = 15;
@@ -946,14 +1061,14 @@ Deno.serve(async (req) => {
             expected_value: projectULFull(scaledSavings, child.childAge, child.horizon, 0.08, 5000),
             is_active: true,
             details: {
-              annual_savings: scaledSavings,
-              target_education_gap: Math.round(child.gapForThisChild),
-              coverages: {
-                fractures: CHILD_FRACTURES_AMOUNT,
-                fractures_rate_per_1000: CHILD_FRACTURES_RATE,
-                child_protection_agreement: policyholderAge <= 55,
-                child_protection_coefficient: childProtectionCoeff,
-              },
+            annual_savings: scaledSavings,
+            target_education_gap: Math.round(child.gapForThisChild),
+            coverages: {
+              fractures: CHILD_FRACTURES_AMOUNT,
+              fractures_rate_per_1000: CHILD_FRACTURES_RATE,
+              child_protection_agreement: childProtectionCoeff > 0,
+              child_protection_coefficient: childProtectionCoeff,
+            },
               premium_bonus_pct: Math.round(getPremiumBonus(scaledSavings) * 100),
               av_charge_pct: Math.round(getAVCharge(scaledSavings) * 10000) / 100,
             },

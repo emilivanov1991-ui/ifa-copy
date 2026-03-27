@@ -191,10 +191,10 @@ const CG_TARIFF = {
 
 const CG_RULES = {
   min_age: 18,
-  max_age: 65,
+  max_age: 70, // age + term <= 70 (от METLIFE_CREDIT_GUARD_RULES)
   min_sum: 10000,
-  max_sum: 500000,
-  reference_sum: 100000, // тарифите са за 100,000 EUR
+  max_sum: 2000000, // от METLIFE_CREDIT_GUARD_RULES.max_sum
+  reference_sum: 100000,
   available_terms: [5, 10, 15, 20, 25, 30, 35],
 };
 

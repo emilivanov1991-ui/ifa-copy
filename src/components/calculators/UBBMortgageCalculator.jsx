@@ -344,7 +344,7 @@ export default function UBBMortgageCalculator({ analysisId, clientId }) {
         <div className="bg-green-50 border-l-4 border-green-400 p-4 rounded text-sm">
           <p className="font-semibold text-green-900 mb-1">Предимства:</p>
           <ul className="text-green-800 space-y-1 text-xs">
-            <li>✓ Най-ниска лихва от 2.28% за суми >100K EUR</li>
+            <li>{"✓ Най-ниска лихва от 2.28% за суми >100K EUR"}</li>
             <li>✓ Flexi опции за гъвкави вноски</li>
             <li>✓ Безплатно рефинансиране в ОББ</li>
             <li>✓ Застраховка живот е опционална</li>

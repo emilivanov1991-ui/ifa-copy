@@ -6,6 +6,7 @@ import MissionSection from '../components/home/MissionSection';
 import ProcessSteps from '../components/home/ProcessSteps';
 import TestimonialsSection from '../components/home/TestimonialsSection';
 import InvestmentCTA from '../components/home/InvestmentCTA';
+import UsefulInfoSection from '../components/home/UsefulInfoSection';
 
 export default function Home() {
   return (
@@ -17,6 +18,7 @@ export default function Home() {
       <ProcessSteps />
       <TestimonialsSection />
       <InvestmentCTA />
+      <UsefulInfoSection />
     </div>
   );
 }

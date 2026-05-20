@@ -50,13 +50,12 @@ function LayoutContent({ children, currentPageName }) {
       {/* Navigation - Hide on ConsultantPortal and FinancialAnalysis */}
       {currentPageName !== 'ConsultantPortal' && currentPageName !== 'FinancialAnalysis' && (
       <header 
-        style={{ height: '64px' }}
         className={`fixed top-0 left-0 right-0 z-50 overflow-hidden transition-all duration-500 ${
           isScrolled 
-            ? 'bg-white/95 backdrop-blur-md shadow-lg shadow-slate-200/50' 
+            ? 'bg-white/95 backdrop-blur-md shadow-lg shadow-slate-200/50 py-0' 
             : hasDarkHero 
-              ? 'bg-transparent' 
-              : 'bg-white/95 backdrop-blur-md shadow-lg shadow-slate-200/50'
+              ? 'bg-transparent py-0' 
+              : 'bg-white/95 backdrop-blur-md shadow-lg shadow-slate-200/50 py-0'
         }`}
       >
         <div className="max-w-7xl mx-auto px-6 flex items-center justify-between">

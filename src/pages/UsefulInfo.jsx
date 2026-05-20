@@ -147,14 +147,17 @@ export default function UsefulInfo() {
 
                   {cert.badge === 'КФН' && (
                     <div className="mt-4">
-                      <div className="w-full rounded-lg border border-slate-200 shadow-sm overflow-hidden" style={{height: '420px'}}>
-                        <iframe
-                          src="https://media.base44.com/files/public/6925a960748714fa4828395a/9dfdd54da_IFA_LICENSE_FSC_09-03-2026.pdf"
-                          title="Удостоверение КФН № 1022-ЗБ/09.03.2026"
-                          className="w-full h-full"
-                          style={{border: 'none'}}
+                      <a
+                        href="https://media.base44.com/files/public/6925a960748714fa4828395a/9dfdd54da_IFA_LICENSE_FSC_09-03-2026.pdf"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        <img
+                          src="https://media.base44.com/images/public/6925a960748714fa4828395a/d8a5961ff_IFA_LICENSE_FSC_09-03-2026.jpg"
+                          alt="Удостоверение КФН № 1022-ЗБ/09.03.2026"
+                          className="w-full rounded-lg border border-slate-200 shadow-sm hover:shadow-md transition-shadow"
                         />
-                      </div>
+                      </a>
                       <a
                         href="https://media.base44.com/files/public/6925a960748714fa4828395a/9dfdd54da_IFA_LICENSE_FSC_09-03-2026.pdf"
                         target="_blank"

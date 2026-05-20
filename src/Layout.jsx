@@ -24,6 +24,7 @@ function LayoutContent({ children, currentPageName }) {
     { name: t('Услуги', 'Services'), page: 'Services' },
     { name: t('Калкулатори', 'Calculators'), page: 'Calculators' },
     { name: t('Контакти', 'Contact'), page: 'Contact' },
+    { name: t('Кариера', 'Career'), page: 'Career' },
   ];
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);

@@ -241,7 +241,7 @@ export default function UBBMortgageCalculator({ analysisId, clientId }) {
               <p className="text-sm text-slate-600">Лихвен процент</p>
               <p className="text-xl font-bold text-slate-900">{calculations.interestRate.toFixed(2)}%</p>
               {calculations.loanAmount > 100000 && (
-                <p className="text-xs text-green-600">✓ Преференциална лихва >100K EUR</p>
+                <p className="text-xs text-green-600">{"✓ Преференциална лихва >100K EUR"}</p>
               )}
             </div>
             <div>

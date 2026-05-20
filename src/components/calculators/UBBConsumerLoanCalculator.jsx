@@ -170,7 +170,7 @@ export default function UBBConsumerLoanCalculator({ analysisId, clientId }) {
               value={inputs.loanTerm}
               onChange={(e) => setInputs({...inputs, loanTerm: parseInt(e.target.value) || 0})}
             />
-            <p className="text-xs text-slate-500 mt-1">Минимум: 12 | Максимум: 84 (до 120 за >75K)</p>
+            <p className="text-xs text-slate-500 mt-1">{"Минимум: 12 | Максимум: 84 (до 120 за >75K)"}</p>
           </div>
           
           <div className="flex items-center gap-2 md:col-span-2">

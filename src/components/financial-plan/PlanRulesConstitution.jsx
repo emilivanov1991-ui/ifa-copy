@@ -1821,12 +1821,12 @@ export const PLAN_CONSTITUTION = {
         applies_to: ["client", "partner"],
         condition: {
           has_pillar_2: "client_pillar_2 === true OR partner_pillar_2 === true",
-          wrong_fund: "pension_fund !== 'УПФ „ОББ" ЕАД'",
+          wrong_fund: "pension_fund !== 'УПФ OBB EAD'",
           includes_check_later: true,
           check_later_value: "Да се провери допълнително",
           check_later_note: "Третира се като различен фонд — смяната се препоръчва с бележка за проверка"
         },
-        target_fund: "УПФ „ОББ" ЕАД",
+        target_fund: "УПФ OBB EAD",
         action: "recommend_fund_switch",
         cost_type: "none — не е месечен разход, еднократна административна процедура",
         source_fields: {

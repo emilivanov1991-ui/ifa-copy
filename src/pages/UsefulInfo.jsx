@@ -145,7 +145,29 @@ export default function UsefulInfo() {
                   </div>
                   <p className="text-sm text-slate-600 leading-relaxed">{cert.description}</p>
 
-                  {cert.link && (
+                  {cert.badge === 'КФН' && (
+                    <div className="mt-4">
+                      <div className="w-full rounded-lg border border-slate-200 shadow-sm overflow-hidden" style={{height: '420px'}}>
+                        <iframe
+                          src="https://media.base44.com/files/public/6925a960748714fa4828395a/9dfdd54da_IFA_LICENSE_FSC_09-03-2026.pdf"
+                          title="Удостоверение КФН № 1022-ЗБ/09.03.2026"
+                          className="w-full h-full"
+                          style={{border: 'none'}}
+                        />
+                      </div>
+                      <a
+                        href="https://media.base44.com/files/public/6925a960748714fa4828395a/9dfdd54da_IFA_LICENSE_FSC_09-03-2026.pdf"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-1 text-xs text-blue-600 hover:text-blue-700 font-medium mt-2"
+                      >
+                        <ExternalLink className="h-3 w-3" />
+                        Отвори в нов прозорец
+                      </a>
+                    </div>
+                  )}
+
+                  {cert.link && cert.badge !== 'КФН' && (
                     <a
                       href={cert.link.url}
                       target="_blank"

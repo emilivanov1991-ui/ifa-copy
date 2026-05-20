@@ -148,7 +148,7 @@ export default function UsefulInfoSection() {
 
                   {cert.badge === 'КФН' && (
                     <a
-                      href="https://www.fsc.bg"
+                      href="https://www.fsc.bg/wp-content/uploads/2026/01/33.pdf"
                       target="_blank"
                       rel="noopener noreferrer"
                       className="inline-flex items-center gap-1 text-xs text-blue-600 hover:text-blue-700 font-medium mt-3"

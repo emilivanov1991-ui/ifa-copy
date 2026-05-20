@@ -63,6 +63,7 @@ import Home from './pages/Home';
 import ProductCatalogAdmin from './pages/ProductCatalogAdmin';
 import ProductConfigDemo from './pages/ProductConfigDemo';
 import Services from './pages/Services';
+import UsefulInfo from './pages/UsefulInfo';
 import app from './pages/_app';
 import __Layout from './Layout.jsx';
 
@@ -84,6 +85,7 @@ export const PAGES = {
     "ProductCatalogAdmin": ProductCatalogAdmin,
     "ProductConfigDemo": ProductConfigDemo,
     "Services": Services,
+    "UsefulInfo": UsefulInfo,
     "_app": app,
 }
 

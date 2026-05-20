@@ -26,6 +26,11 @@ function LayoutContent({ children, currentPageName }) {
     { name: t('Контакти', 'Contact'), page: 'Contact' },
     { name: t('Кариера', 'Career'), page: 'Career' },
   ];
+
+  const footerLinks = [
+    ...navLinks,
+    { name: t('Полезна информация', 'Useful Info'), page: 'UsefulInfo' },
+  ];
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   
@@ -222,7 +227,7 @@ function LayoutContent({ children, currentPageName }) {
             <div>
               <h4 className="font-semibold mb-4">{t('Бързи връзки', 'Quick Links')}</h4>
               <ul className="space-y-3">
-                {navLinks.map((link) => (
+                {footerLinks.map((link) => (
                   <li key={link.name}>
                     <Link 
                       to={createPageUrl(link.page)}

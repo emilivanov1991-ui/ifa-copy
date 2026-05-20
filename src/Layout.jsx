@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { createPageUrl } from './utils';
 import { Menu, X, TrendingUp, LogIn, User, Briefcase, Languages } from 'lucide-react';
 import { Button } from "@/components/ui/button";
@@ -14,6 +14,12 @@ import {
 
 // Pages that have dark hero sections (header should be transparent with white text initially)
 const DARK_HERO_PAGES = ['Home', 'FinancialPlanner'];
+
+function ScrollToTop() {
+  const { pathname } = useLocation();
+  useEffect(() => { window.scrollTo(0, 0); }, [pathname]);
+  return null;
+}
 
 function LayoutContent({ children, currentPageName }) {
   const { language, toggleLanguage, t } = useLanguage();
@@ -47,6 +53,7 @@ function LayoutContent({ children, currentPageName }) {
 
   return (
     <div className="min-h-screen bg-white">
+      <ScrollToTop />
       {/* Navigation - Hide on ConsultantPortal and FinancialAnalysis */}
       {currentPageName !== 'ConsultantPortal' && currentPageName !== 'FinancialAnalysis' && (
       <header 

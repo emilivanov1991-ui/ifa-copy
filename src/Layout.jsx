@@ -50,7 +50,7 @@ function LayoutContent({ children, currentPageName }) {
       {/* Navigation - Hide on ConsultantPortal and FinancialAnalysis */}
       {currentPageName !== 'ConsultantPortal' && currentPageName !== 'FinancialAnalysis' && (
       <header 
-        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
+        className={`fixed top-0 left-0 right-0 z-50 overflow-hidden transition-all duration-500 ${
           isScrolled 
             ? 'bg-white/95 backdrop-blur-md shadow-lg shadow-slate-200/50 py-3' 
             : hasDarkHero 
@@ -64,7 +64,7 @@ function LayoutContent({ children, currentPageName }) {
             <img
               src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6925a960748714fa4828395a/258cedab0_output-onlinepngtools.png"
               alt="Integrity Financial Advisors"
-              className={`h-16 w-auto transition-all duration-300 ${!isScrolled && hasDarkHero ? 'brightness-0 invert' : ''}`}
+              className={`h-32 w-auto transition-all duration-300 ${!isScrolled && hasDarkHero ? 'brightness-0 invert' : ''}`}
             />
           </Link>
 

@@ -52,10 +52,10 @@ function LayoutContent({ children, currentPageName }) {
       <header 
         className={`fixed top-0 left-0 right-0 z-50 overflow-hidden transition-all duration-500 ${
           isScrolled 
-            ? 'bg-white/95 backdrop-blur-md shadow-lg shadow-slate-200/50 py-3' 
+            ? 'bg-white/95 backdrop-blur-md shadow-lg shadow-slate-200/50 py-0' 
             : hasDarkHero 
-              ? 'bg-transparent py-5' 
-              : 'bg-white/95 backdrop-blur-md shadow-lg shadow-slate-200/50 py-3'
+              ? 'bg-transparent py-0' 
+              : 'bg-white/95 backdrop-blur-md shadow-lg shadow-slate-200/50 py-0'
         }`}
       >
         <div className="max-w-7xl mx-auto px-6 flex items-center justify-between">

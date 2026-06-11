@@ -62,13 +62,13 @@ export default function HeroSection() {
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.4 }}
-          className="flex flex-col sm:flex-row gap-4 justify-center items-center"
+          className="flex flex-col gap-4 justify-center items-center"
         >
           <Button 
             size="lg" 
             className="bg-blue-500 hover:bg-blue-600 text-white px-8 py-6 text-lg rounded-full transition-all duration-300 hover:scale-105 hover:shadow-xl hover:shadow-blue-500/25"
           >
-            {t('Започнете сега', 'Get Started')}
+            {t('Започни своята безплатна финансова консултация', 'Start Your Free Financial Consultation')}
             <ArrowRight className="ml-2 h-5 w-5" />
           </Button>
           <Button 

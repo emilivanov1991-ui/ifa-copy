@@ -1,0 +1,93 @@
+{
+  "name": "Commission",
+  "type": "object",
+  "properties": {
+    "client_id": {
+      "type": "string",
+      "description": "Reference to Client entity"
+    },
+    "product_id": {
+      "type": "string",
+      "description": "Reference to FinancialProduct entity"
+    },
+    "consultant_email": {
+      "type": "string",
+      "description": "Email of the consultant who earned this commission"
+    },
+    "client_name": {
+      "type": "string",
+      "description": "Client name for display"
+    },
+    "product_name": {
+      "type": "string",
+      "description": "Product name for display"
+    },
+    "product_type": {
+      "type": "string",
+      "enum": [
+        "investment",
+        "insurance",
+        "pension",
+        "savings",
+        "loan"
+      ],
+      "description": "Type of financial product"
+    },
+    "amount": {
+      "type": "number",
+      "description": "Commission amount in EUR"
+    },
+    "commission_type": {
+      "type": "string",
+      "enum": [
+        "initial",
+        "recurring",
+        "bonus"
+      ],
+      "default": "initial",
+      "description": "Type of commission"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "pending",
+        "approved",
+        "paid",
+        "cancelled"
+      ],
+      "default": "pending",
+      "description": "Commission payment status"
+    },
+    "deal_date": {
+      "type": "string",
+      "format": "date",
+      "description": "Date when the deal was closed"
+    },
+    "payment_date": {
+      "type": "string",
+      "format": "date",
+      "description": "Date when commission was paid"
+    },
+    "financial_partner": {
+      "type": "string",
+      "description": "Name of the financial partner paying the commission"
+    },
+    "commission_rate": {
+      "type": "number",
+      "description": "Commission rate percentage"
+    },
+    "deal_value": {
+      "type": "number",
+      "description": "Total value of the deal"
+    },
+    "notes": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "client_name",
+    "product_name",
+    "amount",
+    "consultant_email"
+  ]
+}

@@ -1,0 +1,47 @@
+{
+  "name": "ConsultantProgress",
+  "type": "object",
+  "properties": {
+    "user_id": {
+      "type": "string"
+    },
+    "user_email": {
+      "type": "string"
+    },
+    "course_id": {
+      "type": "string"
+    },
+    "lessons_completed": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Array of lesson IDs"
+    },
+    "exam_score": {
+      "type": "number",
+      "description": "\u041f\u043e\u0441\u043b\u0435\u0434\u0435\u043d \u0440\u0435\u0437\u0443\u043b\u0442\u0430\u0442 %"
+    },
+    "exam_passed": {
+      "type": "boolean",
+      "default": false
+    },
+    "exam_attempts": {
+      "type": "number",
+      "default": 0
+    },
+    "exam_completed_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "course_completed_at": {
+      "type": "string",
+      "format": "date-time"
+    }
+  },
+  "required": [
+    "user_id",
+    "user_email",
+    "course_id"
+  ]
+}

@@ -1,0 +1,54 @@
+{
+  "name": "ClientAppointment",
+  "type": "object",
+  "properties": {
+    "client_id": {
+      "type": "string",
+      "description": "Reference to Client entity"
+    },
+    "advisor_email": {
+      "type": "string"
+    },
+    "title": {
+      "type": "string"
+    },
+    "description": {
+      "type": "string"
+    },
+    "datetime": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "duration_minutes": {
+      "type": "number",
+      "default": 60
+    },
+    "location": {
+      "type": "string",
+      "enum": [
+        "office",
+        "online",
+        "phone"
+      ],
+      "default": "office"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "pending",
+        "confirmed",
+        "cancelled",
+        "completed"
+      ],
+      "default": "pending"
+    },
+    "notes": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "client_id",
+    "title",
+    "datetime"
+  ]
+}

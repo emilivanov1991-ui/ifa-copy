@@ -1,0 +1,50 @@
+{
+  "name": "NotificationSettings",
+  "type": "object",
+  "properties": {
+    "client_id": {
+      "type": "string",
+      "description": "Reference to Client entity"
+    },
+    "payment_reminders": {
+      "type": "boolean",
+      "default": true
+    },
+    "payment_reminder_days": {
+      "type": "number",
+      "default": 7
+    },
+    "maturity_alerts": {
+      "type": "boolean",
+      "default": true
+    },
+    "maturity_alert_days": {
+      "type": "number",
+      "default": 30
+    },
+    "portfolio_changes": {
+      "type": "boolean",
+      "default": true
+    },
+    "portfolio_change_threshold": {
+      "type": "number",
+      "default": 5,
+      "description": "Percentage change threshold"
+    },
+    "new_products": {
+      "type": "boolean",
+      "default": true
+    },
+    "advisor_messages": {
+      "type": "boolean",
+      "default": true
+    },
+    "email_notifications": {
+      "type": "boolean",
+      "default": true
+    }
+  },
+  "required": [
+    "client_id"
+  ]
+}

@@ -1,0 +1,128 @@
+{
+  "name": "ClientApplication",
+  "type": "object",
+  "properties": {
+    "client_id": {
+      "type": "string",
+      "description": "Reference to Client"
+    },
+    "analysis_id": {
+      "type": "string",
+      "description": "Reference to FinancialAnalysisSubmission"
+    },
+    "plan_id": {
+      "type": "string",
+      "description": "Reference to FinancialPlan"
+    },
+    "offer_id": {
+      "type": "string",
+      "description": "Reference to ProductOffer"
+    },
+    "application_number": {
+      "type": "string",
+      "description": "\u0423\u043d\u0438\u043a\u0430\u043b\u0435\u043d \u043d\u043e\u043c\u0435\u0440 \u043d\u0430 \u0437\u0430\u044f\u0432\u043b\u0435\u043d\u0438\u0435\u0442\u043e"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "draft",
+        "pending_signature",
+        "signed",
+        "submitted",
+        "approved",
+        "rejected",
+        "cancelled"
+      ],
+      "default": "draft"
+    },
+    "product_type": {
+      "type": "string"
+    },
+    "provider": {
+      "type": "string"
+    },
+    "product_name": {
+      "type": "string"
+    },
+    "monthly_premium": {
+      "type": "number"
+    },
+    "annual_premium": {
+      "type": "number"
+    },
+    "coverage_amount": {
+      "type": "number"
+    },
+    "term_years": {
+      "type": "number"
+    },
+    "payment_method": {
+      "type": "string",
+      "enum": [
+        "card",
+        "bank_transfer",
+        "direct_debit"
+      ],
+      "default": "card"
+    },
+    "payment_frequency": {
+      "type": "string",
+      "enum": [
+        "monthly",
+        "quarterly",
+        "semiannual",
+        "annual"
+      ],
+      "default": "monthly"
+    },
+    "initial_payment_status": {
+      "type": "string",
+      "enum": [
+        "pending",
+        "paid",
+        "failed"
+      ],
+      "default": "pending"
+    },
+    "initial_payment_date": {
+      "type": "string",
+      "format": "date"
+    },
+    "stripe_payment_intent_id": {
+      "type": "string"
+    },
+    "stripe_subscription_id": {
+      "type": "string"
+    },
+    "application_pdf_url": {
+      "type": "string"
+    },
+    "signed_pdf_url": {
+      "type": "string"
+    },
+    "signature_date": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "submitted_date": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "next_reminder_date": {
+      "type": "string",
+      "format": "date"
+    },
+    "reminder_count": {
+      "type": "number",
+      "default": 0
+    },
+    "notes": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "analysis_id",
+    "product_type",
+    "provider"
+  ]
+}

@@ -1,0 +1,89 @@
+{
+  "name": "ProductRate",
+  "type": "object",
+  "properties": {
+    "catalog_product_id": {
+      "type": "string",
+      "description": "Reference to ProductCatalog"
+    },
+    "rate_type": {
+      "type": "string",
+      "enum": [
+        "age_based",
+        "term_based",
+        "coverage_based",
+        "flat",
+        "tiered"
+      ],
+      "description": "\u0422\u0438\u043f \u043d\u0430 \u0442\u0430\u0440\u0438\u0444\u0430\u0442\u0430"
+    },
+    "age_from": {
+      "type": "number"
+    },
+    "age_to": {
+      "type": "number"
+    },
+    "term_years": {
+      "type": "number"
+    },
+    "gender": {
+      "type": "string",
+      "enum": [
+        "male",
+        "female",
+        "any"
+      ]
+    },
+    "is_smoker": {
+      "type": "boolean"
+    },
+    "risk_class": {
+      "type": "number",
+      "enum": [
+        1,
+        2,
+        3
+      ],
+      "default": 1
+    },
+    "rate_per_1000": {
+      "type": "number",
+      "description": "\u0422\u0430\u0440\u0438\u0444\u0430 \u043d\u0430 1000 EUR \u043f\u043e\u043a\u0440\u0438\u0442\u0438\u0435"
+    },
+    "flat_rate": {
+      "type": "number",
+      "description": "\u0424\u0438\u043a\u0441\u0438\u0440\u0430\u043d\u0430 \u0442\u0430\u0440\u0438\u0444\u0430"
+    },
+    "coefficient": {
+      "type": "number",
+      "description": "\u041a\u043e\u0435\u0444\u0438\u0446\u0438\u0435\u043d\u0442 \u0437\u0430 \u043a\u0430\u043b\u043a\u0443\u043b\u0430\u0446\u0438\u044f"
+    },
+    "min_premium": {
+      "type": "number"
+    },
+    "max_premium": {
+      "type": "number"
+    },
+    "frequency": {
+      "type": "string",
+      "enum": [
+        "monthly",
+        "quarterly",
+        "semiannual",
+        "annual"
+      ],
+      "default": "annual"
+    },
+    "notes": {
+      "type": "string"
+    },
+    "is_active": {
+      "type": "boolean",
+      "default": true
+    }
+  },
+  "required": [
+    "catalog_product_id",
+    "rate_type"
+  ]
+}

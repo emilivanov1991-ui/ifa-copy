@@ -1,0 +1,58 @@
+{
+  "name": "ClientDocument",
+  "type": "object",
+  "properties": {
+    "client_id": {
+      "type": "string",
+      "description": "Reference to Client entity"
+    },
+    "name": {
+      "type": "string",
+      "description": "Document name"
+    },
+    "category": {
+      "type": "string",
+      "enum": [
+        "policy",
+        "contract",
+        "certificate",
+        "id_document",
+        "financial_statement",
+        "tax_document",
+        "other"
+      ],
+      "description": "Document category"
+    },
+    "file_url": {
+      "type": "string",
+      "description": "URL to the uploaded file"
+    },
+    "expiry_date": {
+      "type": "string",
+      "format": "date",
+      "description": "Document expiry date if applicable"
+    },
+    "reminder_sent": {
+      "type": "boolean",
+      "default": false
+    },
+    "notes": {
+      "type": "string"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "active",
+        "expired",
+        "archived"
+      ],
+      "default": "active"
+    }
+  },
+  "required": [
+    "client_id",
+    "name",
+    "category",
+    "file_url"
+  ]
+}

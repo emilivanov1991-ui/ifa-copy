@@ -1,0 +1,52 @@
+{
+  "name": "ClientNotification",
+  "type": "object",
+  "properties": {
+    "client_id": {
+      "type": "string",
+      "description": "Reference to Client entity"
+    },
+    "type": {
+      "type": "string",
+      "enum": [
+        "payment_reminder",
+        "maturity_alert",
+        "portfolio_change",
+        "new_product",
+        "advisor_message"
+      ],
+      "description": "Type of notification"
+    },
+    "title": {
+      "type": "string"
+    },
+    "message": {
+      "type": "string"
+    },
+    "is_read": {
+      "type": "boolean",
+      "default": false
+    },
+    "priority": {
+      "type": "string",
+      "enum": [
+        "low",
+        "medium",
+        "high"
+      ],
+      "default": "medium"
+    },
+    "related_product_id": {
+      "type": "string"
+    },
+    "related_payment_id": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "client_id",
+    "type",
+    "title",
+    "message"
+  ]
+}

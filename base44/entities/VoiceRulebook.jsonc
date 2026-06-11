@@ -1,0 +1,75 @@
+{
+  "name": "VoiceRulebook",
+  "type": "object",
+  "properties": {
+    "step_id": {
+      "type": "string",
+      "description": "Unique identifier for the step/trigger. E.g. 'planner_step_1', 'analysis_housing', 'analysis_reserve_band_low'"
+    },
+    "trigger_type": {
+      "type": "string",
+      "enum": [
+        "step_enter",
+        "response_band",
+        "validation_error",
+        "completion"
+      ],
+      "description": "When this audio should play"
+    },
+    "language_code": {
+      "type": "string",
+      "enum": [
+        "bg",
+        "en"
+      ],
+      "default": "bg"
+    },
+    "audio_url": {
+      "type": "string",
+      "description": "Direct URL to the hosted .mp3 file"
+    },
+    "text_fallback": {
+      "type": "string",
+      "description": "Text to display if audio fails or is unavailable (also used as caption)"
+    },
+    "avatar_state": {
+      "type": "string",
+      "enum": [
+        "talking",
+        "listening",
+        "thinking",
+        "celebrating",
+        "concerned",
+        "idle"
+      ],
+      "default": "talking",
+      "description": "Visual state of the avatar while this audio plays"
+    },
+    "duration_seconds": {
+      "type": "number",
+      "description": "Approximate duration of the audio clip for UI timing"
+    },
+    "preload_next_step_id": {
+      "type": "string",
+      "description": "Optional: step_id of audio to preload in background after this one plays"
+    },
+    "response_band": {
+      "type": "string",
+      "description": "For response_band type: the band name e.g. 'below_1_month', 'three_to_six_months'"
+    },
+    "is_active": {
+      "type": "boolean",
+      "default": true
+    },
+    "version": {
+      "type": "string",
+      "default": "1.0",
+      "description": "Version of the script for audit/compliance"
+    }
+  },
+  "required": [
+    "step_id",
+    "language_code",
+    "text_fallback"
+  ]
+}

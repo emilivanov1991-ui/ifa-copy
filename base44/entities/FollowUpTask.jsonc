@@ -1,0 +1,88 @@
+{
+  "name": "FollowUpTask",
+  "type": "object",
+  "properties": {
+    "journey_id": {
+      "type": "string"
+    },
+    "client_id": {
+      "type": "string"
+    },
+    "client_name": {
+      "type": "string"
+    },
+    "client_email": {
+      "type": "string"
+    },
+    "client_phone": {
+      "type": "string"
+    },
+    "reason": {
+      "type": "string",
+      "enum": [
+        "mandatory_field_refused",
+        "discovery_blocked",
+        "plan_auto_sell_blocked",
+        "user_rejected_plan",
+        "application_incomplete",
+        "health_non_automatable",
+        "off_boundary_question",
+        "signing_declined",
+        "signing_max_attempts",
+        "payment_failed",
+        "provider_submission_failed",
+        "manual_review_required",
+        "other"
+      ]
+    },
+    "reason_detail": {
+      "type": "string",
+      "description": "Human-readable explanation"
+    },
+    "priority": {
+      "type": "string",
+      "enum": [
+        "low",
+        "medium",
+        "high",
+        "urgent"
+      ],
+      "default": "medium"
+    },
+    "assigned_queue": {
+      "type": "string",
+      "enum": [
+        "sales",
+        "compliance",
+        "technical",
+        "general"
+      ],
+      "default": "sales"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "open",
+        "in_progress",
+        "done",
+        "cancelled"
+      ],
+      "default": "open"
+    },
+    "assigned_to": {
+      "type": "string",
+      "description": "Consultant email or ID"
+    },
+    "notes": {
+      "type": "string"
+    },
+    "resolved_at": {
+      "type": "string",
+      "format": "date-time"
+    }
+  },
+  "required": [
+    "journey_id",
+    "reason"
+  ]
+}

@@ -1,0 +1,647 @@
+{
+  "name": "FinancialPlanRules",
+  "type": "object",
+  "properties": {
+    "rule_version": {
+      "type": "string",
+      "description": "\u0412\u0435\u0440\u0441\u0438\u044f \u043d\u0430 \u043f\u0440\u0430\u0432\u0438\u043b\u0430\u0442\u0430",
+      "default": "1.0"
+    },
+    "is_active": {
+      "type": "boolean",
+      "description": "\u0410\u043a\u0442\u0438\u0432\u043d\u0430 \u043b\u0438 \u0435 \u0442\u0430\u0437\u0438 \u0432\u0435\u0440\u0441\u0438\u044f \u043d\u0430 \u043f\u0440\u0430\u0432\u0438\u043b\u0430\u0442\u0430",
+      "default": true
+    },
+    "optimization_rules": {
+      "type": "object",
+      "description": "\u041f\u0440\u0430\u0432\u0438\u043b\u0430 \u0437\u0430 \u043e\u043f\u0442\u0438\u043c\u0438\u0437\u0430\u0446\u0438\u044f \u043d\u0430 \u0441\u044a\u0449\u0435\u0441\u0442\u0432\u0443\u0432\u0430\u0449\u0438 \u043f\u0440\u043e\u0434\u0443\u043a\u0442\u0438",
+      "properties": {
+        "mortgage": {
+          "type": "object",
+          "properties": {
+            "refinance_condition": {
+              "type": "string",
+              "default": "\u041d\u043e\u0432\u0430 \u043c\u0435\u0441\u0435\u0447\u043d\u0430 \u0432\u043d\u043e\u0441\u043a\u0430 \u043f\u043e-\u043d\u0438\u0441\u043a\u0430 \u0418 \u0441\u043f\u0435\u0441\u0442\u0435\u043d\u043e\u0442\u043e \u043f\u043e\u043a\u0440\u0438\u0432\u0430 \u0442\u0430\u043a\u0441\u0438\u0442\u0435 \u0437\u0430 2 \u0433\u043e\u0434\u0438\u043d\u0438"
+            },
+            "refinance_fees_formula": {
+              "type": "string",
+              "default": "0.2% \u043e\u0442 \u043e\u0441\u0442\u0430\u0442\u044a\u043a\u0430 + 20% \u043e\u0442 \u0442\u0430\u0437\u0438 \u0441\u0443\u043c\u0430 + 60 \u043b\u0432. + 70 \u043b\u0432."
+            },
+            "max_term_years": {
+              "type": "number",
+              "default": 30
+            },
+            "max_age": {
+              "type": "number",
+              "default": 70
+            },
+            "recommend_different_bank": {
+              "type": "boolean",
+              "default": true
+            },
+            "recommend_metlife_credit_guard": {
+              "type": "boolean",
+              "default": true
+            }
+          }
+        },
+        "consumer_loan": {
+          "type": "object",
+          "properties": {
+            "max_term_years": {
+              "type": "number",
+              "default": 10
+            },
+            "max_age": {
+              "type": "number",
+              "default": 70
+            },
+            "recommend_different_bank": {
+              "type": "boolean",
+              "default": true
+            },
+            "recommend_metlife_credit_guard": {
+              "type": "boolean",
+              "default": true
+            }
+          }
+        },
+        "insurance_home": {
+          "type": "object",
+          "properties": {
+            "primary_provider": {
+              "type": "string",
+              "default": "\u0418\u043d\u0441\u0442\u0438\u043d\u043a\u0442"
+            },
+            "primary_provider_limit": {
+              "type": "number",
+              "default": 500000
+            },
+            "secondary_provider": {
+              "type": "string",
+              "default": "\u0414\u0417\u0418 \u0417\u0430\u0449\u0438\u0442\u0430 \u0437\u0430 \u0434\u043e\u043c\u0430"
+            },
+            "recommend_different_provider": {
+              "type": "boolean",
+              "default": true
+            }
+          }
+        },
+        "insurance_casco_go": {
+          "type": "object",
+          "properties": {
+            "provider": {
+              "type": "string",
+              "default": "\u0414\u0417\u0418"
+            },
+            "recommend_different_provider": {
+              "type": "boolean",
+              "default": true
+            }
+          }
+        },
+        "pension_fund": {
+          "type": "object",
+          "properties": {
+            "target_provider": {
+              "type": "string",
+              "default": "\u041e\u0411\u0411 \u041f\u0435\u043d\u0441\u0438\u043e\u043d\u043d\u043e"
+            },
+            "always_optimize": {
+              "type": "boolean",
+              "default": true
+            }
+          }
+        },
+        "investments": {
+          "type": "object",
+          "properties": {
+            "optimize": {
+              "type": "boolean",
+              "default": false
+            }
+          }
+        }
+      }
+    },
+    "plan_limits": {
+      "type": "object",
+      "description": "\u041b\u0438\u043c\u0438\u0442\u0438 \u043d\u0430 \u0444\u0438\u043d\u0430\u043d\u0441\u043e\u0432\u0438\u044f \u043f\u043b\u0430\u043d",
+      "properties": {
+        "max_annual_plan_vs_income": {
+          "type": "number",
+          "description": "\u041c\u0430\u043a\u0441 % \u043e\u0442 \u0433\u043e\u0434\u0438\u0448\u0435\u043d \u0434\u043e\u0445\u043e\u0434 (1.5 = 150%)",
+          "default": 1.5
+        },
+        "max_monthly_plan_vs_balance": {
+          "type": "number",
+          "description": "\u041c\u0430\u043a\u0441 % \u043e\u0442 \u043c\u0435\u0441\u0435\u0447\u0435\u043d \u0431\u0430\u043b\u0430\u043d\u0441 (0.4 = 40%)",
+          "default": 0.4
+        },
+        "max_insurance_vs_plan": {
+          "type": "number",
+          "description": "\u041c\u0430\u043a\u0441 % \u0437\u0430\u0441\u0442\u0440\u0430\u0445\u043e\u0432\u043a\u0438 \u0436\u0438\u0432\u043e\u0442 \u043e\u0442 \u043f\u043b\u0430\u043d (0.33 = 33%)",
+          "default": 0.33
+        },
+        "max_insurance_vs_net_income": {
+          "type": "number",
+          "description": "\u041c\u0430\u043a\u0441 % \u0437\u0430\u0441\u0442\u0440\u0430\u0445\u043e\u0432\u043a\u0438 \u0436\u0438\u0432\u043e\u0442 \u043e\u0442 \u043d\u0435\u0442\u0435\u043d \u0434\u043e\u0445\u043e\u0434 (0.04 = 4%)",
+          "default": 0.04
+        },
+        "min_investments_vs_plan": {
+          "type": "number",
+          "description": "\u041c\u0438\u043d % \u0438\u043d\u0432\u0435\u0441\u0442\u0438\u0446\u0438\u0438 \u043e\u0442 \u043f\u043b\u0430\u043d (0.45 = 45%)",
+          "default": 0.45
+        },
+        "min_monthly_investment": {
+          "type": "number",
+          "description": "\u041c\u0438\u043d\u0438\u043c\u0430\u043b\u043d\u0430 \u043c\u0435\u0441\u0435\u0447\u043d\u0430 \u0438\u043d\u0432\u0435\u0441\u0442\u0438\u0446\u0438\u044f \u0432 \u043b\u0435\u0432\u0430",
+          "default": 50
+        }
+      }
+    },
+    "mortgage_new_property_rules": {
+      "type": "object",
+      "description": "\u041f\u0440\u0430\u0432\u0438\u043b\u0430 \u0437\u0430 \u043d\u043e\u0432 \u0438\u043f\u043e\u0442\u0435\u0447\u0435\u043d \u043a\u0440\u0435\u0434\u0438\u0442 \u043f\u0440\u0438 \u043f\u043e\u043a\u0443\u043f\u043a\u0430 \u043d\u0430 \u0436\u0438\u043b\u0438\u0449\u0435",
+      "properties": {
+        "max_payment_vs_balance": {
+          "type": "number",
+          "description": "\u041c\u0430\u043a\u0441 \u0432\u043d\u043e\u0441\u043a\u0430 \u043e\u0442 \u043c\u0435\u0441\u0435\u0447\u0435\u043d \u0431\u0430\u043b\u0430\u043d\u0441 \u043f\u0440\u0435\u0434\u0438 \u043d\u0430\u043c\u0430\u043b\u0435\u043d\u0438\u0435 (0.9 = 90%)",
+          "default": 0.9
+        },
+        "max_payment_vs_net_income": {
+          "type": "number",
+          "description": "\u041c\u0430\u043a\u0441 \u0432\u043d\u043e\u0441\u043a\u0430 \u043e\u0442 \u043d\u0435\u0442\u0435\u043d \u0434\u043e\u0445\u043e\u0434 (\u043b\u0438\u043c\u0438\u0442 \u0411\u041d\u0411) (0.5 = 50%)",
+          "default": 0.5
+        },
+        "reduced_payment_vs_balance": {
+          "type": "number",
+          "description": "\u041d\u0430\u043c\u0430\u043b\u0435\u043d\u0430 \u0432\u043d\u043e\u0441\u043a\u0430 \u043f\u0440\u0438 \u043d\u0430\u0434\u0432\u0438\u0448\u0430\u0432\u0430\u043d\u0435 (0.86 = 86%)",
+          "default": 0.86
+        },
+        "insurance_allocation": {
+          "type": "number",
+          "description": "\u0410\u043b\u043e\u043a\u0430\u0446\u0438\u044f \u0437\u0430 \u0437\u0430\u0441\u0442\u0440\u0430\u0445\u043e\u0432\u0430\u043d\u0435 \u043f\u0440\u0438 \u043d\u0430\u043c\u0430\u043b\u0435\u043d\u0438\u0435 (0.04 = 4%)",
+          "default": 0.04
+        }
+      }
+    },
+    "standard_plan_structure": {
+      "type": "object",
+      "description": "\u0421\u0442\u0440\u0443\u043a\u0442\u0443\u0440\u0430 \u043d\u0430 \u0441\u0442\u0430\u043d\u0434\u0430\u0440\u0442\u043d\u0438\u044f \u043f\u043b\u0430\u043d",
+      "properties": {
+        "primary_product": {
+          "type": "string",
+          "default": "MetLife Unit Linked"
+        },
+        "pension_change": {
+          "type": "string",
+          "default": "\u041e\u0411\u0411 \u0423\u041f\u0424"
+        },
+        "pension_monthly_cost": {
+          "type": "number",
+          "description": "\u041c\u0435\u0441\u0435\u0447\u043d\u0430 \u0446\u0435\u043d\u0430 \u043d\u0430 \u0423\u041f\u0424 (\u0440\u0430\u0431\u043e\u0442\u0438\u043c \u0441 \u043d\u0435\u0442\u043d\u0438 \u0434\u043e\u0445\u043e\u0434\u0438)",
+          "default": 0
+        },
+        "fallback_if_insufficient": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "default": [
+            "MetLife \u0421\u0440\u043e\u0447\u0435\u043d \u0436\u0438\u0432\u043e\u0442 \u0438\u043b\u0438 \u0414\u0417\u0418 \u0417\u0430\u043a\u0440\u0438\u043b\u0430",
+            "\u0414\u0417\u0418 \u0417\u0430\u043a\u0440\u0438\u043b\u0430 Gold 15 \u043b\u0432/\u043c\u0435\u0441\u0435\u0447\u043d\u043e"
+          ]
+        },
+        "additions_if_extra_budget": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "priority": {
+                "type": "number"
+              },
+              "product": {
+                "type": "string"
+              },
+              "condition": {
+                "type": "string"
+              }
+            }
+          },
+          "default": [
+            {
+              "priority": 1,
+              "product": "Uniqa \u0417\u0434\u0440\u0430\u0432\u0435 \u0438 \u0446\u0435\u043d\u043d\u043e\u0441\u0442 - \u041f\u043b\u0430\u043d \u0415\u0432\u0440\u043e\u043f\u0430",
+              "condition": "\u0432\u0438\u043d\u0430\u0433\u0438"
+            },
+            {
+              "priority": 2,
+              "product": "Generali \u0431\u0430\u0437\u043e\u0432 \u043f\u0430\u043a\u0435\u0442",
+              "condition": "\u0430\u043a\u043e \u043d\u044f\u043c\u0430 \u043e\u0442 \u0444\u0438\u0440\u043c\u0430"
+            },
+            {
+              "priority": 3,
+              "product": "\u0414\u0435\u0442\u0441\u043a\u0438 Unit Linked",
+              "condition": "\u0430\u043a\u043e \u0438\u043c\u0430 \u0434\u0435\u0446\u0430"
+            },
+            {
+              "priority": 4,
+              "product": "\u041d\u043e\u0432 \u0438\u043f\u043e\u0442\u0435\u0447\u0435\u043d/\u043f\u043e\u0442\u0440\u0435\u0431\u0438\u0442\u0435\u043b\u0441\u043a\u0438 \u043a\u0440\u0435\u0434\u0438\u0442",
+              "condition": "\u0430\u043a\u043e \u0449\u0435 \u0437\u0430\u043a\u0443\u043f\u0443\u0432\u0430 \u0436\u0438\u043b\u0438\u0449\u0435"
+            },
+            {
+              "priority": 5,
+              "product": "\u0417\u0430\u0441\u0442\u0440\u0430\u0445\u043e\u0432\u043a\u0430 \u0437\u0430 \u0434\u043e\u043c\u0430",
+              "condition": "\u0430\u043a\u043e \u0438\u043c\u0430 \u0436\u0438\u043b\u0438\u0449\u0435 \u0431\u0435\u0437 \u0437\u0430\u0441\u0442\u0440\u0430\u0445\u043e\u0432\u043a\u0430"
+            },
+            {
+              "priority": 6,
+              "product": "\u041a\u0430\u0441\u043a\u043e/\u0413\u041e",
+              "condition": "\u0430\u043a\u043e \u0438\u043c\u0430 \u043a\u043e\u043b\u0430 \u043d\u0430\u0434 8000 \u043b\u0432 \u0431\u0435\u0437 \u041a\u0430\u0441\u043a\u043e"
+            }
+          ]
+        }
+      }
+    },
+    "metlife_ul_premium_bonus": {
+      "type": "array",
+      "description": "\u041f\u0440\u0435\u043c\u0438\u0435\u043d \u0431\u043e\u043d\u0443\u0441 MetLife UL \u043f\u043e \u0433\u043e\u0434\u0438\u0448\u043d\u0430 \u0441\u0443\u043c\u0430 (EUR)",
+      "items": {
+        "type": "object",
+        "properties": {
+          "min_amount": {
+            "type": "number"
+          },
+          "max_amount": {
+            "type": "number"
+          },
+          "bonus_percent": {
+            "type": "number"
+          }
+        }
+      },
+      "default": [
+        {
+          "min_amount": 300,
+          "max_amount": 1199,
+          "bonus_percent": 0
+        },
+        {
+          "min_amount": 1200,
+          "max_amount": 1799,
+          "bonus_percent": 1
+        },
+        {
+          "min_amount": 1800,
+          "max_amount": 2999,
+          "bonus_percent": 2
+        },
+        {
+          "min_amount": 3000,
+          "max_amount": 4199,
+          "bonus_percent": 3
+        },
+        {
+          "min_amount": 4200,
+          "max_amount": 999999,
+          "bonus_percent": 4
+        }
+      ]
+    },
+    "metlife_ul_management_fee": {
+      "type": "array",
+      "description": "\u0422\u0430\u043a\u0441\u0430 \u0443\u043f\u0440\u0430\u0432\u043b\u0435\u043d\u0438\u0435 MetLife UL \u043f\u043e \u0433\u043e\u0434\u0438\u0448\u043d\u0430 \u0441\u0443\u043c\u0430 (EUR)",
+      "items": {
+        "type": "object",
+        "properties": {
+          "min_amount": {
+            "type": "number"
+          },
+          "max_amount": {
+            "type": "number"
+          },
+          "fee_percent": {
+            "type": "number"
+          }
+        }
+      },
+      "default": [
+        {
+          "min_amount": 300,
+          "max_amount": 719,
+          "fee_percent": 2.0
+        },
+        {
+          "min_amount": 720,
+          "max_amount": 959,
+          "fee_percent": 1.75
+        },
+        {
+          "min_amount": 960,
+          "max_amount": 1199,
+          "fee_percent": 1.5
+        },
+        {
+          "min_amount": 1200,
+          "max_amount": 1499,
+          "fee_percent": 1.25
+        },
+        {
+          "min_amount": 1500,
+          "max_amount": 2399,
+          "fee_percent": 1.0
+        },
+        {
+          "min_amount": 2400,
+          "max_amount": 3599,
+          "fee_percent": 0.75
+        },
+        {
+          "min_amount": 3600,
+          "max_amount": 999999,
+          "fee_percent": 0.5
+        }
+      ]
+    },
+    "metlife_ul_life_coverage_multipliers": {
+      "type": "array",
+      "description": "\u041c\u0443\u043b\u0442\u0438\u043f\u043b\u0438\u043a\u0430\u0442\u043e\u0440\u0438 \u0437\u0430 \u0438\u043d\u0442\u0435\u0433\u0440\u0438\u0440\u0430\u043d\u043e \u043f\u043e\u043a\u0440\u0438\u0442\u0438\u0435 \u0436\u0438\u0432\u043e\u0442 \u043f\u043e \u0432\u044a\u0437\u0440\u0430\u0441\u0442",
+      "items": {
+        "type": "object",
+        "properties": {
+          "age_from": {
+            "type": "number"
+          },
+          "age_to": {
+            "type": "number"
+          },
+          "multiplier": {
+            "type": "number"
+          }
+        }
+      },
+      "default": [
+        {
+          "age_from": 15,
+          "age_to": 30,
+          "multiplier": 30
+        },
+        {
+          "age_from": 31,
+          "age_to": 35,
+          "multiplier": 20
+        },
+        {
+          "age_from": 36,
+          "age_to": 45,
+          "multiplier": 15
+        },
+        {
+          "age_from": 46,
+          "age_to": 55,
+          "multiplier": 10
+        },
+        {
+          "age_from": 56,
+          "age_to": 65,
+          "multiplier": 6
+        }
+      ]
+    },
+    "metlife_ul_life_coverage_default": {
+      "type": "number",
+      "description": "\u041f\u043e\u043a\u0440\u0438\u0442\u0438\u0435 \u0436\u0438\u0432\u043e\u0442 \u043f\u043e \u043f\u043e\u0434\u0440\u0430\u0437\u0431\u0438\u0440\u0430\u043d\u0435 \u0431\u0435\u0437 \u043f\u0430\u0440\u0442\u043d\u044c\u043e\u0440/\u0434\u0435\u0446\u0430 (EUR)",
+      "default": 2500
+    },
+    "insurance_coverages": {
+      "type": "object",
+      "description": "\u041f\u0440\u0435\u043f\u043e\u0440\u044a\u0447\u0438\u0442\u0435\u043b\u043d\u0438 \u0437\u0430\u0441\u0442\u0440\u0430\u0445\u043e\u0432\u0430\u0442\u0435\u043b\u043d\u0438 \u043f\u043e\u043a\u0440\u0438\u0442\u0438\u044f",
+      "properties": {
+        "disability": {
+          "type": "object",
+          "properties": {
+            "formula": {
+              "type": "string",
+              "default": "80% * (\u043f\u0440\u043e\u043c\u0435\u043d\u043b\u0438\u0432\u0438_\u0440\u0430\u0437\u0445\u043e\u0434\u0438 - \u0441\u043e\u0446\u0438\u0430\u043b\u043d\u0430_\u0438\u0437\u0434\u0440\u044a\u0436\u043a\u0430) * (80 - \u0432\u044a\u0437\u0440\u0430\u0441\u0442) * 12"
+            },
+            "source_field_expenses": {
+              "type": "string",
+              "default": "analysis.protection.income_protection.disability.variable_expenses"
+            },
+            "source_field_social_support": {
+              "type": "string",
+              "default": "analysis.protection.income_protection.disability.social_support"
+            }
+          }
+        },
+        "fractures_burns": {
+          "type": "number",
+          "description": "\u0421\u0442\u0430\u043d\u0434\u0430\u0440\u0442\u043d\u0430 \u0441\u0443\u043c\u0430 \u0437\u0430 \u0444\u0440\u0430\u043a\u0442\u0443\u0440\u0438 \u0438 \u0438\u0437\u0433\u0430\u0440\u044f\u043d\u0438\u044f (EUR)",
+          "default": 1500
+        },
+        "critical_illness": {
+          "type": "object",
+          "properties": {
+            "formula": {
+              "type": "string",
+              "default": "(\u043f\u0440\u043e\u043c\u0435\u043d\u043b\u0438\u0432\u0438_\u0440\u0430\u0437\u0445\u043e\u0434\u0438 - \u0441\u043e\u0446\u0438\u0430\u043b\u043d\u0430_\u0438\u0437\u0434\u0440\u044a\u0436\u043a\u0430) * 3 * 12"
+            },
+            "ul_coverage_count": {
+              "type": "number",
+              "default": 40
+            },
+            "term_life_coverage_count": {
+              "type": "number",
+              "default": 32
+            }
+          }
+        },
+        "recommended_coverages": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "default": [
+            "\u041f\u044a\u043b\u043d\u0430/\u0427\u0430\u0441\u0442\u0438\u0447\u043d\u0430 \u0422\u0440\u0430\u0439\u043d\u0430 \u041d\u0435\u0442\u0440\u0443\u0434\u043e\u0441\u043f\u043e\u0441\u043e\u0431\u043d\u043e\u0441\u0442 \u0432\u0441\u043b\u0435\u0434\u0441\u0442\u0432\u0438\u0435 \u043d\u0430 \u0437\u043b\u043e\u043f\u043e\u043b\u0443\u043a\u0430",
+            "\u0424\u0440\u0430\u043a\u0442\u0443\u0440\u0438 \u0438 \u0438\u0437\u0433\u0430\u0440\u044f\u043d\u0438\u044f",
+            "\u0422\u0435\u043b\u0435\u043c\u0435\u0434\u0438\u0446\u0438\u043d\u0430 / \u0412\u0442\u043e\u0440\u043e \u043c\u0435\u0434\u0438\u0446\u0438\u043d\u0441\u043a\u043e \u043c\u043d\u0435\u043d\u0438\u0435",
+            "\u041e\u0442\u043a\u0430\u0437 \u043e\u0442 \u043f\u0440\u0435\u043c\u0438\u044f",
+            "40 \u0422\u0435\u0436\u043a\u0438 \u0437\u0430\u0431\u043e\u043b\u044f\u0432\u0430\u043d\u0438\u044f (UL) / 32 \u0422\u0435\u0436\u043a\u0438 \u0437\u0430\u0431\u043e\u043b\u044f\u0432\u0430\u043d\u0438\u044f (\u0421\u0440\u043e\u0447\u0435\u043d \u0436\u0438\u0432\u043e\u0442)"
+          ]
+        },
+        "round_to": {
+          "type": "number",
+          "description": "\u0417\u0430\u043a\u0440\u044a\u0433\u043b\u044f\u043d\u0435 \u043d\u0430 \u043f\u043e\u043a\u0440\u0438\u0442\u0438\u044f \u043d\u0430 \u043a\u0440\u0430\u0442\u043d\u0438 \u043d\u0430 (EUR)",
+          "default": 100
+        }
+      }
+    },
+    "pricing_psychology": {
+      "type": "object",
+      "description": "\u041f\u0440\u0430\u0432\u0438\u043b\u0430 \u0437\u0430 \u0446\u0435\u043d\u043e\u0432\u0430 \u043f\u0441\u0438\u0445\u043e\u043b\u043e\u0433\u0438\u044f \u0438 \u0432\u0438\u0437\u0443\u0430\u043b\u0438\u0437\u0430\u0446\u0438\u044f",
+      "properties": {
+        "round_premiums_down": {
+          "type": "boolean",
+          "description": "\u0417\u0430\u043a\u0440\u044a\u0433\u043b\u044f\u0439 \u043f\u0440\u0435\u043c\u0438\u0438 \u043d\u0430\u0434\u043e\u043b\u0443 \u0434\u043e \u043f\u0441\u0438\u0445\u043e\u043b\u043e\u0433\u0438\u0447\u0435\u0441\u043a\u0438 \u043f\u0440\u0430\u0433\u043e\u0432\u0435",
+          "default": true
+        },
+        "round_coverages_visually": {
+          "type": "boolean",
+          "description": "\u0412\u0438\u0437\u0443\u0430\u043b\u043d\u043e \u0437\u0430\u043a\u0440\u044a\u0433\u043b\u044f\u0439 \u043f\u043e\u043a\u0440\u0438\u0442\u0438\u044f",
+          "default": true
+        },
+        "show_daily_cost": {
+          "type": "boolean",
+          "description": "\u041f\u043e\u043a\u0430\u0437\u0432\u0430\u0439 \u0434\u043d\u0435\u0432\u043d\u0430 \u0446\u0435\u043d\u0430 \u0437\u0430 \u0437\u0430\u0441\u0442\u0440\u0430\u0445\u043e\u0432\u043a\u0438",
+          "default": true
+        },
+        "show_future_investment_value": {
+          "type": "boolean",
+          "description": "\u041f\u043e\u043a\u0430\u0437\u0432\u0430\u0439 \u0431\u044a\u0434\u0435\u0449\u0430 \u0441\u0442\u043e\u0439\u043d\u043e\u0441\u0442 \u043d\u0430 \u0438\u043d\u0432\u0435\u0441\u0442\u0438\u0446\u0438\u0438 \u043f\u0440\u0438 \u043f\u0435\u043d\u0441\u0438\u044f",
+          "default": true
+        },
+        "examples": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "default": [
+            "103 \u043b\u0432 -> 99 \u043b\u0432",
+            "412 \u043b\u0432 -> 399 \u043b\u0432",
+            "98000 EUR -> 100000 EUR",
+            "107000 EUR -> 100000 EUR"
+          ]
+        }
+      }
+    },
+    "calculations": {
+      "type": "object",
+      "description": "\u0418\u0437\u0447\u0438\u0441\u043b\u0435\u043d\u0438\u044f \u0437\u0430 \u043f\u0440\u0435\u0434\u0441\u0442\u0430\u0432\u044f\u043d\u0435 \u043d\u0430 \u043a\u043b\u0438\u0435\u043d\u0442\u0430",
+      "properties": {
+        "labor_capital": {
+          "type": "object",
+          "properties": {
+            "annual_salary_increase": {
+              "type": "number",
+              "default": 0.03
+            },
+            "calculate_until_age": {
+              "type": "number",
+              "default": 65
+            }
+          }
+        },
+        "tax_relief": {
+          "type": "object",
+          "properties": {
+            "percent": {
+              "type": "number",
+              "default": 0.1
+            },
+            "applicable_products": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "default": [
+                "Unit Linked (\u043a\u043b\u0438\u0435\u043d\u0442/\u043f\u0430\u0440\u0442\u043d\u044c\u043e\u0440 \u0434\u043e 65 \u0433.)",
+                "\u0414\u0435\u0442\u0441\u043a\u0438 Unit Linked (\u0434\u043e 19 \u0433.)",
+                "\u0421\u0440\u043e\u0447\u0435\u043d \u0436\u0438\u0432\u043e\u0442 (\u043a\u043b\u0438\u0435\u043d\u0442/\u043f\u0430\u0440\u0442\u043d\u044c\u043e\u0440 \u0434\u043e 65 \u0433.)",
+                "\u0414\u043e\u043f\u044a\u043b\u043d\u0438\u0442\u0435\u043b\u043d\u043e \u0437\u0434\u0440\u0430\u0432\u043d\u043e (\u043a\u043b\u0438\u0435\u043d\u0442/\u043f\u0430\u0440\u0442\u043d\u044c\u043e\u0440/\u0434\u0435\u0446\u0430 \u0434\u043e 65 \u0433.)",
+                "\u0422\u0440\u0435\u0442\u0438 \u043f\u0435\u043d\u0441\u0438\u043e\u043d\u0435\u043d \u0441\u0442\u044a\u043b\u0431 (\u043a\u043b\u0438\u0435\u043d\u0442/\u043f\u0430\u0440\u0442\u043d\u044c\u043e\u0440 \u0434\u043e 65 \u0433.)"
+              ]
+            }
+          }
+        },
+        "extra_generated_wealth": {
+          "type": "object",
+          "properties": {
+            "components": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "default": [
+                "\u0423\u041f\u0424 \u043d\u0430\u0442\u0440\u0443\u043f\u0430\u043d\u0430 \u0441\u0443\u043c\u0430 \u043a\u044a\u043c 65 \u0433.",
+                "30% \u043e\u0442 \u043d\u0430\u0434\u043f\u043b\u0430\u0442\u0435\u043d\u0438 \u043b\u0438\u0445\u0432\u0438 \u043f\u043e \u043a\u0440\u0435\u0434\u0438\u0442",
+                "\u0421\u0442\u043e\u0439\u043d\u043e\u0441\u0442 \u043d\u0430 \u0438\u043c\u043e\u0442 (\u0430\u043a\u043e \u0449\u0435 \u0441\u0435 \u043a\u0443\u043f\u0443\u0432\u0430)",
+                "UL \u0438\u043d\u0432\u0435\u0441\u0442\u0438\u0446\u0438\u0438 (\u043a\u043b\u0438\u0435\u043d\u0442/\u043f\u0430\u0440\u0442\u043d\u044c\u043e\u0440 \u043a\u044a\u043c 65 \u0433.)",
+                "\u0414\u0435\u0442\u0441\u043a\u0438 UL \u0438\u043d\u0432\u0435\u0441\u0442\u0438\u0446\u0438\u0438 (\u043a\u044a\u043c 19 \u0433.)"
+              ]
+            },
+            "mortgage_interest_savings_percent": {
+              "type": "number",
+              "default": 0.3
+            }
+          }
+        }
+      }
+    },
+    "payment_frequency_rules": {
+      "type": "object",
+      "description": "\u041f\u0440\u0430\u0432\u0438\u043b\u0430 \u0437\u0430 \u043f\u0435\u0440\u0438\u043e\u0434\u0438\u0447\u043d\u043e\u0441\u0442 \u043d\u0430 \u043f\u043b\u0430\u0449\u0430\u043d\u0435 \u0441\u043f\u043e\u0440\u0435\u0434 \u0440\u0435\u0437\u0435\u0440\u0432\u0430 \u043d\u0430 \u043a\u043b\u0438\u0435\u043d\u0442\u0430",
+      "properties": {
+        "base_frequency": {
+          "type": "string",
+          "default": "annual"
+        },
+        "rules": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "reserve_threshold_months": {
+                "type": "number"
+              },
+              "recommended_frequency": {
+                "type": "string"
+              },
+              "description": {
+                "type": "string"
+              }
+            }
+          },
+          "default": [
+            {
+              "reserve_threshold_months": 4,
+              "recommended_frequency": "semiannual",
+              "description": "\u041f\u043e\u0434 4 \u043c\u0435\u0441\u0435\u0447\u043d\u0438 \u0434\u043e\u0445\u043e\u0434\u0430 \u0441\u043b\u0435\u0434 \u0433\u043e\u0434\u0438\u0448\u0435\u043d \u043f\u043b\u0430\u043d -> \u043f\u043e\u043b\u0443\u0433\u043e\u0434\u0438\u0448\u043d\u0430 \u043f\u0435\u0440\u0438\u043e\u0434\u0438\u043a\u0430"
+            },
+            {
+              "reserve_threshold_months": 3,
+              "recommended_frequency": "quarterly",
+              "description": "\u041f\u043e\u0434 3 \u043c\u0435\u0441\u0435\u0447\u043d\u0438 \u0434\u043e\u0445\u043e\u0434\u0430 \u0441\u043b\u0435\u0434 \u0433\u043e\u0434\u0438\u0448\u0435\u043d \u043f\u043b\u0430\u043d -> \u0442\u0440\u0438\u043c\u0435\u0441\u0435\u0447\u043d\u0430 \u043f\u0435\u0440\u0438\u043e\u0434\u0438\u043a\u0430"
+            },
+            {
+              "reserve_threshold_months": 2,
+              "recommended_frequency": "monthly",
+              "description": "\u041f\u043e\u0434 2 \u043c\u0435\u0441\u0435\u0447\u043d\u0438 \u0434\u043e\u0445\u043e\u0434\u0430 \u0441\u043b\u0435\u0434 \u0433\u043e\u0434\u0438\u0448\u0435\u043d \u043f\u043b\u0430\u043d -> \u043c\u0435\u0441\u0435\u0447\u043d\u0430 \u043f\u0435\u0440\u0438\u043e\u0434\u0438\u043a\u0430"
+            }
+          ]
+        },
+        "min_reserve_after_plan": {
+          "type": "number",
+          "description": "\u041c\u0438\u043d\u0438\u043c\u0430\u043b\u0435\u043d \u0440\u0435\u0437\u0435\u0440\u0432 \u0441\u043b\u0435\u0434 \u043f\u043b\u0430\u043d (\u043c\u0435\u0441\u0435\u0447\u043d\u0438 \u0434\u043e\u0445\u043e\u0434\u0430)",
+          "default": 1
+        }
+      }
+    },
+    "currency_conversion": {
+      "type": "object",
+      "properties": {
+        "eur_to_bgn": {
+          "type": "number",
+          "default": 1.95583
+        }
+      }
+    },
+    "notes": {
+      "type": "string",
+      "description": "\u0414\u043e\u043f\u044a\u043b\u043d\u0438\u0442\u0435\u043b\u043d\u0438 \u0431\u0435\u043b\u0435\u0436\u043a\u0438 \u0438 \u0438\u043d\u0441\u0442\u0440\u0443\u043a\u0446\u0438\u0438"
+    }
+  },
+  "required": [
+    "rule_version"
+  ]
+}

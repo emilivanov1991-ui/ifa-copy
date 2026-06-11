@@ -1,0 +1,31 @@
+{
+  "name": "PortfolioHistory",
+  "type": "object",
+  "properties": {
+    "client_id": {
+      "type": "string",
+      "description": "Reference to Client entity"
+    },
+    "date": {
+      "type": "string",
+      "format": "date"
+    },
+    "total_value": {
+      "type": "number"
+    },
+    "investments_value": {
+      "type": "number"
+    },
+    "savings_value": {
+      "type": "number"
+    },
+    "pension_value": {
+      "type": "number"
+    }
+  },
+  "required": [
+    "client_id",
+    "date",
+    "total_value"
+  ]
+}

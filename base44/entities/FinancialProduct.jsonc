@@ -1,0 +1,106 @@
+{
+  "name": "FinancialProduct",
+  "type": "object",
+  "properties": {
+    "client_id": {
+      "type": "string",
+      "description": "Reference to Client entity"
+    },
+    "name": {
+      "type": "string"
+    },
+    "type": {
+      "type": "string",
+      "enum": [
+        "investment",
+        "insurance",
+        "pension",
+        "savings",
+        "loan"
+      ],
+      "description": "Type of financial product"
+    },
+    "provider": {
+      "type": "string",
+      "description": "Bank, insurance company, fund manager etc."
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "active",
+        "proposed",
+        "cancelled",
+        "matured"
+      ],
+      "default": "proposed"
+    },
+    "start_date": {
+      "type": "string",
+      "format": "date"
+    },
+    "maturity_date": {
+      "type": "string",
+      "format": "date"
+    },
+    "current_value": {
+      "type": "number",
+      "default": 0
+    },
+    "initial_value": {
+      "type": "number",
+      "default": 0
+    },
+    "monthly_premium": {
+      "type": "number",
+      "default": 0
+    },
+    "interest_rate": {
+      "type": "number"
+    },
+    "coverage_amount": {
+      "type": "number",
+      "description": "For insurance products"
+    },
+    "coverage_details": {
+      "type": "string",
+      "description": "Description of insurance coverage"
+    },
+    "management_fee": {
+      "type": "number",
+      "default": 0,
+      "description": "Annual management fee percentage"
+    },
+    "expected_return": {
+      "type": "number",
+      "description": "Expected annual return percentage"
+    },
+    "risk_profile": {
+      "type": "string",
+      "enum": [
+        "conservative",
+        "moderate",
+        "balanced",
+        "dynamic",
+        "aggressive"
+      ],
+      "default": "balanced"
+    },
+    "currency": {
+      "type": "string",
+      "enum": [
+        "EUR",
+        "BGN",
+        "USD"
+      ],
+      "default": "EUR"
+    },
+    "notes": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "client_id",
+    "name",
+    "type"
+  ]
+}

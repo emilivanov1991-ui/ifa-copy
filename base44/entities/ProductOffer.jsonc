@@ -1,0 +1,126 @@
+{
+  "name": "ProductOffer",
+  "type": "object",
+  "properties": {
+    "plan_id": {
+      "type": "string",
+      "description": "Reference to FinancialPlan"
+    },
+    "analysis_id": {
+      "type": "string",
+      "description": "Reference to FinancialAnalysisSubmission"
+    },
+    "catalog_product_id": {
+      "type": "string",
+      "description": "Reference to ProductCatalog"
+    },
+    "provider": {
+      "type": "string"
+    },
+    "product_name": {
+      "type": "string"
+    },
+    "product_type": {
+      "type": "string",
+      "enum": [
+        "term_life",
+        "ul_investment",
+        "education_plan",
+        "health_insurance",
+        "pension_plan",
+        "personal_accident",
+        "critical_illness"
+      ]
+    },
+    "beneficiary": {
+      "type": "string",
+      "enum": [
+        "partner1",
+        "partner2",
+        "child1",
+        "child2",
+        "child3",
+        "family"
+      ]
+    },
+    "beneficiary_name": {
+      "type": "string"
+    },
+    "beneficiary_age": {
+      "type": "number"
+    },
+    "term_years": {
+      "type": "number"
+    },
+    "strategy": {
+      "type": "string",
+      "enum": [
+        "conservative",
+        "balanced",
+        "dynamic",
+        "aggressive"
+      ]
+    },
+    "monthly_premium": {
+      "type": "number"
+    },
+    "annual_premium": {
+      "type": "number"
+    },
+    "coverage_amount": {
+      "type": "number"
+    },
+    "expected_value": {
+      "type": "number"
+    },
+    "risk_class": {
+      "type": "number",
+      "default": 1
+    },
+    "selected_coverages": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "coverage_amount": {
+            "type": "number"
+          },
+          "premium": {
+            "type": "number"
+          }
+        }
+      }
+    },
+    "ai_recommendation_reason": {
+      "type": "string",
+      "description": "AI \u043e\u0431\u044f\u0441\u043d\u0435\u043d\u0438\u0435 \u0437\u0430\u0449\u043e \u0442\u043e\u0437\u0438 \u043f\u0440\u043e\u0434\u0443\u043a\u0442 \u0435 \u043f\u0440\u0435\u043f\u043e\u0440\u044a\u0447\u0430\u043d"
+    },
+    "offer_status": {
+      "type": "string",
+      "enum": [
+        "draft",
+        "generated",
+        "sent",
+        "accepted",
+        "rejected"
+      ],
+      "default": "draft"
+    },
+    "pdf_url": {
+      "type": "string"
+    },
+    "valid_until": {
+      "type": "string",
+      "format": "date"
+    }
+  },
+  "required": [
+    "analysis_id",
+    "provider",
+    "product_name",
+    "product_type"
+  ]
+}

@@ -1,0 +1,45 @@
+{
+  "name": "Lesson",
+  "type": "object",
+  "properties": {
+    "course_id": {
+      "type": "string"
+    },
+    "title": {
+      "type": "string"
+    },
+    "content_type": {
+      "type": "string",
+      "enum": [
+        "video",
+        "pdf",
+        "text"
+      ]
+    },
+    "content_url": {
+      "type": "string",
+      "description": "YouTube/Vimeo embed URL \u0438\u043b\u0438 PDF URL"
+    },
+    "content_text": {
+      "type": "string",
+      "description": "\u0417\u0430 text \u0442\u0438\u043f \u0443\u0440\u043e\u0446\u0438"
+    },
+    "order": {
+      "type": "number",
+      "default": 100
+    },
+    "duration_minutes": {
+      "type": "number",
+      "default": 10
+    },
+    "is_active": {
+      "type": "boolean",
+      "default": true
+    }
+  },
+  "required": [
+    "course_id",
+    "title",
+    "content_type"
+  ]
+}

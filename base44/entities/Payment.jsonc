@@ -1,0 +1,52 @@
+{
+  "name": "Payment",
+  "type": "object",
+  "properties": {
+    "client_id": {
+      "type": "string",
+      "description": "Reference to Client entity"
+    },
+    "product_id": {
+      "type": "string",
+      "description": "Reference to FinancialProduct entity"
+    },
+    "amount": {
+      "type": "number"
+    },
+    "payment_date": {
+      "type": "string",
+      "format": "date"
+    },
+    "due_date": {
+      "type": "string",
+      "format": "date"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "pending",
+        "paid",
+        "overdue",
+        "cancelled"
+      ],
+      "default": "pending"
+    },
+    "payment_type": {
+      "type": "string",
+      "enum": [
+        "premium",
+        "contribution",
+        "one_time"
+      ],
+      "default": "premium"
+    },
+    "notes": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "client_id",
+    "product_id",
+    "amount"
+  ]
+}

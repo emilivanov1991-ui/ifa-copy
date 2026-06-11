@@ -1,0 +1,1549 @@
+{
+  "name": "FinancialAnalysisSubmission",
+  "type": "object",
+  "properties": {
+    "client_id": {
+      "type": "string",
+      "description": "Reference to Client entity"
+    },
+    "current_step": {
+      "type": "number",
+      "description": "Current step in the analysis form (1-9)",
+      "default": 1
+    },
+    "last_updated_step": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "gdpr_consent_a": {
+      "type": "boolean",
+      "default": false
+    },
+    "gdpr_consent_b": {
+      "type": "boolean",
+      "default": false
+    },
+    "gdpr_consent_c": {
+      "type": "boolean",
+      "default": false
+    },
+    "client_first_name": {
+      "type": "string"
+    },
+    "client_middle_name": {
+      "type": "string"
+    },
+    "client_last_name": {
+      "type": "string"
+    },
+    "client_birthdate": {
+      "type": "string",
+      "format": "date"
+    },
+    "client_birthday_day": {
+      "type": "number"
+    },
+    "client_birthday_month": {
+      "type": "number"
+    },
+    "client_age": {
+      "type": "number"
+    },
+    "client_gender": {
+      "type": "string",
+      "enum": [
+        "male",
+        "female"
+      ]
+    },
+    "client_birthplace": {
+      "type": "string"
+    },
+    "client_egn": {
+      "type": "string"
+    },
+    "client_id_number": {
+      "type": "string"
+    },
+    "client_id_valid_until": {
+      "type": "string",
+      "format": "date"
+    },
+    "client_address": {
+      "type": "string"
+    },
+    "client_phone": {
+      "type": "string"
+    },
+    "client_email": {
+      "type": "string"
+    },
+    "client_is_pep": {
+      "type": "boolean"
+    },
+    "client_is_employed": {
+      "type": "boolean"
+    },
+    "client_job_description": {
+      "type": "string"
+    },
+    "client_employer_name": {
+      "type": "string"
+    },
+    "client_employer_city": {
+      "type": "string"
+    },
+    "client_employer_street": {
+      "type": "string"
+    },
+    "client_employer_postal_code": {
+      "type": "string"
+    },
+    "client_income_source": {
+      "type": "string"
+    },
+    "client_activity": {
+      "type": "string"
+    },
+    "client_marital_status": {
+      "type": "string",
+      "enum": [
+        "single",
+        "married",
+        "divorced",
+        "widowed"
+      ]
+    },
+    "client_nationality": {
+      "type": "string",
+      "enum": [
+        "bulgarian",
+        "other_eu",
+        "non_eu"
+      ]
+    },
+    "client_is_smoker": {
+      "type": "boolean"
+    },
+    "client_contract_type": {
+      "type": "string",
+      "enum": [
+        "labor",
+        "civil"
+      ]
+    },
+    "client_contract_term": {
+      "type": "string",
+      "enum": [
+        "fixed",
+        "permanent"
+      ]
+    },
+    "client_contract_start_date": {
+      "type": "string",
+      "format": "date"
+    },
+    "client_is_good_health": {
+      "type": "boolean"
+    },
+    "client_health_explanation": {
+      "type": "string"
+    },
+    "client_height_cm": {
+      "type": "number"
+    },
+    "client_weight_kg": {
+      "type": "number"
+    },
+    "include_partner": {
+      "type": "boolean"
+    },
+    "partner_first_name": {
+      "type": "string"
+    },
+    "partner_middle_name": {
+      "type": "string"
+    },
+    "partner_last_name": {
+      "type": "string"
+    },
+    "partner_birthdate": {
+      "type": "string",
+      "format": "date"
+    },
+    "partner_birthday_day": {
+      "type": "number"
+    },
+    "partner_birthday_month": {
+      "type": "number"
+    },
+    "partner_age": {
+      "type": "number"
+    },
+    "partner_gender": {
+      "type": "string",
+      "enum": [
+        "male",
+        "female"
+      ]
+    },
+    "partner_birthplace": {
+      "type": "string"
+    },
+    "partner_egn": {
+      "type": "string"
+    },
+    "partner_id_number": {
+      "type": "string"
+    },
+    "partner_id_valid_until": {
+      "type": "string",
+      "format": "date"
+    },
+    "partner_address": {
+      "type": "string"
+    },
+    "partner_phone": {
+      "type": "string"
+    },
+    "partner_email": {
+      "type": "string"
+    },
+    "partner_is_pep": {
+      "type": "boolean"
+    },
+    "partner_is_employed": {
+      "type": "boolean"
+    },
+    "partner_job_description": {
+      "type": "string"
+    },
+    "partner_employer_name": {
+      "type": "string"
+    },
+    "partner_employer_city": {
+      "type": "string"
+    },
+    "partner_employer_street": {
+      "type": "string"
+    },
+    "partner_employer_postal_code": {
+      "type": "string"
+    },
+    "partner_income_source": {
+      "type": "string"
+    },
+    "partner_activity": {
+      "type": "string"
+    },
+    "partner_marital_status": {
+      "type": "string",
+      "enum": [
+        "single",
+        "married",
+        "divorced",
+        "widowed"
+      ]
+    },
+    "partner_is_smoker": {
+      "type": "boolean"
+    },
+    "partner_contract_type": {
+      "type": "string",
+      "enum": [
+        "labor",
+        "civil"
+      ]
+    },
+    "partner_contract_term": {
+      "type": "string",
+      "enum": [
+        "fixed",
+        "permanent"
+      ]
+    },
+    "partner_contract_start_date": {
+      "type": "string",
+      "format": "date"
+    },
+    "partner_is_good_health": {
+      "type": "boolean"
+    },
+    "partner_health_explanation": {
+      "type": "string"
+    },
+    "partner_height_cm": {
+      "type": "number"
+    },
+    "partner_weight_kg": {
+      "type": "number"
+    },
+    "children_count": {
+      "type": "number"
+    },
+    "children_economically_dependent": {
+      "type": "boolean"
+    },
+    "child_1_name": {
+      "type": "string"
+    },
+    "child_1_birthdate": {
+      "type": "string",
+      "format": "date"
+    },
+    "child_1_age": {
+      "type": "number"
+    },
+    "child_2_name": {
+      "type": "string"
+    },
+    "child_2_birthdate": {
+      "type": "string",
+      "format": "date"
+    },
+    "child_2_age": {
+      "type": "number"
+    },
+    "child_3_name": {
+      "type": "string"
+    },
+    "child_3_birthdate": {
+      "type": "string",
+      "format": "date"
+    },
+    "child_3_age": {
+      "type": "number"
+    },
+    "child_4_name": {
+      "type": "string"
+    },
+    "child_4_birthdate": {
+      "type": "string",
+      "format": "date"
+    },
+    "child_4_age": {
+      "type": "number"
+    },
+    "child_5_name": {
+      "type": "string"
+    },
+    "child_5_birthdate": {
+      "type": "string",
+      "format": "date"
+    },
+    "child_5_age": {
+      "type": "number"
+    },
+    "child_6_name": {
+      "type": "string"
+    },
+    "child_6_birthdate": {
+      "type": "string",
+      "format": "date"
+    },
+    "child_7_name": {
+      "type": "string"
+    },
+    "child_7_birthdate": {
+      "type": "string",
+      "format": "date"
+    },
+    "child_8_name": {
+      "type": "string"
+    },
+    "child_8_birthdate": {
+      "type": "string",
+      "format": "date"
+    },
+    "child_9_name": {
+      "type": "string"
+    },
+    "child_9_birthdate": {
+      "type": "string",
+      "format": "date"
+    },
+    "child_10_name": {
+      "type": "string"
+    },
+    "child_10_birthdate": {
+      "type": "string",
+      "format": "date"
+    },
+    "current_housing": {
+      "type": "string",
+      "enum": [
+        "rented",
+        "subrented",
+        "with_parents",
+        "owned"
+      ]
+    },
+    "current_housing_location": {
+      "type": "string"
+    },
+    "current_housing_address": {
+      "type": "string"
+    },
+    "current_housing_rooms": {
+      "type": "number"
+    },
+    "current_housing_area": {
+      "type": "number"
+    },
+    "current_housing_value": {
+      "type": "number"
+    },
+    "current_housing_movable_value": {
+      "type": "number"
+    },
+    "current_housing_has_mortgage": {
+      "type": "boolean"
+    },
+    "current_mortgage_bank": {
+      "type": "string"
+    },
+    "current_mortgage_remaining": {
+      "type": "number"
+    },
+    "current_mortgage_remaining_years": {
+      "type": "number"
+    },
+    "current_mortgage_interest_rate": {
+      "type": "number"
+    },
+    "current_mortgage_monthly_payment": {
+      "type": "number"
+    },
+    "planning_housing_change": {
+      "type": "boolean"
+    },
+    "planned_housing_type": {
+      "type": "string",
+      "enum": [
+        "apartment",
+        "house",
+        "reconstruction",
+        "optimization"
+      ]
+    },
+    "planned_housing_rooms": {
+      "type": "number"
+    },
+    "planned_housing_area": {
+      "type": "number"
+    },
+    "planned_housing_value": {
+      "type": "number"
+    },
+    "planned_housing_timeline_years": {
+      "type": "number"
+    },
+    "planned_housing_extra_costs": {
+      "type": "number"
+    },
+    "financing_method": {
+      "type": "string",
+      "enum": [
+        "cash",
+        "loan",
+        "cash_and_loan"
+      ]
+    },
+    "available_cash": {
+      "type": "number"
+    },
+    "loan_amount": {
+      "type": "number"
+    },
+    "loan_interest_rate": {
+      "type": "number"
+    },
+    "loan_term_years": {
+      "type": "number"
+    },
+    "expected_monthly_payment": {
+      "type": "number"
+    },
+    "include_housing_in_plan": {
+      "type": "boolean"
+    },
+    "referrals_no_own_home": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "referrals_own_home_long": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "birthday_example_enabled": {
+      "type": "boolean"
+    },
+    "birthday_celebration_place": {
+      "type": "string"
+    },
+    "birthday_place_ready": {
+      "type": "boolean"
+    },
+    "birthday_party_guests_total": {
+      "type": "number"
+    },
+    "birthday_guests_family": {
+      "type": "number"
+    },
+    "birthday_guests_friends": {
+      "type": "number"
+    },
+    "birthday_guests_colleagues": {
+      "type": "number"
+    },
+    "birthday_family_names": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "birthday_friends_names": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "birthday_colleagues_names": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "has_property_1": {
+      "type": "boolean"
+    },
+    "property_1_address": {
+      "type": "string"
+    },
+    "property_1_rooms": {
+      "type": "number"
+    },
+    "property_1_area": {
+      "type": "number"
+    },
+    "property_1_value": {
+      "type": "number"
+    },
+    "property_1_movable_value": {
+      "type": "number"
+    },
+    "property_1_has_insurance": {
+      "type": "boolean"
+    },
+    "property_1_insurer": {
+      "type": "string"
+    },
+    "property_1_insurance_expiry": {
+      "type": "string"
+    },
+    "property_1_insurance_monthly": {
+      "type": "number",
+      "description": "\u041c\u0435\u0441\u0435\u0447\u043d\u0430 \u0441\u0443\u043c\u0430 \u043f\u043e \u0437\u0430\u0441\u0442\u0440\u0430\u0445\u043e\u0432\u043a\u0430\u0442\u0430 \u043d\u0430 \u0438\u043c\u043e\u0442 1 (\u20ac)"
+    },
+    "has_property_2": {
+      "type": "boolean"
+    },
+    "property_2_address": {
+      "type": "string"
+    },
+    "property_2_rooms": {
+      "type": "number"
+    },
+    "property_2_area": {
+      "type": "number"
+    },
+    "property_2_value": {
+      "type": "number"
+    },
+    "property_2_movable_value": {
+      "type": "number"
+    },
+    "property_2_has_insurance": {
+      "type": "boolean"
+    },
+    "property_2_insurer": {
+      "type": "string"
+    },
+    "property_2_insurance_expiry": {
+      "type": "string"
+    },
+    "property_2_insurance_monthly": {
+      "type": "number",
+      "description": "\u041c\u0435\u0441\u0435\u0447\u043d\u0430 \u0441\u0443\u043c\u0430 \u043f\u043e \u0437\u0430\u0441\u0442\u0440\u0430\u0445\u043e\u0432\u043a\u0430\u0442\u0430 \u043d\u0430 \u0438\u043c\u043e\u0442 2 (\u20ac)"
+    },
+    "has_property_3": {
+      "type": "boolean"
+    },
+    "property_3_address": {
+      "type": "string"
+    },
+    "property_3_rooms": {
+      "type": "number"
+    },
+    "property_3_area": {
+      "type": "number"
+    },
+    "property_3_value": {
+      "type": "number"
+    },
+    "property_3_movable_value": {
+      "type": "number"
+    },
+    "property_3_has_insurance": {
+      "type": "boolean"
+    },
+    "property_3_insurer": {
+      "type": "string"
+    },
+    "property_3_insurance_expiry": {
+      "type": "string"
+    },
+    "property_3_insurance_monthly": {
+      "type": "number",
+      "description": "\u041c\u0435\u0441\u0435\u0447\u043d\u0430 \u0441\u0443\u043c\u0430 \u043f\u043e \u0437\u0430\u0441\u0442\u0440\u0430\u0445\u043e\u0432\u043a\u0430\u0442\u0430 \u043d\u0430 \u0438\u043c\u043e\u0442 3 (\u20ac)"
+    },
+    "has_car_1": {
+      "type": "boolean"
+    },
+    "car_1_brand": {
+      "type": "string"
+    },
+    "car_1_model": {
+      "type": "string"
+    },
+    "car_1_year": {
+      "type": "number"
+    },
+    "car_1_value": {
+      "type": "number"
+    },
+    "car_1_reg_number": {
+      "type": "string",
+      "description": "\u0420\u0435\u0433\u0438\u0441\u0442\u0440\u0430\u0446\u0438\u043e\u043d\u0435\u043d \u043d\u043e\u043c\u0435\u0440 \u043d\u0430 \u0430\u0432\u0442\u043e\u043c\u043e\u0431\u0438\u043b 1"
+    },
+    "car_1_engine_size": {
+      "type": "string",
+      "description": "\u041a\u0443\u0431\u0430\u0442\u0443\u0440\u0430 \u043d\u0430 \u0434\u0432\u0438\u0433\u0430\u0442\u0435\u043b\u044f \u043d\u0430 \u0430\u0432\u0442\u043e\u043c\u043e\u0431\u0438\u043b 1",
+      "enum": [
+        "up_to_1400",
+        "up_to_1600",
+        "up_to_1800",
+        "up_to_2000",
+        "up_to_2500",
+        "over_2500"
+      ]
+    },
+    "car_1_go_insurer": {
+      "type": "string"
+    },
+    "car_1_go_monthly": {
+      "type": "number",
+      "description": "\u041c\u0435\u0441\u0435\u0447\u043d\u0430 \u0441\u0443\u043c\u0430 \u043f\u043e \u0413\u041e \u0437\u0430\u0441\u0442\u0440\u0430\u0445\u043e\u0432\u043a\u0430 \u043d\u0430 \u0430\u0432\u0442\u043e\u043c\u043e\u0431\u0438\u043b 1 (\u20ac)"
+    },
+    "car_1_has_casco": {
+      "type": "boolean"
+    },
+    "car_1_casco_insurer": {
+      "type": "string"
+    },
+    "car_1_casco_expiry": {
+      "type": "string"
+    },
+    "car_1_casco_monthly": {
+      "type": "number",
+      "description": "\u041c\u0435\u0441\u0435\u0447\u043d\u0430 \u0441\u0443\u043c\u0430 \u043f\u043e \u041a\u0430\u0441\u043a\u043e \u043d\u0430 \u0430\u0432\u0442\u043e\u043c\u043e\u0431\u0438\u043b 1 (\u20ac)"
+    },
+    "has_car_2": {
+      "type": "boolean"
+    },
+    "car_2_brand": {
+      "type": "string"
+    },
+    "car_2_model": {
+      "type": "string"
+    },
+    "car_2_year": {
+      "type": "number"
+    },
+    "car_2_value": {
+      "type": "number"
+    },
+    "car_2_reg_number": {
+      "type": "string",
+      "description": "\u0420\u0435\u0433\u0438\u0441\u0442\u0440\u0430\u0446\u0438\u043e\u043d\u0435\u043d \u043d\u043e\u043c\u0435\u0440 \u043d\u0430 \u0430\u0432\u0442\u043e\u043c\u043e\u0431\u0438\u043b 2"
+    },
+    "car_2_engine_size": {
+      "type": "string",
+      "description": "\u041a\u0443\u0431\u0430\u0442\u0443\u0440\u0430 \u043d\u0430 \u0434\u0432\u0438\u0433\u0430\u0442\u0435\u043b\u044f \u043d\u0430 \u0430\u0432\u0442\u043e\u043c\u043e\u0431\u0438\u043b 2",
+      "enum": [
+        "up_to_1400",
+        "up_to_1600",
+        "up_to_1800",
+        "up_to_2000",
+        "up_to_2500",
+        "over_2500"
+      ]
+    },
+    "car_2_go_insurer": {
+      "type": "string"
+    },
+    "car_2_go_monthly": {
+      "type": "number",
+      "description": "\u041c\u0435\u0441\u0435\u0447\u043d\u0430 \u0441\u0443\u043c\u0430 \u043f\u043e \u0413\u041e \u0437\u0430\u0441\u0442\u0440\u0430\u0445\u043e\u0432\u043a\u0430 \u043d\u0430 \u0430\u0432\u0442\u043e\u043c\u043e\u0431\u0438\u043b 2 (\u20ac)"
+    },
+    "car_2_has_casco": {
+      "type": "boolean"
+    },
+    "car_2_casco_insurer": {
+      "type": "string"
+    },
+    "car_2_casco_expiry": {
+      "type": "string"
+    },
+    "car_2_casco_monthly": {
+      "type": "number",
+      "description": "\u041c\u0435\u0441\u0435\u0447\u043d\u0430 \u0441\u0443\u043c\u0430 \u043f\u043e \u041a\u0430\u0441\u043a\u043e \u043d\u0430 \u0430\u0432\u0442\u043e\u043c\u043e\u0431\u0438\u043b 2 (\u20ac)"
+    },
+    "has_car_3": {
+      "type": "boolean"
+    },
+    "car_3_brand": {
+      "type": "string"
+    },
+    "car_3_model": {
+      "type": "string"
+    },
+    "car_3_year": {
+      "type": "number"
+    },
+    "car_3_value": {
+      "type": "number"
+    },
+    "car_3_reg_number": {
+      "type": "string",
+      "description": "\u0420\u0435\u0433\u0438\u0441\u0442\u0440\u0430\u0446\u0438\u043e\u043d\u0435\u043d \u043d\u043e\u043c\u0435\u0440 \u043d\u0430 \u0430\u0432\u0442\u043e\u043c\u043e\u0431\u0438\u043b 3"
+    },
+    "car_3_engine_size": {
+      "type": "string",
+      "description": "\u041a\u0443\u0431\u0430\u0442\u0443\u0440\u0430 \u043d\u0430 \u0434\u0432\u0438\u0433\u0430\u0442\u0435\u043b\u044f \u043d\u0430 \u0430\u0432\u0442\u043e\u043c\u043e\u0431\u0438\u043b 3",
+      "enum": [
+        "up_to_1400",
+        "up_to_1600",
+        "up_to_1800",
+        "up_to_2000",
+        "up_to_2500",
+        "over_2500"
+      ]
+    },
+    "car_3_go_insurer": {
+      "type": "string"
+    },
+    "car_3_go_monthly": {
+      "type": "number",
+      "description": "\u041c\u0435\u0441\u0435\u0447\u043d\u0430 \u0441\u0443\u043c\u0430 \u043f\u043e \u0413\u041e \u0437\u0430\u0441\u0442\u0440\u0430\u0445\u043e\u0432\u043a\u0430 \u043d\u0430 \u0430\u0432\u0442\u043e\u043c\u043e\u0431\u0438\u043b 3 (\u20ac)"
+    },
+    "car_3_has_casco": {
+      "type": "boolean"
+    },
+    "car_3_casco_insurer": {
+      "type": "string"
+    },
+    "car_3_casco_expiry": {
+      "type": "string"
+    },
+    "car_3_casco_monthly": {
+      "type": "number",
+      "description": "\u041c\u0435\u0441\u0435\u0447\u043d\u0430 \u0441\u0443\u043c\u0430 \u043f\u043e \u041a\u0430\u0441\u043a\u043e \u043d\u0430 \u0430\u0432\u0442\u043e\u043c\u043e\u0431\u0438\u043b 3 (\u20ac)"
+    },
+    "property_referrals_significant": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "property_referrals_expensive_car": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "income_source": {
+      "type": "string",
+      "enum": [
+        "employment",
+        "self_employed",
+        "rent",
+        "investments",
+        "mixed"
+      ]
+    },
+    "client_risk_layoff": {
+      "type": "boolean"
+    },
+    "client_risk_maternity": {
+      "type": "boolean"
+    },
+    "client_risk_sick_leave": {
+      "type": "boolean"
+    },
+    "client_risk_disability": {
+      "type": "boolean"
+    },
+    "client_risk_death": {
+      "type": "boolean"
+    },
+    "client_has_income_protection": {
+      "type": "boolean"
+    },
+    "client_income_protection_insurer": {
+      "type": "string"
+    },
+    "client_income_protection_date": {
+      "type": "string"
+    },
+    "partner_risk_layoff": {
+      "type": "boolean"
+    },
+    "partner_risk_maternity": {
+      "type": "boolean"
+    },
+    "partner_risk_sick_leave": {
+      "type": "boolean"
+    },
+    "partner_risk_disability": {
+      "type": "boolean"
+    },
+    "partner_risk_death": {
+      "type": "boolean"
+    },
+    "partner_has_income_protection": {
+      "type": "boolean"
+    },
+    "partner_income_protection_insurer": {
+      "type": "string"
+    },
+    "partner_income_protection_date": {
+      "type": "string"
+    },
+    "include_income_protection_in_plan": {
+      "type": "boolean"
+    },
+    "include_property_in_plan": {
+      "type": "boolean"
+    },
+    "has_property_insurance": {
+      "type": "boolean"
+    },
+    "has_casco_insurance": {
+      "type": "boolean"
+    },
+    "has_employer_health_insurance": {
+      "type": "boolean"
+    },
+    "employer_health_insurer": {
+      "type": "string"
+    },
+    "partner_has_employer_health_insurance": {
+      "type": "boolean"
+    },
+    "partner_employer_health_insurer": {
+      "type": "string"
+    },
+    "client_monthly_net_income": {
+      "type": "number"
+    },
+    "partner_monthly_net_income": {
+      "type": "number"
+    },
+    "total_monthly_income": {
+      "type": "number"
+    },
+    "savings_method": {
+      "type": "string",
+      "enum": [
+        "none",
+        "leftover",
+        "fixed"
+      ]
+    },
+    "monthly_savings_amount": {
+      "type": "number"
+    },
+    "client_checking_account": {
+      "type": "number"
+    },
+    "client_savings_book": {
+      "type": "number"
+    },
+    "client_term_deposit": {
+      "type": "number"
+    },
+    "client_mutual_funds": {
+      "type": "number"
+    },
+    "client_savings_account": {
+      "type": "number"
+    },
+    "client_cash": {
+      "type": "number"
+    },
+    "client_crypto": {
+      "type": "number"
+    },
+    "client_gold": {
+      "type": "number"
+    },
+    "client_checking_account_bank": {
+      "type": "string"
+    },
+    "client_savings_account_bank": {
+      "type": "string"
+    },
+    "client_term_deposit_bank": {
+      "type": "string"
+    },
+    "client_mutual_funds_platform": {
+      "type": "string"
+    },
+    "client_crypto_platform": {
+      "type": "string"
+    },
+    "partner_checking_account": {
+      "type": "number"
+    },
+    "partner_savings_book": {
+      "type": "number"
+    },
+    "partner_term_deposit": {
+      "type": "number"
+    },
+    "partner_mutual_funds": {
+      "type": "number"
+    },
+    "partner_savings_account": {
+      "type": "number"
+    },
+    "partner_cash": {
+      "type": "number"
+    },
+    "partner_crypto": {
+      "type": "number"
+    },
+    "partner_gold": {
+      "type": "number"
+    },
+    "partner_checking_account_bank": {
+      "type": "string"
+    },
+    "partner_savings_account_bank": {
+      "type": "string"
+    },
+    "partner_term_deposit_bank": {
+      "type": "string"
+    },
+    "partner_mutual_funds_platform": {
+      "type": "string"
+    },
+    "partner_crypto_platform": {
+      "type": "string"
+    },
+    "desired_reserve_amount": {
+      "type": "number"
+    },
+    "desired_reserve_months": {
+      "type": "number"
+    },
+    "interest_in_better_savings": {
+      "type": "boolean"
+    },
+    "savings_discrepancy_reason_1": {
+      "type": "boolean"
+    },
+    "savings_discrepancy_reason_2": {
+      "type": "boolean"
+    },
+    "savings_discrepancy_reason_3": {
+      "type": "boolean"
+    },
+    "savings_discrepancy_reason_4": {
+      "type": "boolean"
+    },
+    "savings_discrepancy_reason_other": {
+      "type": "string"
+    },
+    "risk_profile": {
+      "type": "string",
+      "enum": [
+        "conservative",
+        "moderate",
+        "dynamic",
+        "aggressive"
+      ]
+    },
+    "conservative_percent": {
+      "type": "number"
+    },
+    "moderate_percent": {
+      "type": "number"
+    },
+    "dynamic_percent": {
+      "type": "number"
+    },
+    "aggressive_percent": {
+      "type": "number"
+    },
+    "investment_horizon": {
+      "type": "string",
+      "enum": [
+        "up_to_1_year",
+        "up_to_5_years",
+        "up_to_7_years",
+        "over_7_years"
+      ]
+    },
+    "investment_experience": {
+      "type": "string",
+      "enum": [
+        "none",
+        "basic",
+        "intermediate",
+        "advanced"
+      ]
+    },
+    "reaction_to_10_percent_drop": {
+      "type": "string",
+      "enum": [
+        "sell_all",
+        "sell_part",
+        "hold",
+        "buy_more"
+      ]
+    },
+    "reaction_to_20_percent_gain": {
+      "type": "string",
+      "enum": [
+        "sell_all",
+        "sell_part",
+        "hold",
+        "buy_more"
+      ]
+    },
+    "referrals_have_savings": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "referrals_invest_regularly": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "include_reserve_in_plan": {
+      "type": "boolean"
+    },
+    "client_retirement_age": {
+      "type": "number"
+    },
+    "partner_retirement_age": {
+      "type": "number"
+    },
+    "client_desired_pension": {
+      "type": "number"
+    },
+    "partner_desired_pension": {
+      "type": "number"
+    },
+    "client_expected_state_pension": {
+      "type": "number"
+    },
+    "partner_expected_state_pension": {
+      "type": "number"
+    },
+    "client_gross_income_pension": {
+      "type": "number"
+    },
+    "partner_gross_income_pension": {
+      "type": "number"
+    },
+    "client_pillar_1": {
+      "type": "boolean"
+    },
+    "client_pillar_2": {
+      "type": "boolean"
+    },
+    "client_pillar_3": {
+      "type": "boolean"
+    },
+    "client_pension_fund": {
+      "type": "string"
+    },
+    "client_voluntary_pension_fund": {
+      "type": "string"
+    },
+    "client_voluntary_pension_monthly": {
+      "type": "number"
+    },
+    "client_voluntary_pension_total": {
+      "type": "number"
+    },
+    "partner_pillar_1": {
+      "type": "boolean"
+    },
+    "partner_pillar_2": {
+      "type": "boolean"
+    },
+    "partner_pillar_3": {
+      "type": "boolean"
+    },
+    "partner_pension_fund": {
+      "type": "string"
+    },
+    "partner_voluntary_pension_fund": {
+      "type": "string"
+    },
+    "partner_voluntary_pension_monthly": {
+      "type": "number"
+    },
+    "partner_voluntary_pension_total": {
+      "type": "number"
+    },
+    "client_voluntary_pension": {
+      "type": "boolean"
+    },
+    "partner_voluntary_pension": {
+      "type": "boolean"
+    },
+    "include_pension_in_plan": {
+      "type": "boolean"
+    },
+    "pension_referrals_abroad": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "pension_referrals_high_income": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "pension_referrals_entrepreneur": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "pension_referrals_young": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "children_birth_costs": {
+      "type": "number"
+    },
+    "children_sport_costs": {
+      "type": "number"
+    },
+    "children_education_costs": {
+      "type": "number"
+    },
+    "children_wedding_costs": {
+      "type": "number"
+    },
+    "children_start_life_costs": {
+      "type": "number"
+    },
+    "children_other_costs": {
+      "type": "number"
+    },
+    "children_current_savings": {
+      "type": "number"
+    },
+    "skip_children_section": {
+      "type": "boolean"
+    },
+    "skip_other_goals_section": {
+      "type": "boolean"
+    },
+    "include_children_in_plan": {
+      "type": "boolean"
+    },
+    "other_goals_car": {
+      "type": "number"
+    },
+    "other_goals_car_years": {
+      "type": "number"
+    },
+    "other_goals_vacation": {
+      "type": "number"
+    },
+    "other_goals_vacation_years": {
+      "type": "number"
+    },
+    "other_goals_other": {
+      "type": "number"
+    },
+    "other_goals_other_years": {
+      "type": "number"
+    },
+    "other_goals_other_description": {
+      "type": "string"
+    },
+    "include_other_goals_in_plan": {
+      "type": "boolean"
+    },
+    "children_referrals_has_kids": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "children_referrals_recent_wedding": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "client_gross_income": {
+      "type": "number"
+    },
+    "client_net_income": {
+      "type": "number"
+    },
+    "client_annual_bonus": {
+      "type": "number"
+    },
+    "client_other_monthly_income": {
+      "type": "number"
+    },
+    "client_13th_salary": {
+      "type": "number"
+    },
+    "client_other_annual_income": {
+      "type": "number"
+    },
+    "partner_gross_income": {
+      "type": "number"
+    },
+    "partner_net_income": {
+      "type": "number"
+    },
+    "partner_annual_bonus": {
+      "type": "number"
+    },
+    "partner_other_monthly_income": {
+      "type": "number"
+    },
+    "partner_13th_salary": {
+      "type": "number"
+    },
+    "partner_other_annual_income": {
+      "type": "number"
+    },
+    "expense_rent": {
+      "type": "number"
+    },
+    "expense_utilities": {
+      "type": "number"
+    },
+    "expense_phone": {
+      "type": "number"
+    },
+    "expense_internet": {
+      "type": "number"
+    },
+    "expense_tv": {
+      "type": "number"
+    },
+    "expense_other_housing": {
+      "type": "number"
+    },
+    "expense_fuel": {
+      "type": "number"
+    },
+    "expense_car_maintenance": {
+      "type": "number"
+    },
+    "expense_car_other": {
+      "type": "number"
+    },
+    "expense_food": {
+      "type": "number"
+    },
+    "expense_clothing": {
+      "type": "number"
+    },
+    "expense_culture": {
+      "type": "number"
+    },
+    "expense_travel": {
+      "type": "number"
+    },
+    "expense_children": {
+      "type": "number"
+    },
+    "expense_cigarettes": {
+      "type": "number"
+    },
+    "expense_pets": {
+      "type": "number"
+    },
+    "expense_vacation": {
+      "type": "number"
+    },
+    "expense_business": {
+      "type": "number"
+    },
+    "expense_other": {
+      "type": "number"
+    },
+    "expense_education": {
+      "type": "number"
+    },
+    "expense_health": {
+      "type": "number"
+    },
+    "expense_cosmetics": {
+      "type": "number"
+    },
+    "expense_hobbies": {
+      "type": "number"
+    },
+    "expense_electronics": {
+      "type": "number"
+    },
+    "expense_taxes": {
+      "type": "number"
+    },
+    "monthly_investments": {
+      "type": "number"
+    },
+    "asset_checking_account": {
+      "type": "number"
+    },
+    "asset_short_term_savings": {
+      "type": "number"
+    },
+    "asset_medium_term_savings": {
+      "type": "number"
+    },
+    "asset_long_term_savings": {
+      "type": "number"
+    },
+    "asset_real_estate": {
+      "type": "number"
+    },
+    "asset_movable_property": {
+      "type": "number"
+    },
+    "liability_mortgage": {
+      "type": "number"
+    },
+    "liability_mortgage_monthly": {
+      "type": "number"
+    },
+    "liability_mortgage_remaining": {
+      "type": "number"
+    },
+    "liability_mortgage_remaining_months": {
+      "type": "number",
+      "default": 0
+    },
+    "liability_mortgage_interest_rate": {
+      "type": "number",
+      "default": 0
+    },
+    "liability_consumer_loans": {
+      "type": "number"
+    },
+    "liability_consumer_loans_monthly": {
+      "type": "number"
+    },
+    "liability_consumer_loans_remaining": {
+      "type": "number"
+    },
+    "liability_consumer_loans_remaining_months": {
+      "type": "number",
+      "default": 0
+    },
+    "liability_consumer_loans_interest_rate": {
+      "type": "number",
+      "default": 0
+    },
+    "liability_credit_cards": {
+      "type": "number"
+    },
+    "liability_credit_cards_monthly": {
+      "type": "number"
+    },
+    "liability_credit_cards_remaining": {
+      "type": "number"
+    },
+    "liability_credit_cards_remaining_months": {
+      "type": "number",
+      "default": 0
+    },
+    "liability_credit_cards_interest_rate": {
+      "type": "number",
+      "default": 0
+    },
+    "liability_leasing": {
+      "type": "number"
+    },
+    "liability_leasing_monthly": {
+      "type": "number"
+    },
+    "liability_leasing_remaining": {
+      "type": "number"
+    },
+    "liability_leasing_remaining_months": {
+      "type": "number",
+      "default": 0
+    },
+    "liability_leasing_interest_rate": {
+      "type": "number",
+      "default": 0
+    },
+    "liability_overdraft": {
+      "type": "number"
+    },
+    "liability_overdraft_monthly": {
+      "type": "number"
+    },
+    "liability_overdraft_remaining": {
+      "type": "number"
+    },
+    "liability_overdraft_remaining_months": {
+      "type": "number",
+      "default": 0
+    },
+    "liability_overdraft_interest_rate": {
+      "type": "number",
+      "default": 0
+    },
+    "insurance_life": {
+      "type": "number"
+    },
+    "insurance_property": {
+      "type": "number"
+    },
+    "insurance_movable": {
+      "type": "number"
+    },
+    "insurance_household": {
+      "type": "number"
+    },
+    "insurance_civil": {
+      "type": "number"
+    },
+    "insurance_casco": {
+      "type": "number"
+    },
+    "insurance_other": {
+      "type": "number"
+    },
+    "priority_income_protection": {
+      "type": "number"
+    },
+    "priority_property_protection": {
+      "type": "number"
+    },
+    "priority_reserve": {
+      "type": "number"
+    },
+    "priority_housing": {
+      "type": "number"
+    },
+    "priority_pension": {
+      "type": "number"
+    },
+    "priority_children": {
+      "type": "number"
+    },
+    "priority_other": {
+      "type": "number"
+    },
+    "monthly_priority_allocation": {
+      "type": "number"
+    },
+    "next_meeting_date": {
+      "type": "string"
+    },
+    "next_meeting_time": {
+      "type": "string"
+    },
+    "next_meeting_datetime": {
+      "type": "string"
+    },
+    "monthly_fixed_investment": {
+      "type": "number"
+    },
+    "monthly_variable_investment": {
+      "type": "number"
+    },
+    "one_time_investment": {
+      "type": "number"
+    },
+    "include_property_apartment": {
+      "type": "boolean"
+    },
+    "property_apartment_value": {
+      "type": "number"
+    },
+    "property_house_value": {
+      "type": "number"
+    },
+    "property_other_value": {
+      "type": "number"
+    },
+    "risk_layoff": {
+      "type": "boolean"
+    },
+    "risk_maternity": {
+      "type": "boolean"
+    },
+    "risk_sick_leave": {
+      "type": "boolean"
+    },
+    "risk_disability": {
+      "type": "boolean"
+    },
+    "risk_death": {
+      "type": "boolean"
+    },
+    "has_income_protection": {
+      "type": "boolean"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "new",
+        "contacted",
+        "in_progress",
+        "converted",
+        "closed"
+      ],
+      "default": "new"
+    },
+    "assigned_advisor": {
+      "type": "string"
+    },
+    "notes": {
+      "type": "string"
+    }
+  },
+  "required": []
+}

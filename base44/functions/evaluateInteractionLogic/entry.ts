@@ -185,6 +185,28 @@ Deno.serve(async (req) => {
     // ── Compute next step if requested ─────────────────────────────────────
     const nextStepId = advanceStep ? getNextStepId(currentStepId, flowType) : null;
 
+    // ── TTS fallback: if no pre-recorded audio, generate speech via Base44 ──
+    // Priority: pre-recorded audio_url > TTS generated > text only
+    const lang = contextData.languageCode || 'bg';
+    const ttsEnabled = body.ttsEnabled !== false; // default true
+
+    if (!result.audio_url && result.text && ttsEnabled) {
+      try {
+        const ttsResult = await base44.integrations.Core.GenerateSpeech({
+          text: result.text,
+          voice: lang === 'bg' ? 'storm' : 'river',
+          language_code: lang,
+        });
+        result.audio_url = ttsResult.url;
+        result.audio_source = 'tts_generated';
+      } catch {
+        // TTS failed — frontend will use text-only fallback
+        result.audio_source = 'text_only';
+      }
+    } else if (result.audio_url) {
+      result.audio_source = 'prerecorded';
+    }
+
     return Response.json({
       ...result,
       currentStepId,

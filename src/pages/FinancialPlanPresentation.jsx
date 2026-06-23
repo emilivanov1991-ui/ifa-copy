@@ -3,18 +3,19 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { base44 } from '@/api/base44Client';
 import {
-  Mic, MicOff, PhoneOff, PhoneCall, Loader2,
-  ChevronRight, ChevronLeft, CheckCircle2,
+  MessageSquare, PhoneOff, Loader2,
+  ChevronRight, CheckCircle2,
   BarChart3, Shield, PiggyBank, Home, Baby,
-  AlertTriangle, X, Volume2
+  AlertTriangle, Send, X
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import AvatarFrame from '@/components/voice/AvatarFrame';
 import { useJourneyState } from '@/components/voice/JourneyStateManager.jsx';
 import GuideAvatar from '@/components/GuideAvatar';
 import { createPageUrl } from '@/utils';
+import ReactMarkdown from 'react-markdown';
 
-const RETELL_API_KEY_SET = true; // Set to false until Retell key is configured
+const AGENT_NAME = 'voice_rulebook_agent';
 
 export default function FinancialPlanPresentation() {
   const urlParams = new URLSearchParams(window.location.search);
@@ -26,21 +27,21 @@ export default function FinancialPlanPresentation() {
   const [offers, setOffers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [currentSection, setCurrentSection] = useState(0);
-  const [callStatus, setCallStatus] = useState('idle'); // idle | connecting | connected | ended | error
-  const [isMuted, setIsMuted] = useState(false);
-  const [avatarState, setAvatarState] = useState('idle');
-  const [showGracefulStop, setShowGracefulStop] = useState(false);
-  const [callDuration, setCallDuration] = useState(0);
-  const callTimerRef = useRef(null);
-  const { advanceState, blockJourney } = useJourneyState();
+
+  // Agent conversation state
+  const [conversation, setConversation] = useState(null);
+  const [messages, setMessages] = useState([]);
+  const [inputText, setInputText] = useState('');
+  const [isSending, setIsSending] = useState(false);
+  const [chatStarted, setChatStarted] = useState(false);
+  const [agentAvatarState, setAgentAvatarState] = useState('idle');
+
+  const messagesEndRef = useRef(null);
+  const { advanceState } = useJourneyState();
 
   // Load plan data
   useEffect(() => {
-    if (!planId && !journeyId) {
-      setLoading(false);
-      return;
-    }
-
+    if (!planId && !journeyId) { setLoading(false); return; }
     const loadData = async () => {
       try {
         if (planId) {
@@ -61,71 +62,91 @@ export default function FinancialPlanPresentation() {
         setLoading(false);
       }
     };
-
     loadData();
   }, [planId, journeyId]);
 
-  // Timer for call duration
+  // Scroll to bottom on new messages
   useEffect(() => {
-    if (callStatus === 'connected') {
-      callTimerRef.current = setInterval(() => setCallDuration(d => d + 1), 1000);
-    } else {
-      clearInterval(callTimerRef.current);
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [messages]);
+
+  // Subscribe to conversation updates
+  useEffect(() => {
+    if (!conversation?.id) return;
+    const unsubscribe = base44.agents.subscribeToConversation(conversation.id, (data) => {
+      setMessages(data.messages || []);
+      // Detect avatar state from last assistant message tool calls
+      const lastMsg = (data.messages || []).filter(m => m.role === 'assistant').slice(-1)[0];
+      if (lastMsg?.content) setAgentAvatarState('talking');
+      else setAgentAvatarState('thinking');
+    });
+    return () => unsubscribe();
+  }, [conversation?.id]);
+
+  // When agent stops streaming, go back to idle
+  useEffect(() => {
+    if (agentAvatarState === 'talking') {
+      const t = setTimeout(() => setAgentAvatarState('idle'), 2000);
+      return () => clearTimeout(t);
     }
-    return () => clearInterval(callTimerRef.current);
-  }, [callStatus]);
+  }, [messages.length]);
 
-  const formatDuration = (seconds) => {
-    const m = Math.floor(seconds / 60).toString().padStart(2, '0');
-    const s = (seconds % 60).toString().padStart(2, '0');
-    return `${m}:${s}`;
-  };
-
-  const handleStartCall = async () => {
-    if (!RETELL_API_KEY_SET) {
-      alert('Retell API key not configured. Please set RETELL_API_KEY in backend secrets.');
-      return;
-    }
-
-    setCallStatus('connecting');
-    setAvatarState('thinking');
-
+  const handleStartChat = async () => {
+    setChatStarted(true);
+    setAgentAvatarState('thinking');
     try {
-      // Get a short-lived Retell access token from our secure backend proxy
-      const response = await base44.functions.invoke('createRetellWebCall', {
-        journey_id: journeyId,
-        plan_id: planId,
-        language_code: journey?.language_code || 'bg',
+      const conv = await base44.agents.createConversation({
+        agent_name: AGENT_NAME,
+        metadata: {
+          name: `Презентация ${plan?.id || ''}`,
+          description: `Journey: ${journeyId || ''} | Plan: ${planId || ''}`,
+        },
+      });
+      setConversation(conv);
+
+      // Advance journey state
+      if (journeyId) {
+        await advanceState(journeyId, 'presentation_in_progress', {
+          presentation_started_at: new Date().toISOString(),
+        });
+      }
+
+      // Send initial context message
+      const planSummary = plan
+        ? `Клиентът е на ${plan.partner1_age} г. Общо месечна вноска: ${plan.total_monthly_premium} €. Продукти: ${offers.map(o => o.product_name).join(', ')}.`
+        : 'Финансовият план е зареден.';
+
+      await base44.agents.addMessage(conv, {
+        role: 'user',
+        content: `Започни презентацията на финансовия план. Контекст: ${planSummary}`,
       });
 
-      if (response.data?.access_token) {
-        // TODO: Initialize Retell Web SDK with the access token
-        // retellClient.startCall({ accessToken: response.data.access_token })
-        setCallStatus('connected');
-        setAvatarState('talking');
-
-        if (journeyId) {
-          // Route through backend state machine — validates transition
-          await advanceState(journeyId, 'presentation_in_progress', {
-            presentation_started_at: new Date().toISOString(),
-            retell_call_id: response.data.call_id,
-          });
-        }
-      } else {
-        throw new Error('No access token received');
-      }
-    } catch (error) {
-      console.error('Call start error:', error);
-      setCallStatus('error');
-      setAvatarState('concerned');
+    } catch (err) {
+      console.error('Agent start error:', err);
+      setAgentAvatarState('concerned');
     }
   };
 
-  const handleEndCall = async () => {
-    setCallStatus('ended');
-    setAvatarState('idle');
-    setCallDuration(0);
-    // TODO: retellClient.stopCall()
+  const handleSendMessage = async () => {
+    if (!inputText.trim() || !conversation || isSending) return;
+    const text = inputText.trim();
+    setInputText('');
+    setIsSending(true);
+    setAgentAvatarState('thinking');
+    try {
+      await base44.agents.addMessage(conversation, { role: 'user', content: text });
+    } catch (err) {
+      console.error('Send error:', err);
+    } finally {
+      setIsSending(false);
+    }
+  };
+
+  const handleEndChat = async () => {
+    setAgentAvatarState('idle');
+    setChatStarted(false);
+    setConversation(null);
+    setMessages([]);
   };
 
   const handleProceedToApplication = async () => {
@@ -136,11 +157,11 @@ export default function FinancialPlanPresentation() {
   };
 
   const sections = [
-    { id: 'overview', label: 'Обзор', icon: BarChart3 },
-    { id: 'protection', label: 'Защита', icon: Shield },
-    { id: 'reserve', label: 'Резерв', icon: PiggyBank },
-    { id: 'housing', label: 'Жилище', icon: Home },
-    { id: 'children', label: 'Деца', icon: Baby },
+    { id: 'overview',    label: 'Обзор',    icon: BarChart3 },
+    { id: 'protection',  label: 'Защита',   icon: Shield },
+    { id: 'reserve',     label: 'Резерв',   icon: PiggyBank },
+    { id: 'housing',     label: 'Жилище',   icon: Home },
+    { id: 'children',    label: 'Деца',     icon: Baby },
   ];
 
   if (loading) {
@@ -156,38 +177,31 @@ export default function FinancialPlanPresentation() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 flex flex-col">
-      <GuideAvatar
-        state={callStatus === 'connected' ? 'talking' : callStatus === 'connecting' ? 'thinking' : 'idle'}
-        isActive={callStatus === 'connected'}
-        tooltip="Вашият AI финансов съветник"
-      />
+      <GuideAvatar state={agentAvatarState} isActive={chatStarted} tooltip="Вашият AI финансов съветник" />
+
       {/* Header */}
       <div className="bg-white border-b border-slate-200 px-4 py-3 flex items-center justify-between shadow-sm">
         <div className="flex items-center gap-3">
           <img
             src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6925a960748714fa4828395a/258cedab0_output-onlinepngtools.png"
-            alt="IFA"
-            className="h-8 w-auto"
+            alt="IFA" className="h-8 w-auto"
           />
           <div>
             <h1 className="text-sm font-bold text-slate-900">Вашият Финансов План</h1>
             <p className="text-xs text-slate-500">Персонализирано за Вас</p>
           </div>
         </div>
-
-        {/* Avatar + Call Status */}
         <div className="flex items-center gap-3">
           <AvatarFrame
-            avatarState={avatarState}
-            isPlaying={callStatus === 'connected'}
-            mode={callStatus === 'connected' ? 'live' : 'scripted'}
+            avatarState={agentAvatarState}
+            isPlaying={chatStarted}
+            mode={chatStarted ? 'live' : 'scripted'}
             compact={true}
           />
-          {/* GuideAvatar in top-left */}
-          {callStatus === 'connected' && (
+          {chatStarted && (
             <div className="flex items-center gap-1 text-green-600">
               <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
-              <span className="text-xs font-medium">{formatDuration(callDuration)}</span>
+              <span className="text-xs font-medium">Активен</span>
             </div>
           )}
         </div>
@@ -202,9 +216,7 @@ export default function FinancialPlanPresentation() {
               onClick={() => setCurrentSection(idx)}
               className={cn(
                 'flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium transition-all',
-                currentSection === idx
-                  ? 'bg-blue-600 text-white shadow-md'
-                  : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                currentSection === idx ? 'bg-blue-600 text-white shadow-md' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
               )}
             >
               <sec.icon className="w-3.5 h-3.5" />
@@ -215,27 +227,17 @@ export default function FinancialPlanPresentation() {
       </div>
 
       {/* Main Content */}
-      <div className="flex-1 p-4 max-w-4xl mx-auto w-full">
+      <div className="flex-1 p-4 max-w-4xl mx-auto w-full flex flex-col gap-4">
+
+        {/* Plan Cards */}
         <AnimatePresence mode="wait">
-          <motion.div
-            key={currentSection}
-            initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: -20 }}
-            className="space-y-4"
-          >
-            {/* Plan Summary Cards */}
+          <motion.div key={currentSection} initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="space-y-4">
             <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
               {offers.slice(0, 6).map((offer, idx) => (
-                <motion.div
-                  key={offer.id}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: idx * 0.1 }}
-                  className="bg-white rounded-2xl border border-slate-200 p-4 shadow-sm"
-                >
+                <motion.div key={offer.id} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: idx * 0.08 }}
+                  className="bg-white rounded-2xl border border-slate-200 p-4 shadow-sm">
                   <p className="text-xs text-slate-500 mb-1">{offer.provider}</p>
-                  <h3 className="text-sm font-semibold text-slate-900 mb-2">{offer.product_name}</h3>
+                  <h3 className="text-sm font-semibold text-slate-900 mb-2 line-clamp-2">{offer.product_name}</h3>
                   <div className="flex justify-between items-end">
                     <div>
                       <p className="text-xs text-slate-500">Месечна премия</p>
@@ -244,9 +246,7 @@ export default function FinancialPlanPresentation() {
                     {offer.coverage_amount > 0 && (
                       <div className="text-right">
                         <p className="text-xs text-slate-500">Покритие</p>
-                        <p className="text-sm font-semibold text-slate-700">
-                          {(offer.coverage_amount / 1000).toFixed(0)}K €
-                        </p>
+                        <p className="text-sm font-semibold text-slate-700">{(offer.coverage_amount / 1000).toFixed(0)}K €</p>
                       </div>
                     )}
                   </div>
@@ -254,7 +254,6 @@ export default function FinancialPlanPresentation() {
               ))}
             </div>
 
-            {/* Total */}
             {plan && (
               <div className="bg-gradient-to-r from-blue-600 to-indigo-600 rounded-2xl p-5 text-white">
                 <p className="text-blue-100 text-sm mb-1">Общо месечна вноска</p>
@@ -266,17 +265,100 @@ export default function FinancialPlanPresentation() {
             )}
           </motion.div>
         </AnimatePresence>
+
+        {/* Chat Panel — visible when started */}
+        <AnimatePresence>
+          {chatStarted && (
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: 30 }}
+              className="bg-white rounded-2xl border border-slate-200 shadow-lg flex flex-col"
+              style={{ minHeight: 320, maxHeight: 420 }}
+            >
+              {/* Chat header */}
+              <div className="flex items-center justify-between px-4 py-3 border-b border-slate-100">
+                <div className="flex items-center gap-2">
+                  <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
+                  <span className="text-sm font-medium text-slate-700">AI Финансов Съветник</span>
+                </div>
+                <button onClick={handleEndChat} className="text-slate-400 hover:text-slate-600">
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
+
+              {/* Messages */}
+              <div className="flex-1 overflow-y-auto px-4 py-3 space-y-3">
+                {messages.length === 0 && (
+                  <div className="flex items-center gap-2 text-slate-400 text-sm py-4 justify-center">
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                    <span>Инициализиране...</span>
+                  </div>
+                )}
+                {messages.map((msg, idx) => (
+                  <div key={idx} className={cn('flex', msg.role === 'user' ? 'justify-end' : 'justify-start')}>
+                    {msg.role !== 'user' && (
+                      <div className="w-7 h-7 rounded-full bg-blue-100 flex items-center justify-center mr-2 shrink-0 mt-1">
+                        <span className="text-xs text-blue-600 font-bold">AI</span>
+                      </div>
+                    )}
+                    {msg.content && (
+                      <div className={cn(
+                        'max-w-[80%] rounded-2xl px-3 py-2 text-sm',
+                        msg.role === 'user'
+                          ? 'bg-blue-600 text-white rounded-br-md'
+                          : 'bg-slate-100 text-slate-800 rounded-bl-md'
+                      )}>
+                        {msg.role === 'user'
+                          ? <p>{msg.content}</p>
+                          : <ReactMarkdown className="prose prose-sm max-w-none">{msg.content}</ReactMarkdown>
+                        }
+                      </div>
+                    )}
+                    {/* Tool calls indicator */}
+                    {msg.tool_calls?.some(tc => ['pending','running','in_progress'].includes(tc.status)) && (
+                      <div className="flex items-center gap-1 text-slate-400 text-xs ml-2 self-end">
+                        <Loader2 className="w-3 h-3 animate-spin" /> обработвам...
+                      </div>
+                    )}
+                  </div>
+                ))}
+                <div ref={messagesEndRef} />
+              </div>
+
+              {/* Input */}
+              <div className="flex gap-2 px-4 py-3 border-t border-slate-100">
+                <input
+                  type="text"
+                  value={inputText}
+                  onChange={(e) => setInputText(e.target.value)}
+                  onKeyDown={(e) => e.key === 'Enter' && handleSendMessage()}
+                  placeholder="Напишете въпрос..."
+                  className="flex-1 text-sm border border-slate-200 rounded-full px-4 py-2 outline-none focus:border-blue-400"
+                  disabled={isSending}
+                />
+                <button
+                  onClick={handleSendMessage}
+                  disabled={!inputText.trim() || isSending}
+                  className="w-9 h-9 rounded-full bg-blue-600 text-white flex items-center justify-center disabled:opacity-40 hover:bg-blue-700 transition-colors"
+                >
+                  {isSending ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
+                </button>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
 
       {/* Bottom Action Bar */}
       <div className="bg-white border-t border-slate-200 p-4 safe-area-bottom">
-        {callStatus === 'idle' && (
+        {!chatStarted && (
           <div className="space-y-3">
             <Button
-              onClick={handleStartCall}
+              onClick={handleStartChat}
               className="w-full bg-blue-600 hover:bg-blue-700 text-white rounded-full py-4 text-base font-semibold flex items-center justify-center gap-2"
             >
-              <PhoneCall className="w-5 h-5" />
+              <MessageSquare className="w-5 h-5" />
               Говорете с Вашия AI Съветник
             </Button>
             <Button
@@ -290,56 +372,18 @@ export default function FinancialPlanPresentation() {
           </div>
         )}
 
-        {callStatus === 'connecting' && (
-          <Button disabled className="w-full rounded-full py-4">
-            <Loader2 className="w-5 h-5 mr-2 animate-spin" />
-            Свързване с AI съветник...
-          </Button>
-        )}
-
-        {callStatus === 'connected' && (
-          <div className="flex gap-3">
-            <Button
-              onClick={() => setIsMuted(!isMuted)}
-              variant="outline"
-              className={cn('flex-1 rounded-full py-4', isMuted && 'bg-red-50 border-red-300 text-red-600')}
-            >
-              {isMuted ? <MicOff className="w-5 h-5" /> : <Mic className="w-5 h-5" />}
-            </Button>
-            <Button
-              onClick={handleEndCall}
-              className="flex-1 bg-red-600 hover:bg-red-700 text-white rounded-full py-4"
-            >
-              <PhoneOff className="w-5 h-5 mr-2" />
-              Край на разговора
-            </Button>
-          </div>
-        )}
-
-        {callStatus === 'ended' && (
+        {chatStarted && (
           <div className="space-y-3">
-            <p className="text-center text-sm text-slate-600">Разговорът приключи. Готови ли сте да продължите?</p>
             <Button
               onClick={handleProceedToApplication}
               className="w-full bg-green-600 hover:bg-green-700 text-white rounded-full py-4"
             >
               <CheckCircle2 className="w-5 h-5 mr-2" />
-              Да — продължи към заявление
+              Приемам плана — продължи към заявление
             </Button>
-            <Button onClick={handleStartCall} variant="outline" className="w-full rounded-full py-3">
-              Нов разговор
-            </Button>
-          </div>
-        )}
-
-        {callStatus === 'error' && (
-          <div className="space-y-2">
-            <div className="flex items-center gap-2 text-red-600 bg-red-50 rounded-xl p-3">
-              <AlertTriangle className="w-4 h-4 flex-shrink-0" />
-              <p className="text-sm">Неуспешна връзка. Моля опитайте отново.</p>
-            </div>
-            <Button onClick={handleStartCall} className="w-full rounded-full bg-blue-600 hover:bg-blue-700 text-white py-3">
-              Опитай отново
+            <Button onClick={handleEndChat} variant="outline" className="w-full rounded-full py-3 border-slate-300 text-slate-600">
+              <PhoneOff className="w-4 h-4 mr-2" />
+              Затвори чата
             </Button>
           </div>
         )}

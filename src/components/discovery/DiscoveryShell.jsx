@@ -27,14 +27,15 @@ function isDiscoveryActive(state) {
 
 // ─── Step definitions (mirrors FinancialAnalysis but with voice metadata) ────
 const DISCOVERY_STEPS = [
-  { id: 1,  section_id: 'consent',     title: 'Съгласие',          icon: ShieldCheck },
-  { id: 3,  section_id: 'housing',     title: 'Жилище',             icon: null },
-  { id: 4,  section_id: 'reserve',     title: 'Резерв',             icon: null },
-  { id: 5,  section_id: 'pension',     title: 'Пенсия',             icon: null },
-  { id: 6,  section_id: 'children',    title: 'Деца и цели',        icon: null },
-  { id: 7,  section_id: 'protection',  title: 'Защита',             icon: null },
-  { id: 8,  section_id: 'cashflow',    title: 'Финансов поток',     icon: null },
-  { id: 9,  section_id: 'priorities',  title: 'Приоритети',         icon: null },
+  { id: 1,  section_id: 'consent',       title: 'Съгласие',          icon: ShieldCheck },
+  { id: 2,  section_id: 'personal_data', title: 'Лични данни',       icon: null },
+  { id: 3,  section_id: 'housing',       title: 'Жилище',            icon: null },
+  { id: 4,  section_id: 'reserve',       title: 'Резерв',            icon: null },
+  { id: 5,  section_id: 'pension',       title: 'Пенсия',            icon: null },
+  { id: 6,  section_id: 'children',      title: 'Деца и цели',       icon: null },
+  { id: 7,  section_id: 'protection',    title: 'Защита',            icon: null },
+  { id: 8,  section_id: 'cashflow',      title: 'Финансов поток',    icon: null },
+  { id: 9,  section_id: 'priorities',    title: 'Приоритети',        icon: null },
 ];
 
 // ─── Reverification screen ────────────────────────────────────────────────────

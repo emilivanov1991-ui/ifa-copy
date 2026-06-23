@@ -63,6 +63,7 @@ const steps = [
 // Step components map for DiscoveryShell
 const STEP_COMPONENTS = {
   1: ConsentStep,
+  2: PersonalDataStep,
   3: HousingStep,
   4: ReserveStep,
   5: PensionStep,
@@ -806,8 +807,8 @@ export default function FinancialAnalysis() {
   const getIncompleteSteps = () => {
     const incomplete = [];
     for (let i = 1; i <= 9; i++) {
-      // Skip step 2 (archived Personal Data step)
-      if (i === 2) continue;
+      // In Discovery Shell (voice mode) step 2 is active; in classic mode it's skipped
+      if (i === 2 && !useDiscoveryShell) continue;
       if (!validateStep(i)) {
         incomplete.push(i);
       }

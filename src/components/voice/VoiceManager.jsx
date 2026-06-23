@@ -71,6 +71,31 @@ export function useVoiceManager(languageCode = 'bg') {
   const ttsUrlCache = useRef({});
 
   /**
+   * Play a URL directly (shared logic).
+   */
+  const playUrl = useCallback((url, avatarSt, nextStepId, onComplete) => {
+    let audio = audioCache[url];
+    if (!audio) { audio = new Audio(url); audioCache[url] = audio; }
+    else { audio.currentTime = 0; }
+    setAvatarState(avatarSt || 'talking');
+    setIsPlaying(true);
+    audio.onended = () => {
+      setIsPlaying(false); setAvatarState('listening');
+      currentAudioRef.current = null;
+      if (nextStepId) preloadStep(nextStepId);
+      onComplete?.();
+    };
+    audio.onerror = () => {
+      setIsPlaying(false); setAvatarState('listening');
+      currentAudioRef.current = null; onComplete?.();
+    };
+    currentAudioRef.current = audio;
+    audio.play().catch(() => {
+      setIsPlaying(false); setAvatarState('listening'); currentAudioRef.current = null;
+    });
+  }, [preloadStep]);
+
+  /**
    * Generate TTS for a text string via evaluateInteractionLogic, cache and play it.
    */
   const playTTS = useCallback((text, avatarSt, onComplete) => {
@@ -106,31 +131,6 @@ export function useVoiceManager(languageCode = 'bg') {
       onComplete?.();
     });
   }, [languageCode, playUrl]);
-
-  /**
-   * Play a URL directly (shared logic).
-   */
-  const playUrl = useCallback((url, avatarSt, nextStepId, onComplete) => {
-    let audio = audioCache[url];
-    if (!audio) { audio = new Audio(url); audioCache[url] = audio; }
-    else { audio.currentTime = 0; }
-    setAvatarState(avatarSt || 'talking');
-    setIsPlaying(true);
-    audio.onended = () => {
-      setIsPlaying(false); setAvatarState('listening');
-      currentAudioRef.current = null;
-      if (nextStepId) preloadStep(nextStepId);
-      onComplete?.();
-    };
-    audio.onerror = () => {
-      setIsPlaying(false); setAvatarState('listening');
-      currentAudioRef.current = null; onComplete?.();
-    };
-    currentAudioRef.current = audio;
-    audio.play().catch(() => {
-      setIsPlaying(false); setAvatarState('listening'); currentAudioRef.current = null;
-    });
-  }, [preloadStep]);
 
   /**
    * Play audio for a step_id.

@@ -10,7 +10,7 @@ import {
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import AvatarFrame from '@/components/voice/AvatarFrame';
-import { useJourneyState } from '@/components/voice/JourneyStateManager';
+import { useJourneyState } from '@/components/voice/JourneyStateManager.jsx';
 import { createPageUrl } from '@/utils';
 
 const RETELL_API_KEY_SET = true; // Set to false until Retell key is configured
@@ -104,6 +104,7 @@ export default function FinancialPlanPresentation() {
         setAvatarState('talking');
 
         if (journeyId) {
+          // Route through backend state machine — validates transition
           await advanceState(journeyId, 'presentation_in_progress', {
             presentation_started_at: new Date().toISOString(),
             retell_call_id: response.data.call_id,

@@ -59,7 +59,7 @@ Deno.serve(async (req) => {
     const user = await base44.auth.me();
     if (!user) return Response.json({ error: 'Unauthorized' }, { status: 401 });
 
-    const { journey_id, to_state } = await req.json();
+    const { journey_id, to_state, extra_data = {} } = await req.json();
     if (!journey_id || !to_state) {
       return Response.json({ error: 'journey_id и to_state са задължителни.' }, { status: 400 });
     }
@@ -86,11 +86,18 @@ Deno.serve(async (req) => {
       }
     }
 
+    // Sanitize extra_data — never allow overriding core state fields
+    const PROTECTED_FIELDS = ['journey_state', 'previous_state', 'state_changed_at'];
+    const safeExtra = Object.fromEntries(
+      Object.entries(extra_data).filter(([k]) => !PROTECTED_FIELDS.includes(k))
+    );
+
     const updated = await base44.asServiceRole.entities.Journey.update(journey_id, {
       previous_state: fromState,
       journey_state: to_state,
       state_changed_at: new Date().toISOString(),
       last_activity_at: new Date().toISOString(),
+      ...safeExtra,
     });
 
     return Response.json({ success: true, journey: updated });

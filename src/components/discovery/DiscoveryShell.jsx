@@ -8,6 +8,7 @@ import {
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import AvatarFrame from '@/components/voice/AvatarFrame';
+import { useJourneyState } from '@/components/voice/JourneyStateManager';
 
 // ─── Journey state helpers ───────────────────────────────────────────────────
 const DISCOVERY_STATES_ORDER = [
@@ -173,6 +174,8 @@ function VoiceBar({ avatarState, caption, isMuted, onToggleMute, isLoading }) {
 
 // ─── Main DiscoveryShell ──────────────────────────────────────────────────────
 export default function DiscoveryShell({
+  // NOTE: all journey_state changes go through the backend journeyStateMachine.
+  // Never call base44.entities.Journey.update({ journey_state: ... }) directly.
   journey,
   onJourneyUpdate,
   formData,
@@ -202,6 +205,7 @@ export default function DiscoveryShell({
   const [isMuted, setIsMuted] = useState(false);
   const [showReverification, setShowReverification] = useState(false);
   const audioRef = useRef(null);
+  const { advanceState } = useJourneyState();
 
   // ── Reverification check on mount ─────────────────────────────────────────
   useEffect(() => {
@@ -264,16 +268,26 @@ export default function DiscoveryShell({
     setCurrentStep(stepId);
     window.scrollTo({ top: 0, behavior: 'smooth' });
 
-    // Update journey last_section_id
+    // Update journey last_section_id + ensure state is discovery_collecting
     if (journey?.id) {
       try {
-        const updated = await base44.entities.Journey.update(journey.id, {
-          last_section_id: step?.section_id,
-          journey_state: 'discovery_collecting',
-          last_activity_at: new Date().toISOString(),
-        });
+        const targetState = 'discovery_collecting';
+        const needsTransition = journey.journey_state !== targetState;
+        let updated;
+        if (needsTransition) {
+          // Route through backend state machine for the state change
+          updated = await advanceState(journey.id, targetState, {
+            last_section_id: step?.section_id,
+          });
+        } else {
+          // State is already correct — just update last_section_id (non-state field)
+          updated = await base44.entities.Journey.update(journey.id, {
+            last_section_id: step?.section_id,
+            last_activity_at: new Date().toISOString(),
+          });
+        }
         onJourneyUpdate?.(updated);
-      } catch { /* non-critical */ }
+      } catch { /* non-critical — voice/progress is enhancement, not blocker */ }
     }
 
     fireVoice(stepId, 'step_enter');
@@ -305,11 +319,10 @@ export default function DiscoveryShell({
   const handleReverificationConfirm = async (flags) => {
     setShowReverification(false);
     if (journey?.id) {
-      const updated = await base44.entities.Journey.update(journey.id, {
-        journey_state: 'discovery_collecting',
+      // Transition discovery_resumed_pending_reverification → discovery_collecting
+      const updated = await advanceState(journey.id, 'discovery_collecting', {
         reverification_flags: flags,
         reverification_completed: true,
-        last_activity_at: new Date().toISOString(),
       });
       onJourneyUpdate?.(updated);
     }
@@ -321,11 +334,10 @@ export default function DiscoveryShell({
     const firstDenied = DISCOVERY_STEPS.find(s => flags[s.section_id] === false);
     setShowReverification(false);
     if (journey?.id) {
-      const updated = await base44.entities.Journey.update(journey.id, {
-        journey_state: 'discovery_collecting',
+      // Transition to discovery_collecting, mark reverification_pending
+      const updated = await advanceState(journey.id, 'discovery_collecting', {
         reverification_flags: flags,
         reverification_pending: true,
-        last_activity_at: new Date().toISOString(),
       });
       onJourneyUpdate?.(updated);
     }

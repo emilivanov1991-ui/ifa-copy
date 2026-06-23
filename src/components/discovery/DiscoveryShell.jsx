@@ -204,6 +204,9 @@ export default function DiscoveryShell({
   const [showValidationErrors, setShowValidationErrors] = useState(false);
   const [isMuted, setIsMuted] = useState(false);
   const [showReverification, setShowReverification] = useState(false);
+  
+  // Calculate progress percent
+  const progressPercent = Math.round((completedSteps.length / DISCOVERY_STEPS.length) * 100);
   const { advanceState } = useJourneyState();
   const { contradictions, checkContradictions, clearContradictions } = useContradictionCheck();
 
@@ -265,26 +268,27 @@ export default function DiscoveryShell({
     setCurrentStep(stepId);
     window.scrollTo({ top: 0, behavior: 'smooth' });
 
-    // Update journey last_section_id + ensure state is discovery_collecting
+    // Update journey last_section_id + progress_percent + ensure state is discovery_collecting
     if (journey?.id) {
       try {
         const targetState = 'discovery_collecting';
         const needsTransition = journey.journey_state !== targetState;
+        const newProgress = Math.round((completedSteps.length / DISCOVERY_STEPS.length) * 100);
         let updated;
         if (needsTransition) {
-          // Route through backend state machine for the state change
           updated = await advanceState(journey.id, targetState, {
             last_section_id: step?.section_id,
+            discovery_progress_percent: newProgress,
           });
         } else {
-          // State is already correct — just update last_section_id (non-state field)
           updated = await base44.entities.Journey.update(journey.id, {
             last_section_id: step?.section_id,
+            discovery_progress_percent: newProgress,
             last_activity_at: new Date().toISOString(),
           });
         }
         onJourneyUpdate?.(updated);
-      } catch { /* non-critical — voice/progress is enhancement, not blocker */ }
+      } catch { /* non-critical */ }
     }
 
     fireVoice(stepId, 'step_enter');

@@ -137,14 +137,14 @@ Deno.serve(async (req) => {
     const fallbackKey = subEvent ? `fallback_${subEvent}` : null;
     const lang = contextData.languageCode || 'bg';
 
-    // Batch fetch: VoiceRulebook records + ResponseBandDefinition for dynamic band evaluation
-    const [stepRecords, fieldRecords, conditionalRecords, fallbackRecords, responseBands] = await Promise.all([
+    // Batch fetch: VoiceRulebook + ResponseBandDefinition + ResponseLogicDefinition for full rulebook evaluation
+    const [stepRecords, fieldRecords, conditionalRecords, fallbackRecords, responseBands, responseLogics] = await Promise.all([
       base44.asServiceRole.entities.VoiceRulebook.filter({ step_id: stepKey, language_code: lang }),
       fieldKey ? base44.asServiceRole.entities.VoiceRulebook.filter({ step_id: fieldKey, language_code: lang }) : Promise.resolve([]),
       base44.asServiceRole.entities.VoiceRulebook.filter({ trigger_type: 'response_band', language_code: lang }),
       fallbackKey ? base44.asServiceRole.entities.VoiceRulebook.filter({ step_id: fallbackKey, language_code: lang }) : Promise.resolve([]),
-      // Fetch active ResponseBandDefinitions for dynamic band matching
       base44.asServiceRole.entities.ResponseBandDefinition.filter({ language_code: lang, is_active: true }, 'priority', 50),
+      base44.asServiceRole.entities.ResponseLogicDefinition.filter({ language_code: lang, is_active: true }),
     ]);
 
     let result = null;
@@ -165,7 +165,49 @@ Deno.serve(async (req) => {
       result = resolve(stepRecords[0], event, contextData);
     }
 
-    // 3b. ResponseBandDefinition dynamic evaluation (DB-driven, replaces hardcoded bands)
+    // 3b. ResponseLogicDefinition evaluation (DB-driven metrics + bands)
+    if (!result && responseLogics.length > 0 && Object.keys(contextData).length > 0) {
+      const sortedLogics = [...responseLogics].sort((a, b) => (a.priority ?? 100) - (b.priority ?? 100));
+      for (const logic of sortedLogics) {
+        // Check if all depends_on_fields are present in contextData
+        const hasAllFields = (logic.depends_on_fields || []).every(f => contextData[f] !== undefined);
+        if (!hasAllFields) continue;
+
+        // Compute the output metric using formula
+        let metricValue = null;
+        if (logic.formula) {
+          try {
+            const expr = parser.parse(logic.formula);
+            metricValue = expr.evaluate(contextData);
+          } catch { /* skip invalid formulas */ }
+        }
+        if (metricValue === null) continue;
+
+        // Evaluate response_bands in priority order
+        const bands = (logic.response_bands || []).sort((a, b) => (a.priority ?? 100) - (b.priority ?? 100));
+        for (const band of bands) {
+          if (!band.expression) continue;
+          try {
+            const expr = parser.parse(band.expression);
+            const matched = expr.evaluate({ [logic.output_metric_name]: metricValue });
+            if (matched) {
+              result = {
+                text: interpolate(band.text_asset_key || band.band_id, contextData),
+                avatar_state: band.avatar_state || 'talking',
+                audio_url: null,
+                matched_band_id: band.band_id,
+                output_metric_name: logic.output_metric_name,
+                output_metric_value: metricValue,
+              };
+              break;
+            }
+          } catch { /* skip invalid expressions */ }
+        }
+        if (result) break;
+      }
+    }
+
+    // 3c. ResponseBandDefinition dynamic evaluation (legacy band format)
     if (!result && responseBands.length > 0 && Object.keys(contextData).length > 0) {
       const sorted = [...responseBands].sort((a, b) => (a.priority ?? 100) - (b.priority ?? 100));
       for (const band of sorted) {

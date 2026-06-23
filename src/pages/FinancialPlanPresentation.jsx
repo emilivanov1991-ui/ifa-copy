@@ -37,7 +37,8 @@ export default function FinancialPlanPresentation() {
   const [agentAvatarState, setAgentAvatarState] = useState('idle');
 
   const messagesEndRef = useRef(null);
-  const { advanceState } = useJourneyState();
+  // NOTE: advanceState removed — FinancialPlanPresentation may be accessed without auth
+  // Journey state advances via backend automations on application submit
 
   // Load plan data
   useEffect(() => {
@@ -104,11 +105,17 @@ export default function FinancialPlanPresentation() {
       });
       setConversation(conv);
 
-      // Advance journey state
+      // Advance journey state via direct entity update (no auth required for this page)
       if (journeyId) {
-        await advanceState(journeyId, 'presentation_in_progress', {
-          presentation_started_at: new Date().toISOString(),
-        });
+        try {
+          await base44.entities.Journey.update(journeyId, {
+            presentation_started_at: new Date().toISOString(),
+            journey_state: 'presentation_in_progress',
+            last_activity_at: new Date().toISOString(),
+          });
+        } catch (err) {
+          console.warn('Failed to update journey state (non-blocking):', err);
+        }
       }
 
       // Send initial context message
@@ -151,7 +158,14 @@ export default function FinancialPlanPresentation() {
 
   const handleProceedToApplication = async () => {
     if (journeyId) {
-      await advanceState(journeyId, 'application_collecting');
+      try {
+        await base44.entities.Journey.update(journeyId, {
+          journey_state: 'application_collecting',
+          last_activity_at: new Date().toISOString(),
+        });
+      } catch (err) {
+        console.warn('Failed to advance journey (non-blocking):', err);
+      }
     }
     window.location.href = createPageUrl('FinancialAnalysis') + `?journey_id=${journeyId}&mode=application`;
   };

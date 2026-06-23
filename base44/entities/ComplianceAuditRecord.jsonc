@@ -1,0 +1,88 @@
+{
+  "name": "ComplianceAuditRecord",
+  "type": "object",
+  "properties": {
+    "journey_id": {
+      "type": "string"
+    },
+    "user_id": {
+      "type": "string"
+    },
+    "rulebook_version": {
+      "type": "string"
+    },
+    "ruleset_hash": {
+      "type": "string"
+    },
+    "consent_record_ids": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "discovery_started_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "discovery_completed_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "last_activity_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "is_resumed_session": {
+      "type": "boolean",
+      "default": false
+    },
+    "reverification_performed": {
+      "type": "boolean",
+      "default": false
+    },
+    "reverified_sections": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "prompt_asset_refs": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "response_asset_refs": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "secure_log_ids": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "plan_generated_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "signing_session_id": {
+      "type": "string"
+    },
+    "payment_event_id": {
+      "type": "string"
+    },
+    "final_journey_state": {
+      "type": "string"
+    },
+    "notes": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "journey_id",
+    "user_id"
+  ]
+}

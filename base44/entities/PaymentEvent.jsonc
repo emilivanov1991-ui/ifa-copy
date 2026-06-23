@@ -1,0 +1,72 @@
+{
+  "name": "PaymentEvent",
+  "type": "object",
+  "properties": {
+    "journey_id": {
+      "type": "string"
+    },
+    "application_id": {
+      "type": "string"
+    },
+    "provider": {
+      "type": "string",
+      "enum": [
+        "stripe"
+      ],
+      "default": "stripe"
+    },
+    "stripe_payment_intent_id": {
+      "type": "string"
+    },
+    "stripe_checkout_session_id": {
+      "type": "string"
+    },
+    "amount": {
+      "type": "number"
+    },
+    "currency": {
+      "type": "string",
+      "default": "EUR"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "pending",
+        "processing",
+        "succeeded",
+        "failed",
+        "refunded",
+        "abandoned"
+      ],
+      "default": "pending"
+    },
+    "error_code": {
+      "type": "string"
+    },
+    "error_message": {
+      "type": "string"
+    },
+    "attempt_number": {
+      "type": "number",
+      "default": 1
+    },
+    "initiated_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "completed_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "webhook_received_at": {
+      "type": "string",
+      "format": "date-time"
+    }
+  },
+  "required": [
+    "journey_id",
+    "provider",
+    "amount",
+    "currency"
+  ]
+}

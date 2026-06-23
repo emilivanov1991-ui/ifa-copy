@@ -1,0 +1,59 @@
+{
+  "name": "ConsentRecord",
+  "type": "object",
+  "properties": {
+    "user_id": {
+      "type": "string"
+    },
+    "journey_id": {
+      "type": "string"
+    },
+    "consent_key": {
+      "type": "string",
+      "description": "References ConsentTemplate.consent_key"
+    },
+    "consent_version": {
+      "type": "string"
+    },
+    "language_code": {
+      "type": "string",
+      "enum": [
+        "bg",
+        "en"
+      ]
+    },
+    "given_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "source": {
+      "type": "string",
+      "enum": [
+        "web_app",
+        "mobile",
+        "consultant"
+      ],
+      "default": "web_app"
+    },
+    "ip_address": {
+      "type": "string"
+    },
+    "device_info": {
+      "type": "string"
+    },
+    "withdrawn_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "is_active": {
+      "type": "boolean",
+      "default": true
+    }
+  },
+  "required": [
+    "user_id",
+    "journey_id",
+    "consent_key",
+    "consent_version"
+  ]
+}

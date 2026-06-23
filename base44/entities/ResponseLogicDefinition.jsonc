@@ -1,0 +1,88 @@
+{
+  "name": "ResponseLogicDefinition",
+  "type": "object",
+  "properties": {
+    "response_logic_id": {
+      "type": "string",
+      "description": "e.g. 'reserve_adequacy', 'debt_ratio_check'"
+    },
+    "depends_on_fields": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "FinancialAnalysisSubmission field names required before evaluation"
+    },
+    "output_metric_name": {
+      "type": "string",
+      "description": "e.g. 'reserve_months', 'debt_to_income'"
+    },
+    "formula": {
+      "type": "string",
+      "description": "expr-eval expression to compute the metric"
+    },
+    "language_code": {
+      "type": "string",
+      "enum": [
+        "bg",
+        "en"
+      ],
+      "default": "bg"
+    },
+    "response_bands": {
+      "type": "array",
+      "description": "Ordered list of bands \u2014 first matching band wins",
+      "items": {
+        "type": "object",
+        "properties": {
+          "band_id": {
+            "type": "string"
+          },
+          "expression": {
+            "type": "string",
+            "description": "expr-eval condition on the computed metric"
+          },
+          "priority": {
+            "type": "number"
+          },
+          "text_asset_key": {
+            "type": "string",
+            "description": "Reference to LocalizedTextAsset.asset_key"
+          },
+          "audio_asset_id": {
+            "type": "string"
+          },
+          "avatar_state": {
+            "type": "string",
+            "enum": [
+              "talking",
+              "listening",
+              "thinking",
+              "celebrating",
+              "concerned",
+              "idle"
+            ]
+          },
+          "ui_highlight": {
+            "type": "string",
+            "description": "Optional UI element to highlight"
+          }
+        }
+      }
+    },
+    "is_active": {
+      "type": "boolean",
+      "default": true
+    },
+    "version": {
+      "type": "string",
+      "default": "1.0"
+    }
+  },
+  "required": [
+    "response_logic_id",
+    "depends_on_fields",
+    "output_metric_name",
+    "response_bands"
+  ]
+}

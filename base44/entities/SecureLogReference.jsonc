@@ -1,0 +1,62 @@
+{
+  "name": "SecureLogReference",
+  "type": "object",
+  "properties": {
+    "journey_id": {
+      "type": "string"
+    },
+    "user_id": {
+      "type": "string"
+    },
+    "log_type": {
+      "type": "string",
+      "enum": [
+        "voice_session",
+        "video_session",
+        "transcript",
+        "evrotrust_evidence",
+        "signing_document",
+        "health_data"
+      ],
+      "description": "Type of encrypted log"
+    },
+    "storage_provider": {
+      "type": "string",
+      "default": "s3_kms"
+    },
+    "encrypted_object_key": {
+      "type": "string",
+      "description": "Key in encrypted object storage \u2014 never the raw file"
+    },
+    "kms_key_id": {
+      "type": "string"
+    },
+    "content_hash": {
+      "type": "string",
+      "description": "SHA256 of the original file for integrity verification"
+    },
+    "file_size_bytes": {
+      "type": "number"
+    },
+    "retention_until": {
+      "type": "string",
+      "format": "date"
+    },
+    "access_roles": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Roles allowed to request a signed URL"
+    },
+    "created_at": {
+      "type": "string",
+      "format": "date-time"
+    }
+  },
+  "required": [
+    "journey_id",
+    "log_type",
+    "encrypted_object_key"
+  ]
+}

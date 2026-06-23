@@ -1,0 +1,72 @@
+{
+  "name": "SigningEvent",
+  "type": "object",
+  "properties": {
+    "journey_id": {
+      "type": "string"
+    },
+    "application_id": {
+      "type": "string"
+    },
+    "signing_session_id": {
+      "type": "string",
+      "description": "Evrotrust session ID"
+    },
+    "attempt_number": {
+      "type": "number",
+      "default": 1
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "pending",
+        "sent",
+        "signed_successful",
+        "declined",
+        "expired",
+        "error"
+      ],
+      "default": "pending"
+    },
+    "reason_code": {
+      "type": "string"
+    },
+    "message": {
+      "type": "string"
+    },
+    "document_refs": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "SecureLogReference IDs"
+    },
+    "signer_identity": {
+      "type": "string"
+    },
+    "started_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "finished_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "valid_until": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "webhook_received_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "is_idempotent_duplicate": {
+      "type": "boolean",
+      "default": false
+    }
+  },
+  "required": [
+    "journey_id",
+    "signing_session_id"
+  ]
+}

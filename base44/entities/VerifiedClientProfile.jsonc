@@ -1,0 +1,179 @@
+{
+  "name": "VerifiedClientProfile",
+  "type": "object",
+  "properties": {
+    "journey_id": {
+      "type": "string",
+      "description": "Reference to Journey"
+    },
+    "user_id": {
+      "type": "string",
+      "description": "Reference to User"
+    },
+    "analysis_id": {
+      "type": "string",
+      "description": "Reference to FinancialAnalysisSubmission"
+    },
+    "language_code": {
+      "type": "string",
+      "enum": [
+        "bg",
+        "en"
+      ],
+      "default": "bg"
+    },
+    "demographics": {
+      "type": "object",
+      "properties": {
+        "first_name": {
+          "type": "string"
+        },
+        "last_name": {
+          "type": "string"
+        },
+        "age": {
+          "type": "number"
+        },
+        "gender": {
+          "type": "string"
+        },
+        "birthdate": {
+          "type": "string",
+          "format": "date"
+        }
+      }
+    },
+    "family": {
+      "type": "object",
+      "properties": {
+        "marital_status": {
+          "type": "string"
+        },
+        "include_partner": {
+          "type": "boolean"
+        },
+        "partner_name": {
+          "type": "string"
+        },
+        "children_count": {
+          "type": "number"
+        },
+        "children_ages": {
+          "type": "array",
+          "items": {
+            "type": "number"
+          }
+        }
+      }
+    },
+    "income": {
+      "type": "object",
+      "properties": {
+        "client_monthly_net": {
+          "type": "number"
+        },
+        "partner_monthly_net": {
+          "type": "number"
+        },
+        "total_monthly": {
+          "type": "number"
+        },
+        "monthly_savings": {
+          "type": "number"
+        },
+        "income_source": {
+          "type": "string"
+        }
+      }
+    },
+    "assets": {
+      "type": "object",
+      "properties": {
+        "checking_account": {
+          "type": "number"
+        },
+        "savings": {
+          "type": "number"
+        },
+        "real_estate": {
+          "type": "number"
+        },
+        "other": {
+          "type": "number"
+        }
+      }
+    },
+    "liabilities": {
+      "type": "object",
+      "properties": {
+        "mortgage_balance": {
+          "type": "number"
+        },
+        "mortgage_monthly": {
+          "type": "number"
+        },
+        "consumer_loans": {
+          "type": "number"
+        },
+        "consumer_loans_monthly": {
+          "type": "number"
+        },
+        "total_monthly_debt": {
+          "type": "number"
+        }
+      }
+    },
+    "goals": {
+      "type": "object",
+      "properties": {
+        "reserve_months_desired": {
+          "type": "number"
+        },
+        "planning_housing_change": {
+          "type": "boolean"
+        },
+        "include_pension": {
+          "type": "boolean"
+        },
+        "include_children": {
+          "type": "boolean"
+        },
+        "risk_profile": {
+          "type": "string"
+        }
+      }
+    },
+    "risk_indicators": {
+      "type": "object",
+      "properties": {
+        "reserve_band": {
+          "type": "string"
+        },
+        "debt_to_income_ratio": {
+          "type": "number"
+        },
+        "savings_to_income_ratio": {
+          "type": "number"
+        },
+        "auto_sell_eligible": {
+          "type": "boolean"
+        }
+      }
+    },
+    "consent_version_ref": {
+      "type": "string"
+    },
+    "discovery_version_ref": {
+      "type": "string"
+    },
+    "approved_at": {
+      "type": "string",
+      "format": "date-time"
+    }
+  },
+  "required": [
+    "journey_id",
+    "user_id",
+    "analysis_id"
+  ]
+}

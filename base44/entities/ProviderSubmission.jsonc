@@ -1,0 +1,82 @@
+{
+  "name": "ProviderSubmission",
+  "type": "object",
+  "properties": {
+    "journey_id": {
+      "type": "string"
+    },
+    "client_id": {
+      "type": "string"
+    },
+    "application_id": {
+      "type": "string"
+    },
+    "provider_id": {
+      "type": "string"
+    },
+    "provider_name": {
+      "type": "string"
+    },
+    "submission_method": {
+      "type": "string",
+      "enum": [
+        "API_JSON",
+        "EMAIL",
+        "SFTP",
+        "PORTAL_DOWNLOAD_ONLY"
+      ],
+      "default": "EMAIL"
+    },
+    "idempotency_key": {
+      "type": "string",
+      "description": "UUIDv4 \u2014 generated once, reused on retries"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "pending",
+        "success",
+        "temporary_failure",
+        "permanent_failure"
+      ],
+      "default": "pending"
+    },
+    "attempt_number": {
+      "type": "number",
+      "default": 0
+    },
+    "max_attempts": {
+      "type": "number",
+      "default": 5
+    },
+    "last_attempt_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "next_attempt_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "response_code": {
+      "type": "string"
+    },
+    "response_body": {
+      "type": "string"
+    },
+    "error_message": {
+      "type": "string"
+    },
+    "submitted_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "notes": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "journey_id",
+    "provider_id",
+    "idempotency_key"
+  ]
+}

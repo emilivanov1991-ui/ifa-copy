@@ -1,0 +1,54 @@
+{
+  "name": "ConsentTemplate",
+  "type": "object",
+  "properties": {
+    "consent_key": {
+      "type": "string",
+      "description": "e.g. 'gdpr_analysis', 'marketing', 'third_party'"
+    },
+    "version": {
+      "type": "string",
+      "default": "1.0"
+    },
+    "language_code": {
+      "type": "string",
+      "enum": [
+        "bg",
+        "en"
+      ],
+      "default": "bg"
+    },
+    "title": {
+      "type": "string"
+    },
+    "full_text": {
+      "type": "string"
+    },
+    "purpose": {
+      "type": "string"
+    },
+    "valid_from": {
+      "type": "string",
+      "format": "date"
+    },
+    "valid_to": {
+      "type": "string",
+      "format": "date"
+    },
+    "is_mandatory": {
+      "type": "boolean",
+      "default": true
+    },
+    "is_active": {
+      "type": "boolean",
+      "default": true
+    }
+  },
+  "required": [
+    "consent_key",
+    "version",
+    "language_code",
+    "title",
+    "full_text"
+  ]
+}

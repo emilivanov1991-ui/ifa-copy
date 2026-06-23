@@ -1,0 +1,53 @@
+{
+  "name": "LocalizedTextAsset",
+  "type": "object",
+  "properties": {
+    "asset_key": {
+      "type": "string",
+      "description": "Unique key e.g. 'planner_step_1_intro', 'gdpr_title'"
+    },
+    "context": {
+      "type": "string",
+      "enum": [
+        "ui_label",
+        "avatar_script",
+        "form_helper",
+        "error_message",
+        "email_template",
+        "objection_response",
+        "sales_script"
+      ],
+      "description": "Where this text is used"
+    },
+    "language_code": {
+      "type": "string",
+      "enum": [
+        "bg",
+        "en"
+      ],
+      "default": "bg"
+    },
+    "text": {
+      "type": "string",
+      "description": "The localized text content"
+    },
+    "audio_asset_id": {
+      "type": "string",
+      "description": "Optional reference to PromptAudioAsset for TTS/prerecorded version"
+    },
+    "version": {
+      "type": "string",
+      "default": "1.0"
+    },
+    "is_active": {
+      "type": "boolean",
+      "default": true
+    }
+  },
+  "required": [
+    "asset_key",
+    "context",
+    "language_code",
+    "text"
+  ]
+}

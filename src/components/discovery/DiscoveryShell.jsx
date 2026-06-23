@@ -9,6 +9,7 @@ import {
 import { cn } from '@/lib/utils';
 import AvatarFrame from '@/components/voice/AvatarFrame';
 import { useJourneyState } from '@/components/voice/JourneyStateManager';
+import { useContradictionCheck } from '@/components/discovery/useContradictionCheck';
 
 // ─── Journey state helpers ───────────────────────────────────────────────────
 const DISCOVERY_STATES_ORDER = [
@@ -206,6 +207,7 @@ export default function DiscoveryShell({
   const [showReverification, setShowReverification] = useState(false);
   const audioRef = useRef(null);
   const { advanceState } = useJourneyState();
+  const { contradictions, checkContradictions, clearContradictions } = useContradictionCheck();
 
   // ── Reverification check on mount ─────────────────────────────────────────
   useEffect(() => {
@@ -264,6 +266,7 @@ export default function DiscoveryShell({
 
   const goToStep = useCallback(async (stepId) => {
     setShowValidationErrors(false);
+    clearContradictions();
     const step = DISCOVERY_STEPS.find(s => s.id === stepId);
     setCurrentStep(stepId);
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -357,6 +360,16 @@ export default function DiscoveryShell({
     });
   };
 
+  // ── Contradiction-aware onChange wrapper ───────────────────────────────────
+  const handleFormChange = useCallback((updates) => {
+    onFormChange?.(updates);
+    // Check contradictions for each changed field (debounced via useCallback, non-blocking)
+    const merged = { ...formData, ...updates };
+    Object.keys(updates).forEach(fieldName => {
+      checkContradictions(fieldName, merged);
+    });
+  }, [onFormChange, formData, checkContradictions]);
+
   const StepComponent = stepComponents?.[currentStep];
   const isLastStep = currentIndex === DISCOVERY_STEPS.length - 1;
   const isFirstStep = currentIndex === 0;
@@ -414,10 +427,30 @@ export default function DiscoveryShell({
               exit={{ opacity: 0, x: -20 }}
               transition={{ duration: 0.25 }}
             >
+              {/* Contradiction warnings */}
+              {contradictions.length > 0 && (
+                <div className="mb-4 space-y-2">
+                  {contradictions.map((c, i) => (
+                    <div
+                      key={i}
+                      className={cn(
+                        'flex items-start gap-2 p-3 rounded-xl text-sm',
+                        c.severity === 'error'
+                          ? 'bg-red-50 border border-red-200 text-red-700'
+                          : 'bg-amber-50 border border-amber-200 text-amber-800'
+                      )}
+                    >
+                      <AlertTriangle className="h-4 w-4 shrink-0 mt-0.5" />
+                      <span>{c.message}</span>
+                    </div>
+                  ))}
+                </div>
+              )}
+
               {StepComponent ? (
                 <StepComponent
                   data={formData}
-                  onChange={onFormChange}
+                  onChange={handleFormChange}
                   showErrors={showValidationErrors}
                   plannerData={plannerData}
                 />

@@ -1,21 +1,12 @@
 import { useCallback, useRef } from 'react';
 import { base44 } from '@/api/base44Client';
+import { getOrCreateDeviceId } from '@/lib/deviceId';
 
-const DEVICE_ID_KEY = 'ifa_device_id';
 const JOURNEY_ID_KEY = 'ifa_journey_id';
 const SESSION_MAX_DAYS = 14;
 
-/**
- * Generate or retrieve a persistent device ID stored in localStorage.
- */
-export function getDeviceId() {
-  let deviceId = localStorage.getItem(DEVICE_ID_KEY);
-  if (!deviceId) {
-    deviceId = 'dev_' + Math.random().toString(36).slice(2) + Date.now().toString(36);
-    localStorage.setItem(DEVICE_ID_KEY, deviceId);
-  }
-  return deviceId;
-}
+// Re-export for backwards compatibility
+export const getDeviceId = getOrCreateDeviceId;
 
 /**
  * All state transitions MUST go through the backend journeyStateMachine function.
@@ -51,7 +42,7 @@ export function useJourneyState() {
    * Implements the 14-day resume policy — transitions through state machine.
    */
   const createOrResumeJourney = useCallback(async (clientId, languageCode = 'bg') => {
-    const deviceId = getDeviceId();
+    const deviceId = getOrCreateDeviceId();
 
     // Look for the latest non-archived journey for this client
     const existing = await base44.entities.Journey.filter(
@@ -98,7 +89,7 @@ export function useJourneyState() {
     // Create new journey
     const newJourney = await base44.entities.Journey.create({
       client_id: clientId,
-      device_id: getDeviceId(),
+      device_id: getOrCreateDeviceId(),
       language_code: languageCode,
       journey_state: 'discovery_not_started',
       discovery_started_at: new Date().toISOString(),

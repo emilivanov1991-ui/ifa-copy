@@ -135,13 +135,16 @@ Deno.serve(async (req) => {
     const stepKey = `${flowType}_step_${currentStepId}`;
     const fieldKey = fieldId ? `${flowType}_field_${fieldId}_${event}` : null;
     const fallbackKey = subEvent ? `fallback_${subEvent}` : null;
+    const lang = contextData.languageCode || 'bg';
 
-    // Batch fetch relevant records
-    const [stepRecords, fieldRecords, conditionalRecords, fallbackRecords] = await Promise.all([
-      base44.entities.VoiceRulebook.filter({ step_id: stepKey, language_code: contextData.languageCode || 'bg' }),
-      fieldKey ? base44.entities.VoiceRulebook.filter({ step_id: fieldKey, language_code: contextData.languageCode || 'bg' }) : Promise.resolve([]),
-      base44.entities.VoiceRulebook.filter({ trigger_type: 'response_band', language_code: contextData.languageCode || 'bg' }),
-      fallbackKey ? base44.entities.VoiceRulebook.filter({ step_id: fallbackKey, language_code: contextData.languageCode || 'bg' }) : Promise.resolve([]),
+    // Batch fetch: VoiceRulebook records + ResponseBandDefinition for dynamic band evaluation
+    const [stepRecords, fieldRecords, conditionalRecords, fallbackRecords, responseBands] = await Promise.all([
+      base44.asServiceRole.entities.VoiceRulebook.filter({ step_id: stepKey, language_code: lang }),
+      fieldKey ? base44.asServiceRole.entities.VoiceRulebook.filter({ step_id: fieldKey, language_code: lang }) : Promise.resolve([]),
+      base44.asServiceRole.entities.VoiceRulebook.filter({ trigger_type: 'response_band', language_code: lang }),
+      fallbackKey ? base44.asServiceRole.entities.VoiceRulebook.filter({ step_id: fallbackKey, language_code: lang }) : Promise.resolve([]),
+      // Fetch active ResponseBandDefinitions for dynamic band matching
+      base44.asServiceRole.entities.ResponseBandDefinition.filter({ language_code: lang, is_active: true }, 'priority', 50),
     ]);
 
     let result = null;
@@ -160,6 +163,30 @@ Deno.serve(async (req) => {
     // 3. Step onenter
     if (!result && stepRecords.length > 0) {
       result = resolve(stepRecords[0], event, contextData);
+    }
+
+    // 3b. ResponseBandDefinition dynamic evaluation (DB-driven, replaces hardcoded bands)
+    if (!result && responseBands.length > 0 && Object.keys(contextData).length > 0) {
+      const sorted = [...responseBands].sort((a, b) => (a.priority ?? 100) - (b.priority ?? 100));
+      for (const band of sorted) {
+        if (!band.expression) continue;
+        try {
+          const expr = parser.parse(band.expression);
+          const matched = expr.evaluate(contextData);
+          if (matched) {
+            result = {
+              text: interpolate(band.ui_message || band.recommendation_text || band.band_label, contextData),
+              avatar_state: band.avatar_state || 'talking',
+              audio_url: null,
+              matched_band_id: band.band_id,
+              band_severity: band.severity,
+              triggers_graceful_stop: band.triggers_graceful_stop || false,
+              plan_flag: band.plan_flag || null,
+            };
+            break;
+          }
+        } catch { /* skip invalid expressions */ }
+      }
     }
 
     // 4. Fallback
@@ -186,7 +213,6 @@ Deno.serve(async (req) => {
     const nextStepId = advanceStep ? getNextStepId(currentStepId, flowType) : null;
 
     // ── TTS: always generate speech from resolved text ──────────────────────
-    const lang = contextData.languageCode || 'bg';
 
     if (result.text) {
       try {

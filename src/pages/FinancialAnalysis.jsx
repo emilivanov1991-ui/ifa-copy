@@ -18,7 +18,8 @@ import {
   Loader2,
   FileCheck,
   AlertTriangle,
-  Briefcase
+  Briefcase,
+  Volume2
 } from 'lucide-react';
 import { cn } from "@/lib/utils";
 import { createPageUrl } from '../utils';
@@ -42,6 +43,7 @@ import ProtectionStep from '../components/analysis/ProtectionStep';
 import FinancialFlowStep from '../components/analysis/FinancialFlowStep';
 import PrioritiesStep from '../components/analysis/PrioritiesStep';
 import ReferralsStep from '../components/analysis/ReferralsStep';
+import DiscoveryShell from '../components/discovery/DiscoveryShell';
 
 const steps = [
   { id: 1, title: 'Съгласие', icon: Shield },
@@ -55,7 +57,21 @@ const steps = [
   { id: 9, title: 'Обобщение', icon: FileCheck },
 ];
 
+// Step components map for DiscoveryShell
+const STEP_COMPONENTS = {
+  1: ConsentStep,
+  3: HousingStep,
+  4: ReserveStep,
+  5: PensionStep,
+  6: ChildrenGoalsStep,
+  7: ProtectionStep,
+  8: FinancialFlowStep,
+  9: PrioritiesStep,
+};
+
 export default function FinancialAnalysis() {
+  const [journey, setJourney] = useState(null);
+  const [useDiscoveryShell, setUseDiscoveryShell] = useState(false);
   const [currentStep, setCurrentStep] = useState(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
@@ -70,6 +86,33 @@ export default function FinancialAnalysis() {
     gdpr_consent_c: false,
     status: 'new'
   });
+
+  // Load Journey for the current client
+  useEffect(() => {
+    const storedData = localStorage.getItem('financialPlannerData');
+    if (!storedData) return;
+    const parsed = JSON.parse(storedData);
+    if (!parsed.client_id) return;
+
+    base44.entities.Journey.filter(
+      { client_id: parsed.client_id, is_archived: false },
+      '-created_date',
+      1
+    ).then(results => {
+      if (results.length > 0) {
+        setJourney(results[0]);
+      } else {
+        // Create new journey
+        base44.entities.Journey.create({
+          client_id: parsed.client_id,
+          language_code: 'bg',
+          journey_state: 'discovery_not_started',
+          discovery_started_at: new Date().toISOString(),
+          last_activity_at: new Date().toISOString(),
+        }).then(j => setJourney(j)).catch(() => {});
+      }
+    }).catch(() => {});
+  }, []);
 
   // Зареждане на данни от Financial Planner или resume на анализ
   useEffect(() => {
@@ -1265,6 +1308,19 @@ export default function FinancialAnalysis() {
 
   return (
     <div className="pt-20 min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
+      {/* Discovery Shell toggle */}
+      <motion.button
+        onClick={() => setUseDiscoveryShell(v => !v)}
+        whileHover={{ scale: 1.05 }}
+        whileTap={{ scale: 0.95 }}
+        className="fixed top-6 left-6 z-50 px-4 py-2 rounded-full flex items-center gap-2 transition-all duration-300 shadow-xl bg-white hover:bg-blue-50 text-slate-700 border-2 border-slate-200 hover:border-blue-400 group"
+      >
+        <Volume2 className="w-4 h-4 group-hover:text-blue-600 transition-colors" />
+        <span className="text-sm font-medium group-hover:text-blue-600 transition-colors">
+          {useDiscoveryShell ? 'Класически режим' : 'Гласов режим'}
+        </span>
+      </motion.button>
+
       {/* Return to Consultant Portal Button */}
       <motion.button
         onClick={() => window.location.href = createPageUrl('ConsultantPortal')}
@@ -1289,6 +1345,27 @@ export default function FinancialAnalysis() {
             Персонален <span className="font-semibold text-blue-600">Финансов</span> Анализ
           </h1>
         </motion.div>
+
+        {/* ── Discovery Shell (voice mode) ── */}
+        {useDiscoveryShell && (
+          <DiscoveryShell
+            journey={journey}
+            onJourneyUpdate={setJourney}
+            formData={formData}
+            onFormChange={handleChange}
+            plannerData={plannerData}
+            stepComponents={STEP_COMPONENTS}
+            validateStep={(stepId, data) => validateStep(stepId)}
+            canSubmit={canSubmit}
+            onSubmit={() => needsMoreReferrals ? setShowReferralsStep(true) : handleSubmit()}
+            isSubmitting={isSubmitting}
+            incompleteSteps={incompleteSteps.map(s => steps.find(st => st.id === s)?.title || s)}
+            languageCode="bg"
+          />
+        )}
+
+        {/* ── Classic mode ── */}
+        {!useDiscoveryShell && <>
 
         {/* Progress Steps */}
         <div className="mb-8 overflow-x-auto pb-2">
@@ -1442,6 +1519,9 @@ export default function FinancialAnalysis() {
             )}
           </div>
         </motion.div>
+
+        {/* end classic mode */}
+        </>}
 
         {/* Privacy Notice */}
         <p className="text-center text-sm text-slate-500 mt-6 font-light">

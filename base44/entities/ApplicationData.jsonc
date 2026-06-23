@@ -1,0 +1,261 @@
+{
+  "name": "ApplicationData",
+  "type": "object",
+  "properties": {
+    "journey_id": {
+      "type": "string",
+      "description": "Reference to Journey"
+    },
+    "plan_id": {
+      "type": "string",
+      "description": "Reference to FinancialPlan"
+    },
+    "client_id": {
+      "type": "string",
+      "description": "Reference to Client"
+    },
+    "user_id": {
+      "type": "string",
+      "description": "Reference to User"
+    },
+    "application_status": {
+      "type": "string",
+      "enum": [
+        "incomplete",
+        "ready_for_signing",
+        "signed",
+        "submitted_to_provider",
+        "approved_by_provider",
+        "rejected",
+        "policy_active"
+      ],
+      "default": "incomplete"
+    },
+    "selected_products": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "product_offer_id": {
+            "type": "string"
+          },
+          "provider": {
+            "type": "string"
+          },
+          "product_name": {
+            "type": "string"
+          },
+          "coverage_amount": {
+            "type": "number"
+          },
+          "monthly_premium": {
+            "type": "number"
+          },
+          "beneficiaries": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "type": "string"
+                },
+                "relationship": {
+                  "type": "string"
+                },
+                "percentage": {
+                  "type": "number"
+                }
+              }
+            }
+          },
+          "payment_frequency": {
+            "type": "string",
+            "enum": [
+              "monthly",
+              "quarterly",
+              "semiannual",
+              "annual"
+            ]
+          }
+        }
+      }
+    },
+    "beneficiary_data": {
+      "type": "object",
+      "properties": {
+        "primary_beneficiaries": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "full_name": {
+                "type": "string"
+              },
+              "egn": {
+                "type": "string"
+              },
+              "relationship": {
+                "type": "string"
+              },
+              "percentage": {
+                "type": "number"
+              }
+            }
+          }
+        },
+        "contingent_beneficiaries": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "full_name": {
+                "type": "string"
+              },
+              "egn": {
+                "type": "string"
+              },
+              "relationship": {
+                "type": "string"
+              },
+              "percentage": {
+                "type": "number"
+              }
+            }
+          }
+        }
+      }
+    },
+    "bank_account": {
+      "type": "object",
+      "properties": {
+        "account_holder": {
+          "type": "string"
+        },
+        "iban": {
+          "type": "string"
+        },
+        "bank_name": {
+          "type": "string"
+        },
+        "swift": {
+          "type": "string"
+        }
+      }
+    },
+    "payment_method": {
+      "type": "string",
+      "enum": [
+        "bank_transfer",
+        "credit_card",
+        "direct_debit"
+      ],
+      "default": "bank_transfer"
+    },
+    "contact_preferences": {
+      "type": "object",
+      "properties": {
+        "preferred_contact_method": {
+          "type": "string",
+          "enum": [
+            "email",
+            "phone",
+            "sms"
+          ]
+        },
+        "contact_time": {
+          "type": "string"
+        },
+        "language": {
+          "type": "string",
+          "enum": [
+            "bg",
+            "en"
+          ]
+        }
+      }
+    },
+    "additional_questions": {
+      "type": "object",
+      "additionalProperties": true,
+      "description": "Product-specific questions (e.g., health questionnaire refs)"
+    },
+    "health_questionnaire_status": {
+      "type": "string",
+      "enum": [
+        "not_started",
+        "in_progress",
+        "completed",
+        "requires_underwriting"
+      ],
+      "default": "not_started"
+    },
+    "health_questionnaire_ref": {
+      "type": "string",
+      "description": "Reference to external health questionnaire session"
+    },
+    "risk_class_assigned": {
+      "type": "number",
+      "enum": [
+        1,
+        2,
+        3
+      ],
+      "description": "Risk class assigned after health questionnaire"
+    },
+    "underwriting_notes": {
+      "type": "string"
+    },
+    "premium_adjustment": {
+      "type": "number",
+      "description": "Premium adjustment due to risk class (percentage)"
+    },
+    "documents_signed": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "document_type": {
+            "type": "string"
+          },
+          "document_url": {
+            "type": "string"
+          },
+          "signed_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "signing_session_id": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "payment_event_id": {
+      "type": "string",
+      "description": "Reference to PaymentEvent"
+    },
+    "provider_submission_id": {
+      "type": "string",
+      "description": "Reference to ProviderSubmission"
+    },
+    "policy_numbers": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Policy numbers assigned by providers after approval"
+    },
+    "activation_date": {
+      "type": "string",
+      "format": "date"
+    },
+    "notes": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "journey_id",
+    "plan_id",
+    "client_id"
+  ]
+}

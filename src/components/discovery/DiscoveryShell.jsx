@@ -209,11 +209,24 @@ export default function DiscoveryShell({
   const { advanceState } = useJourneyState();
   const { contradictions, checkContradictions, clearContradictions } = useContradictionCheck();
 
-  // ── Reverification check on mount ─────────────────────────────────────────
+  // ── On mount: advance from discovery_not_started → intro, fire voice ─────
   useEffect(() => {
-    if (journey?.journey_state === 'discovery_resumed_pending_reverification') {
+    if (!journey?.id) return;
+
+    if (journey.journey_state === 'discovery_not_started') {
+      advanceState(journey.id, 'discovery_intro_in_progress')
+        .then(updated => {
+          onJourneyUpdate?.(updated);
+          fireVoice(currentStep, 'step_enter');
+        })
+        .catch(() => fireVoice(currentStep, 'step_enter'));
+    } else if (journey.journey_state === 'discovery_resumed_pending_reverification') {
       setShowReverification(true);
+    } else {
+      // Already in progress — fire voice for current step
+      fireVoice(currentStep, 'step_enter');
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [journey?.id]);
 
   // ── Mark step done when valid ──────────────────────────────────────────────
@@ -361,13 +374,12 @@ export default function DiscoveryShell({
   };
 
   // ── Contradiction-aware onChange wrapper ───────────────────────────────────
-  const handleFormChange = useCallback((updates) => {
-    onFormChange?.(updates);
-    // Check contradictions for each changed field (debounced via useCallback, non-blocking)
-    const merged = { ...formData, ...updates };
-    Object.keys(updates).forEach(fieldName => {
-      checkContradictions(fieldName, merged);
-    });
+  // Step components call onChange(field, value) — forward to parent and check contradictions
+  const handleFormChange = useCallback((field, value) => {
+    onFormChange?.({ [field]: value });
+    // Non-blocking contradiction check against merged data
+    const merged = { ...formData, [field]: value };
+    checkContradictions(field, merged);
   }, [onFormChange, formData, checkContradictions]);
 
   const StepComponent = stepComponents?.[currentStep];

@@ -44,6 +44,7 @@ import FinancialFlowStep from '../components/analysis/FinancialFlowStep';
 import PrioritiesStep from '../components/analysis/PrioritiesStep';
 import ReferralsStep from '../components/analysis/ReferralsStep';
 import DiscoveryShell from '../components/discovery/DiscoveryShell';
+import { useJourneyState } from '../components/voice/JourneyStateManager';
 
 const steps = [
   { id: 1, title: 'Съгласие', icon: Shield },
@@ -72,6 +73,7 @@ const STEP_COMPONENTS = {
 export default function FinancialAnalysis() {
   const [journey, setJourney] = useState(null);
   const [useDiscoveryShell, setUseDiscoveryShell] = useState(false);
+  const { createOrResumeJourney } = useJourneyState();
   const [currentStep, setCurrentStep] = useState(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
@@ -87,31 +89,16 @@ export default function FinancialAnalysis() {
     status: 'new'
   });
 
-  // Load Journey for the current client
+  // Load Journey for the current client — always through state machine
   useEffect(() => {
     const storedData = localStorage.getItem('financialPlannerData');
     if (!storedData) return;
     const parsed = JSON.parse(storedData);
     if (!parsed.client_id) return;
 
-    base44.entities.Journey.filter(
-      { client_id: parsed.client_id, is_archived: false },
-      '-created_date',
-      1
-    ).then(results => {
-      if (results.length > 0) {
-        setJourney(results[0]);
-      } else {
-        // Create new journey
-        base44.entities.Journey.create({
-          client_id: parsed.client_id,
-          language_code: 'bg',
-          journey_state: 'discovery_not_started',
-          discovery_started_at: new Date().toISOString(),
-          last_activity_at: new Date().toISOString(),
-        }).then(j => setJourney(j)).catch(() => {});
-      }
-    }).catch(() => {});
+    createOrResumeJourney(parsed.client_id, 'bg')
+      .then(({ journey: j }) => setJourney(j))
+      .catch(() => {});
   }, []);
 
   // Зареждане на данни от Financial Planner или resume на анализ
@@ -1352,7 +1339,9 @@ export default function FinancialAnalysis() {
             journey={journey}
             onJourneyUpdate={setJourney}
             formData={formData}
-            onFormChange={handleChange}
+            onFormChange={({ ...updates }) => {
+              Object.entries(updates).forEach(([field, value]) => handleChange(field, value));
+            }}
             plannerData={plannerData}
             stepComponents={STEP_COMPONENTS}
             validateStep={(stepId, data) => validateStep(stepId)}

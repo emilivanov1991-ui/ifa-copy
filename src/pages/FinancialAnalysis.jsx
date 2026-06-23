@@ -44,6 +44,7 @@ import FinancialFlowStep from '../components/analysis/FinancialFlowStep';
 import PrioritiesStep from '../components/analysis/PrioritiesStep';
 import ReferralsStep from '../components/analysis/ReferralsStep';
 import DiscoveryShell from '../components/discovery/DiscoveryShell';
+import AnalysisSuccessScreen from '../components/analysis/AnalysisSuccessScreen';
 import { useJourneyState } from '../components/voice/JourneyStateManager';
 import GuideAvatar from '../components/GuideAvatar';
 
@@ -1216,149 +1217,7 @@ export default function FinancialAnalysis() {
   };
 
   if (isSubmitted) {
-    return (
-      <div className="pt-20 min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
-        <div className="max-w-3xl mx-auto px-6 py-24">
-          <motion.div
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            className="bg-white rounded-2xl shadow-xl p-12"
-          >
-            <div className="w-20 h-20 rounded-full bg-green-100 flex items-center justify-center mx-auto mb-6">
-              <CheckCircle className="h-10 w-10 text-green-600" />
-            </div>
-            <h2 className="text-3xl font-semibold text-slate-900 mb-4 text-center">
-              Поздравления! 🎉
-            </h2>
-            <p className="text-lg text-slate-700 mb-2 text-center font-medium">
-              Вашият финансов анализ е завършен успешно!
-            </p>
-            <p className="text-slate-600 mb-8 text-center">
-              Досието Ви е запазено и готово за преглед от Вашия консултант.
-            </p>
-
-            <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl p-6 mb-8 border border-blue-100">
-              <p className="text-slate-700 font-medium mb-4 text-center">Какво предпочитате да направим сега?</p>
-              
-              <div className="grid md:grid-cols-2 gap-4">
-                {/* Option 1: Generate & View Financial Plan */}
-                <motion.div
-                  whileHover={{ scale: 1.02 }}
-                  className="bg-white rounded-xl p-6 border-2 border-blue-300 hover:border-blue-500 transition-all cursor-pointer shadow-sm hover:shadow-md"
-                  onClick={async () => {
-                    if (!analysisRecordId) {
-                      alert('Грешка: Анализът не е запазен. Моля опитайте отново.');
-                      return;
-                    }
-                    try {
-                      // Generate financial plan
-                      const result = await base44.functions.invoke('generateFinancialPlan', {
-                        analysis_id: analysisRecordId,
-                      });
-                      
-                      if (result.plan_id) {
-                        // Redirect to Financial Plan View
-                        window.location.href = createPageUrl('FinancialPlanView') + `?id=${result.plan_id}`;
-                      } else {
-                        alert('Грешка при генериране на плана. Моля опитайте отново.');
-                      }
-                    } catch (error) {
-                      console.error('Plan generation error:', error);
-                      alert('Грешка: ' + (error.message || 'Неуспешно генериране на плана'));
-                    }
-                  }}
-                >
-                  <div className="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center mb-4 mx-auto">
-                    <BarChart3 className="h-6 w-6 text-blue-600" />
-                  </div>
-                  <h3 className="font-semibold text-slate-900 mb-2 text-center">Виж финансовия план</h3>
-                  <p className="text-sm text-slate-600 text-center">
-                    Прегледайте вашия персонализиран финансов план веднага
-                  </p>
-                  <Button className="w-full mt-4 bg-blue-600 hover:bg-blue-700">
-                    Генерирай план
-                  </Button>
-                </motion.div>
-
-                {/* Option 2: Schedule Meeting */}
-                <div className="bg-white rounded-xl p-6 border-2 border-green-300 shadow-sm">
-                  <div className="w-12 h-12 rounded-full bg-green-100 flex items-center justify-center mb-4 mx-auto">
-                    <Shield className="h-6 w-6 text-green-600" />
-                  </div>
-                  <h3 className="font-semibold text-slate-900 mb-2 text-center">Насрочете среща</h3>
-                  <p className="text-sm text-slate-600 text-center mb-4">
-                    Изберете дата и час за следващата ни среща
-                  </p>
-                  <div className="space-y-3">
-                    <div>
-                      <label className="text-xs font-medium text-slate-600 mb-1 block">Дата</label>
-                      <input
-                        type="date"
-                        min={new Date(Date.now() + 86400000).toISOString().split('T')[0]}
-                        value={formData.next_meeting_date || ''}
-                        onChange={(e) => {
-                          const val = e.target.value;
-                          setFormData(prev => {
-                            const updated = { ...prev, next_meeting_date: val, next_meeting_datetime: val && prev.next_meeting_time ? `${val}T${prev.next_meeting_time}` : prev.next_meeting_datetime };
-                            return updated;
-                          });
-                        }}
-                        className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-green-500"
-                      />
-                    </div>
-                    <div>
-                      <label className="text-xs font-medium text-slate-600 mb-1 block">Час</label>
-                      <input
-                        type="time"
-                        value={formData.next_meeting_time || ''}
-                        onChange={(e) => {
-                          const val = e.target.value;
-                          setFormData(prev => {
-                            const updated = { ...prev, next_meeting_time: val, next_meeting_datetime: prev.next_meeting_date && val ? `${prev.next_meeting_date}T${val}` : prev.next_meeting_datetime };
-                            return updated;
-                          });
-                        }}
-                        className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-green-500"
-                      />
-                    </div>
-                    {formData.next_meeting_datetime && (
-                      <p className="text-xs text-green-600 font-medium text-center">
-                        📅 {new Date(formData.next_meeting_datetime).toLocaleString('bg-BG', {
-                          day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit'
-                        })}
-                      </p>
-                    )}
-                  </div>
-                  <Button
-                    variant="outline"
-                    className="w-full mt-4 border-green-600 text-green-700 hover:bg-green-50"
-                    onClick={async () => {
-                      if (analysisRecordId && formData.next_meeting_datetime) {
-                        await base44.entities.FinancialAnalysisSubmission.update(analysisRecordId, {
-                          next_meeting_date: formData.next_meeting_date,
-                          next_meeting_time: formData.next_meeting_time,
-                          next_meeting_datetime: formData.next_meeting_datetime
-                        });
-                      }
-                      window.location.href = createPageUrl('Home');
-                    }}
-                  >
-                    Благодаря, довиждане
-                  </Button>
-                </div>
-              </div>
-            </div>
-
-            <div className="bg-slate-50 rounded-xl p-4 border border-slate-200">
-              <p className="text-xs text-slate-600 text-center">
-                💡 <span className="font-medium">Добре е да знаете:</span> Досието Ви е запазено и можете да го прегледате по всяко време от клиентския портал. 
-                Консултантът Ви ще има достъп до пълната информация.
-              </p>
-            </div>
-          </motion.div>
-        </div>
-      </div>
-    );
+    return <AnalysisSuccessScreen formData={formData} analysisRecordId={analysisRecordId} />;
   }
 
   return (

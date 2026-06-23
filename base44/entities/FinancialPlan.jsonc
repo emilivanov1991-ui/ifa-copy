@@ -10,6 +10,23 @@
       "type": "string",
       "description": "Reference to Client entity"
     },
+    "journey_id": {
+      "type": "string",
+      "description": "Reference to Journey"
+    },
+    "verified_profile_id": {
+      "type": "string",
+      "description": "Reference to VerifiedClientProfile \u2014 snapshot \u043f\u0440\u0438 \u0433\u0435\u043d\u0435\u0440\u0438\u0440\u0430\u043d\u0435"
+    },
+    "rulebook_version": {
+      "type": "string",
+      "description": "\u0412\u0435\u0440\u0441\u0438\u044f \u043d\u0430 \u043f\u0440\u0430\u0432\u0438\u043b\u0430\u0442\u0430 \u043f\u0440\u0438 \u0433\u0435\u043d\u0435\u0440\u0438\u0440\u0430\u043d\u0435",
+      "default": "3.0"
+    },
+    "ruleset_hash": {
+      "type": "string",
+      "description": "SHA256 fingerprint \u043d\u0430 rulebook + \u0432\u0445\u043e\u0434\u043d\u0438 \u0434\u0430\u043d\u043d\u0438 \u2014 \u0437\u0430 compliance audit"
+    },
     "plan_status": {
       "type": "string",
       "enum": [
@@ -85,12 +102,16 @@
               "term_life",
               "ul_investment",
               "education_plan",
-              "mlc_health",
+              "health_insurance",
+              "critical_illness",
               "pension_plan",
               "personal_accident"
             ]
           },
           "provider": {
+            "type": "string"
+          },
+          "product_name": {
             "type": "string"
           },
           "beneficiary": {
@@ -101,8 +122,16 @@
               "child1",
               "child2",
               "child3",
+              "child4",
+              "child5",
               "family"
             ]
+          },
+          "beneficiary_name": {
+            "type": "string"
+          },
+          "beneficiary_age": {
+            "type": "number"
           },
           "strategy": {
             "type": "string",
@@ -131,6 +160,9 @@
           "is_active": {
             "type": "boolean",
             "default": true
+          },
+          "details": {
+            "type": "object"
           }
         }
       }

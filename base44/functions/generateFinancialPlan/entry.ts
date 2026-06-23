@@ -833,7 +833,7 @@ Deno.serve(async (req) => {
     const user = await base44.auth.me();
     if (!user) return Response.json({ error: 'Unauthorized' }, { status: 401 });
 
-    const { analysis_id } = await req.json();
+    const { analysis_id, verified_profile_id, journey_id } = await req.json();
     if (!analysis_id) return Response.json({ error: 'analysis_id е задължително' }, { status: 400 });
 
     const analysisRows = await base44.asServiceRole.entities.FinancialAnalysisSubmission.filter({ id: analysis_id });
@@ -1636,7 +1636,29 @@ Deno.serve(async (req) => {
       }),
     };
 
+    // ruleset_hash — SHA256 на версия + тарифа (детерминистичен fingerprint)
+    const rulebookVersion = '3.0';
+    const rulebookPayload = `v${rulebookVersion}|${cAge}|${totalIncome}|${budgetAnnual}`;
+    const hashBuffer = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(rulebookPayload));
+    const ruleset_hash = Array.from(new Uint8Array(hashBuffer)).map(b => b.toString(16).padStart(2,'0')).join('');
+
+    // Допълни план с references
+    if (verified_profile_id) financialPlan.verified_profile_id = verified_profile_id;
+    if (journey_id) financialPlan.journey_id = journey_id;
+    financialPlan.rulebook_version = rulebookVersion;
+    financialPlan.ruleset_hash = ruleset_hash;
+
     const savedPlan = await base44.asServiceRole.entities.FinancialPlan.create(financialPlan);
+
+    // Запиши plan_id и ruleset_hash в Journey ако е подаден journey_id
+    if (journey_id) {
+      await base44.asServiceRole.entities.Journey.update(journey_id, {
+        plan_id: savedPlan.id,
+        ruleset_hash,
+        rulebook_version: rulebookVersion,
+        last_activity_at: new Date().toISOString(),
+      });
+    }
 
     for (const product of planProducts) {
       await base44.asServiceRole.entities.ProductOffer.create({

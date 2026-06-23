@@ -3,9 +3,12 @@ import { Button } from "@/components/ui/button";
 import { ChevronDown, ArrowRight } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useLanguage } from '../LanguageProvider';
+import { useNavigate } from 'react-router-dom';
+import { createPageUrl } from '@/utils';
 
 export default function HeroSection() {
   const { t } = useLanguage();
+  const navigate = useNavigate();
   const scrollToServices = () => {
     document.getElementById('services')?.scrollIntoView({ behavior: 'smooth' });
   };
@@ -66,6 +69,7 @@ export default function HeroSection() {
         >
           <Button 
             size="lg" 
+            onClick={() => navigate(createPageUrl('Onboarding'))}
             className="bg-blue-500 hover:bg-blue-600 text-white px-8 py-6 text-lg rounded-full transition-all duration-300 hover:scale-105 hover:shadow-xl hover:shadow-blue-500/25"
           >
             {t('Започни своята безплатна финансова консултация', 'Start Your Free Financial Consultation')}

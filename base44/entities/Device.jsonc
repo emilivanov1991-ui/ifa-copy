@@ -1,0 +1,42 @@
+{
+  "name": "Device",
+  "type": "object",
+  "properties": {
+    "device_id": {
+      "type": "string",
+      "description": "Unique device fingerprint from localStorage"
+    },
+    "user_id": {
+      "type": "string",
+      "description": "Reference to User entity \u2014 null for anonymous devices"
+    },
+    "device_info": {
+      "type": "string",
+      "description": "Browser/device info from navigator.userAgent"
+    },
+    "ip_address": {
+      "type": "string",
+      "description": "Last known IP address"
+    },
+    "last_seen_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Last activity timestamp"
+    },
+    "created_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "is_active": {
+      "type": "boolean",
+      "default": true
+    },
+    "active_journey_id": {
+      "type": "string",
+      "description": "Reference to current active Journey for this device"
+    }
+  },
+  "required": [
+    "device_id"
+  ]
+}

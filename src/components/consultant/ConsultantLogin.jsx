@@ -6,8 +6,12 @@ import { Label } from "@/components/ui/label";
 import { base44 } from '@/api/base44Client';
 import { Lock, User, Eye, EyeOff, AlertCircle } from 'lucide-react';
 
-function hashPassword(password) {
-  return btoa(password);
+async function hashPassword(password) {
+  const encoder = new TextEncoder();
+  const data = encoder.encode(password);
+  const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+  const hashArray = Array.from(new Uint8Array(hashBuffer));
+  return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
 }
 
 export default function ConsultantLogin({ onLogin }) {
@@ -22,15 +26,21 @@ export default function ConsultantLogin({ onLogin }) {
     setError('');
     setLoading(true);
 
-    const hash = hashPassword(password);
-    const accounts = await base44.entities.ConsultantAccount.filter({ username, password_hash: hash, is_active: true });
+    try {
+      const hash = await hashPassword(password);
+      const accounts = await base44.entities.ConsultantAccount.filter({ username, password_hash: hash, is_active: true });
 
-    if (accounts.length > 0) {
-      onLogin(accounts[0]);
-    } else {
-      setError('Грешно потребителско име или парола.');
+      if (accounts.length > 0) {
+        onLogin(accounts[0]);
+      } else {
+        setError('Грешно потребителско име или парола.');
+      }
+    } catch (err) {
+      setError('Грешка при влизане.');
+      console.error('Login error:', err);
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   };
 
   return (

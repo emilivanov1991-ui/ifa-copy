@@ -1642,6 +1642,60 @@ Deno.serve(async (req) => {
     const hashBuffer = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(rulebookPayload));
     const ruleset_hash = Array.from(new Uint8Array(hashBuffer)).map(b => b.toString(16).padStart(2,'0')).join('');
 
+    // ── ЗАПИС НА JsonRulebookVersion ЗА COMPLIANCE AUDIT ──
+    // Това е "конституцията" на правилата използвани при генерирането
+    const rulebookJson = {
+      version: rulebookVersion,
+      generated_at: new Date().toISOString(),
+      tariffs: {
+        TERM_LIFE_BASIC_RATES,
+        CI32_RATES,
+        CI40_COEFFICIENTS,
+        RISK_CLASS_1,
+        AV_CHARGE_TABLE,
+        PREMIUM_BONUS_TABLE,
+        CG_TARIFF,
+        CG_RULES,
+        UNIQA_EUROPA_TARIFFS,
+        GENERALI_BASIC_MONTHLY_EUR,
+        DZI_ZAKRILA_PLATINUM,
+        CHILD_FRACTURES_RATE,
+        CHILD_FRACTURES_AMOUNT,
+        CHILD_PROTECTION_COEFFICIENTS,
+        METLIFE_CARE_AGE_RATES,
+        ML_CARE_PACKAGES,
+        ML_CARE_RULES,
+        MORTALITY_QX,
+      },
+      optimization_rules: {
+        mortgage: { breakeven_months: 24, refinancing_costs_formula: "(remaining * 0.002) * 1.20 + 60 + 70" },
+        ceilings_mode_a: { ceiling_1: "income * 1.5 / 12", ceiling_2: "balance * 0.40" },
+        ceilings_mode_b: { ceiling_1: "income * 2.0 / 12", ceiling_2: "balance * 0.66" },
+      },
+      product_selection_hierarchy: ["ul_investment", "term_life", "dzi_zakrila"],
+      investment_goals: {
+        junior_target_age: 20,
+        pension_retirement_age: 65,
+        assumed_return: 0.08,
+        post_retirement_return: 0.04,
+      }
+    };
+
+    await base44.asServiceRole.entities.JsonRulebookVersion.create({
+      version: rulebookVersion,
+      ruleset_hash,
+      valid_from: new Date().toISOString().split('T')[0],
+      rulebook_json: rulebookJson,
+      changelog: 'v3.0 — Пълна тарифна интеграция (MetLife, Uniqa, Generali, DZI)',
+      is_active: true,
+      created_by: user.email || 'system',
+      approved_by: 'auto-approved',
+      approved_at: new Date().toISOString(),
+    }).catch(err => {
+      console.warn('JsonRulebookVersion запис неуспешен (non-blocking):', err.message);
+    });
+    // ───────────────────────────────────────────────────────
+
     // Допълни план с references
     if (verified_profile_id) financialPlan.verified_profile_id = verified_profile_id;
     if (journey_id) financialPlan.journey_id = journey_id;

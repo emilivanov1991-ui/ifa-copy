@@ -79,19 +79,11 @@ export function useVoiceManager(languageCode = 'bg') {
     const cacheKey = `${languageCode}:${text}`;
     const cachedUrl = ttsUrlCache.current[cacheKey];
 
-    const playUrl = (url) => {
-      let audio = audioCache[url];
-      if (!audio) { audio = new Audio(url); audioCache[url] = audio; }
-      else { audio.currentTime = 0; }
-      audio.onended = () => { setIsPlaying(false); setAvatarState('listening'); currentAudioRef.current = null; onComplete?.(); };
-      audio.onerror = () => { setIsPlaying(false); setAvatarState('listening'); currentAudioRef.current = null; onComplete?.(); };
-      currentAudioRef.current = audio;
-      audio.play().catch(() => { setIsPlaying(false); setAvatarState('listening'); currentAudioRef.current = null; });
-    };
+    if (cachedUrl) {
+      playUrl(cachedUrl, avatarSt || 'talking', null, onComplete);
+      return;
+    }
 
-    if (cachedUrl) { playUrl(cachedUrl); return; }
-
-    // Generate TTS via backend — evaluateInteractionLogic returns audio_url
     setAvatarState('thinking');
     base44.functions.invoke('evaluateInteractionLogic', {
       flowType: 'planner',
@@ -102,10 +94,8 @@ export function useVoiceManager(languageCode = 'bg') {
       const url = res?.data?.audio_url;
       if (url) {
         ttsUrlCache.current[cacheKey] = url;
-        setAvatarState(avatarSt || 'talking');
-        playUrl(url);
+        playUrl(url, avatarSt || 'talking', null, onComplete);
       } else {
-        // No URL returned — text-only, wait reading time
         setIsPlaying(false);
         setAvatarState('listening');
         onComplete?.();
@@ -115,78 +105,85 @@ export function useVoiceManager(languageCode = 'bg') {
       setAvatarState('listening');
       onComplete?.();
     });
-  }, [languageCode, stop]);
+  }, [languageCode, playUrl]);
 
   /**
-   * Play audio for a step_id. Falls back to TTS generation if no pre-recorded audio.
-   * @param {string} stepId - The step_id key in VoiceRulebook
-   * @param {function} onComplete - Optional callback when audio finishes
+   * Play a URL directly (shared logic).
+   */
+  const playUrl = useCallback((url, avatarSt, nextStepId, onComplete) => {
+    let audio = audioCache[url];
+    if (!audio) { audio = new Audio(url); audioCache[url] = audio; }
+    else { audio.currentTime = 0; }
+    setAvatarState(avatarSt || 'talking');
+    setIsPlaying(true);
+    audio.onended = () => {
+      setIsPlaying(false); setAvatarState('listening');
+      currentAudioRef.current = null;
+      if (nextStepId) preloadStep(nextStepId);
+      onComplete?.();
+    };
+    audio.onerror = () => {
+      setIsPlaying(false); setAvatarState('listening');
+      currentAudioRef.current = null; onComplete?.();
+    };
+    currentAudioRef.current = audio;
+    audio.play().catch(() => {
+      setIsPlaying(false); setAvatarState('listening'); currentAudioRef.current = null;
+    });
+  }, [preloadStep]);
+
+  /**
+   * Play audio for a step_id.
+   * 1. If rulebook entry has audio_url → play directly.
+   * 2. If rulebook entry has text_fallback → call evaluateInteractionLogic for TTS.
+   * 3. If no rulebook entry at all → call evaluateInteractionLogic by step_id directly.
    */
   const playStep = useCallback((stepId, onComplete) => {
-    if (!rulebookRef.current) return;
-    const entry = rulebookRef.current[stepId];
-    if (!entry) return;
-
-    // Stop any currently playing audio
     stop();
 
-    // Set avatar to talking state
-    setAvatarState(entry.avatar_state || 'talking');
-    setCurrentText(entry.text_fallback || '');
-    setIsPlaying(true);
+    // Determine flowType and stepNumber from stepId (e.g. "planner_step_3" → planner, 3)
+    const match = stepId.match(/^(planner|analysis)_step_(\d+)$/);
+    const flowType = match ? match[1] : 'planner';
+    const currentStepId = match ? parseInt(match[2]) : 0;
 
-    if (!entry.audio_url) {
-      // No pre-recorded audio — generate TTS from text_fallback
-      if (entry.text_fallback) {
-        playTTS(entry.text_fallback, entry.avatar_state, onComplete);
-      } else {
-        setIsPlaying(false);
-        setAvatarState('listening');
-        onComplete?.();
-      }
+    const entry = rulebookRef.current?.[stepId];
+
+    // Case 1: Pre-recorded audio in rulebook
+    if (entry?.audio_url) {
+      setCurrentText(entry.text_fallback || '');
+      playUrl(entry.audio_url, entry.avatar_state, entry.preload_next_step_id, onComplete);
+      if (entry.preload_next_step_id) preloadStep(entry.preload_next_step_id);
       return;
     }
 
-    // Use cached audio or create new
-    let audio = audioCache[entry.audio_url];
-    if (!audio) {
-      audio = new Audio(entry.audio_url);
-      audioCache[entry.audio_url] = audio;
-    } else {
-      audio.currentTime = 0;
-    }
+    // Case 2 & 3: Generate via backend (handles both text_fallback TTS and full DB lookup)
+    setAvatarState('thinking');
+    setIsPlaying(true);
+    if (entry?.text_fallback) setCurrentText(entry.text_fallback);
 
-    audio.onended = () => {
-      setIsPlaying(false);
-      setAvatarState('listening');
-      currentAudioRef.current = null;
-      // Preload next step in background
-      if (entry.preload_next_step_id) {
-        preloadStep(entry.preload_next_step_id);
+    base44.functions.invoke('evaluateInteractionLogic', {
+      flowType,
+      currentStepId,
+      event: 'step_enter',
+      contextData: { languageCode },
+    }).then(res => {
+      const data = res?.data;
+      if (data?.audio_url) {
+        if (data.text) setCurrentText(data.text);
+        // Cache audio_url back into rulebook so next time it plays instantly
+        if (entry) entry.audio_url = data.audio_url;
+        playUrl(data.audio_url, data.avatar_state || 'talking', null, onComplete);
+      } else if (data?.text) {
+        // Got text but no audio — use playTTS
+        setCurrentText(data.text);
+        playTTS(data.text, data.avatar_state || 'talking', onComplete);
+      } else {
+        setIsPlaying(false); setAvatarState('idle'); onComplete?.();
       }
-      onComplete?.();
-    };
-
-    audio.onerror = () => {
-      setIsPlaying(false);
-      setAvatarState('listening');
-      currentAudioRef.current = null;
-      onComplete?.();
-    };
-
-    currentAudioRef.current = audio;
-    audio.play().catch(() => {
-      // Autoplay blocked by browser - show text only
-      setIsPlaying(false);
-      setAvatarState('listening');
-      currentAudioRef.current = null;
+    }).catch(() => {
+      setIsPlaying(false); setAvatarState('idle'); onComplete?.();
     });
-
-    // Preload the next step while this one plays
-    if (entry.preload_next_step_id) {
-      preloadStep(entry.preload_next_step_id);
-    }
-  }, [stop, preloadStep]);
+  }, [stop, playUrl, preloadStep, playTTS, languageCode]);
 
   return { playStep, preloadStep, stop, avatarState, isPlaying, currentText };
 }

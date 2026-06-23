@@ -67,8 +67,58 @@ export function useVoiceManager(languageCode = 'bg') {
     audioCache[entry.audio_url] = audio;
   }, []);
 
+  // In-memory TTS cache: text → audio_url (avoids re-generating same phrase)
+  const ttsUrlCache = useRef({});
+
   /**
-   * Play audio for a step_id. Falls back to text display if no audio.
+   * Generate TTS for a text string via evaluateInteractionLogic, cache and play it.
+   */
+  const playTTS = useCallback((text, avatarSt, onComplete) => {
+    if (!text) { onComplete?.(); return; }
+
+    const cacheKey = `${languageCode}:${text}`;
+    const cachedUrl = ttsUrlCache.current[cacheKey];
+
+    const playUrl = (url) => {
+      let audio = audioCache[url];
+      if (!audio) { audio = new Audio(url); audioCache[url] = audio; }
+      else { audio.currentTime = 0; }
+      audio.onended = () => { setIsPlaying(false); setAvatarState('listening'); currentAudioRef.current = null; onComplete?.(); };
+      audio.onerror = () => { setIsPlaying(false); setAvatarState('listening'); currentAudioRef.current = null; onComplete?.(); };
+      currentAudioRef.current = audio;
+      audio.play().catch(() => { setIsPlaying(false); setAvatarState('listening'); currentAudioRef.current = null; });
+    };
+
+    if (cachedUrl) { playUrl(cachedUrl); return; }
+
+    // Generate TTS via backend — evaluateInteractionLogic returns audio_url
+    setAvatarState('thinking');
+    base44.functions.invoke('evaluateInteractionLogic', {
+      flowType: 'planner',
+      currentStepId: 0,
+      event: 'step_enter',
+      contextData: { languageCode, __tts_text: text },
+    }).then(res => {
+      const url = res?.data?.audio_url;
+      if (url) {
+        ttsUrlCache.current[cacheKey] = url;
+        setAvatarState(avatarSt || 'talking');
+        playUrl(url);
+      } else {
+        // No URL returned — text-only, wait reading time
+        setIsPlaying(false);
+        setAvatarState('listening');
+        onComplete?.();
+      }
+    }).catch(() => {
+      setIsPlaying(false);
+      setAvatarState('listening');
+      onComplete?.();
+    });
+  }, [languageCode, stop]);
+
+  /**
+   * Play audio for a step_id. Falls back to TTS generation if no pre-recorded audio.
    * @param {string} stepId - The step_id key in VoiceRulebook
    * @param {function} onComplete - Optional callback when audio finishes
    */
@@ -86,14 +136,14 @@ export function useVoiceManager(languageCode = 'bg') {
     setIsPlaying(true);
 
     if (!entry.audio_url) {
-      // Text-only fallback: show text, call onComplete after estimated reading time
-      const readingTime = (entry.duration_seconds || 3) * 1000;
-      const timeout = setTimeout(() => {
+      // No pre-recorded audio — generate TTS from text_fallback
+      if (entry.text_fallback) {
+        playTTS(entry.text_fallback, entry.avatar_state, onComplete);
+      } else {
         setIsPlaying(false);
         setAvatarState('listening');
         onComplete?.();
-      }, readingTime);
-      currentAudioRef.current = { pause: () => clearTimeout(timeout), currentTime: 0 };
+      }
       return;
     }
 

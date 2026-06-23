@@ -126,6 +126,23 @@ Deno.serve(async (req) => {
       advanceStep = false,         // whether to compute nextStepId
     } = body;
 
+    const lang = contextData.languageCode || 'bg';
+
+    // ── Direct TTS shortcut: if __tts_text is provided, skip DB lookup and go straight to TTS ──
+    if (contextData.__tts_text) {
+      const text = contextData.__tts_text;
+      let audio_url = null;
+      try {
+        const ttsResult = await base44.integrations.Core.GenerateSpeech({
+          text,
+          voice: lang === 'bg' ? 'storm' : 'river',
+          language_code: lang,
+        });
+        audio_url = ttsResult.url;
+      } catch { /* ignore */ }
+      return Response.json({ text, audio_url, avatar_state: 'talking', resolved: true });
+    }
+
     // ── Fetch matching rulebook records from VoiceRulebook entity ──────────
     // step_id format: "{flowType}_step_{stepId}" for step-level
     //                 "{flowType}_field_{fieldId}_{event}" for field-level
@@ -135,7 +152,6 @@ Deno.serve(async (req) => {
     const stepKey = `${flowType}_step_${currentStepId}`;
     const fieldKey = fieldId ? `${flowType}_field_${fieldId}_${event}` : null;
     const fallbackKey = subEvent ? `fallback_${subEvent}` : null;
-    const lang = contextData.languageCode || 'bg';
 
     // Batch fetch: VoiceRulebook + ResponseBandDefinition + ResponseLogicDefinition for full rulebook evaluation
     const [stepRecords, fieldRecords, conditionalRecords, fallbackRecords, responseBands, responseLogics] = await Promise.all([

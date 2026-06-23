@@ -1,0 +1,62 @@
+{
+  "name": "TariffTableVersion",
+  "type": "object",
+  "properties": {
+    "provider": {
+      "type": "string",
+      "description": "\u0417\u0430\u0441\u0442\u0440\u0430\u0445\u043e\u0432\u0430\u0442\u0435\u043b, e.g. 'MetLife', '\u0423\u041d\u0418\u041a\u0410', '\u0414\u0417\u0418', 'Generali'"
+    },
+    "product_type": {
+      "type": "string",
+      "description": "\u0422\u0438\u043f \u043f\u0440\u043e\u0434\u0443\u043a\u0442, e.g. 'term_life', 'ul_investment', 'health_insurance'"
+    },
+    "table_name": {
+      "type": "string",
+      "description": "\u0418\u043c\u0435 \u043d\u0430 \u0442\u0430\u0440\u0438\u0444\u043d\u0430\u0442\u0430 \u0442\u0430\u0431\u043b\u0438\u0446\u0430, e.g. 'TERM_LIFE_BASIC_RATES', 'UNIQA_EUROPA_TARIFFS'"
+    },
+    "version": {
+      "type": "string",
+      "description": "\u0412\u0435\u0440\u0441\u0438\u044f \u043d\u0430 \u0442\u0430\u0440\u0438\u0444\u0430\u0442\u0430, e.g. '2026.01'"
+    },
+    "effective_date": {
+      "type": "string",
+      "format": "date",
+      "description": "\u0414\u0430\u0442\u0430 \u043e\u0442 \u043a\u043e\u044f\u0442\u043e \u0442\u0430\u0440\u0438\u0444\u0430\u0442\u0430 \u0435 \u0432\u0430\u043b\u0438\u0434\u043d\u0430"
+    },
+    "table_json": {
+      "type": "object",
+      "description": "\u041f\u044a\u043b\u043d\u0430\u0442\u0430 \u0442\u0430\u0440\u0438\u0444\u043d\u0430 \u0442\u0430\u0431\u043b\u0438\u0446\u0430 \u043a\u0430\u0442\u043e JSON",
+      "additionalProperties": true
+    },
+    "currency": {
+      "type": "string",
+      "default": "EUR",
+      "enum": [
+        "EUR",
+        "BGN"
+      ]
+    },
+    "source_document": {
+      "type": "string",
+      "description": "\u0420\u0435\u0444\u0435\u0440\u0435\u043d\u0446\u0438\u044f \u043a\u044a\u043c \u0434\u043e\u043a\u0443\u043c\u0435\u043d\u0442 (\u0438\u043c\u0435/URL) \u043e\u0442 \u043a\u043e\u0439\u0442\u043e \u0435 \u0432\u0437\u0435\u0442\u0430 \u0442\u0430\u0440\u0438\u0444\u0430\u0442\u0430"
+    },
+    "is_active": {
+      "type": "boolean",
+      "default": true
+    },
+    "created_by": {
+      "type": "string"
+    },
+    "notes": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "provider",
+    "product_type",
+    "table_name",
+    "version",
+    "effective_date",
+    "table_json"
+  ]
+}

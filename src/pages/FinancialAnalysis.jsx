@@ -1154,6 +1154,57 @@ export default function FinancialAnalysis() {
       //   });
       // }
 
+      // ── Bridge to Journey State Machine ──────────────────────────
+      // Resolve the final analysis ID (may have just been created above)
+      const finalAnalysisId = analysisRecordId
+        || (plannerData?.client_id
+          ? (await base44.entities.FinancialAnalysisSubmission.filter(
+              { client_id: plannerData.client_id }, '-created_date', 1
+            ).then(r => r[0]?.id).catch(() => null))
+          : null);
+
+      if (journey?.id && finalAnalysisId) {
+        try {
+          // 1. Attach analysis_id to Journey (non-state field — direct update is allowed)
+          await base44.entities.Journey.update(journey.id, {
+            analysis_id: finalAnalysisId,
+            last_activity_at: new Date().toISOString(),
+          });
+
+          // 2. Advance to discovery_ready_for_review (if not already past it)
+          const currentState = journey.journey_state;
+          const discoveryStates = [
+            'discovery_not_started', 'discovery_intro_in_progress',
+            'discovery_collecting', 'discovery_resumed_pending_reverification',
+          ];
+          if (discoveryStates.includes(currentState)) {
+            await base44.functions.invoke('journeyStateMachine', {
+              journey_id: journey.id,
+              to_state: 'discovery_ready_for_review',
+              extra_data: { analysis_id: finalAnalysisId },
+            });
+          }
+
+          // 3. Immediately approve → triggers createVerifiedProfile automation
+          await base44.functions.invoke('journeyStateMachine', {
+            journey_id: journey.id,
+            to_state: 'analysis_approved',
+            extra_data: { analysis_id: finalAnalysisId },
+          });
+
+          // 4. Kick off plan generation (non-blocking — automation will also handle it)
+          base44.functions.invoke('createVerifiedProfile', {
+            journey_id: journey.id,
+            analysis_id: finalAnalysisId,
+          }).catch(() => { /* plan generation is async — errors handled by automation */ });
+
+        } catch (smError) {
+          // State machine errors are non-blocking for the user — plan will be retried by automation
+          console.warn('Journey state machine bridge error (non-blocking):', smError.message);
+        }
+      }
+      // ─────────────────────────────────────────────────────────────
+
       setIsSubmitting(false);
       setIsSubmitted(true);
     } catch (error) {

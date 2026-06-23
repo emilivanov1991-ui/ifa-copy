@@ -86,9 +86,17 @@ export function useJourneyState() {
       }
     }
 
+    // Resolve authenticated user_id
+    let userId = null;
+    try {
+      const me = await base44.auth.me();
+      userId = me?.id || null;
+    } catch { /* public/anonymous session — user_id stays null */ }
+
     // Create new journey
     const newJourney = await base44.entities.Journey.create({
       client_id: clientId,
+      user_id: userId,
       device_id: getOrCreateDeviceId(),
       language_code: languageCode,
       journey_state: 'discovery_not_started',

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useRef } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { base44 } from '@/api/base44Client';
 import { Button } from '@/components/ui/button';
@@ -10,6 +10,7 @@ import { cn } from '@/lib/utils';
 import AvatarFrame from '@/components/voice/AvatarFrame';
 import { useJourneyState } from '@/components/voice/JourneyStateManager';
 import { useContradictionCheck } from '@/components/discovery/useContradictionCheck';
+import { useVoiceManager } from '@/components/voice/VoiceManager';
 
 // ─── Journey state helpers ───────────────────────────────────────────────────
 const DISCOVERY_STATES_ORDER = [
@@ -200,14 +201,13 @@ export default function DiscoveryShell({
 
   const [completedSteps, setCompletedSteps] = useState([]);
   const [showValidationErrors, setShowValidationErrors] = useState(false);
-  const [avatarState, setAvatarState] = useState('idle');
-  const [voiceCaption, setVoiceCaption] = useState('');
-  const [isVoiceLoading, setIsVoiceLoading] = useState(false);
   const [isMuted, setIsMuted] = useState(false);
   const [showReverification, setShowReverification] = useState(false);
-  const audioRef = useRef(null);
   const { advanceState } = useJourneyState();
   const { contradictions, checkContradictions, clearContradictions } = useContradictionCheck();
+
+  // ── Voice engine — local-first from VoiceRulebook, TTS fallback via evaluateInteractionLogic ──
+  const { playStep, preloadStep, stop: stopVoice, avatarState, isPlaying, currentText } = useVoiceManager(languageCode);
 
   // ── On mount: advance from discovery_not_started → intro, fire voice ─────
   useEffect(() => {
@@ -236,43 +236,23 @@ export default function DiscoveryShell({
     }
   }, [formData, currentStep]);
 
-  // ── Fire voice on step enter ───────────────────────────────────────────────
-  const fireVoice = useCallback(async (stepId, event = 'step_enter') => {
+  // ── Fire voice on step enter — uses VoiceRulebook (pre-recorded/TTS) ──────
+  const fireVoice = useCallback((stepId) => {
     if (isMuted) return;
     const step = DISCOVERY_STEPS.find(s => s.id === stepId);
     if (!step) return;
+    // VoiceManager maps step_id → audio_url from VoiceRulebook entity
+    // Convention: analysis_step_<numeric_id> (e.g. analysis_step_3 for housing)
+    const voiceStepId = `analysis_step_${step.id}`;
+    playStep(voiceStepId);
 
-    setIsVoiceLoading(true);
-    setAvatarState('thinking');
-
-    try {
-      const ctx = buildContext(formData, plannerData, languageCode);
-      const res = await base44.functions.invoke('evaluateInteractionLogic', {
-        flowType: 'analysis',
-        currentStepId: `analysis_step_${stepId}`,
-        event,
-        contextData: ctx,
-        advanceStep: false,
-      });
-
-      const data = res?.data ?? {};
-      setVoiceCaption(data.text || '');
-      setAvatarState(data.avatar_state || 'talking');
-
-      if (data.audio_url && !isMuted) {
-        if (audioRef.current) {
-          audioRef.current.pause();
-        }
-        audioRef.current = new Audio(data.audio_url);
-        audioRef.current.play().catch(() => {});
-        audioRef.current.onended = () => setAvatarState('listening');
-      }
-    } catch {
-      setAvatarState('idle');
-    } finally {
-      setIsVoiceLoading(false);
+    // Preload the next step's audio in background
+    const nextIdx = DISCOVERY_STEPS.findIndex(s => s.id === stepId) + 1;
+    if (nextIdx < DISCOVERY_STEPS.length) {
+      const nextStep = DISCOVERY_STEPS[nextIdx];
+      preloadStep(`analysis_step_${nextStep.id}`);
     }
-  }, [formData, plannerData, languageCode, isMuted]);
+  }, [isMuted, playStep, preloadStep]);
 
   // ── Navigation ─────────────────────────────────────────────────────────────
   const currentIndex = DISCOVERY_STEPS.findIndex(s => s.id === currentStep);
@@ -365,10 +345,7 @@ export default function DiscoveryShell({
   // ── Mute toggle ────────────────────────────────────────────────────────────
   const handleToggleMute = () => {
     setIsMuted(m => {
-      if (!m && audioRef.current) {
-        audioRef.current.pause();
-        setAvatarState('idle');
-      }
+      if (!m) stopVoice();
       return !m;
     });
   };
@@ -398,10 +375,10 @@ export default function DiscoveryShell({
       {/* Voice bar */}
       <VoiceBar
         avatarState={avatarState}
-        caption={voiceCaption}
+        caption={currentText}
         isMuted={isMuted}
         onToggleMute={handleToggleMute}
-        isLoading={isVoiceLoading}
+        isLoading={isPlaying && !currentText}
       />
 
       {/* Reverification overlay */}

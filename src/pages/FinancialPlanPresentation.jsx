@@ -177,6 +177,7 @@ export default function FinancialPlanPresentation() {
             mode={callStatus === 'connected' ? 'live' : 'scripted'}
             compact={true}
           />
+          {/* GuideAvatar in top-left */}
           {callStatus === 'connected' && (
             <div className="flex items-center gap-1 text-green-600">
               <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />

@@ -45,6 +45,7 @@ import PrioritiesStep from '../components/analysis/PrioritiesStep';
 import ReferralsStep from '../components/analysis/ReferralsStep';
 import DiscoveryShell from '../components/discovery/DiscoveryShell';
 import { useJourneyState } from '../components/voice/JourneyStateManager';
+import GuideAvatar from '../components/GuideAvatar';
 
 const steps = [
   { id: 1, title: 'Съгласие', icon: Shield },
@@ -1346,6 +1347,13 @@ export default function FinancialAnalysis() {
 
   return (
     <div className="pt-20 min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
+      {/* Guide Avatar */}
+      <GuideAvatar
+        state={currentStep <= 3 ? 'talking' : currentStep <= 7 ? 'listening' : 'thinking'}
+        isActive={currentStep === 1}
+        tooltip="Вашият финансов водач"
+      />
+
       {/* Discovery Shell toggle */}
       <motion.button
         onClick={() => setUseDiscoveryShell(v => !v)}

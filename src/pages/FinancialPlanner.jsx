@@ -9,6 +9,7 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/component
 import { RotateCcw, Loader2, Lock, Unlock, HelpCircle, ArrowLeft, ShieldAlert, Shield, ShieldCheck, Frown, Smile, PartyPopper, Home, HomeIcon, Car, GraduationCap, Wallet, TrendingUp, Briefcase, Baby, PiggyBank, Plane, Heart, Target, CheckCircle2, Calendar, Users, FileText, Info, User, XCircle, ArrowRight, Sparkles, ChevronDown, Search, Settings, Presentation, Handshake, Eye, Coins } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import GuideAvatar from '@/components/GuideAvatar';
+import { useVoiceManager } from '@/components/voice/VoiceManager';
 import { PlannerStep3, PlannerStep4, PlannerStep5 } from '@/components/planner/PlannerSteps345';
 import PlannerStep7 from '@/components/planner/PlannerStep7';
 import PlannerStep8 from '@/components/planner/PlannerStep8';
@@ -171,6 +172,8 @@ export default function FinancialPlanner() {
     housing: false,
     cash: false
   });
+
+  const { playStep, stop, avatarState, isPlaying, currentText } = useVoiceManager('bg');
 
   const [isGenerating, setIsGenerating] = useState(false);
   const [recentlyChanged, setRecentlyChanged] = useState(null);
@@ -396,6 +399,14 @@ export default function FinancialPlanner() {
       setLockedGoals(prev => ({ ...prev, [key]: true }));
     }
   };
+
+  // Play voice for current step
+  useEffect(() => {
+    if (!showIntroAnimation && !isGenerating) {
+      playStep(`planner_step_${currentStep}`);
+    }
+    return () => stop();
+  }, [currentStep, showIntroAnimation, isGenerating]);
 
   // Initialize allocations when entering step 6
   useEffect(() => {
@@ -728,9 +739,9 @@ export default function FinancialPlanner() {
       {/* Guide Avatar — top-left, follows current step */}
       {!showIntroAnimation && !isGenerating && (
         <GuideAvatar
-          state={currentStep <= 2 ? 'talking' : currentStep <= 5 ? 'listening' : currentStep <= 8 ? 'thinking' : 'celebrating'}
-          isActive={currentStep === 1 || currentStep === 9}
-          tooltip={currentStep <= 5 ? 'Вашият финансов водач' : 'Анализираме данните ви'}
+          state={avatarState}
+          isActive={isPlaying}
+          tooltip={currentText || (currentStep <= 5 ? 'Вашият финансов водач' : 'Анализираме данните ви')}
         />
       )}
 

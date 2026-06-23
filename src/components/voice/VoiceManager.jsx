@@ -22,6 +22,7 @@ export function useVoiceManager(languageCode = 'bg') {
   const [currentText, setCurrentText] = useState('');
   const currentAudioRef = useRef(null);
   const rulebookRef = useRef(null);
+  const prefetchStepRef = useRef(null);
 
   // Load entire rulebook for this language once on mount
   useEffect(() => {
@@ -36,6 +37,11 @@ export function useVoiceManager(languageCode = 'bg') {
         entries.forEach(e => { map[e.step_id] = e; });
         rulebookCache[cacheKey] = map;
         rulebookRef.current = map;
+        // Eagerly prefetch step 1 for both flows so first interaction is instant
+        setTimeout(() => {
+          prefetchStepRef.current?.('planner_step_1');
+          prefetchStepRef.current?.('analysis_step_1');
+        }, 500);
       })
       .catch(() => {
         // Silently fail - voice is enhancement, not critical path
@@ -132,21 +138,84 @@ export function useVoiceManager(languageCode = 'bg') {
     });
   }, [languageCode, playUrl]);
 
-  /**
-   * Play audio for a step_id.
-   * 1. If rulebook entry has audio_url → play directly.
-   * 2. If rulebook entry has text_fallback → call evaluateInteractionLogic for TTS.
-   * 3. If no rulebook entry at all → call evaluateInteractionLogic by step_id directly.
-   */
-  const playStep = useCallback((stepId, onComplete) => {
-    stop();
+  // Keep ref in sync so the rulebook useEffect can call prefetchStep
+  useEffect(() => { prefetchStepRef.current = prefetchStep; });
 
-    // Determine flowType and stepNumber from stepId (e.g. "planner_step_3" → planner, 3)
+  // Cache for pre-fetched TTS per stepId (stepId → audio_url)
+  const stepAudioCache = useRef({});
+
+  /**
+   * Prefetch TTS audio for a stepId in the background without playing.
+   * Call this while user is on the CURRENT step to prepare the NEXT step.
+   */
+  const prefetchStep = useCallback((stepId) => {
+    if (!stepId) return;
+    if (stepAudioCache.current[stepId]) return; // already cached
+
     const match = stepId.match(/^(planner|analysis)_step_(\d+)$/);
     const flowType = match ? match[1] : 'planner';
     const currentStepId = match ? parseInt(match[2]) : 0;
 
     const entry = rulebookRef.current?.[stepId];
+
+    // If pre-recorded audio exists, just preload the audio file
+    if (entry?.audio_url) {
+      stepAudioCache.current[stepId] = { audio_url: entry.audio_url, text: entry.text_fallback || '', avatar_state: entry.avatar_state };
+      if (!audioCache[entry.audio_url]) {
+        const audio = new Audio(entry.audio_url);
+        audio.preload = 'auto';
+        audioCache[entry.audio_url] = audio;
+      }
+      return;
+    }
+
+    // No pre-recorded audio — generate TTS in background
+    base44.functions.invoke('evaluateInteractionLogic', {
+      flowType,
+      currentStepId,
+      event: 'step_enter',
+      contextData: { languageCode },
+    }).then(res => {
+      const data = res?.data;
+      if (data?.audio_url) {
+        stepAudioCache.current[stepId] = { audio_url: data.audio_url, text: data.text || '', avatar_state: data.avatar_state || 'talking' };
+        // Also update rulebook entry for future use
+        if (entry) entry.audio_url = data.audio_url;
+        // Preload into browser audio cache
+        if (!audioCache[data.audio_url]) {
+          const audio = new Audio(data.audio_url);
+          audio.preload = 'auto';
+          audioCache[data.audio_url] = audio;
+        }
+      }
+    }).catch(() => { /* silent - prefetch is best-effort */ });
+  }, [languageCode]);
+
+  /**
+   * Play audio for a step_id.
+   * 1. If stepAudioCache has it → play instantly (no network call).
+   * 2. If rulebook entry has audio_url → play directly.
+   * 3. Otherwise → call evaluateInteractionLogic for TTS.
+   */
+  const playStep = useCallback((stepId, onComplete) => {
+    stop();
+
+    const match = stepId.match(/^(planner|analysis)_step_(\d+)$/);
+    const flowType = match ? match[1] : 'planner';
+    const currentStepId = match ? parseInt(match[2]) : 0;
+
+    const entry = rulebookRef.current?.[stepId];
+
+    // Case 0: Already prefetched — play instantly
+    const prefetched = stepAudioCache.current[stepId];
+    if (prefetched?.audio_url) {
+      if (prefetched.text) setCurrentText(prefetched.text);
+      playUrl(prefetched.audio_url, prefetched.avatar_state || 'talking', null, onComplete);
+      // Prefetch next step
+      const nextMatch = stepId.match(/^(planner|analysis)_step_(\d+)$/);
+      if (nextMatch) prefetchStep(`${nextMatch[1]}_step_${parseInt(nextMatch[2]) + 1}`);
+      return;
+    }
 
     // Case 1: Pre-recorded audio in rulebook
     if (entry?.audio_url) {
@@ -156,7 +225,7 @@ export function useVoiceManager(languageCode = 'bg') {
       return;
     }
 
-    // Case 2 & 3: Generate via backend (handles both text_fallback TTS and full DB lookup)
+    // Case 2: Generate via backend
     setAvatarState('thinking');
     setIsPlaying(true);
     if (entry?.text_fallback) setCurrentText(entry.text_fallback);
@@ -170,11 +239,13 @@ export function useVoiceManager(languageCode = 'bg') {
       const data = res?.data;
       if (data?.audio_url) {
         if (data.text) setCurrentText(data.text);
-        // Cache audio_url back into rulebook so next time it plays instantly
+        // Cache for next time
+        stepAudioCache.current[stepId] = { audio_url: data.audio_url, text: data.text || '', avatar_state: data.avatar_state || 'talking' };
         if (entry) entry.audio_url = data.audio_url;
         playUrl(data.audio_url, data.avatar_state || 'talking', null, onComplete);
+        // Prefetch next step
+        if (nextMatch) prefetchStep(`${nextMatch[1]}_step_${parseInt(nextMatch[2]) + 1}`);
       } else if (data?.text) {
-        // Got text but no audio — use playTTS
         setCurrentText(data.text);
         playTTS(data.text, data.avatar_state || 'talking', onComplete);
       } else {
@@ -183,9 +254,11 @@ export function useVoiceManager(languageCode = 'bg') {
     }).catch(() => {
       setIsPlaying(false); setAvatarState('idle'); onComplete?.();
     });
-  }, [stop, playUrl, preloadStep, playTTS, languageCode]);
 
-  return { playStep, preloadStep, stop, avatarState, isPlaying, currentText };
+    const nextMatch = match;
+  }, [stop, playUrl, preloadStep, prefetchStep, playTTS, languageCode]);
+
+  return { playStep, preloadStep, prefetchStep, stop, avatarState, isPlaying, currentText };
 }
 
 export default useVoiceManager;

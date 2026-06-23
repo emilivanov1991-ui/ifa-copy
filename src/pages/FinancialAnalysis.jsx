@@ -1241,14 +1241,30 @@ export default function FinancialAnalysis() {
               <p className="text-slate-700 font-medium mb-4 text-center">Какво предпочитате да направим сега?</p>
               
               <div className="grid md:grid-cols-2 gap-4">
-                {/* Option 1: View Financial Plan Presentation */}
+                {/* Option 1: Generate & View Financial Plan */}
                 <motion.div
                   whileHover={{ scale: 1.02 }}
                   className="bg-white rounded-xl p-6 border-2 border-blue-300 hover:border-blue-500 transition-all cursor-pointer shadow-sm hover:shadow-md"
-                  onClick={() => {
-                    // Navigate to financial plan creation page with analysis preselected
-                    if (analysisRecordId) {
-                      window.location.href = createPageUrl('FinancialPlanCreate') + `?analysisId=${analysisRecordId}`;
+                  onClick={async () => {
+                    if (!analysisRecordId) {
+                      alert('Грешка: Анализът не е запазен. Моля опитайте отново.');
+                      return;
+                    }
+                    try {
+                      // Generate financial plan
+                      const result = await base44.functions.invoke('generateFinancialPlan', {
+                        analysis_id: analysisRecordId,
+                      });
+                      
+                      if (result.plan_id) {
+                        // Redirect to Financial Plan View
+                        window.location.href = createPageUrl('FinancialPlanView') + `?id=${result.plan_id}`;
+                      } else {
+                        alert('Грешка при генериране на плана. Моля опитайте отново.');
+                      }
+                    } catch (error) {
+                      console.error('Plan generation error:', error);
+                      alert('Грешка: ' + (error.message || 'Неуспешно генериране на плана'));
                     }
                   }}
                 >
@@ -1260,7 +1276,7 @@ export default function FinancialAnalysis() {
                     Прегледайте вашия персонализиран финансов план веднага
                   </p>
                   <Button className="w-full mt-4 bg-blue-600 hover:bg-blue-700">
-                    Продължи към презентация
+                    Генерирай план
                   </Button>
                 </motion.div>
 

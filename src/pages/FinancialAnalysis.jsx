@@ -47,6 +47,7 @@ import DiscoveryShell from '../components/discovery/DiscoveryShell';
 import AnalysisSuccessScreen from '../components/analysis/AnalysisSuccessScreen';
 import { useJourneyState } from '../components/voice/JourneyStateManager';
 import GuideAvatar from '../components/GuideAvatar';
+import { useVoiceManager } from '../components/voice/VoiceManager';
 
 const steps = [
   { id: 1, title: 'Съгласие', icon: Shield },
@@ -76,6 +77,7 @@ const STEP_COMPONENTS = {
 export default function FinancialAnalysis() {
   const [journey, setJourney] = useState(null);
   const [useDiscoveryShell, setUseDiscoveryShell] = useState(false);
+  const { playStep, avatarState, isPlaying, currentText } = useVoiceManager('bg');
   const { createOrResumeJourney } = useJourneyState();
   const [currentStep, setCurrentStep] = useState(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -91,6 +93,11 @@ export default function FinancialAnalysis() {
     gdpr_consent_c: false,
     status: 'new'
   });
+
+  // Play voice for current analysis step
+  useEffect(() => {
+    playStep(`analysis_step_${currentStep}`);
+  }, [currentStep]);
 
   // Load Journey for the current client — always through state machine
   useEffect(() => {
@@ -1225,9 +1232,9 @@ export default function FinancialAnalysis() {
     <div className="pt-20 min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
       {/* Guide Avatar */}
       <GuideAvatar
-        state={currentStep <= 3 ? 'talking' : currentStep <= 7 ? 'listening' : 'thinking'}
-        isActive={currentStep === 1}
-        tooltip="Вашият финансов водач"
+        state={avatarState}
+        isActive={isPlaying}
+        tooltip={currentText || "Вашият финансов водач"}
       />
 
       {/* Return to Consultant Portal Button */}

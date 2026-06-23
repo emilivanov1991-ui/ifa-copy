@@ -405,7 +405,6 @@ export default function FinancialPlanner() {
     if (!showIntroAnimation && !isGenerating) {
       playStep(`planner_step_${currentStep}`);
     }
-    return () => stop();
   }, [currentStep, showIntroAnimation, isGenerating]);
 
   // Initialize allocations when entering step 6

@@ -11,6 +11,7 @@ import {
 import { cn } from '@/lib/utils';
 import AvatarFrame from '@/components/voice/AvatarFrame';
 import { useJourneyState } from '@/components/voice/JourneyStateManager.jsx';
+import GuideAvatar from '@/components/GuideAvatar';
 import { createPageUrl } from '@/utils';
 
 const RETELL_API_KEY_SET = true; // Set to false until Retell key is configured
@@ -155,6 +156,11 @@ export default function FinancialPlanPresentation() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 flex flex-col">
+      <GuideAvatar
+        state={callStatus === 'connected' ? 'talking' : callStatus === 'connecting' ? 'thinking' : 'idle'}
+        isActive={callStatus === 'connected'}
+        tooltip="Вашият AI финансов съветник"
+      />
       {/* Header */}
       <div className="bg-white border-b border-slate-200 px-4 py-3 flex items-center justify-between shadow-sm">
         <div className="flex items-center gap-3">

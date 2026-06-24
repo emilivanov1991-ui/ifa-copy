@@ -17,6 +17,7 @@ import SigningStatusPoller from '@/components/application/SigningStatusPoller';
 import PaymentCheckout from '@/components/application/PaymentCheckout';
 import JourneyCompletedScreen from '@/components/application/JourneyCompletedScreen';
 import PlanProjectionsChart from '@/components/financial-plan/PlanProjectionsChart';
+import PDFPreviewSigning from '@/components/application/PDFPreviewSigning';
 
 const AGENT_NAME = 'presentation_advisor';
 
@@ -31,7 +32,7 @@ export default function FinancialPlanPresentation() {
   const [loading, setLoading] = useState(true);
   const [currentSection, setCurrentSection] = useState(0);
 
-  // Phase 5 state: 'presentation' | 'application' | 'signing' | 'payment'
+  // Phase 5 state: 'presentation' | 'application' | 'pdf_preview' | 'signing' | 'payment'
   const [phase, setPhase] = useState('presentation');
   const [applicationId, setApplicationId] = useState(null);
   const [signingEventId, setSigningEventId] = useState(null);
@@ -183,7 +184,7 @@ export default function FinancialPlanPresentation() {
 
   const handleApplicationComplete = (appId) => {
     setApplicationId(appId);
-    setPhase('signing');
+    setPhase('pdf_preview'); // Show PDF before signing
   };
 
   const handleSigningComplete = () => {
@@ -259,6 +260,34 @@ export default function FinancialPlanPresentation() {
             planId={planId}
             analysisData={analysisData}
             onComplete={handleApplicationComplete}
+          />
+        </div>
+      </div>
+    );
+  }
+
+  if (phase === 'pdf_preview') {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 flex flex-col">
+        <div className="bg-white border-b border-slate-200 px-4 py-3 flex items-center gap-3">
+          <img src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6925a960748714fa4828395a/258cedab0_output-onlinepngtools.png" alt="IFA" className="h-8 w-auto" />
+          <div>
+            <h1 className="text-sm font-bold text-slate-900">Преглед на документа</h1>
+            <p className="text-xs text-slate-500">Стъпка 2а от 3</p>
+          </div>
+        </div>
+        <div className="flex-1 p-4 overflow-y-auto pt-6">
+          <PDFPreviewSigning
+            planId={planId}
+            journeyId={journeyId}
+            applicationId={applicationId}
+            analysisData={analysisData}
+            onProceedToSigning={({ signingEventId: evId, signingUrl: evUrl }) => {
+              setSigningEventId(evId);
+              setSigningUrl(evUrl);
+              setPhase('signing');
+            }}
+            onFallback={() => setPhase('signing')}
           />
         </div>
       </div>

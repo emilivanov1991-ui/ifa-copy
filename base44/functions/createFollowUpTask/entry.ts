@@ -25,7 +25,7 @@ Deno.serve(async (req) => {
     // Get client data
     let client;
     if (journey.client_id) {
-      const clients = await base44.entities.Client.filter({ id: journey.client_id });
+      const clients = await base44.asServiceRole.entities.Client.filter({ id: journey.client_id });
       if (clients.length > 0) {
         client = clients[0];
       }
@@ -85,12 +85,23 @@ Deno.serve(async (req) => {
         reason_detail = journey.notes || 'Requires manual review';
     }
 
+    // Fallback: get client_email from FinancialAnalysisSubmission for anonymous journeys
+    let clientEmail = client?.email || journey.client_email || '';
+    let clientName = client ? `${client.first_name} ${client.last_name}` : '';
+    if (!clientEmail && journey.analysis_id) {
+      const analyses = await base44.asServiceRole.entities.FinancialAnalysisSubmission.filter({ id: journey.analysis_id });
+      if (analyses.length) {
+        clientEmail = analyses[0].client_email || '';
+        clientName = clientName || `${analyses[0].client_first_name || ''} ${analyses[0].client_last_name || ''}`.trim();
+      }
+    }
+
     // Create FollowUpTask
-    const task = await base44.entities.FollowUpTask.create({
+    const task = await base44.asServiceRole.entities.FollowUpTask.create({
       journey_id,
       client_id: client?.id || null,
-      client_name: client ? `${client.first_name} ${client.last_name}` : 'Unknown',
-      client_email: client?.email || journey.client_email || '',
+      client_name: clientName || 'Unknown',
+      client_email: clientEmail,
       client_phone: client?.phone || '',
       reason,
       reason_detail,

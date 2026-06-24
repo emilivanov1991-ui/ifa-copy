@@ -26,14 +26,15 @@ Deno.serve(async (req) => {
       console.log('Provider submission worker called without auth header');
     }
 
-    // Fetch pending provider submissions
-    const allPending = await base44.asServiceRole.entities.ProviderSubmission.filter({
-      status: 'pending',
-    });
-
-    // Filter: only those where next_attempt_at is in the past (or not set)
+    // Fetch pending AND temporary_failure submissions (both need retrying)
     const now = new Date();
-    const pendingSubmissions = allPending.filter(s =>
+    const [pendingBatch, retryBatch] = await Promise.all([
+      base44.asServiceRole.entities.ProviderSubmission.filter({ status: 'pending' }, '-created_date', 50),
+      base44.asServiceRole.entities.ProviderSubmission.filter({ status: 'temporary_failure' }, '-last_attempt_at', 50),
+    ]);
+
+    // Filter both: only those where next_attempt_at is in the past (or not set)
+    const pendingSubmissions = [...pendingBatch, ...retryBatch].filter(s =>
       !s.next_attempt_at || new Date(s.next_attempt_at) <= now
     );
 

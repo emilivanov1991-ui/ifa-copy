@@ -58,6 +58,28 @@ const EMAIL_TEMPLATES = {
 С уважение,
 Екипът на IFA`,
     },
+    graceful_stop: {
+      subject: 'Вашият финансов анализ е запазен — IFA',
+      body: (name) => `Уважаем/а ${name},
+
+Благодарим Ви, че отделихте времето за финансовия анализ с Integrity Financial Advisors!
+
+Запазихме всичките Ви данни. Един от нашите финансови съветници ще се свърже с Вас в рамките на 24 часа, за да обсъди следващите стъпки и да отговори на всички Ваши въпроси.
+
+С уважение,
+Екипът на IFA`,
+    },
+    user_rejected_plan: {
+      subject: 'Вашият финансов анализ е запазен — IFA',
+      body: (name) => `Уважаем/а ${name},
+
+Благодарим Ви, че отделихте времето за финансовия анализ с Integrity Financial Advisors!
+
+Запазихме всичките Ви данни. Един от нашите финансови съветници ще се свърже с Вас в рамките на 24 часа, за да обсъди следващите стъпки и да отговори на всички Ваши въпроси.
+
+С уважение,
+Екипът на IFA`,
+    },
     default: {
       subject: 'Вашето запитване е получено — IFA',
       body: (name) => `Уважаем/а ${name},
@@ -115,6 +137,28 @@ The IFA Team`,
 Unfortunately your payment was not processed successfully.
 
 Please don't worry — a consultant will contact you within 24 hours to resolve the situation.
+
+Best regards,
+The IFA Team`,
+    },
+    graceful_stop: {
+      subject: 'Your financial analysis has been saved — IFA',
+      body: (name) => `Dear ${name},
+
+Thank you for taking the time to complete the financial analysis with Integrity Financial Advisors!
+
+We have saved all your data. One of our financial advisors will contact you within 24 hours to discuss the next steps and answer any questions you may have.
+
+Best regards,
+The IFA Team`,
+    },
+    user_rejected_plan: {
+      subject: 'Your financial analysis has been saved — IFA',
+      body: (name) => `Dear ${name},
+
+Thank you for taking the time to complete the financial analysis with Integrity Financial Advisors!
+
+We have saved all your data. One of our financial advisors will contact you within 24 hours to discuss the next steps and answer any questions you may have.
 
 Best regards,
 The IFA Team`,

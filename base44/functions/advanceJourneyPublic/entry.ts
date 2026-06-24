@@ -12,6 +12,11 @@ const PUBLIC_ALLOWED_TRANSITIONS = [
   'presentation_in_progress',
   'presentation_stopped_boundary',
   'application_collecting',
+  'application_ready_for_signing',
+  'signing_in_progress',
+  'payment_in_progress',
+  'provider_submission_in_progress',
+  'completed',
   'graceful_stop',
 ];
 
@@ -40,11 +45,19 @@ Deno.serve(async (req) => {
 
     // Permitted transitions map (subset of journeyStateMachine)
     const ALLOWED = {
-      plan_ready:                ['presentation_intro_pending', 'graceful_stop'],
-      plan_auto_sell_blocked:    ['graceful_stop'],
-      presentation_intro_pending:['presentation_in_progress'],
-      presentation_in_progress:  ['application_collecting', 'presentation_stopped_boundary', 'graceful_stop'],
+      plan_ready:                    ['presentation_intro_pending', 'graceful_stop'],
+      plan_auto_sell_blocked:        ['graceful_stop'],
+      presentation_intro_pending:    ['presentation_in_progress'],
+      presentation_in_progress:      ['application_collecting', 'presentation_stopped_boundary', 'graceful_stop'],
       presentation_stopped_boundary: ['graceful_stop'],
+      application_collecting:        ['application_ready_for_signing', 'application_incomplete', 'graceful_stop'],
+      application_incomplete:        ['application_collecting', 'graceful_stop'],
+      application_ready_for_signing: ['signing_in_progress'],
+      signing_in_progress:           ['payment_in_progress', 'signing_failed'],
+      signing_failed:                ['signing_in_progress', 'graceful_stop'],
+      payment_in_progress:           ['provider_submission_in_progress', 'payment_failed'],
+      payment_failed:                ['payment_in_progress', 'graceful_stop'],
+      provider_submission_in_progress: ['completed', 'graceful_stop'],
     };
 
     const allowed = ALLOWED[fromState] || [];

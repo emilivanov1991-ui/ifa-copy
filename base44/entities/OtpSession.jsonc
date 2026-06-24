@@ -1,0 +1,48 @@
+{
+  "name": "OtpSession",
+  "type": "object",
+  "properties": {
+    "email": {
+      "type": "string",
+      "description": "Email address for OTP authentication"
+    },
+    "client_id": {
+      "type": "string",
+      "description": "Reference to Client entity"
+    },
+    "otp_code": {
+      "type": "string",
+      "description": "6-digit OTP code"
+    },
+    "expires_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When the OTP code expires (10 minutes from creation)"
+    },
+    "is_used": {
+      "type": "boolean",
+      "default": false,
+      "description": "Whether the OTP code has been used"
+    },
+    "used_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When the OTP code was used"
+    },
+    "attempt_count": {
+      "type": "number",
+      "default": 0,
+      "description": "Number of failed verification attempts"
+    },
+    "created_at": {
+      "type": "string",
+      "format": "date-time"
+    }
+  },
+  "required": [
+    "email",
+    "client_id",
+    "otp_code",
+    "expires_at"
+  ]
+}

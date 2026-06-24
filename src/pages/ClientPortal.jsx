@@ -20,8 +20,10 @@ import {
   AlertCircle,
   Loader2,
   Lock,
-  Eye,
-  EyeOff
+  Mail,
+  Key,
+  ArrowLeft,
+  Timer
 } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -44,10 +46,17 @@ export default function ClientPortal() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [currentUser, setCurrentUser] = useState(null);
   const [clientData, setClientData] = useState(null);
-  const [loginForm, setLoginForm] = useState({ username: '', password: '' });
+  
+  // OTP Login state
+  const [loginStep, setLoginStep] = useState('email'); // 'email' | 'otp'
+  const [email, setEmail] = useState('');
+  const [otpCode, setOtpCode] = useState('');
   const [loginError, setLoginError] = useState('');
-  const [isLoggingIn, setIsLoggingIn] = useState(false);
-  const [showPassword, setShowPassword] = useState(false);
+  const [isSendingOTP, setIsSendingOTP] = useState(false);
+  const [isVerifyingOTP, setIsVerifyingOTP] = useState(false);
+  const [otpSessionId, setOtpSessionId] = useState(null);
+  const [countdown, setCountdown] = useState(0);
+  const [attemptsRemaining, setAttemptsRemaining] = useState(5);
 
   // Check for saved session
   useEffect(() => {
@@ -56,12 +65,21 @@ export default function ClientPortal() {
       try {
         const session = JSON.parse(savedSession);
         setCurrentUser(session.user);
+        setClientData(session.clientData);
         setIsAuthenticated(true);
       } catch (e) {
         localStorage.removeItem('clientPortalSession');
       }
     }
   }, []);
+
+  // Countdown timer for OTP resend
+  useEffect(() => {
+    if (countdown > 0) {
+      const timer = setTimeout(() => setCountdown(countdown - 1), 1000);
+      return () => clearTimeout(timer);
+    }
+  }, [countdown]);
 
   // Fetch client data based on user email
   const { data: clients, isLoading: clientLoading } = useQuery({
@@ -100,45 +118,101 @@ export default function ClientPortal() {
     enabled: !!clientData?.id,
   });
 
-  const handleLogin = async (e) => {
+  const handleSendOTP = async (e) => {
     e.preventDefault();
     setLoginError('');
-    setIsLoggingIn(true);
+    setIsSendingOTP(true);
 
     try {
-      // Get all clients and find by email locally (to work around security rules)
-      const allClients = await base44.entities.Client.list();
-      const clients = allClients.filter(c => c.email === loginForm.username);
+      const response = await base44.functions.invoke('sendOTP', { email: email.toLowerCase() });
       
-      if (clients.length === 0) {
-        setLoginError('Невалидно потребителско име или парола');
-        setIsLoggingIn(false);
-        return;
+      if (response.data.success) {
+        setOtpSessionId(response.data.otp_session_id);
+        setLoginStep('otp');
+        setCountdown(60); // 60 seconds resend cooldown
+        setAttemptsRemaining(5);
+      } else {
+        setLoginError(response.data.error || 'Грешка при изпращане на код');
       }
-
-      const client = clients[0];
-      
-      // Check password (stored in client record)
-      if (client.portal_password !== loginForm.password) {
-        setLoginError('Невалидно потребителско име или парола');
-        setIsLoggingIn(false);
-        return;
-      }
-
-      // Success - save session
-      const session = {
-        user: { email: client.email, name: `${client.first_name} ${client.last_name}` },
-        clientId: client.id
-      };
-      localStorage.setItem('clientPortalSession', JSON.stringify(session));
-      setCurrentUser(session.user);
-      setIsAuthenticated(true);
     } catch (error) {
-      console.error('Login error:', error);
+      console.error('SendOTP error:', error);
+      setLoginError(error.response?.data?.error || 'Възникна грешка. Моля, опитайте отново.');
+    }
+    
+    setIsSendingOTP(false);
+  };
+
+  const handleVerifyOTP = async (e) => {
+    e.preventDefault();
+    setLoginError('');
+    setIsVerifyingOTP(true);
+
+    try {
+      const response = await base44.functions.invoke('verifyOTP', { 
+        email: email.toLowerCase(), 
+        otp_code: otpCode 
+      });
+      
+      if (response.data.success) {
+        // Success - save session
+        const session = {
+          user: { 
+            email: response.data.client.email, 
+            name: `${response.data.client.first_name} ${response.data.client.last_name}` 
+          },
+          clientData: response.data.client
+        };
+        localStorage.setItem('clientPortalSession', JSON.stringify(session));
+        setCurrentUser(session.user);
+        setClientData(session.clientData);
+        setIsAuthenticated(true);
+      } else {
+        setLoginError(response.data.error || 'Невалиден код');
+        if (response.data.attempts_remaining !== undefined) {
+          setAttemptsRemaining(response.data.attempts_remaining);
+        }
+      }
+    } catch (error) {
+      console.error('VerifyOTP error:', error);
+      setLoginError(error.response?.data?.error || 'Възникна грешка. Моля, опитайте отново.');
+      if (error.response?.data?.attempts_remaining !== undefined) {
+        setAttemptsRemaining(error.response.data.attempts_remaining);
+      }
+    }
+    
+    setIsVerifyingOTP(false);
+  };
+
+  const handleResendOTP = async () => {
+    if (countdown > 0) return;
+    
+    setLoginError('');
+    setIsSendingOTP(true);
+    
+    try {
+      const response = await base44.functions.invoke('sendOTP', { email: email.toLowerCase() });
+      
+      if (response.success) {
+        setOtpSessionId(response.otp_session_id);
+        setCountdown(60);
+        setOtpCode('');
+        setLoginStep('otp');
+      } else {
+        setLoginError(response.error || 'Грешка при изпращане на код');
+      }
+    } catch (error) {
+      console.error('ResendOTP error:', error);
       setLoginError('Възникна грешка. Моля, опитайте отново.');
     }
     
-    setIsLoggingIn(false);
+    setIsSendingOTP(false);
+  };
+
+  const handleBackToEmail = () => {
+    setLoginStep('email');
+    setOtpCode('');
+    setOtpSessionId(null);
+    setLoginError('');
   };
 
   const handleLogout = () => {
@@ -173,7 +247,11 @@ export default function ClientPortal() {
                 transition={{ type: "spring", bounce: 0.5, delay: 0.2 }}
                 className="w-20 h-20 rounded-2xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center mx-auto mb-6 shadow-lg shadow-blue-500/30"
               >
-                <Lock className="h-10 w-10 text-white" />
+                {loginStep === 'email' ? (
+                  <Mail className="h-10 w-10 text-white" />
+                ) : (
+                  <Key className="h-10 w-10 text-white" />
+                )}
               </motion.div>
               <motion.h1 
                 initial={{ opacity: 0, y: 10 }}
@@ -189,96 +267,164 @@ export default function ClientPortal() {
                 transition={{ delay: 0.4 }}
                 className="text-blue-200"
               >
-                Влезте за достъп до вашия финансов план
+                {loginStep === 'email' 
+                  ? 'Въведете имейл за вход' 
+                  : 'Въведете кода от имейла'}
               </motion.p>
             </div>
 
-            <form onSubmit={handleLogin} className="space-y-5">
-              <motion.div 
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: 0.5 }}
-                className="space-y-2"
-              >
-                <Label htmlFor="username" className="text-blue-100">Имейл</Label>
-                <Input
-                  id="username"
-                  type="email"
-                  placeholder="example@mail.com"
-                  value={loginForm.username}
-                  onChange={(e) => setLoginForm({ ...loginForm, username: e.target.value })}
-                  className="rounded-xl bg-white/10 border-white/20 text-white placeholder:text-blue-300/50 focus:border-blue-400 focus:ring-blue-400/20 h-12"
-                  required
-                />
-              </motion.div>
-
-              <motion.div 
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: 0.6 }}
-                className="space-y-2"
-              >
-                <Label htmlFor="password" className="text-blue-100">Парола</Label>
-                <div className="relative">
+            {loginStep === 'email' ? (
+              <form onSubmit={handleSendOTP} className="space-y-5">
+                <motion.div 
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: 0.5 }}
+                  className="space-y-2"
+                >
+                  <Label htmlFor="email" className="text-blue-100">Имейл</Label>
                   <Input
-                    id="password"
-                    type={showPassword ? "text" : "password"}
-                    placeholder="••••••••"
-                    value={loginForm.password}
-                    onChange={(e) => setLoginForm({ ...loginForm, password: e.target.value })}
-                    className="rounded-xl bg-white/10 border-white/20 text-white placeholder:text-blue-300/50 focus:border-blue-400 pr-12 h-12"
+                    id="email"
+                    type="email"
+                    placeholder="example@mail.com"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    className="rounded-xl bg-white/10 border-white/20 text-white placeholder:text-blue-300/50 focus:border-blue-400 focus:ring-blue-400/20 h-12"
                     required
                   />
-                  <button
-                    type="button"
-                    onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-4 top-1/2 -translate-y-1/2 text-blue-300 hover:text-white transition-colors"
-                  >
-                    {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
-                  </button>
-                </div>
-              </motion.div>
-
-              {loginError && (
-                <motion.div 
-                  initial={{ opacity: 0, scale: 0.95 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  className="p-4 bg-red-500/20 border border-red-400/30 rounded-xl text-red-200 text-sm backdrop-blur-sm"
-                >
-                  {loginError}
                 </motion.div>
-              )}
 
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.7 }}
-              >
-                <Button 
-                  type="submit"
-                  disabled={isLoggingIn}
-                  className="w-full bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 rounded-xl py-6 text-lg font-semibold shadow-lg shadow-blue-500/25 transition-all hover:shadow-xl hover:shadow-blue-500/30 hover:scale-[1.02]"
+                {loginError && (
+                  <motion.div 
+                    initial={{ opacity: 0, scale: 0.95 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    className="p-4 bg-red-500/20 border border-red-400/30 rounded-xl text-red-200 text-sm backdrop-blur-sm"
+                  >
+                    {loginError}
+                  </motion.div>
+                )}
+
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.6 }}
                 >
-                  {isLoggingIn ? (
-                    <>
-                      <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-                      Влизане...
-                    </>
-                  ) : (
-                    'Вход в портала'
-                  )}
-                </Button>
-              </motion.div>
-            </form>
+                  <Button 
+                    type="submit"
+                    disabled={isSendingOTP}
+                    className="w-full bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 rounded-xl py-6 text-lg font-semibold shadow-lg shadow-blue-500/25 transition-all hover:shadow-xl hover:shadow-blue-500/30 hover:scale-[1.02]"
+                  >
+                    {isSendingOTP ? (
+                      <>
+                        <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                        Изпращане на код...
+                      </>
+                    ) : (
+                      'Изпрати код за вход'
+                    )}
+                  </Button>
+                </motion.div>
 
-            <motion.p 
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.8 }}
-              className="text-sm text-blue-300/70 mt-6 text-center"
-            >
-              Данните за вход са изпратени на вашия имейл след финансовия анализ
-            </motion.p>
+                <motion.p 
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ delay: 0.7 }}
+                  className="text-sm text-blue-300/70 text-center"
+                >
+                  Кодът ще бъде изпратен на вашия имейл
+                </motion.p>
+              </form>
+            ) : (
+              <form onSubmit={handleVerifyOTP} className="space-y-5">
+                <motion.button
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  type="button"
+                  onClick={handleBackToEmail}
+                  className="flex items-center gap-2 text-blue-300 hover:text-white transition-colors mx-auto"
+                >
+                  <ArrowLeft className="h-4 w-4" />
+                  Назад към имейл
+                </motion.button>
+
+                <motion.div 
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: 0.5 }}
+                  className="space-y-2"
+                >
+                  <Label htmlFor="otp" className="text-blue-100">Код за потвърждение</Label>
+                  <Input
+                    id="otp"
+                    type="text"
+                    inputMode="numeric"
+                    pattern="[0-9]*"
+                    maxLength={6}
+                    placeholder="000000"
+                    value={otpCode}
+                    onChange={(e) => setOtpCode(e.target.value.replace(/[^0-9]/g, ''))}
+                    className="rounded-xl bg-white/10 border-white/20 text-white placeholder:text-blue-300/50 focus:border-blue-400 focus:ring-blue-400/20 h-12 text-center text-2xl tracking-[0.5em] font-mono"
+                    required
+                  />
+                </motion.div>
+
+                {loginError && (
+                  <motion.div 
+                    initial={{ opacity: 0, scale: 0.95 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    className="p-4 bg-red-500/20 border border-red-400/30 rounded-xl text-red-200 text-sm backdrop-blur-sm"
+                  >
+                    <div className="flex items-center justify-between">
+                      <span>{loginError}</span>
+                      {attemptsRemaining < 5 && (
+                        <span className="text-xs bg-red-500/30 px-2 py-1 rounded">
+                          {attemptsRemaining} опита
+                        </span>
+                      )}
+                    </div>
+                  </motion.div>
+                )}
+
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.6 }}
+                >
+                  <Button 
+                    type="submit"
+                    disabled={isVerifyingOTP || otpCode.length !== 6}
+                    className="w-full bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 rounded-xl py-6 text-lg font-semibold shadow-lg shadow-blue-500/25 transition-all hover:shadow-xl hover:shadow-blue-500/30 hover:scale-[1.02]"
+                  >
+                    {isVerifyingOTP ? (
+                      <>
+                        <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                        Проверка...
+                      </>
+                    ) : (
+                      'Вход в портала'
+                    )}
+                  </Button>
+                </motion.div>
+
+                <div className="text-center">
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    onClick={handleResendOTP}
+                    disabled={countdown > 0}
+                    className="text-blue-300 hover:text-white disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    {countdown > 0 ? (
+                      <>
+                        <Timer className="h-4 w-4 mr-2" />
+                        Изпрати нов код след {countdown}с
+                      </>
+                    ) : (
+                      'Изпрати нов код'
+                    )}
+                  </Button>
+                </div>
+              </form>
+            )}
           </motion.div>
         </div>
       </div>

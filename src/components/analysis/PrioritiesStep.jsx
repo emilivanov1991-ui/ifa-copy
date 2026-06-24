@@ -23,6 +23,8 @@ const getPriorities = (t) => [
 
 export default function PrioritiesStep({ data, onChange, showErrors, lang = 'bg' }) {
   const t = (bg, en) => lang === 'en' ? en : bg;
+  const allPriorities = getPriorities(t);
+
   // Calculate monthly balance from FinancialFlowStep data
   const monthlyBalance = useMemo(() => {
     const includePartner = data.include_partner || false;
@@ -69,8 +71,6 @@ export default function PrioritiesStep({ data, onChange, showErrors, lang = 'bg'
       return true;
     });
   };
-
-  const allPriorities = getPriorities(t);
 
   const priorities = getActivePriorities();
   const maxPriority = priorities.length;

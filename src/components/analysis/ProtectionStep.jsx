@@ -31,8 +31,8 @@ export default function ProtectionStep({ data, onChange, showErrors, plannerData
   const isFieldInvalid = (value) => showErrors && (value === undefined || value === '' || value === null);
   const t = (bg, en) => lang === 'en' ? en : bg;
 
-  const clientName = plannerData?.client_first_name || 'Клиент';
-  const partnerName = plannerData?.partner_first_name || 'Партньор';
+  const clientName = plannerData?.client_first_name || t('Клиент', 'Client');
+  const partnerName = plannerData?.partner_first_name || t('Партньор', 'Partner');
   const includePartner = plannerData?.family_type === 'family' || data.include_partner;
 
   const hasAnyProperty = data.has_property_1 || false;
@@ -99,33 +99,33 @@ export default function ProtectionStep({ data, onChange, showErrors, plannerData
     return (
       <div className="pt-4 border-t border-slate-200 space-y-3">
         <div className="flex items-center justify-between">
-          <Label className="cursor-pointer">Имате ли защита на имуществото?</Label>
+          <Label className="cursor-pointer">{t('Имате ли защита на имуществото?', 'Do you have property protection?')}</Label>
           <div className="flex items-center gap-2">
-            <span className={cn("text-sm font-medium", !hasIns ? "text-red-600" : "text-slate-400")}>не</span>
+            <span className={cn("text-sm font-medium", !hasIns ? "text-red-600" : "text-slate-400")}>{t('не', 'no')}</span>
             <button type="button" onClick={() => onChange(`${prefix}_has_insurance`, !hasIns)}
               className={cn("w-12 h-6 rounded-full transition-colors relative", hasIns ? "bg-green-500" : "bg-red-500")}>
               <div className={cn("w-5 h-5 bg-white rounded-full absolute top-0.5 transition-all", hasIns ? "left-6" : "left-0.5")} />
             </button>
-            <span className={cn("text-sm font-medium", hasIns ? "text-green-600" : "text-slate-400")}>да</span>
+            <span className={cn("text-sm font-medium", hasIns ? "text-green-600" : "text-slate-400")}>{t('да', 'yes')}</span>
           </div>
         </div>
         {hasIns && (
           <div className="grid sm:grid-cols-2 gap-4">
             <div className="space-y-2" data-invalid={hasIns && isFieldInvalid(data[`${prefix}_insurer`]) ? "true" : undefined}>
-              <Label className="text-sm">Застраховател <span className="text-red-500">*</span></Label>
+              <Label className="text-sm">{t('Застраховател', 'Insurer')} <span className="text-red-500">*</span></Label>
               <Combobox options={INSURANCE_COMPANIES} value={data[`${prefix}_insurer`] || ''}
                 onValueChange={v => onChange(`${prefix}_insurer`, v)}
-                placeholder="Търси застраховател..." searchPlaceholder="Търси..." emptyText="Няма намерен застраховател."
+                placeholder={t('Търси застраховател...', 'Search insurer...')} searchPlaceholder={t('Търси...', 'Search...')} emptyText={t('Няма намерен застраховател.', 'No insurer found.')}
                 triggerClassName={`rounded-lg ${hasIns && isFieldInvalid(data[`${prefix}_insurer`]) ? 'border-red-500 bg-red-50' : ''}`} />
             </div>
             <div className="space-y-2" data-invalid={hasIns && isFieldInvalid(data[`${prefix}_insurance_expiry`]) ? "true" : undefined}>
-              <Label className="text-sm">Срок на полицата (дд.мм.гггг) <span className="text-red-500">*</span></Label>
+              <Label className="text-sm">{t('Срок на полицата (дд.мм.гггг)', 'Policy term (dd.mm.yyyy)')} <span className="text-red-500">*</span></Label>
               <BulgarianDateInput value={data[`${prefix}_insurance_expiry`] || ''}
                 onChange={v => onChange(`${prefix}_insurance_expiry`, v)}
                 className={`rounded-lg ${hasIns && isFieldInvalid(data[`${prefix}_insurance_expiry`]) ? 'border-red-500 bg-red-50' : ''}`} required />
             </div>
             <div className="space-y-2 sm:col-span-2">
-              <Label className="text-sm">Месечна сума по застраховката (€)</Label>
+              <Label className="text-sm">{t('Месечна сума по застраховката (€)', 'Monthly insurance premium (€)')}</Label>
               <Input type="number" min="0" value={data[`${prefix}_insurance_monthly`] ?? ''}
                 onChange={e => onChange(`${prefix}_insurance_monthly`, e.target.value === '' ? '' : parseFloat(e.target.value))}
                 className="rounded-lg w-40" placeholder="0" />
@@ -196,7 +196,7 @@ export default function ProtectionStep({ data, onChange, showErrors, plannerData
     return (
       <div className="pt-4 border-t border-slate-200 space-y-3">
         <div className="flex items-center justify-between">
-          <Label className="cursor-pointer">Подсигурени ли са Вашите доходи?</Label>
+          <Label className="cursor-pointer">{t('Подсигурени ли са Вашите доходи?', 'Is your income secured?')}</Label>
           <div className="flex items-center gap-2">
             <span className={cn("text-sm font-medium", !hasProtection ? "text-red-600" : "text-slate-400")}>не</span>
             <button type="button" onClick={() => onChange(hasField, !hasProtection)}
@@ -211,7 +211,7 @@ export default function ProtectionStep({ data, onChange, showErrors, plannerData
             <div className="space-y-1" data-invalid={hasProtection && isFieldInvalid(data[insurerField]) ? "true" : undefined}>
               <Label className="text-xs text-slate-500">Застраховател <span className="text-red-500">*</span></Label>
               <Combobox options={INSURANCE_COMPANIES} value={data[insurerField] || ''} onValueChange={v => onChange(insurerField, v)}
-                placeholder="Търси застраховател..." searchPlaceholder="Търси..." emptyText="Няма намерен застраховател."
+                placeholder={t('Търси застраховател...', 'Search insurer...')} searchPlaceholder={t('Търси...', 'Search...')} emptyText={t('Няма намерен застраховател.', 'No insurer found.')}
                 triggerClassName={`rounded-lg text-sm ${hasProtection && isFieldInvalid(data[insurerField]) ? 'border-red-500 bg-red-50' : ''}`} />
             </div>
             <div className="space-y-1" data-invalid={hasProtection && isFieldInvalid(data[dateField]) ? "true" : undefined}>
@@ -265,7 +265,7 @@ export default function ProtectionStep({ data, onChange, showErrors, plannerData
                   </Button>
                 )}
                 <div className="grid sm:grid-cols-2 gap-4">
-                  {[['property_1_address','Адрес','text'],['property_1_rooms','Брой стаи','number'],['property_1_area','Застроена площ (кв.м)','number'],['property_1_value','Стойност (€)','number']].map(([field,label,type]) => (
+                  {[['property_1_address',t('Адрес', 'Address'),'text'],['property_1_rooms',t('Брой стаи', 'Rooms'),'number'],['property_1_area',t('Застроена площ (кв.м)', 'Area (sq.m.)'),'number'],['property_1_value',t('Стойност (€)', 'Value (€)'),'number']].map(([field,label,type]) => (
                     <div key={field} className="space-y-2" data-invalid={data.has_property_1 && isFieldInvalid(data[field]) ? "true" : undefined}>
                       <Label className="text-sm">{label} <span className="text-red-500">*</span></Label>
                       <Input type={type} min={type==='number'?'0':undefined} value={data[field] ?? ''}
@@ -274,7 +274,7 @@ export default function ProtectionStep({ data, onChange, showErrors, plannerData
                     </div>
                   ))}
                   <div className="space-y-2 sm:col-span-2" data-invalid={data.has_property_1 && isFieldInvalid(data.property_1_movable_value) ? "true" : undefined}>
-                    <Label className="text-sm">Стойност на движимото имущество (€) <span className="text-red-500">*</span></Label>
+                    <Label className="text-sm">{t('Стойност на движимото имущество (€)', 'Movable property value (€)')} <span className="text-red-500">*</span></Label>
                     <Input type="number" min="0" value={data.property_1_movable_value ?? ''}
                       onChange={e => onChange('property_1_movable_value', e.target.value === '' ? '' : parseInt(e.target.value))}
                       className={`rounded-lg ${data.has_property_1 && isFieldInvalid(data.property_1_movable_value) ? 'border-red-500 bg-red-50' : ''}`} required />
@@ -299,7 +299,7 @@ export default function ProtectionStep({ data, onChange, showErrors, plannerData
               </div>
               <div className="ml-6 p-4 bg-white rounded-lg border border-slate-200 space-y-4">
                 <div className="grid sm:grid-cols-2 gap-4">
-                  {[['property_2_address','Адрес','text'],['property_2_rooms','Брой стаи','number'],['property_2_area','Застроена площ (кв.м)','number'],['property_2_value','Стойност (€)','number']].map(([field,label,type]) => (
+                  {[['property_2_address',t('Адрес', 'Address'),'text'],['property_2_rooms',t('Брой стаи', 'Rooms'),'number'],['property_2_area',t('Застроена площ (кв.м)', 'Area (sq.m.)'),'number'],['property_2_value',t('Стойност (€)', 'Value (€)'),'number']].map(([field,label,type]) => (
                     <div key={field} className="space-y-2" data-invalid={data.has_property_2 && isFieldInvalid(data[field]) ? "true" : undefined}>
                       <Label className="text-sm">{label} <span className="text-red-500">*</span></Label>
                       <Input type={type} min={type==='number'?'0':undefined} value={data[field] ?? ''}
@@ -308,7 +308,7 @@ export default function ProtectionStep({ data, onChange, showErrors, plannerData
                     </div>
                   ))}
                   <div className="space-y-2 sm:col-span-2" data-invalid={data.has_property_2 && isFieldInvalid(data.property_2_movable_value) ? "true" : undefined}>
-                    <Label className="text-sm">Стойност на движимото имущество (€) <span className="text-red-500">*</span></Label>
+                    <Label className="text-sm">{t('Стойност на движимото имущество (€)', 'Movable property value (€)')} <span className="text-red-500">*</span></Label>
                     <Input type="number" min="0" value={data.property_2_movable_value ?? ''}
                       onChange={e => onChange('property_2_movable_value', e.target.value === '' ? '' : parseInt(e.target.value))}
                       className={`rounded-lg ${data.has_property_2 && isFieldInvalid(data.property_2_movable_value) ? 'border-red-500 bg-red-50' : ''}`} required />
@@ -333,7 +333,7 @@ export default function ProtectionStep({ data, onChange, showErrors, plannerData
               </div>
               <div className="ml-6 p-4 bg-white rounded-lg border border-slate-200 space-y-4">
                 <div className="grid sm:grid-cols-2 gap-4">
-                  {[['property_3_address','Адрес','text'],['property_3_rooms','Брой стаи','number'],['property_3_area','Застроена площ (кв.м)','number'],['property_3_value','Стойност (€)','number']].map(([field,label,type]) => (
+                  {[['property_3_address',t('Адрес', 'Address'),'text'],['property_3_rooms',t('Брой стаи', 'Rooms'),'number'],['property_3_area',t('Застроена площ (кв.м)', 'Area (sq.m.)'),'number'],['property_3_value',t('Стойност (€)', 'Value (€)'),'number']].map(([field,label,type]) => (
                     <div key={field} className="space-y-2" data-invalid={data.has_property_3 && isFieldInvalid(data[field]) ? "true" : undefined}>
                       <Label className="text-sm">{label} <span className="text-red-500">*</span></Label>
                       <Input type={type} min={type==='number'?'0':undefined} value={data[field] ?? ''}
@@ -342,7 +342,7 @@ export default function ProtectionStep({ data, onChange, showErrors, plannerData
                     </div>
                   ))}
                   <div className="space-y-2 sm:col-span-2" data-invalid={data.has_property_3 && isFieldInvalid(data.property_3_movable_value) ? "true" : undefined}>
-                    <Label className="text-sm">Стойност на движимото имущество (€) <span className="text-red-500">*</span></Label>
+                    <Label className="text-sm">{t('Стойност на движимото имущество (€)', 'Movable property value (€)')} <span className="text-red-500">*</span></Label>
                     <Input type="number" min="0" value={data.property_3_movable_value ?? ''}
                       onChange={e => onChange('property_3_movable_value', e.target.value === '' ? '' : parseInt(e.target.value))}
                       className={`rounded-lg ${data.has_property_3 && isFieldInvalid(data.property_3_movable_value) ? 'border-red-500 bg-red-50' : ''}`} required />
@@ -356,7 +356,7 @@ export default function ProtectionStep({ data, onChange, showErrors, plannerData
           {/* Car 1 */}
           <div className="space-y-4 pt-4 border-t border-slate-200">
             <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2"><Car className="h-4 w-4 text-slate-500" /><Label className="font-medium">Автомобил</Label></div>
+              <div className="flex items-center gap-2"><Car className="h-4 w-4 text-slate-500" /><Label className="font-medium">{t('Автомобил', 'Car')}</Label></div>
               <div className="flex items-center gap-2">
                 <span className={cn("text-sm font-medium", !(data.has_car_1 ?? false) ? "text-red-600" : "text-slate-400")}>{t('няма', 'none')}</span>
                 <button type="button" onClick={() => onChange('has_car_1', !(data.has_car_1 ?? false))}
@@ -426,7 +426,7 @@ export default function ProtectionStep({ data, onChange, showErrors, plannerData
                         onChange(field, newList);
                       }}
                       className={cn("rounded-lg", isDuplicate && "border-amber-500")} />
-                    {isDuplicate && <p className="text-amber-600 text-sm mt-1">Това име бе предоставено на предходните теми. С кого бихме могли да го заменим?</p>}
+                    {isDuplicate && <p className="text-amber-600 text-sm mt-1">{t('Това име бе предоставено на предходните теми. С кого бихме могли да го заменим?', 'This name was provided in the previous section. Who could we replace it with?')}</p>}
                   </div>
                 );
               })}
@@ -519,8 +519,8 @@ export default function ProtectionStep({ data, onChange, showErrors, plannerData
           { value: 'bulgaria_ins', label: 'ЗК „България Иншурънс" АД' },
           { value: 'unknown', label: 'Не знам, ще проверя' },
         ];
-        const cName = [data.client_first_name, data.client_last_name].filter(Boolean).join(' ') || 'Клиент';
-        const pName = [data.partner_first_name, data.partner_last_name].filter(Boolean).join(' ') || 'Партньор';
+        const cName = [data.client_first_name, data.client_last_name].filter(Boolean).join(' ') || t('Клиент', 'Client');
+        const pName = [data.partner_first_name, data.partner_last_name].filter(Boolean).join(' ') || t('Партньор', 'Partner');
         const HealthRow = ({ label, fieldHas, fieldInsurer }) => (
           <div className="space-y-3">
             <div className="flex items-center justify-between">
@@ -536,9 +536,9 @@ export default function ProtectionStep({ data, onChange, showErrors, plannerData
             </div>
             {data[fieldHas] && (
               <div className="space-y-1">
-                <Label className="text-xs text-slate-500">Застраховател</Label>
+                <Label className="text-xs text-slate-500">{t('Застраховател', 'Insurer')}</Label>
                 <Combobox options={HEALTH_INSURERS} value={data[fieldInsurer] || ''} onValueChange={v => onChange(fieldInsurer, v)}
-                  placeholder="Търси застраховател..." searchPlaceholder="Търси..." emptyText="Няма намерен застраховател."
+                  placeholder={t('Търси застраховател...', 'Search insurer...')} searchPlaceholder={t('Търси...', 'Search...')} emptyText={t('Няма намерен застраховател.', 'No insurer found.')}
                   triggerClassName="rounded-lg" />
               </div>
             )}

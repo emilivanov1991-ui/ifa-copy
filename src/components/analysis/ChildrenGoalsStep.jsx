@@ -204,7 +204,7 @@ export default function ChildrenGoalsStep({ data, onChange, showErrors, plannerD
                 <Label className="font-medium">{t('Почивка', 'Vacation')}</Label>
               </div>
               <div className="space-y-1">
-                <Label className="text-xs text-slate-500 text-center block">Сума (€)</Label>
+                <Label className="text-xs text-slate-500 text-center block">{t('Сума (€)', 'Amount (€)')}</Label>
                 <Input
                   type="number"
                   min="0"
@@ -215,7 +215,7 @@ export default function ChildrenGoalsStep({ data, onChange, showErrors, plannerD
                 />
               </div>
               <div className="space-y-1">
-                <Label className="text-xs text-slate-500 text-center block">Хоризонт (години)</Label>
+                <Label className="text-xs text-slate-500 text-center block">{t('Хоризонт (години)', 'Horizon (years)')}</Label>
                 <Input
                   type="number"
                   min="1"
@@ -240,7 +240,7 @@ export default function ChildrenGoalsStep({ data, onChange, showErrors, plannerD
                 />
               </div>
               <div className="space-y-1">
-                <Label className="text-xs text-slate-500 text-center block">Сума (€)</Label>
+                <Label className="text-xs text-slate-500 text-center block">{t('Сума (€)', 'Amount (€)')}</Label>
                 <Input
                   type="number"
                   min="0"
@@ -251,7 +251,7 @@ export default function ChildrenGoalsStep({ data, onChange, showErrors, plannerD
                 />
               </div>
               <div className="space-y-1">
-                <Label className="text-xs text-slate-500 text-center block">Хоризонт (години)</Label>
+                <Label className="text-xs text-slate-500 text-center block">{t('Хоризонт (години)', 'Horizon (years)')}</Label>
                 <Input
                   type="number"
                   min="1"
@@ -273,7 +273,7 @@ export default function ChildrenGoalsStep({ data, onChange, showErrors, plannerD
             checked={data.include_other_goals_in_plan || false}
             onCheckedChange={(checked) => onChange('include_other_goals_in_plan', checked)}
           />
-          <span className="font-medium text-blue-800">Да бъде включено във финансовия план</span>
+          <span className="font-medium text-blue-800">{t('Да бъде включено във финансовия план', 'Include in financial plan')}</span>
         </label>
       )}
     </>
@@ -315,7 +315,7 @@ export default function ChildrenGoalsStep({ data, onChange, showErrors, plannerD
                 return (
                   <div key={`has_kids_${index}`}>
                     <Input
-                      placeholder="Име на познат"
+                      placeholder={t('Име на познат', 'Name of acquaintance')}
                       value={name}
                       onChange={(e) => {
                         const newList = [...list];
@@ -329,7 +329,7 @@ export default function ChildrenGoalsStep({ data, onChange, showErrors, plannerD
                     />
                     {isDuplicate && (
                       <p className="text-amber-600 text-sm mt-1">
-                        Това име бе предоставено на предходните теми. С кого бихме могли да го заменим?
+                        {t('Това име бе предоставено на предходните теми. С кого бихме могли да го заменим?', 'This name was provided in the previous section. Who could we replace it with?')}
                       </p>
                     )}
                   </div>
@@ -339,14 +339,14 @@ export default function ChildrenGoalsStep({ data, onChange, showErrors, plannerD
 
               {/* Recent wedding */}
               <div className="space-y-3">
-              <Label className="text-slate-700">Е имал сватба през последните три години?</Label>
+              <Label className="text-slate-700">{t('Е имал сватба през последните три години?', 'Had a wedding in the last three years?')}</Label>
               {(data.children_referrals_recent_wedding?.length > 0 ? data.children_referrals_recent_wedding : ['']).map((name, index) => {
                 const isDuplicate = isDuplicateName(name);
                 const list = data.children_referrals_recent_wedding?.length > 0 ? data.children_referrals_recent_wedding : [''];
                 return (
                   <div key={`wedding_${index}`}>
                     <Input
-                      placeholder="Име на познат"
+                      placeholder={t('Име на познат', 'Name of acquaintance')}
                       value={name}
                       onChange={(e) => {
                         const newList = [...list];
@@ -360,7 +360,7 @@ export default function ChildrenGoalsStep({ data, onChange, showErrors, plannerD
                     />
                     {isDuplicate && (
                       <p className="text-amber-600 text-sm mt-1">
-                        Това име бе предоставено на предходните теми. С кого бихме могли да го заменим?
+                        {t('Това име бе предоставено на предходните теми. С кого бихме могли да го заменим?', 'This name was provided in the previous section. Who could we replace it with?')}
                       </p>
                     )}
                   </div>
@@ -472,7 +472,7 @@ export default function ChildrenGoalsStep({ data, onChange, showErrors, plannerD
               <p className="text-xs text-slate-500">{t('детска количка, пелени, медицински грижи...', 'pram, diapers, medical care...')}</p>
             </div>
             <div className="space-y-1">
-              <Label className="text-xs text-slate-500 text-center block">Сума (€)</Label>
+              <Label className="text-xs text-slate-500 text-center block">{t('Сума (€)', 'Amount (€)')}</Label>
               <Input
                 type="number"
                 min="0"
@@ -490,7 +490,7 @@ export default function ChildrenGoalsStep({ data, onChange, showErrors, plannerD
               <p className="text-xs text-slate-500">{t('студентски такси, общежитие...', 'tuition fees, student housing...')}</p>
             </div>
             <div className="space-y-1">
-              <Label className="text-xs text-slate-500 text-center block">Сума (€)</Label>
+              <Label className="text-xs text-slate-500 text-center block">{t('Сума (€)', 'Amount (€)')}</Label>
               <Input
                 type="number"
                 min="0"
@@ -509,7 +509,7 @@ export default function ChildrenGoalsStep({ data, onChange, showErrors, plannerD
               <p className="text-xs text-slate-500">{t('помощ за жилище, започване на бизнес', 'housing assistance, starting a business')}</p>
             </div>
             <div className="space-y-1">
-              <Label className="text-xs text-slate-500 text-center block">Сума (€)</Label>
+              <Label className="text-xs text-slate-500 text-center block">{t('Сума (€)', 'Amount (€)')}</Label>
               <Input
                 type="number"
                 min="0"
@@ -532,7 +532,7 @@ export default function ChildrenGoalsStep({ data, onChange, showErrors, plannerD
           <div className="grid grid-cols-2 gap-4 items-end pt-4" data-invalid={!data.skip_children_section && isInvalid(data.children_current_savings) ? "true" : undefined}>
             <Label className="font-medium">{t('Колко спестявания имате заделени за горните цели?', 'How much savings do you have set aside for these goals?')} <span className="text-red-500">*</span></Label>
             <div className="space-y-1">
-              <Label className="text-xs text-slate-500 text-center block">Сума (€)</Label>
+              <Label className="text-xs text-slate-500 text-center block">{t('Сума (€)', 'Amount (€)')}</Label>
               <Input
                 type="number"
                 min="0"
@@ -581,7 +581,7 @@ export default function ChildrenGoalsStep({ data, onChange, showErrors, plannerD
               return (
                 <div key={`has_kids_${index}`}>
                   <Input
-                    placeholder="Име на познат"
+                    placeholder={t('Име на познат', 'Name of acquaintance')}
                     value={name}
                     onChange={(e) => {
                       const newList = [...list];
@@ -595,7 +595,7 @@ export default function ChildrenGoalsStep({ data, onChange, showErrors, plannerD
                   />
                   {isDuplicate && (
                     <p className="text-amber-600 text-sm mt-1">
-                      Това име бе предоставено на предходните теми. С кого бихме могли да го заменим?
+                      {t('Това име бе предоставено на предходните теми. С кого бихме могли да го заменим?', 'This name was provided in the previous section. Who could we replace it with?')}
                     </p>
                   )}
                 </div>
@@ -612,7 +612,7 @@ export default function ChildrenGoalsStep({ data, onChange, showErrors, plannerD
               return (
                 <div key={`wedding_${index}`}>
                   <Input
-                    placeholder="Име на познат"
+                    placeholder={t('Име на познат', 'Name of acquaintance')}
                     value={name}
                     onChange={(e) => {
                       const newList = [...list];
@@ -626,7 +626,7 @@ export default function ChildrenGoalsStep({ data, onChange, showErrors, plannerD
                   />
                   {isDuplicate && (
                     <p className="text-amber-600 text-sm mt-1">
-                      Това име бе предоставено на предходните теми. С кого бихме могли да го заменим?
+                      {t('Това име бе предоставено на предходните теми. С кого бихме могли да го заменим?', 'This name was provided in the previous section. Who could we replace it with?')}
                     </p>
                   )}
                 </div>

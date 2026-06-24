@@ -90,8 +90,8 @@ export default function PensionStep({ data, onChange, showErrors, plannerData, l
   const t = (bg, en) => lang === 'en' ? en : bg;
   
   // Get names from Financial Planner or from analysis data directly
-  const clientName = plannerData?.client_first_name || data.client_first_name || 'Клиент';
-  const partnerName = plannerData?.partner_first_name || data.partner_first_name || 'Партньор';
+  const clientName = plannerData?.client_first_name || data.client_first_name || t('Клиент', 'Client');
+  const partnerName = plannerData?.partner_first_name || data.partner_first_name || t('Партньор', 'Partner');
   const includePartner = plannerData?.family_type === 'family' || data.include_partner || plannerData?.include_partner;
 
   // Auto-populate gross income from net income (from Reserve step)
@@ -279,6 +279,7 @@ export default function PensionStep({ data, onChange, showErrors, plannerData, l
               <div className="p-3 bg-blue-100 rounded-lg">
                 <p className="text-sm text-blue-800">
                   {t('Разлика:', 'Gap:')} <span className="font-semibold">
+
                     {clientDiff.toLocaleString()} €
                   </span>
                 </p>
@@ -317,7 +318,7 @@ export default function PensionStep({ data, onChange, showErrors, plannerData, l
                 </div>
                 {/* Gross Income */}
                 <div className="space-y-2" data-invalid={isFieldInvalid(data.partner_gross_income_pension) ? "true" : undefined}>
-                  <Label>Брутен доход (€) <span className="text-red-500">*</span></Label>
+                  <Label>{t('Брутен доход (€)', 'Gross income (€)')} <span className="text-red-500">*</span></Label>
                   <Input
                     type="number"
                     min="0"
@@ -329,7 +330,7 @@ export default function PensionStep({ data, onChange, showErrors, plannerData, l
                   />
                 </div>
                 <div className="space-y-2" data-invalid={isFieldInvalid(data.partner_retirement_age) ? "true" : undefined}>
-                  <Label>Кога искате да излезете в пенсия? (възраст) <span className="text-red-500">*</span></Label>
+                  <Label>{t('Кога искате да излезете в пенсия? (възраст)', 'At what age do you want to retire?')} <span className="text-red-500">*</span></Label>
                   <Input
                     type="number"
                     min="50"
@@ -342,7 +343,7 @@ export default function PensionStep({ data, onChange, showErrors, plannerData, l
                   />
                 </div>
                 <div className="space-y-2" data-invalid={isFieldInvalid(data.partner_desired_pension) ? "true" : undefined}>
-                  <Label>От каква месечна пенсия ще се нуждаете? (€) <span className="text-red-500">*</span></Label>
+                  <Label>{t('От каква месечна пенсия ще се нуждаете? (€)', 'What monthly pension will you need? (€)')} <span className="text-red-500">*</span></Label>
                   <Input
                     type="number"
                     min="0"
@@ -354,7 +355,7 @@ export default function PensionStep({ data, onChange, showErrors, plannerData, l
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label>Очаквана държавна пенсия (€)</Label>
+                  <Label>{t('Очаквана държавна пенсия (€)', 'Expected state pension (€)')}</Label>
                   <Input
                     type="number"
                     min="0"
@@ -430,7 +431,7 @@ export default function PensionStep({ data, onChange, showErrors, plannerData, l
               {/* II. Pillar */}
               <div className="space-y-3">
                 <div className="flex items-center gap-3">
-                  <Label className="flex-1">II. Стълб (допълнително задължително)</Label>
+                  <Label className="flex-1">{t('II. Стълб (допълнително задължително)', 'II. Pillar (supplementary mandatory)')}</Label>
                   <div className="flex items-center gap-2">
                     <span className={cn("text-sm font-medium", (data.client_pillar_2 ?? true) ? "text-green-600" : "text-slate-400")}>Да</span>
                     <button
@@ -710,7 +711,7 @@ export default function PensionStep({ data, onChange, showErrors, plannerData, l
                   />
                   {isDuplicate && (
                     <p className="text-amber-600 text-sm mt-1">
-                      Това име бе предоставено на предходните теми. С кого бихме могли да го заменим?
+                      {t('Това име бе предоставено на предходните теми. С кого бихме могли да го заменим?', 'This name was provided in the previous section. Who could we replace it with?')}
                     </p>
                   )}
                 </div>
@@ -750,7 +751,7 @@ export default function PensionStep({ data, onChange, showErrors, plannerData, l
                   />
                   {isDuplicate && (
                     <p className="text-amber-600 text-sm mt-1">
-                      Това име бе предоставено на предходните теми. С кого бихме могли да го заменим?
+                      {t('Това име бе предоставено на предходните теми. С кого бихме могли да го заменим?', 'This name was provided in the previous section. Who could we replace it with?')}
                     </p>
                   )}
                 </div>
@@ -790,7 +791,7 @@ export default function PensionStep({ data, onChange, showErrors, plannerData, l
                   />
                   {isDuplicate && (
                     <p className="text-amber-600 text-sm mt-1">
-                      Това име бе предоставено на предходните теми. С кого бихме могли да го заменим?
+                      {t('Това име бе предоставено на предходните теми. С кого бихме могли да го заменим?', 'This name was provided in the previous section. Who could we replace it with?')}
                     </p>
                   )}
                 </div>
@@ -830,7 +831,7 @@ export default function PensionStep({ data, onChange, showErrors, plannerData, l
                   />
                   {isDuplicate && (
                     <p className="text-amber-600 text-sm mt-1">
-                      Това име бе предоставено на предходните теми. С кого бихме могли да го заменим?
+                      {t('Това име бе предоставено на предходните теми. С кого бихме могли да го заменим?', 'This name was provided in the previous section. Who could we replace it with?')}
                     </p>
                   )}
                 </div>

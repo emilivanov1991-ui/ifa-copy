@@ -247,7 +247,7 @@ export default function FinancialFlowStep({ data, onChange, showErrors, plannerD
                 <Label className="text-sm">{t('Брутен доход', 'Gross income')} <span className="text-red-500">*</span></Label>
                 <Input type="number" min="0" value={data.client_gross_income ?? ''}
                   onChange={(e) => onChange('client_gross_income', e.target.value === '' ? '' : parseInt(e.target.value))} 
-                  className={`rounded-lg w-28 ${isFieldInvalid(data.client_gross_income) ? 'border-red-500 bg-red-50' : ''}`} />
+                  className={`rounded-lg w-28 ${isFieldInvalid(data.client_gross_income) ? 'border-red-500 bg-red-50' : ''}`} required />
               </div>
               <div className="flex items-center justify-between gap-4" data-invalid={isFieldInvalid(data.client_net_income) ? "true" : undefined}>
                 <Label className="text-sm">{t('Нетен доход', 'Net income')} <span className="text-red-500">*</span></Label>
@@ -283,7 +283,7 @@ export default function FinancialFlowStep({ data, onChange, showErrors, plannerD
                   <Label className="text-sm">Брутен доход <span className="text-red-500">*</span></Label>
                   <Input type="number" min="0" value={data.partner_gross_income ?? ''}
                     onChange={(e) => onChange('partner_gross_income', e.target.value === '' ? '' : parseInt(e.target.value))} 
-                    className={`rounded-lg w-28 ${isFieldInvalid(data.partner_gross_income) ? 'border-red-500 bg-red-50' : ''}`} />
+                    className={`rounded-lg w-28 ${isFieldInvalid(data.partner_gross_income) ? 'border-red-500 bg-red-50' : ''}`} required />
                 </div>
                 <div className="flex items-center justify-between gap-4" data-invalid={isFieldInvalid(data.partner_net_income) ? "true" : undefined}>
                   <Label className="text-sm">Нетен доход <span className="text-red-500">*</span></Label>
@@ -292,7 +292,7 @@ export default function FinancialFlowStep({ data, onChange, showErrors, plannerD
                     className={`rounded-lg w-28 ${isFieldInvalid(data.partner_net_income) ? 'border-red-500 bg-red-50' : ''}`} />
                 </div>
                 <div className="flex items-center justify-between gap-4" data-invalid={isFieldInvalid(data.partner_annual_bonus) ? "true" : undefined}>
-                  <Label className="text-sm">Годишен бонус <span className="text-red-500">*</span></Label>
+                  <Label className="text-sm">{t('Годишен бонус', 'Annual bonus')} <span className="text-red-500">*</span></Label>
                   <div className="flex items-center gap-2">
                     <Input type="number" min="0" value={data.partner_annual_bonus ?? ''}
                       onChange={(e) => onChange('partner_annual_bonus', e.target.value === '' ? '' : parseInt(e.target.value))} 
@@ -302,7 +302,7 @@ export default function FinancialFlowStep({ data, onChange, showErrors, plannerD
                   </div>
                 </div>
                 <div className="flex items-center justify-between gap-4" data-invalid={isFieldInvalid(data.partner_other_monthly_income) ? "true" : undefined}>
-                  <Label className="text-sm">Други месечни доходи <span className="text-red-500">*</span></Label>
+                  <Label className="text-sm">{t('Други месечни доходи', 'Other monthly income')} <span className="text-red-500">*</span></Label>
                   <Input type="number" min="0" value={data.partner_other_monthly_income ?? ''}
                     onChange={(e) => onChange('partner_other_monthly_income', e.target.value === '' ? '' : parseInt(e.target.value))} 
                     className={`rounded-lg w-28 ${isFieldInvalid(data.partner_other_monthly_income) ? 'border-red-500 bg-red-50' : ''}`} />

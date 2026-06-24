@@ -43,8 +43,8 @@ export default function ReserveStep({ data, onChange, showErrors, plannerData, l
   const t = (bg, en) => lang === 'en' ? en : bg;
   
   // Get names from Financial Planner or from analysis data directly
-  const clientName = plannerData?.client_first_name || data.client_first_name || 'Клиент';
-  const partnerName = plannerData?.partner_first_name || data.partner_first_name || 'Партньор';
+    const clientName = plannerData?.client_first_name || data.client_first_name || t('Клиент', 'Client');
+    const partnerName = plannerData?.partner_first_name || data.partner_first_name || t('Партньор', 'Partner');
   const includePartner = plannerData?.family_type === 'family' || data.include_partner || plannerData?.include_partner;
   // Get total monthly income from input
   const totalMonthlyIncome = data.total_monthly_income || 0;
@@ -240,7 +240,7 @@ export default function ReserveStep({ data, onChange, showErrors, plannerData, l
 
               {/* Спестовна сметка */}
               <div className="grid grid-cols-3 gap-2 items-center">
-                <Label className="text-sm">Спестовна сметка</Label>
+                <Label className="text-sm">{t('Спестовна сметка', 'Savings account')}</Label>
                 <Input
                   type="number"
                   min="0"
@@ -253,15 +253,15 @@ export default function ReserveStep({ data, onChange, showErrors, plannerData, l
                   options={BANK_OPTIONS}
                   value={data.client_savings_account_bank || ''}
                   onValueChange={(value) => onChange('client_savings_account_bank', value)}
-                  placeholder="Банка"
-                  searchPlaceholder="Търси банка..."
-                  emptyText="Няма намерена банка."
+                  placeholder={t('Банка', 'Bank')}
+                  searchPlaceholder={t('Търси банка...', 'Search bank...')}
+                  emptyText={t('Няма намерена банка.', 'No bank found.')}
                 />
               </div>
 
               {/* Срочен депозит */}
               <div className="grid grid-cols-3 gap-2 items-center">
-                <Label className="text-sm">Срочен депозит</Label>
+                <Label className="text-sm">{t('Срочен депозит', 'Term deposit')}</Label>
                 <Input
                   type="number"
                   min="0"
@@ -274,9 +274,9 @@ export default function ReserveStep({ data, onChange, showErrors, plannerData, l
                   options={BANK_OPTIONS}
                   value={data.client_term_deposit_bank || ''}
                   onValueChange={(value) => onChange('client_term_deposit_bank', value)}
-                  placeholder="Банка"
-                  searchPlaceholder="Търси банка..."
-                  emptyText="Няма намерена банка."
+                  placeholder={t('Банка', 'Bank')}
+                  searchPlaceholder={t('Търси банка...', 'Search bank...')}
+                  emptyText={t('Няма намерена банка.', 'No bank found.')}
                 />
               </div>
 
@@ -297,7 +297,7 @@ export default function ReserveStep({ data, onChange, showErrors, plannerData, l
 
               {/* Взаимни фондове */}
               <div className="grid grid-cols-3 gap-2 items-center">
-                <Label className="text-sm">Взаимни фондове, акции, облигации и др.</Label>
+                <Label className="text-sm">{t('Взаимни фондове, акции, облигации и др.', 'Mutual funds, stocks, bonds etc.')}</Label>
                 <Input
                   type="number"
                   min="0"
@@ -307,7 +307,7 @@ export default function ReserveStep({ data, onChange, showErrors, plannerData, l
                   className="rounded-lg text-center"
                 />
                 <Input
-                  placeholder="Платформа"
+                  placeholder={t('Платформа', 'Platform')}
                   value={data.client_mutual_funds_platform || ''}
                   onChange={(e) => onChange('client_mutual_funds_platform', e.target.value)}
                   className="rounded-lg text-sm text-center"
@@ -316,7 +316,7 @@ export default function ReserveStep({ data, onChange, showErrors, plannerData, l
 
               {/* Криптовалути */}
               <div className="grid grid-cols-3 gap-2 items-center">
-                <Label className="text-sm">Криптовалути</Label>
+                <Label className="text-sm">{t('Криптовалути', 'Cryptocurrencies')}</Label>
                 <Input
                   type="number"
                   min="0"
@@ -326,7 +326,7 @@ export default function ReserveStep({ data, onChange, showErrors, plannerData, l
                   className="rounded-lg text-center"
                 />
                 <Input
-                  placeholder="Платформа"
+                  placeholder={t('Платформа', 'Platform')}
                   value={data.client_crypto_platform || ''}
                   onChange={(e) => onChange('client_crypto_platform', e.target.value)}
                   className="rounded-lg text-sm text-center"
@@ -335,7 +335,7 @@ export default function ReserveStep({ data, onChange, showErrors, plannerData, l
 
               {/* Злато */}
               <div className="grid grid-cols-3 gap-2 items-center">
-                <Label className="text-sm">Злато и др.</Label>
+                <Label className="text-sm">{t('Злато и др.', 'Gold etc.')}</Label>
                 <Input
                   type="number"
                   min="0"
@@ -350,7 +350,7 @@ export default function ReserveStep({ data, onChange, showErrors, plannerData, l
 
             {/* Client subtotal */}
             <div className="mt-3 pt-3 border-t border-slate-200 flex justify-between items-center">
-              <span className="text-sm text-slate-600">Подсума {clientName}:</span>
+              <span className="text-sm text-slate-600">{t('Подсума', 'Subtotal')} {clientName}:</span>
               <span className="font-semibold text-slate-700">{clientTotal.toLocaleString('bg-BG')} €</span>
             </div>
           </div>
@@ -366,14 +366,14 @@ export default function ReserveStep({ data, onChange, showErrors, plannerData, l
               {/* Header row */}
               <div className="grid grid-cols-3 gap-2 mb-2 px-1">
                 <div className="text-xs font-medium text-slate-500"></div>
-                <div className="text-xs font-medium text-slate-500 text-center">Сума (€)</div>
-                <div className="text-xs font-medium text-slate-500 text-center">Банка/Платформа</div>
+                <div className="text-xs font-medium text-slate-500 text-center">{t('Сума (€)', 'Amount (€)')}</div>
+                <div className="text-xs font-medium text-slate-500 text-center">{t('Банка/Платформа', 'Bank/Platform')}</div>
               </div>
               
               <div className="space-y-3">
                 {/* Разплащателна сметка */}
                 <div className="grid grid-cols-3 gap-2 items-center" data-invalid={isFieldInvalid(data.partner_checking_account) ? "true" : undefined}>
-                  <Label className="text-sm">Разплащателна сметка <span className="text-red-500">*</span></Label>
+                  <Label className="text-sm">{t('Разплащателна сметка', 'Current account')} <span className="text-red-500">*</span></Label>
                   <Input
                     type="number"
                     min="0"
@@ -387,9 +387,9 @@ export default function ReserveStep({ data, onChange, showErrors, plannerData, l
                     options={BANK_OPTIONS}
                     value={data.partner_checking_account_bank || ''}
                     onValueChange={(value) => onChange('partner_checking_account_bank', value)}
-                    placeholder="Банка"
-                    searchPlaceholder="Търси банка..."
-                    emptyText="Няма намерена банка."
+                    placeholder={t('Банка', 'Bank')}
+                    searchPlaceholder={t('Търси банка...', 'Search bank...')}
+                    emptyText={t('Няма намерена банка.', 'No bank found.')}
                   />
                 </div>
 
@@ -408,9 +408,9 @@ export default function ReserveStep({ data, onChange, showErrors, plannerData, l
                     options={BANK_OPTIONS}
                     value={data.partner_savings_account_bank || ''}
                     onValueChange={(value) => onChange('partner_savings_account_bank', value)}
-                    placeholder="Банка"
-                    searchPlaceholder="Търси банка..."
-                    emptyText="Няма намерена банка."
+                    placeholder={t('Банка', 'Bank')}
+                    searchPlaceholder={t('Търси банка...', 'Search bank...')}
+                    emptyText={t('Няма намерена банка.', 'No bank found.')}
                   />
                 </div>
 
@@ -429,9 +429,9 @@ export default function ReserveStep({ data, onChange, showErrors, plannerData, l
                     options={BANK_OPTIONS}
                     value={data.partner_term_deposit_bank || ''}
                     onValueChange={(value) => onChange('partner_term_deposit_bank', value)}
-                    placeholder="Банка"
-                    searchPlaceholder="Търси банка..."
-                    emptyText="Няма намерена банка."
+                    placeholder={t('Банка', 'Bank')}
+                    searchPlaceholder={t('Търси банка...', 'Search bank...')}
+                    emptyText={t('Няма намерена банка.', 'No bank found.')}
                   />
                 </div>
 
@@ -462,7 +462,7 @@ export default function ReserveStep({ data, onChange, showErrors, plannerData, l
                     className="rounded-lg text-center"
                   />
                   <Input
-                    placeholder="Платформа"
+                    placeholder={t('Платформа', 'Platform')}
                     value={data.partner_mutual_funds_platform || ''}
                     onChange={(e) => onChange('partner_mutual_funds_platform', e.target.value)}
                     className="rounded-lg text-sm text-center"
@@ -481,7 +481,7 @@ export default function ReserveStep({ data, onChange, showErrors, plannerData, l
                     className="rounded-lg text-center"
                   />
                   <Input
-                    placeholder="Платформа"
+                    placeholder={t('Платформа', 'Platform')}
                     value={data.partner_crypto_platform || ''}
                     onChange={(e) => onChange('partner_crypto_platform', e.target.value)}
                     className="rounded-lg text-sm text-center"
@@ -505,7 +505,7 @@ export default function ReserveStep({ data, onChange, showErrors, plannerData, l
 
               {/* Partner subtotal */}
               <div className="mt-3 pt-3 border-t border-slate-200 flex justify-between items-center">
-                <span className="text-sm text-slate-600">Подсума {partnerName}:</span>
+                <span className="text-sm text-slate-600">{t('Подсума', 'Subtotal')} {partnerName}:</span>
                 <span className="font-semibold text-slate-700">{partnerTotal.toLocaleString('bg-BG')} €</span>
               </div>
             </div>
@@ -845,7 +845,7 @@ export default function ReserveStep({ data, onChange, showErrors, plannerData, l
                   />
                   {isDuplicate && (
                     <p className="text-amber-600 text-sm mt-1">
-                      Това име бе предоставено на предходната тема. С кого бихме могли да го заменим?
+                      {t('Това име бе предоставено на предходната тема. С кого бихме могли да го заменим?', 'This name was provided in the previous section. Who could we replace it with?')}
                     </p>
                   )}
                 </div>
@@ -884,7 +884,7 @@ export default function ReserveStep({ data, onChange, showErrors, plannerData, l
                   />
                   {isDuplicate && (
                     <p className="text-amber-600 text-sm mt-1">
-                      Това име бе предоставено на предходната тема. С кого бихме могли да го заменим?
+                      {t('Това име бе предоставено на предходната тема. С кого бихме могли да го заменим?', 'This name was provided in the previous section. Who could we replace it with?')}
                     </p>
                   )}
                 </div>

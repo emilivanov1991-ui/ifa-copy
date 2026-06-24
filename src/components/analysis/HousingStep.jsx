@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
@@ -64,29 +64,36 @@ const bankOptions = [
   { value: "eurobank", label: "Юробанк България АД (Пощенска Банка)" },
 ];
 
-const MONTHS = ['Януари','Февруари','Март','Април','Май','Юни','Юли','Август','Септември','Октомври','Ноември','Декември'];
+  const MONTHS = {
+    bg: ['Януари','Февруари','Март','Април','Май','Юни','Юли','Август','Септември','Октомври','Ноември','Декември'],
+    en: ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
+  };
 
-function getBdayLabel(data) {
-  const clientBday = data.client_birthday_day && data.client_birthday_month
-    ? `${data.client_birthday_day}-ти ${MONTHS[data.client_birthday_month - 1]}`
-    : null;
-  const partnerBday = data.include_partner && data.partner_birthday_day && data.partner_birthday_month
-    ? `${data.partner_birthday_day}-ти ${MONTHS[data.partner_birthday_month - 1]}`
-    : null;
+  const currentMonths = MONTHS[lang] || MONTHS.bg;
+
+  function getBdayLabel(data, lang, t) {
+    const clientBday = data.client_birthday_day && data.client_birthday_month
+      ? `${data.client_birthday_day}${lang === 'bg' ? '-ти' : ''} ${currentMonths[data.client_birthday_month - 1]}`
+      : null;
+    const partnerBday = data.include_partner && data.partner_birthday_day && data.partner_birthday_month
+      ? `${data.partner_birthday_day}${lang === 'bg' ? '-ти' : ''} ${currentMonths[data.partner_birthday_month - 1]}`
+      : null;
   return clientBday
     ? (partnerBday ? `${clientBday} / ${partnerBday}` : clientBday)
-    : '(въведете рожден ден)';
+    : t(' (въведете рожден ден)', ' (enter birthday)');
 }
 
-function BirthdayPlaceQuestion({ data, onChange }) {
-  const bdayLabel = getBdayLabel(data);
+function BirthdayPlaceQuestion({ data, onChange, lang, t }) {
+  const bdayLabel = getBdayLabel(data, lang, t);
   return (
     <div className="space-y-3">
       <Label className="text-slate-700">
-        Представете си, че днес е <span className="font-semibold">{bdayLabel}</span> и <span className="font-bold">имате неограничен бюджет</span>! Къде бихте празнували своя рожен ден?
+        {t('Представете си, че днес е', 'Imagine that today is')} <span className="font-semibold">{bdayLabel}</span> {t('и', 'and')} <span className="font-bold">{t('имате неограничен бюджет', 'you have an unlimited budget')}</span>! {t('Къде бихте празнували своя рожен ден?', 'Where would you celebrate your birthday?')}
+
       </Label>
       <Input
-        placeholder="Опишете мястото..."
+        placeholder={t('Опишете мястото...', 'Describe the place...')}
+
         value={data.birthday_celebration_place || ''}
         onChange={(e) => {
           onChange('birthday_celebration_place', e.target.value);
@@ -104,17 +111,17 @@ function BirthdayPlaceQuestion({ data, onChange }) {
   );
 }
 
-function BirthdayPartyQuestion({ data }) {
-  const clientBday = data.client_birthday_day && data.client_birthday_month
-    ? `${data.client_birthday_day}-ти ${MONTHS[data.client_birthday_month - 1]}`
-    : '';
-  const partnerBday = data.include_partner && data.partner_birthday_day && data.partner_birthday_month
-    ? ` / ${data.partner_birthday_day}-ти ${MONTHS[data.partner_birthday_month - 1]}`
-    : '';
+function BirthdayPartyQuestion({ data, lang, t }) {
+    const clientBday = data.client_birthday_day && data.client_birthday_month
+      ? `${data.client_birthday_day}${lang === 'bg' ? '-ти' : ''} ${currentMonths[data.client_birthday_month - 1]}`
+      : '';
+    const partnerBday = data.include_partner && data.partner_birthday_day && data.partner_birthday_month
+      ? ` / ${data.partner_birthday_day}${lang === 'bg' ? '-ти' : ''} ${currentMonths[data.partner_birthday_month - 1]}`
+      : '';
   const preposition = /^[аъоуеиАЪОУЕИ]/.test(data.birthday_celebration_place || '') ? 'в' : 'на';
   return (
     <Label className="text-slate-700">
-      Представете си, че сте {preposition} <span className="font-semibold">{data.birthday_celebration_place}</span> и е {clientBday}{partnerBday}, <span className="font-bold">имате неограничен бюджет и организирате едно голямо парти. Колко човека бихте поканили на едно такова голямо парти?</span>
+      {t('Представете си, че сте', 'Imagine you are at')} {preposition} <span className="font-semibold">{data.birthday_celebration_place}</span> {t('и е', 'and it is')} {clientBday}{partnerBday}, <span className="font-bold">{t('имате неограничен бюджет и организирате едно голямо парти. Колко човека бихте поканили на едно такова голямо парти?', 'you have an unlimited budget and are organizing a big party. How many people would you invite to such a big party?')}</span>
     </Label>
   );
 }
@@ -460,7 +467,7 @@ export default function HousingStep({ data, onChange, showErrors, plannerData, l
             {data.planned_housing_type === 'reconstruction' && (
               <div className="grid sm:grid-cols-2 gap-4">
                 <div className="space-y-2" data-invalid={isFieldInvalid(data.planned_housing_timeline_years) ? "true" : undefined}>
-                  <Label>Времеви хоризонт (години) <span className="text-red-500">*</span></Label>
+                  <Label>{t('Времеви хоризонт (години)', 'Time horizon (years)')} <span className="text-red-500">*</span></Label>
                   <Input
                     type="number"
                     min="1"
@@ -472,7 +479,7 @@ export default function HousingStep({ data, onChange, showErrors, plannerData, l
                   />
                 </div>
                 <div className="space-y-2" data-invalid={isFieldInvalid(data.planned_housing_extra_costs) ? "true" : undefined}>
-                  <Label>Разходи ремонт/обзавеждане (€) <span className="text-red-500">*</span></Label>
+                  <Label>{t('Разходи ремонт/обзавеждане (€)', 'Renovation/furnishing costs (€)')} <span className="text-red-500">*</span></Label>
                   <Input
                     type="number"
                     min="0"
@@ -731,20 +738,20 @@ export default function HousingStep({ data, onChange, showErrors, plannerData, l
                       type="number"
                       min="1"
                       max="31"
-                      placeholder="дд"
+                      placeholder={t('дд', 'dd')}
                       value={data.client_birthday_day || ''}
                       onChange={(e) => onChange('client_birthday_day', parseInt(e.target.value) || '')}
                       className="rounded-lg w-20"
                     />
                   </div>
                   <div className="space-y-1">
-                   <Label className="text-xs text-slate-500">Месец</Label>
+                   <Label className="text-xs text-slate-500">{t('Месец', 'Month')}</Label>
                    <div className="relative">
                      <Input
                        type="number"
                        min="1"
                        max="12"
-                       placeholder="мм"
+                       placeholder={t('мм', 'mm')}
                        value={data.client_birthday_month || ''}
                        onChange={(e) => onChange('client_birthday_month', parseInt(e.target.value) || '')}
                        className="rounded-lg w-20"
@@ -758,7 +765,7 @@ export default function HousingStep({ data, onChange, showErrors, plannerData, l
                   </div>
                   {data.client_birthday_day && data.client_birthday_month && (
                     <span className="text-sm text-slate-600 mt-5">
-                      → {data.client_birthday_day}-ти {['Януари','Февруари','Март','Април','Май','Юни','Юли','Август','Септември','Октомври','Ноември','Декември'][data.client_birthday_month - 1]}
+                      → {data.client_birthday_day}{lang === 'bg' ? '-ти' : ''} {currentMonths[data.client_birthday_month - 1]}
                     </span>
                   )}
                 </div>
@@ -776,20 +783,20 @@ export default function HousingStep({ data, onChange, showErrors, plannerData, l
                         type="number"
                         min="1"
                         max="31"
-                        placeholder="дд"
+                        placeholder={t('дд', 'dd')}
                         value={data.partner_birthday_day || ''}
                         onChange={(e) => onChange('partner_birthday_day', parseInt(e.target.value) || '')}
                         className="rounded-lg w-20"
                       />
                     </div>
                     <div className="space-y-1">
-                     <Label className="text-xs text-slate-500">Месец</Label>
+                     <Label className="text-xs text-slate-500">{t('Месец', 'Month')}</Label>
                      <div className="relative">
                        <Input
                          type="number"
                          min="1"
                          max="12"
-                         placeholder="мм"
+                         placeholder={t('мм', 'mm')}
                          value={data.partner_birthday_month || ''}
                          onChange={(e) => onChange('partner_birthday_month', parseInt(e.target.value) || '')}
                          className="rounded-lg w-20"
@@ -803,7 +810,7 @@ export default function HousingStep({ data, onChange, showErrors, plannerData, l
                     </div>
                     {data.partner_birthday_day && data.partner_birthday_month && (
                       <span className="text-sm text-slate-600 mt-5">
-                        → {data.partner_birthday_day}-ти {['Януари','Февруари','Март','Април','Май','Юни','Юли','Август','Септември','Октомври','Ноември','Декември'][data.partner_birthday_month - 1]}
+                        → {data.partner_birthday_day}{lang === 'bg' ? '-ти' : ''} {currentMonths[data.partner_birthday_month - 1]}
                       </span>
                     )}
                   </div>
@@ -820,7 +827,7 @@ export default function HousingStep({ data, onChange, showErrors, plannerData, l
                 <Input
                   type="number"
                   min="0"
-                  placeholder="Брой гости"
+                  placeholder={t('Брой гости', 'Number of guests')}
                   value={data.birthday_party_guests_total || ''}
                   onChange={(e) => onChange('birthday_party_guests_total', parseInt(e.target.value) || '')}
                   className="rounded-lg w-48"
@@ -831,12 +838,12 @@ export default function HousingStep({ data, onChange, showErrors, plannerData, l
             {data.birthday_party_guests_total > 0 && (
               <div className="space-y-4">
                 <Label className="text-slate-700">
-                  Вероятно биха били в три категории: Семейство, Приятели и Колеги. Колко от тези {data.birthday_party_guests_total} биха били Семейство, Приятели, Колеги?
+                  {t('Вероятно биха били в три категории: Семейство, Приятели и Колеги. Колко от тези', 'They would probably fall into three categories: Family, Friends, and Colleagues. How many of these')} {data.birthday_party_guests_total} {t('биха били Семейство, Приятели, Колеги?', 'would be Family, Friends, Colleagues?')}
                 </Label>
                 
                 <div className="grid sm:grid-cols-3 gap-4">
                   <div className="space-y-2">
-                    <Label className="text-sm">Семейство</Label>
+                    <Label className="text-sm">{t('Семейство', 'Family')}</Label>
                     <Input
                       type="number"
                       min="0"
@@ -847,7 +854,7 @@ export default function HousingStep({ data, onChange, showErrors, plannerData, l
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label className="text-sm">Приятели</Label>
+                    <Label className="text-sm">{t('Приятели', 'Friends')}</Label>
                     <Input
                       type="number"
                       min="0"
@@ -858,7 +865,7 @@ export default function HousingStep({ data, onChange, showErrors, plannerData, l
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label className="text-sm">Колеги</Label>
+                    <Label className="text-sm">{t('Колеги', 'Colleagues')}</Label>
                     <Input
                       type="number"
                       min="0"
@@ -875,7 +882,7 @@ export default function HousingStep({ data, onChange, showErrors, plannerData, l
                  data.birthday_guests_colleagues !== undefined && data.birthday_guests_colleagues !== '' &&
                  ((data.birthday_guests_family || 0) + (data.birthday_guests_friends || 0) + (data.birthday_guests_colleagues || 0)) < data.birthday_party_guests_total && (
                   <div className="p-3 bg-amber-50 border border-amber-200 rounded-lg text-amber-700 text-sm">
-                    Общият сбор е по-малък от посоченото по-горе.
+                    {t('Общият сбор е по-малък от посоченото по-горе.', 'The total sum is less than indicated above.')}
                   </div>
                 )}
 
@@ -883,12 +890,12 @@ export default function HousingStep({ data, onChange, showErrors, plannerData, l
                   <div className="space-y-6 mt-6 pt-6 border-t border-slate-200">
                     {data.birthday_guests_family > 0 && (
                       <div className="space-y-3">
-                        <Label className="text-slate-700 font-medium">Имена на Семейство ({data.birthday_guests_family})</Label>
+                        <Label className="text-slate-700 font-medium">{t('Имена на Семейство', 'Family Names')} ({data.birthday_guests_family})</Label>
                         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
                           {Array.from({ length: data.birthday_guests_family }).map((_, index) => (
                             <Input
                               key={`family_${index}`}
-                              placeholder={`Семейство ${index + 1}`}
+                              placeholder={`${t('Семейство', 'Family')} ${index + 1}`}
                               value={(data.birthday_family_names || [])[index] || ''}
                               onChange={(e) => {
                                 const newNames = [...(data.birthday_family_names || [])];
@@ -904,12 +911,12 @@ export default function HousingStep({ data, onChange, showErrors, plannerData, l
 
                     {data.birthday_guests_friends > 0 && (
                       <div className="space-y-3">
-                        <Label className="text-slate-700 font-medium">Имена на Приятели ({data.birthday_guests_friends})</Label>
+                        <Label className="text-slate-700 font-medium">{t('Имена на Приятели', 'Friends Names')} ({data.birthday_guests_friends})</Label>
                         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
                           {Array.from({ length: data.birthday_guests_friends }).map((_, index) => (
                             <Input
                               key={`friends_${index}`}
-                              placeholder={`Приятел ${index + 1}`}
+                              placeholder={`${t('Приятел', 'Friend')} ${index + 1}`}
                               value={(data.birthday_friends_names || [])[index] || ''}
                               onChange={(e) => {
                                 const newNames = [...(data.birthday_friends_names || [])];
@@ -925,12 +932,12 @@ export default function HousingStep({ data, onChange, showErrors, plannerData, l
 
                     {data.birthday_guests_colleagues > 0 && (
                       <div className="space-y-3">
-                        <Label className="text-slate-700 font-medium">Имена на Колеги ({data.birthday_guests_colleagues})</Label>
+                        <Label className="text-slate-700 font-medium">{t('Имена на Колеги', 'Colleagues Names')} ({data.birthday_guests_colleagues})</Label>
                         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
                           {Array.from({ length: data.birthday_guests_colleagues }).map((_, index) => (
                             <Input
                               key={`colleagues_${index}`}
-                              placeholder={`Колега ${index + 1}`}
+                              placeholder={`${t('Колега', 'Colleague')} ${index + 1}`}
                               value={(data.birthday_colleagues_names || [])[index] || ''}
                               onChange={(e) => {
                                 const newNames = [...(data.birthday_colleagues_names || [])];

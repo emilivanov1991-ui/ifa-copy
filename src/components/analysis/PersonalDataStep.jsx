@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
@@ -11,6 +11,8 @@ import {
 } from "@/components/ui/select";
 import { User, Users, Baby, Shield, X } from 'lucide-react';
 import BulgarianDateInput from '@/components/ui/BulgarianDateInput';
+import ContradictionBanner from '@/components/ui/ContradictionBanner';
+import { useContradictionCheck } from '@/components/discovery/useContradictionCheck';
 
 const BANK_OPTIONS = [
   { value: 'allianz', label: 'Алианц Банк България АД' },
@@ -129,6 +131,12 @@ export default function PersonalDataStep({ data, onChange, showErrors }) {
   const isFieldInvalid = (value) => showErrors && (value === undefined || value === '' || value === null);
   const [showDisclaimer, setShowDisclaimer] = useState(true);
   const [emailTouched, setEmailTouched] = useState({ client: false, partner: false });
+  const { contradictions, checkContradictions } = useContradictionCheck();
+
+  // Check contradictions on relevant field changes
+  const checkForContradictions = useCallback((fieldName) => {
+    checkContradictions(fieldName, data);
+  }, [data, checkContradictions]);
   
   // Email validation - only show error after field loses focus and has content
   const isEmailInvalid = (email, touched) => {
@@ -169,6 +177,9 @@ export default function PersonalDataStep({ data, onChange, showErrors }) {
 
   return (
     <div className="space-y-8 relative">
+      {/* Contradiction Feedback */}
+      <ContradictionBanner contradictions={contradictions} />
+
       {showDisclaimer && (
         <div className="fixed bottom-4 right-4 max-w-sm bg-blue-600 text-white p-4 rounded-xl shadow-xl z-50">
           <button 
@@ -262,7 +273,7 @@ export default function PersonalDataStep({ data, onChange, showErrors }) {
           </div>
           <div className="space-y-2" data-invalid={isFieldInvalid(data.client_email) || isEmailInvalid(data.client_email, emailTouched.client) ? 'true' : undefined}>
             <Label>Email <span className="text-red-500">*</span></Label>
-            <Input type="email" placeholder="email@example.com" value={data.client_email || ''} onChange={(e) => onChange('client_email', e.target.value)} onBlur={() => setEmailTouched(prev => ({ ...prev, client: true }))} className={`rounded-lg ${isFieldInvalid(data.client_email) || isEmailInvalid(data.client_email, emailTouched.client) ? 'border-red-500 bg-red-50' : ''}`} required />
+            <Input type="email" placeholder="email@example.com" value={data.client_email || ''} onChange={(e) => { onChange('client_email', e.target.value); checkForContradictions('client_email'); }} onBlur={() => setEmailTouched(prev => ({ ...prev, client: true }))} className={`rounded-lg ${isFieldInvalid(data.client_email) || isEmailInvalid(data.client_email, emailTouched.client) ? 'border-red-500 bg-red-50' : ''}`} required />
             {isEmailInvalid(data.client_email, emailTouched.client) && (
               <p className="text-red-500 text-xs">Невалиден формат на email</p>
             )}
@@ -465,7 +476,7 @@ export default function PersonalDataStep({ data, onChange, showErrors }) {
               </div>
               <div className="space-y-2" data-invalid={isFieldInvalid(data.partner_email) || isEmailInvalid(data.partner_email, emailTouched.partner) ? "true" : undefined}>
                 <Label>Email <span className="text-red-500">*</span></Label>
-                <Input type="email" placeholder="email@example.com" value={data.partner_email || ''} onChange={(e) => onChange('partner_email', e.target.value)} onBlur={() => setEmailTouched(prev => ({ ...prev, partner: true }))} className={`rounded-lg ${isFieldInvalid(data.partner_email) || isEmailInvalid(data.partner_email, emailTouched.partner) ? 'border-red-500 bg-red-50' : ''}`} required />
+                <Input type="email" placeholder="email@example.com" value={data.partner_email || ''} onChange={(e) => { onChange('partner_email', e.target.value); checkForContradictions('partner_email'); }} onBlur={() => setEmailTouched(prev => ({ ...prev, partner: true }))} className={`rounded-lg ${isFieldInvalid(data.partner_email) || isEmailInvalid(data.partner_email, emailTouched.partner) ? 'border-red-500 bg-red-50' : ''}`} required />
                 {isEmailInvalid(data.partner_email, emailTouched.partner) && (
                   <p className="text-red-500 text-xs">Невалиден формат на email</p>
                 )}

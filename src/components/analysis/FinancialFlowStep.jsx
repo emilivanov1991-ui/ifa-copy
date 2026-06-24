@@ -1,11 +1,18 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useCallback } from 'react';
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Banknote, Home, Car, ShoppingBag, PiggyBank, CreditCard, Shield } from 'lucide-react';
+import ContradictionBanner from '@/components/ui/ContradictionBanner';
+import { useContradictionCheck } from '@/components/discovery/useContradictionCheck';
 
 export default function FinancialFlowStep({ data, onChange, showErrors, plannerData, lang = 'bg' }) {
   const includePartner = data.include_partner || false;
   const t = (bg, en) => lang === 'en' ? en : bg;
+  const { contradictions, checkContradictions } = useContradictionCheck();
+
+  const checkForContradictions = useCallback((fieldName) => {
+    checkContradictions(fieldName, data);
+  }, [data, checkContradictions]);
   
   // Helper to check if a field is invalid
   const isFieldInvalid = (value) => showErrors && (value === undefined || value === null || value === '');
@@ -231,6 +238,7 @@ export default function FinancialFlowStep({ data, onChange, showErrors, plannerD
 
   return (
     <div className="space-y-8">
+      <ContradictionBanner contradictions={contradictions} />
       {/* Income */}
       <div className="bg-slate-50 rounded-xl p-6">
         <div className="flex items-center gap-2 mb-6">
@@ -424,8 +432,8 @@ export default function FinancialFlowStep({ data, onChange, showErrors, plannerD
         <div className="flex items-center justify-between gap-2" data-invalid={isFieldInvalid(data.monthly_investments) ? "true" : undefined}>
           <Label className="text-sm">{t('Месечна сума', 'Monthly amount')} <span className="text-red-500">*</span></Label>
           <Input type="number" min="0" value={data.monthly_investments ?? ''}
-            onChange={(e) => onChange('monthly_investments', e.target.value === '' ? '' : parseInt(e.target.value))} 
-            className={`rounded-lg w-28 ${isFieldInvalid(data.monthly_investments) ? 'border-red-500 bg-red-50' : ''}`} />
+                       onChange={(e) => { onChange('monthly_investments', e.target.value === '' ? '' : parseInt(e.target.value)); checkForContradictions('monthly_investments'); }} 
+                       className={`rounded-lg w-28 ${isFieldInvalid(data.monthly_investments) ? 'border-red-500 bg-red-50' : ''}`} />
         </div>
       </div>
 

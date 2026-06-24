@@ -105,13 +105,13 @@ export default function FinancialPlanPresentation() {
       });
       setConversation(conv);
 
-      // Advance journey state via direct entity update (no auth required for this page)
+      // Advance journey state via advanceJourneyPublic (routes through state machine + audit)
       if (journeyId) {
         try {
-          await base44.entities.Journey.update(journeyId, {
-            presentation_started_at: new Date().toISOString(),
-            journey_state: 'presentation_in_progress',
-            last_activity_at: new Date().toISOString(),
+          await base44.functions.invoke('advanceJourneyPublic', {
+            journey_id: journeyId,
+            to_state: 'presentation_in_progress',
+            extra_data: { presentation_started_at: new Date().toISOString() },
           });
         } catch (err) {
           console.warn('Failed to update journey state (non-blocking):', err);
@@ -159,9 +159,9 @@ export default function FinancialPlanPresentation() {
   const handleProceedToApplication = async () => {
     if (journeyId) {
       try {
-        await base44.entities.Journey.update(journeyId, {
-          journey_state: 'application_collecting',
-          last_activity_at: new Date().toISOString(),
+        await base44.functions.invoke('advanceJourneyPublic', {
+          journey_id: journeyId,
+          to_state: 'application_collecting',
         });
       } catch (err) {
         console.warn('Failed to advance journey (non-blocking):', err);

@@ -4,18 +4,19 @@ import { Button } from '@/components/ui/button';
 import { base44 } from '@/api/base44Client';
 import {
   MessageSquare, PhoneOff, Loader2,
-  ChevronRight, CheckCircle2,
-  BarChart3, Shield, PiggyBank, Home, Baby,
-  AlertTriangle, Send, X
+  CheckCircle2, BarChart3, Shield, PiggyBank, Home, Baby,
+  Send, X, FileText, CreditCard
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import AvatarFrame from '@/components/voice/AvatarFrame';
-import { useJourneyState } from '@/components/voice/JourneyStateManager.jsx';
 import GuideAvatar from '@/components/GuideAvatar';
 import { createPageUrl } from '@/utils';
 import ReactMarkdown from 'react-markdown';
+import ApplicationCollectionForm from '@/components/application/ApplicationCollectionForm';
+import SigningStatusPoller from '@/components/application/SigningStatusPoller';
+import PaymentCheckout from '@/components/application/PaymentCheckout';
 
-const AGENT_NAME = 'voice_rulebook_agent';
+const AGENT_NAME = 'presentation_advisor';
 
 export default function FinancialPlanPresentation() {
   const urlParams = new URLSearchParams(window.location.search);
@@ -27,6 +28,13 @@ export default function FinancialPlanPresentation() {
   const [offers, setOffers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [currentSection, setCurrentSection] = useState(0);
+
+  // Phase 5 state: 'presentation' | 'application' | 'signing' | 'payment'
+  const [phase, setPhase] = useState('presentation');
+  const [applicationId, setApplicationId] = useState(null);
+  const [signingEventId, setSigningEventId] = useState(null);
+  const [signingUrl, setSigningUrl] = useState(null);
+  const [analysisData, setAnalysisData] = useState(null);
 
   // Agent conversation state
   const [conversation, setConversation] = useState(null);
@@ -40,7 +48,7 @@ export default function FinancialPlanPresentation() {
   // NOTE: advanceState removed — FinancialPlanPresentation may be accessed without auth
   // Journey state advances via backend automations on application submit
 
-  // Load plan data
+  // Load plan data + analysis
   useEffect(() => {
     if (!planId && !journeyId) { setLoading(false); return; }
     const loadData = async () => {
@@ -51,6 +59,11 @@ export default function FinancialPlanPresentation() {
             setPlan(plans[0]);
             const offerData = await base44.entities.ProductOffer.filter({ plan_id: planId });
             setOffers(offerData);
+            // Load analysis for ApplicationCollectionForm
+            if (plans[0].analysis_id) {
+              const analyses = await base44.entities.FinancialAnalysisSubmission.filter({ id: plans[0].analysis_id });
+              if (analyses.length > 0) setAnalysisData(analyses[0]);
+            }
           }
         }
         if (journeyId) {
@@ -158,16 +171,25 @@ export default function FinancialPlanPresentation() {
 
   const handleProceedToApplication = async () => {
     if (journeyId) {
-      try {
-        await base44.functions.invoke('advanceJourneyPublic', {
-          journey_id: journeyId,
-          to_state: 'application_collecting',
-        });
-      } catch (err) {
-        console.warn('Failed to advance journey (non-blocking):', err);
-      }
+      await base44.functions.invoke('advanceJourneyPublic', {
+        journey_id: journeyId,
+        to_state: 'application_collecting',
+      }).catch(() => {});
     }
-    window.location.href = createPageUrl('FinancialAnalysis') + `?journey_id=${journeyId}&mode=application`;
+    setPhase('application');
+  };
+
+  const handleApplicationComplete = (appId) => {
+    setApplicationId(appId);
+    setPhase('signing');
+  };
+
+  const handleSigningComplete = () => {
+    setPhase('payment');
+  };
+
+  const handleSigningFailed = () => {
+    // Stay on signing screen, user can retry
   };
 
   const sections = [
@@ -184,6 +206,85 @@ export default function FinancialPlanPresentation() {
         <div className="text-center text-white">
           <Loader2 className="w-12 h-12 animate-spin mx-auto mb-4" />
           <p className="text-xl">Зареждане на финансовия план...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Phase 5 screens
+  if (phase === 'application') {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 flex flex-col">
+        <div className="bg-white border-b border-slate-200 px-4 py-3 flex items-center gap-3">
+          <img src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6925a960748714fa4828395a/258cedab0_output-onlinepngtools.png" alt="IFA" className="h-8 w-auto" />
+          <div>
+            <h1 className="text-sm font-bold text-slate-900">Попълване на заявление</h1>
+            <p className="text-xs text-slate-500">Стъпка 1 от 3</p>
+          </div>
+        </div>
+        <div className="flex-1 p-4 flex items-start justify-center pt-8">
+          <ApplicationCollectionForm
+            journeyId={journeyId}
+            planId={planId}
+            analysisData={analysisData}
+            onComplete={handleApplicationComplete}
+          />
+        </div>
+      </div>
+    );
+  }
+
+  if (phase === 'signing') {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 flex flex-col">
+        <div className="bg-white border-b border-slate-200 px-4 py-3 flex items-center gap-3">
+          <img src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6925a960748714fa4828395a/258cedab0_output-onlinepngtools.png" alt="IFA" className="h-8 w-auto" />
+          <div>
+            <h1 className="text-sm font-bold text-slate-900">Електронно подписване</h1>
+            <p className="text-xs text-slate-500">Стъпка 2 от 3</p>
+          </div>
+        </div>
+        <div className="flex-1 p-4 flex items-start justify-center pt-8">
+          {signingEventId ? (
+            <SigningStatusPoller
+              signingEventId={signingEventId}
+              signingUrl={signingUrl}
+              onSigned={handleSigningComplete}
+              onFailed={handleSigningFailed}
+            />
+          ) : (
+            <div className="max-w-md mx-auto bg-white rounded-2xl shadow-xl border border-slate-200 p-6 text-center">
+              <FileText className="w-12 h-12 text-blue-400 mx-auto mb-3" />
+              <h3 className="font-bold text-slate-900 mb-2">Готови за подписване</h3>
+              <p className="text-sm text-slate-500 mb-5">Документите са изготвени. Консултантът ще инициира сесията за подписване чрез Evrotrust.</p>
+              <Button className="w-full bg-blue-600 hover:bg-blue-700 text-white rounded-full" onClick={handleSigningComplete}>
+                Продължи без подписване (тест)
+              </Button>
+            </div>
+          )}
+        </div>
+      </div>
+    );
+  }
+
+  if (phase === 'payment') {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 flex flex-col">
+        <div className="bg-white border-b border-slate-200 px-4 py-3 flex items-center gap-3">
+          <img src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6925a960748714fa4828395a/258cedab0_output-onlinepngtools.png" alt="IFA" className="h-8 w-auto" />
+          <div>
+            <h1 className="text-sm font-bold text-slate-900">Плащане</h1>
+            <p className="text-xs text-slate-500">Стъпка 3 от 3</p>
+          </div>
+        </div>
+        <div className="flex-1 p-4 flex items-start justify-center pt-8">
+          <PaymentCheckout
+            journeyId={journeyId}
+            applicationId={applicationId}
+            plan={plan}
+            onSuccess={() => {}}
+            onCancel={() => setPhase('presentation')}
+          />
         </div>
       </div>
     );

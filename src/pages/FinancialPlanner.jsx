@@ -2274,8 +2274,27 @@ export default function FinancialPlanner() {
                     let client;
                     if (clientId) { await base44.entities.Client.update(clientId, clientData); client = { id: clientId, ...clientData }; }
                     else { client = await base44.entities.Client.create(clientData); }
+
+                    // --- Journey init ---
+                    let journeyId = localStorage.getItem('active_journey_id');
+                    if (!journeyId) {
+                      const deviceId = localStorage.getItem('device_id') || `dev_${Date.now()}`;
+                      localStorage.setItem('device_id', deviceId);
+                      const journey = await base44.entities.Journey.create({
+                        client_id: client.id,
+                        device_id: deviceId,
+                        language_code: 'bg',
+                        journey_state: 'discovery_collecting',
+                        discovery_started_at: new Date().toISOString(),
+                        last_activity_at: new Date().toISOString(),
+                      });
+                      journeyId = journey.id;
+                      localStorage.setItem('active_journey_id', journeyId);
+                    }
+                    // --------------------
+
                     const plannerData = {
-                      client_id: client.id, family_type: familyType,
+                      client_id: client.id, journey_id: journeyId, family_type: familyType,
                       client_first_name: clientFirstName, client_last_name: clientLastName,
                       client_phone: clientPhone, client_email: clientEmail,
                       partner_first_name: partnerFirstName, partner_last_name: partnerLastName,

@@ -37,9 +37,10 @@ const BANK_OPTIONS = [
   { value: 'other', label: 'Друга' },
 ];
 
-export default function ReserveStep({ data, onChange, showErrors, plannerData }) {
+export default function ReserveStep({ data, onChange, showErrors, plannerData, lang = 'bg' }) {
   // Helper to check if a field is invalid - only when showErrors is true
   const isFieldInvalid = (value) => showErrors && (value === undefined || value === '' || value === null);
+  const t = (bg, en) => lang === 'en' ? en : bg;
   
   // Get names from Financial Planner or from analysis data directly
   const clientName = plannerData?.client_first_name || data.client_first_name || 'Клиент';
@@ -112,12 +113,12 @@ export default function ReserveStep({ data, onChange, showErrors, plannerData })
       <div className="bg-slate-50 rounded-xl p-6">
         <div className="flex items-center gap-2 mb-6">
           <PiggyBank className="h-5 w-5 text-blue-600" />
-          <h3 className="font-semibold text-slate-900">По какъв начин създавате своя финансов резерв?</h3>
+          <h3 className="font-semibold text-slate-900">{t('По какъв начин създавате своя финансов резерв?', 'How do you build your financial reserve?')}</h3>
         </div>
 
         {/* Monthly Net Income */}
         <div className="mb-6 p-4 bg-white rounded-lg border border-slate-200">
-          <h4 className="font-medium text-slate-700 mb-4">Месечен среден нетен доход <span className="text-red-500">*</span></h4>
+          <h4 className="font-medium text-slate-700 mb-4">{t('Месечен среден нетен доход', 'Average monthly net income')} <span className="text-red-500">*</span></h4>
           <div className={includePartner ? "grid sm:grid-cols-2 gap-4" : ""}>
             <div className="space-y-2" data-invalid={isFieldInvalid(data.client_monthly_net_income) ? "true" : undefined}>
               <Label className="text-sm">{clientName} (€) <span className="text-red-500">*</span></Label>
@@ -155,32 +156,32 @@ export default function ReserveStep({ data, onChange, showErrors, plannerData })
             )}
           </div>
           <div className="mt-3 pt-3 border-t border-slate-200 flex justify-between items-center">
-            <span className="text-sm text-slate-600">Общо:</span>
+            <span className="text-sm text-slate-600">{t('Общо:', 'Total:')}</span>
             <span className="font-semibold text-blue-600">{(data.total_monthly_income || 0).toLocaleString('bg-BG')} €</span>
           </div>
         </div>
 
         <div className="space-y-4">
           <div className="space-y-2" data-invalid={isFieldInvalid(data.savings_method) ? "true" : undefined}>
-            <Label>Метод на спестяване <span className="text-red-500">*</span></Label>
+            <Label>{t('Метод на спестяване', 'Savings method')} <span className="text-red-500">*</span></Label>
             <Select 
               value={data.savings_method || ''} 
               onValueChange={(value) => onChange('savings_method', value)}
             >
               <SelectTrigger className={`rounded-lg ${isFieldInvalid(data.savings_method) ? 'border-red-500 bg-red-50' : ''}`}>
-                <SelectValue placeholder="Изберете" />
+                <SelectValue placeholder={t('Изберете', 'Select')} />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="none">Не спестявам</SelectItem>
-                <SelectItem value="leftover">Каквото остане след разходи</SelectItem>
-                <SelectItem value="fixed">Спестявам в началото на месеца фиксирана сума</SelectItem>
+                <SelectItem value="none">{t('Не спестявам', "I don't save")}</SelectItem>
+                <SelectItem value="leftover">{t('Каквото остане след разходи', 'Whatever is left after expenses')}</SelectItem>
+                <SelectItem value="fixed">{t('Спестявам в началото на месеца фиксирана сума', 'I save a fixed amount at the start of the month')}</SelectItem>
               </SelectContent>
             </Select>
           </div>
 
           {(data.savings_method === 'leftover' || data.savings_method === 'fixed') && (
             <div className="space-y-2">
-              <Label>Приблизително спестяване месечно (€) <span className="text-red-500">*</span></Label>
+              <Label>{t('Приблизително спестяване месечно (€)', 'Approximate monthly savings (€)')} <span className="text-red-500">*</span></Label>
               <Input
                 type="number"
                 min="0"
@@ -197,7 +198,7 @@ export default function ReserveStep({ data, onChange, showErrors, plannerData })
 
       {/* Current Savings and Investments */}
       <div className="bg-slate-50 rounded-xl p-6">
-        <h3 className="font-semibold text-slate-900 mb-6">Текущи спестявания и инвестиции</h3>
+        <h3 className="font-semibold text-slate-900 mb-6">{t('Текущи спестявания и инвестиции', 'Current savings and investments')}</h3>
 
         <div className={includePartner ? "grid lg:grid-cols-2 gap-8" : ""}>
           {/* Client */}
@@ -210,20 +211,20 @@ export default function ReserveStep({ data, onChange, showErrors, plannerData })
             {/* Header row */}
             <div className="grid grid-cols-3 gap-2 mb-2 px-1">
               <div className="text-xs font-medium text-slate-500"></div>
-              <div className="text-xs font-medium text-slate-500 text-center">Сума (€)</div>
-              <div className="text-xs font-medium text-slate-500 text-center">Банка/Платформа</div>
+              <div className="text-xs font-medium text-slate-500 text-center">{t('Сума (€)', 'Amount (€)')}</div>
+              <div className="text-xs font-medium text-slate-500 text-center">{t('Банка/Платформа', 'Bank/Platform')}</div>
             </div>
             
             <div className="space-y-3">
               {/* Разплащателна сметка */}
               <div className="grid grid-cols-3 gap-2 items-center" data-invalid={isFieldInvalid(data.client_checking_account) ? "true" : undefined}>
-                <Label className="text-sm">Разплащателна сметка <span className="text-red-500">*</span></Label>
+                <Label className="text-sm">{t('Разплащателна сметка', 'Current account')} <span className="text-red-500">*</span></Label>
                 <Input
-                  type="number"
-                  min="0"
-                  placeholder="0"
-                  value={data.client_checking_account ?? ''}
-                  onChange={(e) => onChange('client_checking_account', e.target.value === '' ? '' : parseInt(e.target.value))}
+                   type="number"
+                   min="0"
+                   placeholder="0"
+                   value={data.client_checking_account ?? ''}
+                   onChange={(e) => onChange('client_checking_account', e.target.value === '' ? '' : parseInt(e.target.value))}
                   className={`rounded-lg text-center ${isFieldInvalid(data.client_checking_account) ? 'border-red-500 bg-red-50' : ''}`}
                   required
                 />
@@ -231,9 +232,9 @@ export default function ReserveStep({ data, onChange, showErrors, plannerData })
                   options={BANK_OPTIONS}
                   value={data.client_checking_account_bank || ''}
                   onValueChange={(value) => onChange('client_checking_account_bank', value)}
-                  placeholder="Банка"
-                  searchPlaceholder="Търси банка..."
-                  emptyText="Няма намерена банка."
+                  placeholder={t('Банка', 'Bank')}
+                  searchPlaceholder={t('Търси банка...', 'Search bank...')}
+                  emptyText={t('Няма намерена банка.', 'No bank found.')}
                 />
               </div>
 
@@ -281,13 +282,13 @@ export default function ReserveStep({ data, onChange, showErrors, plannerData })
 
               {/* Пари в брой */}
               <div className="grid grid-cols-3 gap-2 items-center" data-invalid={isFieldInvalid(data.client_cash) ? "true" : undefined}>
-                <Label className="text-sm">Пари в брой <span className="text-red-500">*</span></Label>
+                <Label className="text-sm">{t('Пари в брой', 'Cash')} <span className="text-red-500">*</span></Label>
                 <Input
-                  type="number"
-                  min="0"
-                  placeholder="0"
-                  value={data.client_cash ?? ''}
-                  onChange={(e) => onChange('client_cash', e.target.value === '' ? '' : parseInt(e.target.value))}
+                 type="number"
+                 min="0"
+                 placeholder="0"
+                 value={data.client_cash ?? ''}
+                 onChange={(e) => onChange('client_cash', e.target.value === '' ? '' : parseInt(e.target.value))}
                   className={`rounded-lg text-center ${isFieldInvalid(data.client_cash) ? 'border-red-500 bg-red-50' : ''}`}
                   required
                 />
@@ -394,7 +395,7 @@ export default function ReserveStep({ data, onChange, showErrors, plannerData })
 
                 {/* Спестовна сметка */}
                 <div className="grid grid-cols-3 gap-2 items-center">
-                  <Label className="text-sm">Спестовна сметка</Label>
+                  <Label className="text-sm">{t('Спестовна сметка', 'Savings account')}</Label>
                   <Input
                     type="number"
                     min="0"
@@ -415,7 +416,7 @@ export default function ReserveStep({ data, onChange, showErrors, plannerData })
 
                 {/* Срочен депозит */}
                 <div className="grid grid-cols-3 gap-2 items-center">
-                  <Label className="text-sm">Срочен депозит</Label>
+                  <Label className="text-sm">{t('Срочен депозит', 'Term deposit')}</Label>
                   <Input
                     type="number"
                     min="0"
@@ -451,7 +452,7 @@ export default function ReserveStep({ data, onChange, showErrors, plannerData })
 
                 {/* Взаимни фондове */}
                 <div className="grid grid-cols-3 gap-2 items-center">
-                  <Label className="text-sm">Взаимни фондове, акции, облигации и др.</Label>
+                  <Label className="text-sm">{t('Взаимни фондове, акции, облигации и др.', 'Mutual funds, stocks, bonds etc.')}</Label>
                   <Input
                     type="number"
                     min="0"
@@ -470,7 +471,7 @@ export default function ReserveStep({ data, onChange, showErrors, plannerData })
 
                 {/* Криптовалути */}
                 <div className="grid grid-cols-3 gap-2 items-center">
-                  <Label className="text-sm">Криптовалути</Label>
+                  <Label className="text-sm">{t('Криптовалути', 'Cryptocurrencies')}</Label>
                   <Input
                     type="number"
                     min="0"
@@ -489,7 +490,7 @@ export default function ReserveStep({ data, onChange, showErrors, plannerData })
 
                 {/* Злато */}
                 <div className="grid grid-cols-3 gap-2 items-center">
-                  <Label className="text-sm">Злато и др.</Label>
+                  <Label className="text-sm">{t('Злато и др.', 'Gold etc.')}</Label>
                   <Input
                     type="number"
                     min="0"
@@ -514,7 +515,7 @@ export default function ReserveStep({ data, onChange, showErrors, plannerData })
         {/* Grand Total */}
         <div className="mt-6 pt-6 border-t border-slate-200">
           <div className="flex items-center justify-between">
-            <span className="font-semibold text-slate-900">Общ сбор на спестявания и инвестиции:</span>
+            <span className="font-semibold text-slate-900">{t('Общ сбор на спестявания и инвестиции:', 'Total savings and investments:')}</span>
             <span className="text-2xl font-bold text-blue-600">{grandTotal.toLocaleString('bg-BG')} €</span>
           </div>
         </div>
@@ -522,10 +523,10 @@ export default function ReserveStep({ data, onChange, showErrors, plannerData })
 
       {/* Reserve Size */}
       <div className="bg-slate-50 rounded-xl p-6">
-        <h3 className="font-semibold text-slate-900 mb-4">Какъв размер на резерва е достатъчен според Вас?</h3>
+        <h3 className="font-semibold text-slate-900 mb-4">{t('Какъв размер на резерва е достатъчен според Вас?', 'What reserve amount do you consider sufficient?')}</h3>
         <div className="space-y-4">
           <div className="space-y-2" data-invalid={isFieldInvalid(data.desired_reserve_amount) ? "true" : undefined}>
-            <Label>Желан размер на резерва (€) <span className="text-red-500">*</span></Label>
+            <Label>{t('Желан размер на резерва (€)', 'Desired reserve amount (€)')} <span className="text-red-500">*</span></Label>
             <Input
               type="number"
               min="0"
@@ -548,7 +549,7 @@ export default function ReserveStep({ data, onChange, showErrors, plannerData })
             return (
               <>
                 <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg">
-                  <span className="text-blue-700 font-medium">Препоръчителният резерв за Вас е: </span>
+                  <span className="text-blue-700 font-medium">{t('Препоръчителният резерв за Вас е: ', 'The recommended reserve for you is: ')}</span>
                   <span className="text-blue-800 font-bold">
                     {recommendedMin === recommendedMax 
                       ? `${recommendedMin.toLocaleString('bg-BG')} €`
@@ -560,7 +561,7 @@ export default function ReserveStep({ data, onChange, showErrors, plannerData })
                 {showReserveMessage && totalLiquid > recommendedReserve && (
                   <div className="p-4 bg-red-50 border border-red-200 rounded-lg">
                     <p className="text-red-700">
-                      Спестяванията ви надвишават препоръчителния резерв и губите средно <span className="font-bold">{Math.round((totalLiquid - recommendedReserve) * 0.05).toLocaleString('bg-BG')} €</span> годишно от инфлация. Ще ви помогнем да реализирате доходност на тези средства!
+                      {t('Спестяванията ви надвишават препоръчителния резерв и губите средно', 'Your savings exceed the recommended reserve and you lose an average of')} <span className="font-bold">{Math.round((totalLiquid - recommendedReserve) * 0.05).toLocaleString('bg-BG')} €</span> {t('годишно от инфлация. Ще ви помогнем да реализирате доходност на тези средства!', 'annually to inflation. We will help you earn returns on these funds!')}
                     </p>
                   </div>
                 )}
@@ -568,7 +569,7 @@ export default function ReserveStep({ data, onChange, showErrors, plannerData })
                 {showReserveMessage && totalLiquid < recommendedReserve && totalLiquid >= 0 && (
                   <div className="p-4 bg-red-50 border border-red-200 rounded-lg">
                     <p className="text-red-700">
-                      Спестяванията ви са по-малко от препоръчителния резерв с <span className="font-bold">{(recommendedReserve - totalLiquid).toLocaleString('bg-BG')} €</span>. Ще ви помогнем да достигнете до него чрез правилно финансово планиране!
+                      {t('Спестяванията ви са по-малко от препоръчителния резерв с', 'Your savings are below the recommended reserve by')} <span className="font-bold">{(recommendedReserve - totalLiquid).toLocaleString('bg-BG')} €</span>. {t('Ще ви помогнем да достигнете до него чрез правилно финансово планиране!', 'We will help you reach it through proper financial planning!')}
                     </p>
                   </div>
                 )}
@@ -582,12 +583,12 @@ export default function ReserveStep({ data, onChange, showErrors, plannerData })
       <div className="bg-slate-50 rounded-xl p-6">
         <div className="flex items-center gap-2 mb-6">
           <TrendingUp className="h-5 w-5 text-blue-600" />
-          <h3 className="font-semibold text-slate-900">Рисков профил</h3>
+          <h3 className="font-semibold text-slate-900">{t('Рисков профил', 'Risk Profile')}</h3>
         </div>
 
         <div className="space-y-6">
           <div className="space-y-4">
-            <Label>Разпределете инвестицията в % според отделните инструменти (общо 100%) <span className="text-red-500">*</span></Label>
+            <Label>{t('Разпределете инвестицията в % според отделните инструменти (общо 100%)', 'Distribute your investment in % across different instruments (total 100%)')} <span className="text-red-500">*</span></Label>
             
             {/* Visual Risk Profile Cards */}
             <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 mt-3">
@@ -595,7 +596,7 @@ export default function ReserveStep({ data, onChange, showErrors, plannerData })
               <div className="p-4 rounded-xl border-2 border-blue-200 bg-blue-50">
                 <div className="flex items-center gap-2 mb-3">
                   <Shield className="h-5 w-5 text-blue-600" />
-                  <span className="font-medium text-blue-800">Консервативен <span className="text-red-500">*</span></span>
+                  <span className="font-medium text-blue-800">{t('Консервативен', 'Conservative')} <span className="text-red-500">*</span></span>
                 </div>
                 <div className="text-xs text-blue-600 mb-2">+2% годишно</div>
                 <div className="h-2 bg-blue-200 rounded-full mb-3">
@@ -623,7 +624,7 @@ export default function ReserveStep({ data, onChange, showErrors, plannerData })
               <div className="p-4 rounded-xl border-2 border-green-200 bg-green-50">
                 <div className="flex items-center gap-2 mb-3">
                   <Scale className="h-5 w-5 text-green-600" />
-                  <span className="font-medium text-green-800">Балансиран <span className="text-red-500">*</span></span>
+                  <span className="font-medium text-green-800">{t('Балансиран', 'Balanced')} <span className="text-red-500">*</span></span>
                 </div>
                 <div className="text-xs text-green-600 mb-2">+7% / -3%</div>
                 <div className="h-2 bg-green-200 rounded-full mb-3">
@@ -651,7 +652,7 @@ export default function ReserveStep({ data, onChange, showErrors, plannerData })
               <div className="p-4 rounded-xl border-2 border-amber-200 bg-amber-50">
                 <div className="flex items-center gap-2 mb-3">
                   <Zap className="h-5 w-5 text-amber-600" />
-                  <span className="font-medium text-amber-800">Динамичен <span className="text-red-500">*</span></span>
+                  <span className="font-medium text-amber-800">{t('Динамичен', 'Dynamic')} <span className="text-red-500">*</span></span>
                 </div>
                 <div className="text-xs text-amber-600 mb-2">+12% / -5%</div>
                 <div className="h-2 bg-amber-200 rounded-full mb-3">
@@ -679,7 +680,7 @@ export default function ReserveStep({ data, onChange, showErrors, plannerData })
               <div className="p-4 rounded-xl border-2 border-red-200 bg-red-50">
                 <div className="flex items-center gap-2 mb-3">
                   <Flame className="h-5 w-5 text-red-600" />
-                  <span className="font-medium text-red-800">Агресивен <span className="text-red-500">*</span></span>
+                  <span className="font-medium text-red-800">{t('Агресивен', 'Aggressive')} <span className="text-red-500">*</span></span>
                 </div>
                 <div className="text-xs text-red-600 mb-2">+25% / -15%</div>
                 <div className="h-2 bg-red-200 rounded-full mb-3">
@@ -710,7 +711,7 @@ export default function ReserveStep({ data, onChange, showErrors, plannerData })
                 {totalPercent !== 100 ? (
                   <div className="p-4 bg-amber-50 border border-amber-200 rounded-lg">
                     <p className="text-amber-700">
-                      Моля разпределете активите така, че общия сбор да прави 100% (текущо: {totalPercent}%)
+                      {t(`Моля разпределете активите така, че общия сбор да прави 100% (текущо: ${totalPercent}%)`, `Please distribute assets so the total equals 100% (current: ${totalPercent}%)`)}
                     </p>
                   </div>
                 ) : (
@@ -718,13 +719,13 @@ export default function ReserveStep({ data, onChange, showErrors, plannerData })
                     {(cons > 80 || mod > 80 || dyn > 80 || agg > 80) ? (
                       <div className="p-4 bg-red-50 border border-red-200 rounded-lg">
                         <p className="text-red-700">
-                          Прекалената концентрация в един вид активи води до по-голяма волатилност и риск! Препоръчваме Ви по-широка диверсификация!
+                          {t('Прекалената концентрация в един вид активи води до по-голяма волатилност и риск! Препоръчваме Ви по-широка диверсификация!', 'Excessive concentration in one asset type leads to higher volatility and risk! We recommend broader diversification!')}
                         </p>
                       </div>
                     ) : (
                       <div className="p-4 bg-green-50 border border-green-200 rounded-lg">
                         <p className="text-green-700">
-                          Поздравления! Явно правилно разбирате идеята за диверсификация на Вашите активи!
+                          {t('Поздравления! Явно правилно разбирате идеята за диверсификация на Вашите активи!', 'Congratulations! You clearly understand the concept of asset diversification!')}
                         </p>
                       </div>
                     )}
@@ -735,73 +736,73 @@ export default function ReserveStep({ data, onChange, showErrors, plannerData })
           </div>
 
           <div className="space-y-2" data-invalid={isFieldInvalid(data.investment_horizon) ? "true" : undefined}>
-            <Label>Инвестиционен хоризонт <span className="text-red-500">*</span></Label>
+            <Label>{t('Инвестиционен хоризонт', 'Investment horizon')} <span className="text-red-500">*</span></Label>
             <Select 
               value={data.investment_horizon || ''} 
               onValueChange={(value) => onChange('investment_horizon', value)}
             >
               <SelectTrigger className={`rounded-lg ${isFieldInvalid(data.investment_horizon) ? 'border-red-500 bg-red-50' : ''}`}>
-                <SelectValue placeholder="Изберете" />
+                <SelectValue placeholder={t('Изберете', 'Select')} />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="up_to_1_year">До 1 година</SelectItem>
-                <SelectItem value="up_to_5_years">До 5 години</SelectItem>
-                <SelectItem value="up_to_7_years">До 7 години</SelectItem>
-                <SelectItem value="over_7_years">Над 7 години</SelectItem>
+                <SelectItem value="up_to_1_year">{t('До 1 година', 'Up to 1 year')}</SelectItem>
+                <SelectItem value="up_to_5_years">{t('До 5 години', 'Up to 5 years')}</SelectItem>
+                <SelectItem value="up_to_7_years">{t('До 7 години', 'Up to 7 years')}</SelectItem>
+                <SelectItem value="over_7_years">{t('Над 7 години', 'Over 7 years')}</SelectItem>
               </SelectContent>
             </Select>
           </div>
 
           <div className="space-y-2" data-invalid={isFieldInvalid(data.investment_experience) ? "true" : undefined}>
-            <Label>Какъв е Вашият опит с инвестирането? <span className="text-red-500">*</span></Label>
+            <Label>{t('Какъв е Вашият опит с инвестирането?', 'What is your investment experience?')} <span className="text-red-500">*</span></Label>
             <Select 
               value={data.investment_experience || ''} 
               onValueChange={(value) => onChange('investment_experience', value)}
             >
               <SelectTrigger className={`rounded-lg ${isFieldInvalid(data.investment_experience) ? 'border-red-500 bg-red-50' : ''}`}>
-                <SelectValue placeholder="Изберете" />
+                <SelectValue placeholder={t('Изберете', 'Select')} />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="none">Нямам опит</SelectItem>
-                <SelectItem value="basic">Основен (спестовни сметки, депозити)</SelectItem>
-                <SelectItem value="intermediate">Среден (взаимни фондове, облигации)</SelectItem>
-                <SelectItem value="advanced">Напреднал (акции, структурирани продукти)</SelectItem>
+                <SelectItem value="none">{t('Нямам опит', 'No experience')}</SelectItem>
+                <SelectItem value="basic">{t('Основен (спестовни сметки, депозити)', 'Basic (savings accounts, deposits)')}</SelectItem>
+                <SelectItem value="intermediate">{t('Среден (взаимни фондове, облигации)', 'Intermediate (mutual funds, bonds)')}</SelectItem>
+                <SelectItem value="advanced">{t('Напреднал (акции, структурирани продукти)', 'Advanced (stocks, structured products)')}</SelectItem>
               </SelectContent>
             </Select>
           </div>
 
           <div className="space-y-2" data-invalid={isFieldInvalid(data.reaction_to_10_percent_drop) ? "true" : undefined}>
-            <Label>Какво бихте направили, ако стойността на инвестицията падне с 10%? <span className="text-red-500">*</span></Label>
+            <Label>{t('Какво бихте направили, ако стойността на инвестицията падне с 10%?', 'What would you do if your investment drops by 10%?')} <span className="text-red-500">*</span></Label>
             <Select 
               value={data.reaction_to_10_percent_drop || ''} 
               onValueChange={(value) => onChange('reaction_to_10_percent_drop', value)}
             >
               <SelectTrigger className={`rounded-lg ${isFieldInvalid(data.reaction_to_10_percent_drop) ? 'border-red-500 bg-red-50' : ''}`}>
-                <SelectValue placeholder="Изберете" />
+                <SelectValue placeholder={t('Изберете', 'Select')} />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="sell_all">Продавам всичко</SelectItem>
-                <SelectItem value="sell_part">Продавам част</SelectItem>
-                <SelectItem value="hold">Изчаквам</SelectItem>
-                <SelectItem value="buy_more">Купувам още</SelectItem>
+                <SelectItem value="sell_all">{t('Продавам всичко', 'Sell everything')}</SelectItem>
+                <SelectItem value="sell_part">{t('Продавам част', 'Sell part')}</SelectItem>
+                <SelectItem value="hold">{t('Изчаквам', 'Wait and hold')}</SelectItem>
+                <SelectItem value="buy_more">{t('Купувам още', 'Buy more')}</SelectItem>
               </SelectContent>
             </Select>
           </div>
 
           <div className="space-y-2" data-invalid={isFieldInvalid(data.reaction_to_20_percent_gain) ? "true" : undefined}>
-            <Label>Какво бихте направили, ако инвестицията нарасне с 20%? <span className="text-red-500">*</span></Label>
+            <Label>{t('Какво бихте направили, ако инвестицията нарасне с 20%?', 'What would you do if your investment grows by 20%?')} <span className="text-red-500">*</span></Label>
             <Select 
               value={data.reaction_to_20_percent_gain || ''} 
               onValueChange={(value) => onChange('reaction_to_20_percent_gain', value)}
             >
               <SelectTrigger className={`rounded-lg ${isFieldInvalid(data.reaction_to_20_percent_gain) ? 'border-red-500 bg-red-50' : ''}`}>
-                <SelectValue placeholder="Изберете" />
+                <SelectValue placeholder={t('Изберете', 'Select')} />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="sell_all">Продавам всичко</SelectItem>
-                <SelectItem value="sell_part">Продавам част</SelectItem>
-                <SelectItem value="hold">Задържам</SelectItem>
-                <SelectItem value="buy_more">Купувам още</SelectItem>
+                <SelectItem value="sell_all">{t('Продавам всичко', 'Sell everything')}</SelectItem>
+                <SelectItem value="sell_part">{t('Продавам част', 'Sell part')}</SelectItem>
+                <SelectItem value="hold">{t('Задържам', 'Hold')}</SelectItem>
+                <SelectItem value="buy_more">{t('Купувам още', 'Buy more')}</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -810,12 +811,12 @@ export default function ReserveStep({ data, onChange, showErrors, plannerData })
 
       {/* Investment Referrals */}
       <div className="bg-slate-50 rounded-xl p-6">
-        <h3 className="font-semibold text-slate-900 mb-4">Кои от Вашите близки или познати:</h3>
+        <h3 className="font-semibold text-slate-900 mb-4">{t('Кои от Вашите близки или познати:', 'Which of your friends or acquaintances:')}</h3>
         
         <div className="grid md:grid-cols-2 gap-6">
           {/* Have savings but no investments */}
           <div className="space-y-3">
-            <Label className="text-slate-700">Имат спестявания, но не са предприели инвестиционни решения?</Label>
+            <Label className="text-slate-700">{t('Имат спестявания, но не са предприели инвестиционни решения?', 'Have savings but have not made any investment decisions?')}</Label>
             {(data.referrals_have_savings || ['']).map((name, index) => {
               // Check if name exists in housing or birthday referrals
               const existingNames = [
@@ -830,7 +831,7 @@ export default function ReserveStep({ data, onChange, showErrors, plannerData })
               return (
                 <div key={`savings_${index}`}>
                   <Input
-                    placeholder="Име на познат"
+                    placeholder={t('Име на познат', 'Name of acquaintance')}
                     value={name}
                     onChange={(e) => {
                       const newList = [...(data.referrals_have_savings || [''])];
@@ -854,7 +855,7 @@ export default function ReserveStep({ data, onChange, showErrors, plannerData })
 
           {/* Invest regularly or interested */}
           <div className="space-y-3">
-            <Label className="text-slate-700">Инвестират редовно или се интересуват от инвестиции?</Label>
+            <Label className="text-slate-700">{t('Инвестират редовно или се интересуват от инвестиции?', 'Invest regularly or are interested in investments?')}</Label>
             {(data.referrals_invest_regularly || ['']).map((name, index) => {
               // Check if name exists in housing or birthday referrals
               const existingNames = [
@@ -899,7 +900,7 @@ export default function ReserveStep({ data, onChange, showErrors, plannerData })
           checked={data.include_reserve_in_plan || false}
           onCheckedChange={(checked) => onChange('include_reserve_in_plan', checked)}
         />
-        <span className="font-medium text-blue-800">Да бъде включено във финансовия план</span>
+        <span className="font-medium text-blue-800">{t('Да бъде включено във финансовия план', 'Include in financial plan')}</span>
       </label>
     </div>
   );

@@ -11,17 +11,18 @@ import {
 import { ListOrdered, TrendingUp, AlertTriangle } from 'lucide-react';
 import FinancialHealthCard from './FinancialHealthCard';
 
-const allPriorities = [
-  { key: 'priority_income_protection', label: 'Подсигуряване на доходите' },
-  { key: 'priority_property_protection', label: 'Защита на собствеността' },
-  { key: 'priority_reserve', label: 'Създаване и увеличаване стойността на резерва' },
-  { key: 'priority_housing', label: 'Ново жилище' },
-  { key: 'priority_pension', label: 'По-добра пенсия' },
-  { key: 'priority_children', label: 'Финансово подсигуряване на децата' },
-  { key: 'priority_other', label: 'Други (кола, почивка...)' },
+const getPriorities = (t) => [
+  { key: 'priority_income_protection', label: t('Подсигуряване на доходите', 'Income Protection') },
+  { key: 'priority_property_protection', label: t('Защита на собствеността', 'Property Protection') },
+  { key: 'priority_reserve', label: t('Създаване и увеличаване стойността на резерва', 'Building and growing the reserve') },
+  { key: 'priority_housing', label: t('Ново жилище', 'New home') },
+  { key: 'priority_pension', label: t('По-добра пенсия', 'Better pension') },
+  { key: 'priority_children', label: t('Финансово подсигуряване на децата', "Children's financial security") },
+  { key: 'priority_other', label: t('Други (кола, почивка...)', 'Other (car, vacation...)') },
 ];
 
-export default function PrioritiesStep({ data, onChange, showErrors }) {
+export default function PrioritiesStep({ data, onChange, showErrors, lang = 'bg' }) {
+  const t = (bg, en) => lang === 'en' ? en : bg;
   // Calculate monthly balance from FinancialFlowStep data
   const monthlyBalance = useMemo(() => {
     const includePartner = data.include_partner || false;
@@ -69,6 +70,8 @@ export default function PrioritiesStep({ data, onChange, showErrors }) {
     });
   };
 
+  const allPriorities = getPriorities(t);
+
   const priorities = getActivePriorities();
   const maxPriority = priorities.length;
 
@@ -111,16 +114,16 @@ export default function PrioritiesStep({ data, onChange, showErrors }) {
       <div className="bg-slate-50 rounded-xl p-6">
         <div className="flex items-center gap-2 mb-2">
           <ListOrdered className="h-5 w-5 text-blue-600" />
-          <h3 className="font-semibold text-slate-900">След анализа и на база на видяното - Какви са Вашите приоритети сега? <span className="text-red-500">*</span></h3>
+          <h3 className="font-semibold text-slate-900">{t('След анализа и на база на видяното - Какви са Вашите приоритети сега?', 'After the analysis — what are your priorities now?')} <span className="text-red-500">*</span></h3>
         </div>
-        <p className="text-sm text-slate-600 mb-4">1 - най-важно, {maxPriority} - най-малко важно</p>
+        <p className="text-sm text-slate-600 mb-4">{t(`1 - най-важно, ${maxPriority} - най-малко важно`, `1 - most important, ${maxPriority} - least important`)}</p>
 
         <div className={`bg-white rounded-lg border overflow-hidden ${isInvalid ? 'border-red-500' : 'border-slate-200'}`}>
           <table className="w-full">
             <thead className="bg-slate-100">
               <tr>
                 <th className="text-center text-sm font-medium text-slate-700 px-4 py-2 w-16">№</th>
-                <th className="text-left text-sm font-medium text-slate-700 px-4 py-2">Приоритет</th>
+                <th className="text-left text-sm font-medium text-slate-700 px-4 py-2">{t('Приоритет', 'Priority')}</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100">
@@ -154,7 +157,7 @@ export default function PrioritiesStep({ data, onChange, showErrors }) {
           </table>
         </div>
         {isInvalid && (
-          <p className="text-red-500 text-sm mt-2">Моля, задайте приоритет на всички елементи.</p>
+          <p className="text-red-500 text-sm mt-2">{t('Моля, задайте приоритет на всички елементи.', 'Please assign a priority to all items.')}</p>
         )}
 
         {/* Income protection warning - right after priorities table */}
@@ -162,7 +165,7 @@ export default function PrioritiesStep({ data, onChange, showErrors }) {
           <div className="mt-3 flex items-start gap-3 bg-amber-50 border border-amber-300 rounded-lg p-4">
             <AlertTriangle className="h-5 w-5 text-amber-600 flex-shrink-0 mt-0.5" />
             <p className="text-sm text-amber-800 font-medium">
-              Всички останали Ваши цели зависят от възможността Ви да генерирате средства. Подсигуряването на доходите Ви следва да е приоритет.
+              {t('Всички останали Ваши цели зависят от възможността Ви да генерирате средства. Подсигуряването на доходите Ви следва да е приоритет.', 'All your other goals depend on your ability to generate income. Income protection should be your top priority.')}
             </p>
           </div>
         )}
@@ -172,16 +175,16 @@ export default function PrioritiesStep({ data, onChange, showErrors }) {
       <div className="bg-slate-50 rounded-xl p-6">
         <div className="flex items-center gap-2 mb-6">
           <TrendingUp className="h-5 w-5 text-blue-600" />
-          <h3 className="font-semibold text-slate-900">Месечно заделяне</h3>
+          <h3 className="font-semibold text-slate-900">{t('Месечно заделяне', 'Monthly allocation')}</h3>
         </div>
         <div className="space-y-2" data-invalid={showErrors && (data.monthly_priority_allocation === undefined || data.monthly_priority_allocation === '') ? "true" : undefined}>
           <Label>
-            Каква част от <span className="font-semibold text-blue-600">{monthlyBalance.toLocaleString()} €</span> (месечен баланс от "Финансов поток"), която Ви остава на месечна база бихте заделили за осигуряване на Вашите приоритети? <span className="text-red-500">*</span>
+            {t('Каква част от', 'What portion of')} <span className="font-semibold text-blue-600">{monthlyBalance.toLocaleString()} €</span> {t('(месечен баланс от "Финансов поток"), която Ви остава на месечна база бихте заделили за осигуряване на Вашите приоритети?', '(monthly balance from "Financial Flow") would you allocate monthly to secure your priorities?')} <span className="text-red-500">*</span>
           </Label>
           <Input
             type="number"
             min="0"
-            placeholder="Въведете сума в евро"
+            placeholder={t('Въведете сума в евро', 'Enter amount in euro')}
             value={data.monthly_priority_allocation ?? ''}
             onChange={(e) => onChange('monthly_priority_allocation', e.target.value === '' ? '' : parseInt(e.target.value))}
             className={`rounded-lg max-w-xs ${showErrors && (data.monthly_priority_allocation === undefined || data.monthly_priority_allocation === '') ? 'border-red-500 bg-red-50' : ''}`}
@@ -190,7 +193,7 @@ export default function PrioritiesStep({ data, onChange, showErrors }) {
           {data.monthly_priority_allocation !== undefined && data.monthly_priority_allocation !== '' && monthlyBalance > 0 && data.monthly_priority_allocation > monthlyBalance && (
             <div className="flex items-start gap-2 mt-2 text-amber-700 bg-amber-50 border border-amber-300 rounded-lg px-3 py-2">
               <AlertTriangle className="h-4 w-4 flex-shrink-0 mt-0.5" />
-              <p className="text-sm font-medium">Сумата надхвърля текущите ви възможности за спестяване.</p>
+              <p className="text-sm font-medium">{t('Сумата надхвърля текущите ви възможности за спестяване.', 'The amount exceeds your current savings capacity.')}</p>
             </div>
           )}
         </div>

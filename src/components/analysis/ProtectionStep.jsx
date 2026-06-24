@@ -27,8 +27,9 @@ const INSURANCE_COMPANIES = [
   { value: 'uniqa', label: 'ЗД Уника' },
 ];
 
-export default function ProtectionStep({ data, onChange, showErrors, plannerData }) {
+export default function ProtectionStep({ data, onChange, showErrors, plannerData, lang = 'bg' }) {
   const isFieldInvalid = (value) => showErrors && (value === undefined || value === '' || value === null);
+  const t = (bg, en) => lang === 'en' ? en : bg;
 
   const clientName = plannerData?.client_first_name || 'Клиент';
   const partnerName = plannerData?.partner_first_name || 'Партньор';
@@ -238,29 +239,29 @@ export default function ProtectionStep({ data, onChange, showErrors, plannerData
       <div className="bg-slate-50 rounded-xl p-6">
         <div className="flex items-center gap-2 mb-6">
           <Shield className="h-5 w-5 text-blue-600" />
-          <h3 className="font-semibold text-slate-900">Защита на собствеността</h3>
+          <h3 className="font-semibold text-slate-900">{t('Защита на собствеността', 'Property Protection')}</h3>
         </div>
-        <p className="text-sm text-slate-600 mb-4">Какво имущество притежавате?</p>
+        <p className="text-sm text-slate-600 mb-4">{t('Какво имущество притежавате?', 'What property do you own?')}</p>
 
         <div className="space-y-6">
           {/* Property 1 */}
           <div className="space-y-4">
             <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2"><Building2 className="h-4 w-4 text-slate-500" /><Label className="font-medium">Недвижимо имущество</Label></div>
+              <div className="flex items-center gap-2"><Building2 className="h-4 w-4 text-slate-500" /><Label className="font-medium">{t('Недвижимо имущество', 'Real estate')}</Label></div>
               <div className="flex items-center gap-2">
-                <span className={cn("text-sm font-medium", !(data.has_property_1 ?? false) ? "text-red-600" : "text-slate-400")}>няма</span>
+                <span className={cn("text-sm font-medium", !(data.has_property_1 ?? false) ? "text-red-600" : "text-slate-400")}>{t('няма', 'none')}</span>
                 <button type="button" onClick={() => onChange('has_property_1', !(data.has_property_1 ?? false))}
                   className={cn("w-12 h-6 rounded-full transition-colors relative", (data.has_property_1 ?? false) ? "bg-green-500" : "bg-red-500")}>
                   <div className={cn("w-5 h-5 bg-white rounded-full absolute top-0.5 transition-all", (data.has_property_1 ?? false) ? "left-6" : "left-0.5")} />
                 </button>
-                <span className={cn("text-sm font-medium", (data.has_property_1 ?? false) ? "text-green-600" : "text-slate-400")}>има</span>
+                <span className={cn("text-sm font-medium", (data.has_property_1 ?? false) ? "text-green-600" : "text-slate-400")}>{t('има', 'has')}</span>
               </div>
             </div>
             {data.has_property_1 && (
               <div className="ml-6 p-4 bg-white rounded-lg border border-slate-200 space-y-4">
                 {data.current_housing === 'owned' && (
                   <Button variant="outline" size="sm" onClick={importFromHousing} className="rounded-full mb-2">
-                    <Download className="h-4 w-4 mr-2" />Вземи данни от "Ново жилище"
+                    <Download className="h-4 w-4 mr-2" />{t('Вземи данни от "Ново жилище"', 'Import from "Housing" step')}
                   </Button>
                 )}
                 <div className="grid sm:grid-cols-2 gap-4">
@@ -284,7 +285,7 @@ export default function ProtectionStep({ data, onChange, showErrors, plannerData
             )}
             {data.has_property_1 && !data.has_property_2 && (
               <Button variant="outline" size="sm" onClick={() => onChange('has_property_2', true)} className="rounded-full ml-6">
-                <Plus className="h-4 w-4 mr-2" />Добави втори имот
+                <Plus className="h-4 w-4 mr-2" />{t('Добави втори имот', 'Add second property')}
               </Button>
             )}
           </div>
@@ -293,7 +294,7 @@ export default function ProtectionStep({ data, onChange, showErrors, plannerData
           {data.has_property_2 && (
             <div className="space-y-4">
               <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2"><Building2 className="h-4 w-4 text-slate-500" /><Label className="font-medium">Втори имот</Label></div>
+                <div className="flex items-center gap-2"><Building2 className="h-4 w-4 text-slate-500" /><Label className="font-medium">{t('Втори имот', 'Second property')}</Label></div>
                 <Switch checked={data.has_property_2 || false} onCheckedChange={c => onChange('has_property_2', c)} />
               </div>
               <div className="ml-6 p-4 bg-white rounded-lg border border-slate-200 space-y-4">
@@ -317,7 +318,7 @@ export default function ProtectionStep({ data, onChange, showErrors, plannerData
               </div>
               {!data.has_property_3 && (
                 <Button variant="outline" size="sm" onClick={() => onChange('has_property_3', true)} className="rounded-full ml-6">
-                  <Plus className="h-4 w-4 mr-2" />Добави трети имот
+                  <Plus className="h-4 w-4 mr-2" />{t('Добави трети имот', 'Add third property')}
                 </Button>
               )}
             </div>
@@ -327,7 +328,7 @@ export default function ProtectionStep({ data, onChange, showErrors, plannerData
           {data.has_property_3 && (
             <div className="space-y-4">
               <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2"><Building2 className="h-4 w-4 text-slate-500" /><Label className="font-medium">Трети имот</Label></div>
+                <div className="flex items-center gap-2"><Building2 className="h-4 w-4 text-slate-500" /><Label className="font-medium">{t('Трети имот', 'Third property')}</Label></div>
                 <Switch checked={data.has_property_3 || false} onCheckedChange={c => onChange('has_property_3', c)} />
               </div>
               <div className="ml-6 p-4 bg-white rounded-lg border border-slate-200 space-y-4">
@@ -357,18 +358,18 @@ export default function ProtectionStep({ data, onChange, showErrors, plannerData
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2"><Car className="h-4 w-4 text-slate-500" /><Label className="font-medium">Автомобил</Label></div>
               <div className="flex items-center gap-2">
-                <span className={cn("text-sm font-medium", !(data.has_car_1 ?? false) ? "text-red-600" : "text-slate-400")}>няма</span>
+                <span className={cn("text-sm font-medium", !(data.has_car_1 ?? false) ? "text-red-600" : "text-slate-400")}>{t('няма', 'none')}</span>
                 <button type="button" onClick={() => onChange('has_car_1', !(data.has_car_1 ?? false))}
                   className={cn("w-12 h-6 rounded-full transition-colors relative", (data.has_car_1 ?? false) ? "bg-green-500" : "bg-red-500")}>
                   <div className={cn("w-5 h-5 bg-white rounded-full absolute top-0.5 transition-all", (data.has_car_1 ?? false) ? "left-6" : "left-0.5")} />
                 </button>
-                <span className={cn("text-sm font-medium", (data.has_car_1 ?? false) ? "text-green-600" : "text-slate-400")}>има</span>
+                <span className={cn("text-sm font-medium", (data.has_car_1 ?? false) ? "text-green-600" : "text-slate-400")}>{t('има', 'has')}</span>
               </div>
             </div>
             {data.has_car_1 && <CarProtectionFields n={1} data={data} onChange={onChange} showErrors={showErrors} />}
             {data.has_car_1 && !data.has_car_2 && (
               <Button variant="outline" size="sm" onClick={() => onChange('has_car_2', true)} className="rounded-full ml-6">
-                <Plus className="h-4 w-4 mr-2" />Добави втори автомобил
+                <Plus className="h-4 w-4 mr-2" />{t('Добави втори автомобил', 'Add second car')}
               </Button>
             )}
           </div>
@@ -377,13 +378,13 @@ export default function ProtectionStep({ data, onChange, showErrors, plannerData
           {data.has_car_2 && (
             <div className="space-y-4">
               <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2"><Car className="h-4 w-4 text-slate-500" /><Label className="font-medium">Втори автомобил</Label></div>
+                <div className="flex items-center gap-2"><Car className="h-4 w-4 text-slate-500" /><Label className="font-medium">{t('Втори автомобил', 'Second car')}</Label></div>
                 <Switch checked={data.has_car_2 || false} onCheckedChange={c => onChange('has_car_2', c)} />
               </div>
               <CarProtectionFields n={2} data={data} onChange={onChange} showErrors={showErrors} />
               {!data.has_car_3 && (
                 <Button variant="outline" size="sm" onClick={() => onChange('has_car_3', true)} className="rounded-full ml-6">
-                  <Plus className="h-4 w-4 mr-2" />Добави трети автомобил
+                  <Plus className="h-4 w-4 mr-2" />{t('Добави трети автомобил', 'Add third car')}
                 </Button>
               )}
             </div>
@@ -393,7 +394,7 @@ export default function ProtectionStep({ data, onChange, showErrors, plannerData
           {data.has_car_3 && (
             <div className="space-y-4">
               <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2"><Car className="h-4 w-4 text-slate-500" /><Label className="font-medium">Трети автомобил</Label></div>
+                <div className="flex items-center gap-2"><Car className="h-4 w-4 text-slate-500" /><Label className="font-medium">{t('Трети автомобил', 'Third car')}</Label></div>
                 <Switch checked={data.has_car_3 || false} onCheckedChange={c => onChange('has_car_3', c)} />
               </div>
               <CarProtectionFields n={3} data={data} onChange={onChange} showErrors={showErrors} />
@@ -404,11 +405,11 @@ export default function ProtectionStep({ data, onChange, showErrors, plannerData
 
       {/* Property Referrals */}
       <div className="bg-slate-50 rounded-xl p-6">
-        <h3 className="font-semibold text-slate-900 mb-4">Кой от Вашите приятели и познати:</h3>
+        <h3 className="font-semibold text-slate-900 mb-4">{t('Кой от Вашите приятели и познати:', 'Which of your friends and acquaintances:')}</h3>
         <div className="grid md:grid-cols-2 gap-6">
           {[
-            ['property_referrals_significant', 'Има по-значително имущество, което е добре да бъде защитено?'],
-            ['property_referrals_expensive_car', 'Има по-скъп автомобил/и?']
+            ['property_referrals_significant', t('Има по-значително имущество, което е добре да бъде защитено?', 'Has significant property that should be protected?')],
+            ['property_referrals_expensive_car', t('Има по-скъп автомобил/и?', 'Has an expensive car or cars?')]
           ].map(([field, label]) => (
             <div key={field} className="space-y-3">
               <Label className="text-slate-700">{label}</Label>
@@ -417,7 +418,7 @@ export default function ProtectionStep({ data, onChange, showErrors, plannerData
                 const list = data[field]?.length > 0 ? data[field] : [''];
                 return (
                   <div key={`${field}_${index}`}>
-                    <Input placeholder="Име на познат" value={name}
+                    <Input placeholder={t('Име на познат', 'Name of acquaintance')} value={name}
                       onChange={e => {
                         const newList = [...list];
                         newList[index] = e.target.value;
@@ -437,7 +438,7 @@ export default function ProtectionStep({ data, onChange, showErrors, plannerData
       {hasAnyAsset && (
         <label className="flex items-center gap-3 p-4 rounded-xl border-2 border-blue-200 bg-blue-50 cursor-pointer">
           <Checkbox checked={data.include_property_in_plan || false} onCheckedChange={c => onChange('include_property_in_plan', c)} />
-          <span className="font-medium text-blue-800">Да бъде включено във финансовия план</span>
+          <span className="font-medium text-blue-800">{t('Да бъде включено във финансовия план', 'Include in financial plan')}</span>
         </label>
       )}
 
@@ -445,37 +446,37 @@ export default function ProtectionStep({ data, onChange, showErrors, plannerData
       <div className="bg-slate-50 rounded-xl p-6">
         <div className="flex items-center gap-2 mb-6">
           <Wallet className="h-5 w-5 text-blue-600" />
-          <h3 className="font-semibold text-slate-900">Подсигуряване на доходите</h3>
+          <h3 className="font-semibold text-slate-900">{t('Подсигуряване на доходите', 'Income Protection')}</h3>
         </div>
         <div className="space-y-4">
           <div className="space-y-2" data-invalid={isFieldInvalid(data.income_source) ? "true" : undefined}>
-            <Label>От къде идват Вашите доходи? <span className="text-red-500">*</span></Label>
+            <Label>{t('От къде идват Вашите доходи?', 'Where does your income come from?')} <span className="text-red-500">*</span></Label>
             <Select value={data.income_source || ''} onValueChange={v => onChange('income_source', v)}>
               <SelectTrigger className={`rounded-lg ${isFieldInvalid(data.income_source) ? 'border-red-500 bg-red-50' : ''}`}>
-                <SelectValue placeholder="Изберете" />
+                <SelectValue placeholder={t('Изберете', 'Select')} />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="employment">Работа по трудов договор</SelectItem>
-                <SelectItem value="self_employed">Собствен бизнес</SelectItem>
-                <SelectItem value="rent">Наем</SelectItem>
-                <SelectItem value="investments">Инвестиции</SelectItem>
-                <SelectItem value="mixed">Смесени източници</SelectItem>
+                <SelectItem value="employment">{t('Работа по трудов договор', 'Employment')}</SelectItem>
+                <SelectItem value="self_employed">{t('Собствен бизнес', 'Self-employed / own business')}</SelectItem>
+                <SelectItem value="rent">{t('Наем', 'Rental income')}</SelectItem>
+                <SelectItem value="investments">{t('Инвестиции', 'Investments')}</SelectItem>
+                <SelectItem value="mixed">{t('Смесени източници', 'Mixed sources')}</SelectItem>
               </SelectContent>
             </Select>
           </div>
 
           <div className="pt-4 border-t border-slate-200">
-            <p className="text-sm text-slate-600 mb-4">Какво би се отразило негативно върху Вашите доходи?</p>
+            <p className="text-sm text-slate-600 mb-4">{t('Какво би се отразило негативно върху Вашите доходи?', 'What could negatively affect your income?')}</p>
             <div className={includePartner ? "grid lg:grid-cols-2 gap-8" : ""}>
               {/* Client Column */}
               <div>
                 <div className="flex items-center gap-2 mb-4"><User className="h-4 w-4 text-slate-500" /><span className="font-medium text-slate-700">{clientName}</span></div>
                 <div className="space-y-4">
-                  <RiskRow label="Съкращение" field="client_risk_layoff" grossIncome={clientGrossIncome} netIncome={clientNetIncome} calcFn={calculateLayoffCompensation} />
-                  <RiskRow label="Отпуск по майчинство" field="client_risk_maternity" grossIncome={clientGrossIncome} netIncome={clientNetIncome} calcFn={calculateMaternityYear1} extraContent={MaternityContent} />
-                  <RiskRow label="Болнични" field="client_risk_sick_leave" grossIncome={clientGrossIncome} netIncome={clientNetIncome} calcFn={calculateSickLeaveCompensation} />
-                  <RiskRow label="Инвалидност" field="client_risk_disability" grossIncome={clientGrossIncome} netIncome={clientNetIncome} calcFn={calculateDisabilityCompensation} />
-                  <RiskRow label="Смърт" field="client_risk_death" grossIncome={clientGrossIncome} netIncome={clientNetIncome} calcFn={calculateDeathCompensation} />
+                  <RiskRow label={t('Съкращение', 'Layoff')} field="client_risk_layoff" grossIncome={clientGrossIncome} netIncome={clientNetIncome} calcFn={calculateLayoffCompensation} />
+                  <RiskRow label={t('Отпуск по майчинство', 'Maternity leave')} field="client_risk_maternity" grossIncome={clientGrossIncome} netIncome={clientNetIncome} calcFn={calculateMaternityYear1} extraContent={MaternityContent} />
+                  <RiskRow label={t('Болнични', 'Sick leave')} field="client_risk_sick_leave" grossIncome={clientGrossIncome} netIncome={clientNetIncome} calcFn={calculateSickLeaveCompensation} />
+                  <RiskRow label={t('Инвалидност', 'Disability')} field="client_risk_disability" grossIncome={clientGrossIncome} netIncome={clientNetIncome} calcFn={calculateDisabilityCompensation} />
+                  <RiskRow label={t('Смърт', 'Death')} field="client_risk_death" grossIncome={clientGrossIncome} netIncome={clientNetIncome} calcFn={calculateDeathCompensation} />
                   <IncomeProtectionBlock hasField="client_has_income_protection" insurerField="client_income_protection_insurer" dateField="client_income_protection_date" grossIncome={clientGrossIncome} netIncome={clientNetIncome} age={data.client_age} retirementAge={data.client_retirement_age} />
                 </div>
               </div>
@@ -485,11 +486,11 @@ export default function ProtectionStep({ data, onChange, showErrors, plannerData
                 <div>
                   <div className="flex items-center gap-2 mb-4"><Users className="h-4 w-4 text-slate-500" /><span className="font-medium text-slate-700">{partnerName}</span></div>
                   <div className="space-y-4">
-                    <RiskRow label="Съкращение" field="partner_risk_layoff" grossIncome={partnerGrossIncome} netIncome={partnerNetIncome} calcFn={calculateLayoffCompensation} />
-                    <RiskRow label="Отпуск по майчинство" field="partner_risk_maternity" grossIncome={partnerGrossIncome} netIncome={partnerNetIncome} calcFn={calculateMaternityYear1} extraContent={MaternityContent} />
-                    <RiskRow label="Болнични" field="partner_risk_sick_leave" grossIncome={partnerGrossIncome} netIncome={partnerNetIncome} calcFn={calculateSickLeaveCompensation} />
-                    <RiskRow label="Инвалидност" field="partner_risk_disability" grossIncome={partnerGrossIncome} netIncome={partnerNetIncome} calcFn={calculateDisabilityCompensation} />
-                    <RiskRow label="Смърт" field="partner_risk_death" grossIncome={partnerGrossIncome} netIncome={partnerNetIncome} calcFn={calculateDeathCompensation} />
+                    <RiskRow label={t('Съкращение', 'Layoff')} field="partner_risk_layoff" grossIncome={partnerGrossIncome} netIncome={partnerNetIncome} calcFn={calculateLayoffCompensation} />
+                    <RiskRow label={t('Отпуск по майчинство', 'Maternity leave')} field="partner_risk_maternity" grossIncome={partnerGrossIncome} netIncome={partnerNetIncome} calcFn={calculateMaternityYear1} extraContent={MaternityContent} />
+                    <RiskRow label={t('Болнични', 'Sick leave')} field="partner_risk_sick_leave" grossIncome={partnerGrossIncome} netIncome={partnerNetIncome} calcFn={calculateSickLeaveCompensation} />
+                    <RiskRow label={t('Инвалидност', 'Disability')} field="partner_risk_disability" grossIncome={partnerGrossIncome} netIncome={partnerNetIncome} calcFn={calculateDisabilityCompensation} />
+                    <RiskRow label={t('Смърт', 'Death')} field="partner_risk_death" grossIncome={partnerGrossIncome} netIncome={partnerNetIncome} calcFn={calculateDeathCompensation} />
                     <IncomeProtectionBlock hasField="partner_has_income_protection" insurerField="partner_income_protection_insurer" dateField="partner_income_protection_date" grossIncome={partnerGrossIncome} netIncome={partnerNetIncome} age={data.partner_age} retirementAge={data.partner_retirement_age} />
                   </div>
                 </div>
@@ -545,7 +546,7 @@ export default function ProtectionStep({ data, onChange, showErrors, plannerData
         );
         return (
           <div className="bg-slate-50 rounded-xl p-6 space-y-4">
-            <p className="font-medium text-slate-900">Работодателска здравна застраховка</p>
+            <p className="font-medium text-slate-900">{t('Работодателска здравна застраховка', 'Employer health insurance')}</p>
             <HealthRow label={cName} fieldHas="has_employer_health_insurance" fieldInsurer="employer_health_insurer" />
             {data.include_partner && (<><div className="border-t border-slate-200" /><HealthRow label={pName} fieldHas="partner_has_employer_health_insurance" fieldInsurer="partner_employer_health_insurer" /></>)}
           </div>
@@ -554,7 +555,7 @@ export default function ProtectionStep({ data, onChange, showErrors, plannerData
 
       <label className="flex items-center gap-3 p-4 rounded-xl border-2 border-blue-200 bg-blue-50 cursor-pointer">
         <Checkbox checked={data.include_income_protection_in_plan || false} onCheckedChange={c => onChange('include_income_protection_in_plan', c)} />
-        <span className="font-medium text-blue-800">Да бъде включено във финансовия план</span>
+        <span className="font-medium text-blue-800">{t('Да бъде включено във финансовия план', 'Include in financial plan')}</span>
       </label>
     </div>
   );

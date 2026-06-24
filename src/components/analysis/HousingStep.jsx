@@ -119,9 +119,10 @@ function BirthdayPartyQuestion({ data }) {
   );
 }
 
-export default function HousingStep({ data, onChange, showErrors, plannerData }) {
+export default function HousingStep({ data, onChange, showErrors, plannerData, lang = 'bg' }) {
   const [showDownPaymentWarning, setShowDownPaymentWarning] = React.useState(false);
   const isFieldInvalid = (value) => showErrors && (value === undefined || value === '' || value === null);
+  const t = (bg, en) => lang === 'en' ? en : bg;
   const plannedValue = data.planned_housing_value || 0;
   const extraCosts = data.planned_housing_extra_costs || 0;
   const availableCash = data.available_cash || 0;
@@ -142,23 +143,23 @@ export default function HousingStep({ data, onChange, showErrors, plannerData })
       <div className="bg-slate-50 rounded-xl p-6">
         <div className="flex items-center gap-2 mb-6">
           <Home className="h-5 w-5 text-blue-600" />
-          <h3 className="font-semibold text-slate-900">Сегашна ситуация</h3>
+          <h3 className="font-semibold text-slate-900">{t('Сегашна ситуация', 'Current Situation')}</h3>
         </div>
         
         <div className="space-y-4">
           <div className="space-y-2" data-invalid={isFieldInvalid(data.current_housing) ? "true" : undefined}>
-            <Label>Текущо жилище <span className="text-red-500">*</span></Label>
+            <Label>{t('Текущо жилище', 'Current Housing')} <span className="text-red-500">*</span></Label>
             <Select 
               value={data.current_housing || ''} 
               onValueChange={(value) => onChange('current_housing', value)}
             >
               <SelectTrigger className={`rounded-lg ${isFieldInvalid(data.current_housing) ? 'border-red-500 bg-red-50' : ''}`}>
-                <SelectValue placeholder="Изберете" />
+                <SelectValue placeholder={t('Изберете', 'Select')} />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="rented">Наето жилище</SelectItem>
-                <SelectItem value="with_parents">При родители</SelectItem>
-                <SelectItem value="owned">Собствено жилище</SelectItem>
+                <SelectItem value="rented">{t('Наето жилище', 'Rented')}</SelectItem>
+                <SelectItem value="with_parents">{t('При родители', 'With parents')}</SelectItem>
+                <SelectItem value="owned">{t('Собствено жилище', 'Own home')}</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -167,7 +168,7 @@ export default function HousingStep({ data, onChange, showErrors, plannerData })
             <>
               {(data.current_housing === 'rented' || data.current_housing === 'with_parents') && (
                 <div className="space-y-2" data-invalid={isFieldInvalid(data.current_housing_location) ? "true" : undefined}>
-                  <Label>Локация <span className="text-red-500">*</span></Label>
+                  <Label>{t('Локация', 'Location')} <span className="text-red-500">*</span></Label>
                   <Input
                     value={data.current_housing_location || ''}
                     onChange={(e) => onChange('current_housing_location', e.target.value)}
@@ -179,7 +180,7 @@ export default function HousingStep({ data, onChange, showErrors, plannerData })
 
               {data.current_housing === 'owned' && (
                 <div className="space-y-2" data-invalid={isFieldInvalid(data.current_housing_address) ? "true" : undefined}>
-                  <Label>Адрес <span className="text-red-500">*</span></Label>
+                  <Label>{t('Адрес', 'Address')} <span className="text-red-500">*</span></Label>
                   <Input
                     value={data.current_housing_address || ''}
                     onChange={(e) => onChange('current_housing_address', e.target.value)}
@@ -191,19 +192,19 @@ export default function HousingStep({ data, onChange, showErrors, plannerData })
 
               <div className={cn("grid gap-4", (data.current_housing === 'with_parents' || data.current_housing === 'rented') ? "sm:grid-cols-2" : "sm:grid-cols-2 lg:grid-cols-4")}>
                 <div className="space-y-2" data-invalid={isFieldInvalid(data.current_housing_rooms) ? "true" : undefined}>
-                  <Label>Брой стаи <span className="text-red-500">*</span></Label>
+                  <Label>{t('Брой стаи', 'Rooms')} <span className="text-red-500">*</span></Label>
                   <Input
-                    type="number"
-                    min="1"
-                    max="20"
-                    value={data.current_housing_rooms || ''}
-                    onChange={(e) => onChange('current_housing_rooms', parseInt(e.target.value) || '')}
-                    className={`rounded-lg ${isFieldInvalid(data.current_housing_rooms) ? 'border-red-500 bg-red-50' : ''}`}
-                    required
+                   type="number"
+                   min="1"
+                   max="20"
+                   value={data.current_housing_rooms || ''}
+                   onChange={(e) => onChange('current_housing_rooms', parseInt(e.target.value) || '')}
+                   className={`rounded-lg ${isFieldInvalid(data.current_housing_rooms) ? 'border-red-500 bg-red-50' : ''}`}
+                   required
                   />
-                </div>
-                <div className="space-y-2" data-invalid={isFieldInvalid(data.current_housing_area) ? "true" : undefined}>
-                  <Label>Застроена площ (кв.м) <span className="text-red-500">*</span></Label>
+                  </div>
+                  <div className="space-y-2" data-invalid={isFieldInvalid(data.current_housing_area) ? "true" : undefined}>
+                  <Label>{t('Застроена площ (кв.м)', 'Area (sq.m)')} <span className="text-red-500">*</span></Label>
                   <Input
                     type="number"
                     min="10"
@@ -216,7 +217,7 @@ export default function HousingStep({ data, onChange, showErrors, plannerData })
                 {data.current_housing === 'owned' && (
                   <>
                     <div className="space-y-2" data-invalid={isFieldInvalid(data.current_housing_value) ? "true" : undefined}>
-                      <Label>Стойност (€) <span className="text-red-500">*</span></Label>
+                      <Label>{t('Стойност (€)', 'Value (€)')} <span className="text-red-500">*</span></Label>
                       <Input
                         type="number"
                         min="0"
@@ -227,7 +228,7 @@ export default function HousingStep({ data, onChange, showErrors, plannerData })
                       />
                     </div>
                     <div className="space-y-2" data-invalid={isFieldInvalid(data.current_housing_movable_value) ? "true" : undefined}>
-                      <Label>Движимо имущество (€) <span className="text-red-500">*</span></Label>
+                      <Label>{t('Движимо имущество (€)', 'Movable property (€)')} <span className="text-red-500">*</span></Label>
                       <Input
                         type="number"
                         min="0"
@@ -246,7 +247,7 @@ export default function HousingStep({ data, onChange, showErrors, plannerData })
           {data.current_housing === 'owned' && (
             <div className="border-t border-slate-200 pt-4 mt-4">
               <div className="flex items-center justify-between mb-4">
-                <Label className="cursor-pointer">Има ли ипотека?</Label>
+                <Label className="cursor-pointer">{t('Има ли ипотека?', 'Is there a mortgage?')}</Label>
                 <div className="flex items-center gap-2">
                   <span className={cn("text-sm font-medium", !(data.current_housing_has_mortgage ?? false) ? "text-green-600" : "text-slate-400")}>Не</span>
                   <button
@@ -269,7 +270,7 @@ export default function HousingStep({ data, onChange, showErrors, plannerData })
               {data.current_housing_has_mortgage && (
                 <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 p-4 bg-white rounded-lg border border-slate-200">
                   <div className="space-y-2" data-invalid={isFieldInvalid(data.current_mortgage_remaining) ? "true" : undefined}>
-                    <Label>Остатъчна сума (€) <span className="text-red-500">*</span></Label>
+                    <Label>{t('Остатъчна сума (€)', 'Remaining balance (€)')} <span className="text-red-500">*</span></Label>
                     <Input
                       type="number"
                       min="0"
@@ -280,7 +281,7 @@ export default function HousingStep({ data, onChange, showErrors, plannerData })
                     />
                   </div>
                   <div className="space-y-2" data-invalid={isFieldInvalid(data.current_mortgage_interest_rate) ? "true" : undefined}>
-                    <Label>Лихвен процент (%) <span className="text-red-500">*</span></Label>
+                    <Label>{t('Лихвен процент (%)', 'Interest rate (%)')} <span className="text-red-500">*</span></Label>
                     <Input
                       type="number"
                       min="0"
@@ -292,19 +293,19 @@ export default function HousingStep({ data, onChange, showErrors, plannerData })
                     />
                   </div>
                   <div className="space-y-2" data-invalid={isFieldInvalid(data.current_mortgage_bank) ? "true" : undefined}>
-                    <Label>Банка <span className="text-red-500">*</span></Label>
+                    <Label>{t('Банка', 'Bank')} <span className="text-red-500">*</span></Label>
                     <Combobox
                       options={bankOptions}
                       value={data.current_mortgage_bank || ''}
                       onValueChange={(value) => onChange('current_mortgage_bank', value)}
-                      placeholder="Търси банка..."
-                      searchPlaceholder="Търси банка..."
-                      emptyText="Няма намерена банка."
+                      placeholder={t('Търси банка...', 'Search bank...')}
+                      searchPlaceholder={t('Търси банка...', 'Search bank...')}
+                      emptyText={t('Няма намерена банка.', 'No bank found.')}
                       triggerClassName={`rounded-lg ${isFieldInvalid(data.current_mortgage_bank) ? 'border-red-500 bg-red-50' : ''}`}
                     />
                   </div>
                   <div className="space-y-2" data-invalid={isFieldInvalid(data.current_mortgage_remaining_years) ? "true" : undefined}>
-                    <Label>Оставащ период (години) <span className="text-red-500">*</span></Label>
+                    <Label>{t('Оставащ период (години)', 'Remaining term (years)')} <span className="text-red-500">*</span></Label>
                     <Input
                       type="number"
                       min="0"
@@ -316,7 +317,7 @@ export default function HousingStep({ data, onChange, showErrors, plannerData })
                     />
                   </div>
                   <div className="space-y-2" data-invalid={isFieldInvalid(data.current_mortgage_monthly_payment) ? "true" : undefined}>
-                    <Label>Месечна вноска (€) <span className="text-red-500">*</span></Label>
+                    <Label>{t('Месечна вноска (€)', 'Monthly payment (€)')} <span className="text-red-500">*</span></Label>
                     <Input
                       type="number"
                       min="0"
@@ -336,13 +337,13 @@ export default function HousingStep({ data, onChange, showErrors, plannerData })
       <div className="bg-slate-50 rounded-xl p-6">
         <div className="flex items-center gap-2 mb-6">
           <Building2 className="h-5 w-5 text-blue-600" />
-          <h3 className="font-semibold text-slate-900">Планирате ли промяна?</h3>
+          <h3 className="font-semibold text-slate-900">{t('Планирате ли промяна?', 'Are you planning a change?')}</h3>
         </div>
 
         <div className="flex items-center justify-between mb-6">
-          <Label className="cursor-pointer">Планирам промяна</Label>
+          <Label className="cursor-pointer">{t('Планирам промяна', 'I plan a change')}</Label>
           <div className="flex items-center gap-2">
-            <span className={cn("text-sm font-medium", !(data.planning_housing_change ?? true) ? "text-red-600" : "text-slate-400")}>Не</span>
+            <span className={cn("text-sm font-medium", !(data.planning_housing_change ?? true) ? "text-red-600" : "text-slate-400")}>{t('Не', 'No')}</span>
             <button
               type="button"
               onClick={() => onChange('planning_housing_change', !(data.planning_housing_change ?? true))}
@@ -356,34 +357,34 @@ export default function HousingStep({ data, onChange, showErrors, plannerData })
                 (data.planning_housing_change ?? true) ? "right-1" : "left-1"
               )} />
             </button>
-            <span className={cn("text-sm font-medium", (data.planning_housing_change ?? true) ? "text-green-600" : "text-slate-400")}>Да</span>
-          </div>
-        </div>
+            <span className={cn("text-sm font-medium", (data.planning_housing_change ?? true) ? "text-green-600" : "text-slate-400")}>{t('Да', 'Yes')}</span>
+            </div>
+            </div>
 
-        {(data.planning_housing_change ?? true) && (
-          <div className="space-y-4">
+            {(data.planning_housing_change ?? true) && (
+            <div className="space-y-4">
             <div className="space-y-2" data-invalid={isFieldInvalid(data.planned_housing_type) ? "true" : undefined}>
-              <Label>Вид на промяната <span className="text-red-500">*</span></Label>
-              <Select 
-                value={data.planned_housing_type || ''} 
-                onValueChange={(value) => onChange('planned_housing_type', value)}
-              >
-                <SelectTrigger className={`rounded-lg ${isFieldInvalid(data.planned_housing_type) ? 'border-red-500 bg-red-50' : ''}`}>
-                  <SelectValue placeholder="Изберете" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="apartment">Покупка на Апартамент или Къща</SelectItem>
-                  <SelectItem value="house">Строителство на Къща</SelectItem>
-                  <SelectItem value="reconstruction">Реконструкция и ремонтни дейности</SelectItem>
-                </SelectContent>
-              </Select>
+            <Label>{t('Вид на промяната', 'Type of change')} <span className="text-red-500">*</span></Label>
+            <Select 
+              value={data.planned_housing_type || ''} 
+              onValueChange={(value) => onChange('planned_housing_type', value)}
+            >
+              <SelectTrigger className={`rounded-lg ${isFieldInvalid(data.planned_housing_type) ? 'border-red-500 bg-red-50' : ''}`}>
+                <SelectValue placeholder={t('Изберете', 'Select')} />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="apartment">{t('Покупка на Апартамент или Къща', 'Purchase of Apartment or House')}</SelectItem>
+                <SelectItem value="house">{t('Строителство на Къща', 'House Construction')}</SelectItem>
+                <SelectItem value="reconstruction">{t('Реконструкция и ремонтни дейности', 'Reconstruction and Renovation')}</SelectItem>
+              </SelectContent>
+            </Select>
             </div>
 
             {(data.planned_housing_type === 'apartment' || data.planned_housing_type === 'house') && (
               <>
                 <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
                   <div className="space-y-2" data-invalid={isFieldInvalid(data.planned_housing_rooms) ? "true" : undefined}>
-                    <Label>Брой стаи <span className="text-red-500">*</span></Label>
+                    <Label>{t('Брой стаи', 'Rooms')} <span className="text-red-500">*</span></Label>
                     <Input
                       type="number"
                       min="1"
@@ -395,7 +396,7 @@ export default function HousingStep({ data, onChange, showErrors, plannerData })
                     />
                   </div>
                   <div className="space-y-2" data-invalid={isFieldInvalid(data.planned_housing_area) ? "true" : undefined}>
-                    <Label>Застроена площ (кв.м) <span className="text-red-500">*</span></Label>
+                    <Label>{t('Застроена площ (кв.м)', 'Area (sq.m)')} <span className="text-red-500">*</span></Label>
                     <Input
                       type="number"
                       min="10"
@@ -406,7 +407,7 @@ export default function HousingStep({ data, onChange, showErrors, plannerData })
                     />
                   </div>
                   <div className="space-y-2" data-invalid={isFieldInvalid(data.planned_housing_value) ? "true" : undefined}>
-                    <Label>Стойност на имота (€) <span className="text-red-500">*</span></Label>
+                    <Label>{t('Стойност на имота (€)', 'Property value (€)')} <span className="text-red-500">*</span></Label>
                     <Input
                       type="number"
                       min="0"
@@ -417,7 +418,7 @@ export default function HousingStep({ data, onChange, showErrors, plannerData })
                     />
                   </div>
                   <div className="space-y-2" data-invalid={isFieldInvalid(data.planned_housing_timeline_years) ? "true" : undefined}>
-                    <Label>Времеви хоризонт (години) <span className="text-red-500">*</span></Label>
+                    <Label>{t('Времеви хоризонт (години)', 'Time horizon (years)')} <span className="text-red-500">*</span></Label>
                     <Input
                       type="number"
                       min="1"
@@ -429,7 +430,7 @@ export default function HousingStep({ data, onChange, showErrors, plannerData })
                     />
                   </div>
                   <div className="space-y-2" data-invalid={isFieldInvalid(data.planned_housing_extra_costs) ? "true" : undefined}>
-                    <Label>Разходи ремонт/обзавеждане (€) <span className="text-red-500">*</span></Label>
+                    <Label>{t('Разходи ремонт/обзавеждане (€)', 'Renovation/furnishing costs (€)')} <span className="text-red-500">*</span></Label>
                     <Input
                       type="number"
                       min="0"
@@ -440,7 +441,7 @@ export default function HousingStep({ data, onChange, showErrors, plannerData })
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label>Цена на кв.м. (€)</Label>
+                    <Label>{t('Цена на кв.м. (€)', 'Price per sq.m. (€)')}</Label>
                     <Input
                       type="number"
                       value={data.planned_housing_area > 0 ? Math.round((data.planned_housing_value || 0) / data.planned_housing_area) : ''}
@@ -450,8 +451,8 @@ export default function HousingStep({ data, onChange, showErrors, plannerData })
                   </div>
                 </div>
                 <p className="text-xs text-slate-500 mt-1">
-                  В случай на необходимост за определяне на приблизителната стойност на имота кликнете{' '}
-                  <a href="https://www.imot.bg/sredni-ceni/table" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">тук</a>!
+                  {t('В случай на необходимост за определяне на приблизителната стойност на имота кликнете', 'To determine the approximate value of the property click')}{' '}
+                  <a href="https://www.imot.bg/sredni-ceni/table" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">{t('тук', 'here')}</a>!
                 </p>
               </>
             )}
@@ -489,21 +490,21 @@ export default function HousingStep({ data, onChange, showErrors, plannerData })
 
       {(data.planning_housing_change ?? true) && data.planned_housing_type && (
         <div className="bg-slate-50 rounded-xl p-6">
-          <h3 className="font-semibold text-slate-900 mb-6">Начин на финансиране</h3>
+          <h3 className="font-semibold text-slate-900 mb-6">{t('Начин на финансиране', 'Financing Method')}</h3>
           
           <div className="space-y-4">
             <div className="space-y-2" data-invalid={isFieldInvalid(data.financing_method) ? "true" : undefined}>
-              <Label>Метод на финансиране <span className="text-red-500">*</span></Label>
+              <Label>{t('Метод на финансиране', 'Financing method')} <span className="text-red-500">*</span></Label>
               <Select 
                 value={data.financing_method || ''} 
                 onValueChange={(value) => onChange('financing_method', value)}
               >
                 <SelectTrigger className={`rounded-lg ${isFieldInvalid(data.financing_method) ? 'border-red-500 bg-red-50' : ''}`}>
-                  <SelectValue placeholder="Изберете" />
+                  <SelectValue placeholder={t('Изберете', 'Select')} />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="cash">Пари в брой</SelectItem>
-                  <SelectItem value="cash_and_loan">Пари в брой + заем / кредит</SelectItem>
+                  <SelectItem value="cash">{t('Пари в брой', 'Cash')}</SelectItem>
+                  <SelectItem value="cash_and_loan">{t('Пари в брой + заем / кредит', 'Cash + Loan')}</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -511,30 +512,30 @@ export default function HousingStep({ data, onChange, showErrors, plannerData })
             {data.financing_method === 'cash' ? (
               <div className="space-y-2" data-invalid={isFieldInvalid(data.available_cash) ? "true" : undefined}>
                 <Label>
-                  Наличност в брой към момента на {
-                    data.planned_housing_type === 'apartment' ? 'Закупуването' :
-                    data.planned_housing_type === 'house' ? 'строителството' :
-                    'Ремонта и реконструкцията'
+                  {t('Наличност в брой към момента на', 'Cash available at the time of')} {
+                  data.planned_housing_type === 'apartment' ? t('Закупуването', 'purchase') :
+                  data.planned_housing_type === 'house' ? t('строителството', 'construction') :
+                  t('Ремонта и реконструкцията', 'renovation')
                   } (€) <span className="text-red-500">*</span>
-                </Label>
-                <Input
+                  </Label>
+                  <Input
                   type="number"
                   min="0"
                   value={data.available_cash || ''}
                   onChange={(e) => onChange('available_cash', parseInt(e.target.value) || '')}
                   className={`rounded-lg ${isFieldInvalid(data.available_cash) ? 'border-red-500 bg-red-50' : ''}`}
                   required
-                />
+                  />
               </div>
             ) : data.financing_method === 'cash_and_loan' ? (
               <>
                 <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
                   <div className="space-y-2" data-invalid={isFieldInvalid(data.available_cash) ? "true" : undefined}>
                     <Label>
-                      Наличност в брой към момента на {
-                        data.planned_housing_type === 'apartment' ? 'Закупуването' :
-                        data.planned_housing_type === 'house' ? 'строителството' :
-                        'Ремонта и реконструкцията'
+                      {t('Наличност в брой към момента на', 'Cash available at the time of')} {
+                        data.planned_housing_type === 'apartment' ? t('Закупуването', 'purchase') :
+                        data.planned_housing_type === 'house' ? t('строителството', 'construction') :
+                        t('Ремонта и реконструкцията', 'renovation')
                       } (€) <span className="text-red-500">*</span>
                     </Label>
                     <Input
@@ -557,7 +558,7 @@ export default function HousingStep({ data, onChange, showErrors, plannerData })
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label>Размер на заема (€)</Label>
+                    <Label>{t('Размер на заема (€)', 'Loan amount (€)')}</Label>
                     <Input
                       type="number"
                       min="0"
@@ -567,7 +568,7 @@ export default function HousingStep({ data, onChange, showErrors, plannerData })
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label>Лихвен процент (%) <span className="text-red-500">*</span></Label>
+                    <Label>{t('Лихвен процент (%)', 'Interest rate (%)')} <span className="text-red-500">*</span></Label>
                     <Select 
                       value={(data.loan_interest_rate || 3).toString()} 
                       onValueChange={(value) => onChange('loan_interest_rate', parseFloat(value))}
@@ -583,7 +584,7 @@ export default function HousingStep({ data, onChange, showErrors, plannerData })
                     </Select>
                   </div>
                   <div className="space-y-2" data-invalid={isFieldInvalid(data.loan_term_years) ? "true" : undefined}>
-                    <Label>Срок на изплащане (години) <span className="text-red-500">*</span></Label>
+                    <Label>{t('Срок на изплащане (години)', 'Repayment term (years)')} <span className="text-red-500">*</span></Label>
                     <Input
                       type="number"
                       min="1"
@@ -595,7 +596,7 @@ export default function HousingStep({ data, onChange, showErrors, plannerData })
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label>Очаквана месечна вноска (€)</Label>
+                    <Label>{t('Очаквана месечна вноска (€)', 'Expected monthly payment (€)')}</Label>
                     <Input
                       type="number"
                       min="0"
@@ -605,7 +606,7 @@ export default function HousingStep({ data, onChange, showErrors, plannerData })
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label>Общо надплащане (€)</Label>
+                    <Label>{t('Общо надплащане (€)', 'Total overpayment (€)')}</Label>
                     <Input
                       type="number"
                       min="0"
@@ -625,7 +626,7 @@ export default function HousingStep({ data, onChange, showErrors, plannerData })
                 {showDownPaymentWarning && plannedValue > 0 && availableCash > 0 && availableCash < (plannedValue * 0.15) && (
                   <div className="mt-4 p-4 bg-amber-50 border border-amber-200 rounded-lg">
                     <p className="text-amber-700">
-                      <span className="font-semibold">Внимание:</span> Необходимото минимално самоучастие е 15%. Съветваме Ви да го осигурим преди закупуването на имота.
+                      <span className="font-semibold">{t('Внимание:', 'Warning:')}</span> {t('Необходимото минимално самоучастие е 15%. Съветваме Ви да го осигурим преди закупуването на имота.', 'The required minimum down payment is 15%. We advise you to secure it before purchasing the property.')}
                     </p>
                   </div>
                 )}
@@ -633,11 +634,11 @@ export default function HousingStep({ data, onChange, showErrors, plannerData })
                 {totalOverpayment > 0 && (
                   <div className="mt-4 p-4 bg-green-50 border border-green-200 rounded-lg">
                     <div className="flex items-center gap-2">
-                      <span className="text-green-700 font-medium">Можем да спестим между:</span>
+                      <span className="text-green-700 font-medium">{t('Можем да спестим между:', 'We can save between:')}</span>
                       <span className="text-green-800 font-bold text-lg">{potentialSavingsMin.toLocaleString('bg-BG')} € - {potentialSavingsMax.toLocaleString('bg-BG')} €</span>
                     </div>
                     <p className="text-green-600 text-sm mt-1">
-                      Това е между 30% и 40% от общото надплащане по кредита. Това постигаме, чрез преференциални кредитни условия, по-изгодно застраховане и ефективен Инвестиционно-погасителен план.
+                      {t('Това е между 30% и 40% от общото надплащане по кредита. Това постигаме, чрез преференциални кредитни условия, по-изгодно застраховане и ефективен Инвестиционно-погасителен план.', 'This is 30-40% of the total loan overpayment, achieved through preferential credit terms, better insurance, and an effective investment-repayment plan.')}
                     </p>
                   </div>
                 )}
@@ -648,15 +649,15 @@ export default function HousingStep({ data, onChange, showErrors, plannerData })
       )}
 
       <div className="bg-slate-50 rounded-xl p-6">
-        <h3 className="font-semibold text-slate-900 mb-4">Кой от вашите познати:</h3>
+        <h3 className="font-semibold text-slate-900 mb-4">{t('Кой от вашите познати:', 'Which of your acquaintances:')}</h3>
         
         <div className="grid md:grid-cols-2 gap-6">
           <div className="space-y-3">
-            <Label className="text-slate-700">Все още не живее в собствено жилище (живее при родителите си, под наем...)</Label>
+            <Label className="text-slate-700">{t('Все още не живее в собствено жилище (живее при родителите си, под наем...)', 'Does not yet own a home (renting, with parents...)')}</Label>
             {(data.referrals_no_own_home || ['']).map((name, index) => (
               <Input
                 key={`no_home_${index}`}
-                placeholder="Име на познат"
+                placeholder={t('Име на познат', 'Name of acquaintance')}
                 value={name}
                 onChange={(e) => {
                   const newList = [...(data.referrals_no_own_home || [''])];
@@ -672,11 +673,11 @@ export default function HousingStep({ data, onChange, showErrors, plannerData })
           </div>
 
           <div className="space-y-3">
-            <Label className="text-slate-700">Вече дълго време живее в собствено жилище</Label>
+            <Label className="text-slate-700">{t('Вече дълго време живее в собствено жилище', 'Has been living in their own home for a long time')}</Label>
             {(data.referrals_own_home_long || ['']).map((name, index) => (
               <Input
                 key={`own_home_${index}`}
-                placeholder="Име на познат"
+                placeholder={t('Име на познат', 'Name of acquaintance')}
                 value={name}
                 onChange={(e) => {
                   const newList = [...(data.referrals_own_home_long || [''])];
@@ -695,7 +696,7 @@ export default function HousingStep({ data, onChange, showErrors, plannerData })
 
       <div className="bg-slate-50 rounded-xl p-6">
         <div className="flex items-center justify-between mb-4">
-          <h3 className="font-semibold text-slate-900">Визуализационна помощ за препоръки</h3>
+          <h3 className="font-semibold text-slate-900">{t('Визуализационна помощ за препоръки', 'Visualization aid for referrals')}</h3>
           <div className="flex items-center gap-2">
             <span className={cn("text-sm font-medium", !(data.birthday_example_enabled ?? false) ? "text-red-600" : "text-slate-400")}>Не</span>
             <button
@@ -955,7 +956,7 @@ export default function HousingStep({ data, onChange, showErrors, plannerData })
           checked={data.include_housing_in_plan || false}
           onCheckedChange={(checked) => onChange('include_housing_in_plan', checked)}
         />
-        <span className="font-medium text-blue-800">Да бъде включено във финансовия план</span>
+        <span className="font-medium text-blue-800">{t('Да бъде включено във финансовия план', 'Include in financial plan')}</span>
       </label>
     </div>
   );

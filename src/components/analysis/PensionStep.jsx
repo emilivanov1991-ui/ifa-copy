@@ -84,9 +84,10 @@ const netToBruto = (netEUR) => {
   }
 };
 
-export default function PensionStep({ data, onChange, showErrors, plannerData }) {
+export default function PensionStep({ data, onChange, showErrors, plannerData, lang = 'bg' }) {
   // Helper to check if a field is invalid - only when showErrors is true
   const isFieldInvalid = (value) => showErrors && (value === undefined || value === '' || value === null);
+  const t = (bg, en) => lang === 'en' ? en : bg;
   
   // Get names from Financial Planner or from analysis data directly
   const clientName = plannerData?.client_first_name || data.client_first_name || 'Клиент';
@@ -147,9 +148,9 @@ export default function PensionStep({ data, onChange, showErrors, plannerData })
   }, [data.partner_work_category, data.partner_retirement_age, data.partner_gross_income_pension, includePartner]);
 
   const categoryOptions = [
-    { value: 'third', label: 'Трета категория' },
-    { value: 'second', label: 'Втора категория' },
-    { value: 'first', label: 'Първа категория' },
+    { value: 'third', label: t('Трета категория', 'Third category') },
+    { value: 'second', label: t('Втора категория', 'Second category') },
+    { value: 'first', label: t('Първа категория', 'First category') },
   ];
 
   // Calculate differences
@@ -190,7 +191,7 @@ export default function PensionStep({ data, onChange, showErrors, plannerData })
       <div className="bg-slate-50 rounded-xl p-6">
         <div className="flex items-center gap-2 mb-6">
           <Umbrella className="h-5 w-5 text-blue-600" />
-          <h3 className="font-semibold text-slate-900">По-добра пенсия</h3>
+          <h3 className="font-semibold text-slate-900">{t('По-добра пенсия', 'Better Pension')}</h3>
         </div>
 
         <div className={includePartner ? "grid lg:grid-cols-2 gap-8" : ""}>
@@ -203,7 +204,7 @@ export default function PensionStep({ data, onChange, showErrors, plannerData })
             <div className="space-y-4">
               {/* Work Category */}
               <div className="space-y-2">
-                <Label>Категория труд</Label>
+                <Label>{t('Категория труд', 'Work category')}</Label>
                 <div className="flex gap-2">
                   {categoryOptions.map((option) => (
                     <button
@@ -224,7 +225,7 @@ export default function PensionStep({ data, onChange, showErrors, plannerData })
               </div>
               {/* Gross Income */}
               <div className="space-y-2" data-invalid={isFieldInvalid(data.client_gross_income_pension) ? "true" : undefined}>
-                <Label>Брутен доход (€) <span className="text-red-500">*</span></Label>
+                <Label>{t('Брутен доход (€)', 'Gross income (€)')} <span className="text-red-500">*</span></Label>
                 <Input
                   type="number"
                   min="0"
@@ -236,7 +237,7 @@ export default function PensionStep({ data, onChange, showErrors, plannerData })
                 />
               </div>
               <div className="space-y-2" data-invalid={isFieldInvalid(data.client_retirement_age) ? "true" : undefined}>
-                <Label>Кога искате да излезете в пенсия? (възраст) <span className="text-red-500">*</span></Label>
+                <Label>{t('Кога искате да излезете в пенсия? (възраст)', 'At what age do you want to retire?')} <span className="text-red-500">*</span></Label>
                 <Input
                   type="number"
                   min="50"
@@ -249,7 +250,7 @@ export default function PensionStep({ data, onChange, showErrors, plannerData })
                 />
               </div>
               <div className="space-y-2" data-invalid={isFieldInvalid(data.client_desired_pension) ? "true" : undefined}>
-                <Label>От каква месечна пенсия ще се нуждаете? (€) <span className="text-red-500">*</span></Label>
+                <Label>{t('От каква месечна пенсия ще се нуждаете? (€)', 'What monthly pension will you need? (€)')} <span className="text-red-500">*</span></Label>
                 <Input
                   type="number"
                   min="0"
@@ -261,7 +262,7 @@ export default function PensionStep({ data, onChange, showErrors, plannerData })
                 />
               </div>
               <div className="space-y-2">
-                <Label>Очаквана държавна пенсия (€)</Label>
+                <Label>{t('Очаквана държавна пенсия (€)', 'Expected state pension (€)')}</Label>
                 <Input
                   type="number"
                   min="0"
@@ -271,13 +272,13 @@ export default function PensionStep({ data, onChange, showErrors, plannerData })
                 />
                 {data.client_pension_is_social && (
                   <p className="text-amber-600 text-sm">
-                    Калкулирана е социалната пенсия за страната поради липса на необходима пенсионна възраст
+                    {t('Калкулирана е социалната пенсия за страната поради липса на необходима пенсионна възраст', 'The social pension has been calculated due to insufficient retirement age')}
                   </p>
                 )}
               </div>
               <div className="p-3 bg-blue-100 rounded-lg">
                 <p className="text-sm text-blue-800">
-                  Разлика: <span className="font-semibold">
+                  {t('Разлика:', 'Gap:')} <span className="font-semibold">
                     {clientDiff.toLocaleString()} €
                   </span>
                 </p>
@@ -295,7 +296,7 @@ export default function PensionStep({ data, onChange, showErrors, plannerData })
               <div className="space-y-4">
                 {/* Work Category */}
                 <div className="space-y-2">
-                  <Label>Категория труд</Label>
+                  <Label>{t('Категория труд', 'Work category')}</Label>
                   <div className="flex gap-2">
                     {categoryOptions.map((option) => (
                       <button
@@ -383,10 +384,10 @@ export default function PensionStep({ data, onChange, showErrors, plannerData })
         {showCalculation && (
           <div className="mt-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
             <p className="text-blue-800">
-              За осигуряване на подобна сума са ви необходими инвестиции в размер на около <span className="font-bold">{monthlyInvestmentNeeded.toLocaleString()} €</span> месечно. Във финансовия план ще откриете по-подробни предложения и проекции.
+              {t('За осигуряване на подобна сума са ви необходими инвестиции в размер на около', 'To secure such an amount, you need investments of approximately')} <span className="font-bold">{monthlyInvestmentNeeded.toLocaleString()} €</span> {t('месечно. Във финансовия план ще откриете по-подробни предложения и проекции.', 'monthly. Your financial plan will contain detailed proposals and projections.')}
             </p>
             <p className="text-xs text-blue-600 mt-2">
-              (Изчислено при {investmentHorizon} години инвестиционен хоризонт, {yearsUntil85} години пенсия до 85г. и 8% средна годишна доходност)
+              {t(`(Изчислено при ${investmentHorizon} години инвестиционен хоризонт, ${yearsUntil85} години пенсия до 85г. и 8% средна годишна доходност)`, `(Calculated with ${investmentHorizon} year investment horizon, ${yearsUntil85} years of pension until age 85, 8% avg. annual return)`)}
             </p>
           </div>
         )}
@@ -394,7 +395,7 @@ export default function PensionStep({ data, onChange, showErrors, plannerData })
 
       {/* Pension Pillars */}
       <div className="bg-slate-50 rounded-xl p-6">
-        <h3 className="font-semibold text-slate-900 mb-6">Какво сте направили до сега?</h3>
+        <h3 className="font-semibold text-slate-900 mb-6">{t('Какво сте направили до сега?', 'What have you done so far?')}</h3>
         
         <div className={includePartner ? "grid lg:grid-cols-2 gap-8" : ""}>
           {/* Client */}
@@ -406,7 +407,7 @@ export default function PensionStep({ data, onChange, showErrors, plannerData })
             <div className="space-y-4">
               {/* I. Pillar */}
               <div className="flex items-center gap-3">
-                <Label className="flex-1">I. Стълб (държавно осигуряване)</Label>
+                <Label className="flex-1">{t('I. Стълб (държавно осигуряване)', 'I. Pillar (state insurance)')}</Label>
                 <div className="flex items-center gap-2">
                   <span className={cn("text-sm font-medium", (data.client_pillar_1 ?? true) ? "text-green-600" : "text-slate-400")}>Да</span>
                   <button
@@ -450,27 +451,27 @@ export default function PensionStep({ data, onChange, showErrors, plannerData })
                 </div>
                 {(data.client_pillar_2 ?? true) && (
                     <div className="ml-4 space-y-2" data-invalid={isFieldInvalid(data.client_pension_fund) ? "true" : undefined}>
-                      <Label className="text-sm">Име на частен пенсионен фонд? <span className="text-red-500">*</span></Label>
+                      <Label className="text-sm">{t('Име на частен пенсионен фонд?', 'Name of private pension fund?')} <span className="text-red-500">*</span></Label>
                       <Combobox
-                        options={PENSION_FUND_OPTIONS}
-                        value={data.client_pension_fund || ''}
-                        onValueChange={(value) => onChange('client_pension_fund', value)}
-                        placeholder="Търси фонд..."
-                        searchPlaceholder="Търси..."
-                        emptyText="Няма намерен фонд."
+                       options={PENSION_FUND_OPTIONS}
+                       value={data.client_pension_fund || ''}
+                       onValueChange={(value) => onChange('client_pension_fund', value)}
+                       placeholder={t('Търси фонд...', 'Search fund...')}
+                       searchPlaceholder={t('Търси...', 'Search...')}
+                       emptyText={t('Няма намерен фонд.', 'No fund found.')}
                         triggerClassName={`rounded-lg ${isFieldInvalid(data.client_pension_fund) ? 'border-red-500 bg-red-50' : ''}`}
                       />
                     <p className="text-xs text-slate-500 mt-2">
-                      В случай, на необходимост за откриване на дружеството, което управлява Вашите средства: Телефон за информация на НОИ: <span className="font-bold">0700 10 292</span> !
+                      {t('В случай, на необходимост за откриване на дружеството, което управлява Вашите средства: Телефон за информация на НОИ:', 'To find the fund managing your assets, call the NSI information line:')} <span className="font-bold">0700 10 292</span> !
                     </p>
-                  </div>
-                )}
-                </div>
+                    </div>
+                    )}
+                    </div>
 
-                {/* III. Pillar */}
-                <div className="space-y-3">
-                  <div className="flex items-center gap-3">
-                    <Label className="flex-1">III. Стълб (доброволно осигуряване)</Label>
+                    {/* III. Pillar */}
+                    <div className="space-y-3">
+                    <div className="flex items-center gap-3">
+                    <Label className="flex-1">{t('III. Стълб (доброволно осигуряване)', 'III. Pillar (voluntary insurance)')}</Label>
                     <div className="flex items-center gap-2">
                       <span className={cn("text-sm font-medium", (data.client_pillar_3 ?? false) ? "text-green-600" : "text-slate-400")}>Да</span>
                       <button
@@ -503,19 +504,19 @@ export default function PensionStep({ data, onChange, showErrors, plannerData })
                         />
                       </div>
                       <div className="space-y-2">
-                        <Label className="text-sm">Месечна вноска (€) <span className="text-red-500">*</span></Label>
+                        <Label className="text-sm">{t('Месечна вноска (€)', 'Monthly contribution (€)')} <span className="text-red-500">*</span></Label>
                         <Input
-                          type="number"
-                          min="0"
-                          placeholder=""
-                          value={data.client_voluntary_pension_monthly || ''}
-                          onChange={(e) => onChange('client_voluntary_pension_monthly', parseInt(e.target.value) || '')}
-                          className="rounded-lg"
-                          required
+                         type="number"
+                         min="0"
+                         placeholder=""
+                         value={data.client_voluntary_pension_monthly || ''}
+                         onChange={(e) => onChange('client_voluntary_pension_monthly', parseInt(e.target.value) || '')}
+                         className="rounded-lg"
+                         required
                         />
-                      </div>
-                      <div className="space-y-2">
-                        <Label className="text-sm">Обща стойност на партидата (ориентировъчна стойност) (€) <span className="text-red-500">*</span></Label>
+                        </div>
+                        <div className="space-y-2">
+                        <Label className="text-sm">{t('Обща стойност на партидата (ориентировъчна стойност) (€)', 'Total account value (approximate) (€)')} <span className="text-red-500">*</span></Label>
                         <Input
                           type="number"
                           min="0"
@@ -542,7 +543,7 @@ export default function PensionStep({ data, onChange, showErrors, plannerData })
               <div className="space-y-4">
                 {/* I. Pillar */}
                 <div className="flex items-center gap-3">
-                  <Label className="flex-1">I. Стълб (държавно осигуряване)</Label>
+                  <Label className="flex-1">{t('I. Стълб (държавно осигуряване)', 'I. Pillar (state insurance)')}</Label>
                   <div className="flex items-center gap-2">
                     <span className={cn("text-sm font-medium", (data.partner_pillar_1 ?? true) ? "text-green-600" : "text-slate-400")}>Да</span>
                     <button
@@ -565,7 +566,7 @@ export default function PensionStep({ data, onChange, showErrors, plannerData })
                 {/* II. Pillar */}
                 <div className="space-y-3">
                   <div className="flex items-center gap-3">
-                    <Label className="flex-1">II. Стълб (допълнително задължително)</Label>
+                    <Label className="flex-1">{t('II. Стълб (допълнително задължително)', 'II. Pillar (supplementary mandatory)')}</Label>
                     <div className="flex items-center gap-2">
                       <span className={cn("text-sm font-medium", (data.partner_pillar_2 ?? true) ? "text-green-600" : "text-slate-400")}>Да</span>
                       <button
@@ -674,12 +675,12 @@ export default function PensionStep({ data, onChange, showErrors, plannerData })
 
       {/* Pension Referrals */}
       <div className="bg-slate-50 rounded-xl p-6">
-        <h3 className="font-semibold text-slate-900 mb-4">Кой от Вашите приятели и познати:</h3>
+        <h3 className="font-semibold text-slate-900 mb-4">{t('Кой от Вашите приятели и познати:', 'Which of your friends and acquaintances:')}</h3>
         
         <div className="grid md:grid-cols-2 gap-6">
           {/* Works abroad */}
           <div className="space-y-3">
-            <Label className="text-slate-700">Работи в чужбина?</Label>
+            <Label className="text-slate-700">{t('Работи в чужбина?', 'Works abroad?')}</Label>
             {(data.pension_referrals_abroad || ['']).map((name, index) => {
               const existingNames = [
                 ...(data.referrals_no_own_home || []),
@@ -719,7 +720,7 @@ export default function PensionStep({ data, onChange, showErrors, plannerData })
 
           {/* High income */}
           <div className="space-y-3">
-            <Label className="text-slate-700">Има доход над средния за страната?</Label>
+            <Label className="text-slate-700">{t('Има доход над средния за страната?', 'Has above-average income?')}</Label>
             {(data.pension_referrals_high_income || ['']).map((name, index) => {
               const existingNames = [
                 ...(data.referrals_no_own_home || []),
@@ -759,7 +760,7 @@ export default function PensionStep({ data, onChange, showErrors, plannerData })
 
           {/* Freelancer / Entrepreneur */}
           <div className="space-y-3">
-            <Label className="text-slate-700">Има свободна професия или е предприемач с нисък осигурителен праг?</Label>
+            <Label className="text-slate-700">{t('Има свободна професия или е предприемач с нисък осигурителен праг?', 'Has a freelance profession or is an entrepreneur with a low insurance threshold?')}</Label>
             {(data.pension_referrals_entrepreneur || ['']).map((name, index) => {
               const existingNames = [
                 ...(data.referrals_no_own_home || []),
@@ -799,7 +800,7 @@ export default function PensionStep({ data, onChange, showErrors, plannerData })
 
           {/* Young professional */}
           <div className="space-y-3">
-            <Label className="text-slate-700">Е млад човек в началото на кариерата си?</Label>
+            <Label className="text-slate-700">{t('Е млад човек в началото на кариерата си?', 'Is a young person at the start of their career?')}</Label>
             {(data.pension_referrals_young || ['']).map((name, index) => {
               const existingNames = [
                 ...(data.referrals_no_own_home || []),
@@ -845,7 +846,7 @@ export default function PensionStep({ data, onChange, showErrors, plannerData })
           checked={data.include_pension_in_plan || false}
           onCheckedChange={(checked) => onChange('include_pension_in_plan', checked)}
         />
-        <span className="font-medium text-blue-800">Да бъде включено във финансовия план</span>
+        <span className="font-medium text-blue-800">{t('Да бъде включено във финансовия план', 'Include in financial plan')}</span>
       </label>
     </div>
   );

@@ -4,8 +4,9 @@ import { Label } from "@/components/ui/label";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { Shield, ChevronDown } from 'lucide-react';
 
-export default function ConsentStep({ data, onChange, showErrors }) {
+export default function ConsentStep({ data, onChange, showErrors, lang = 'bg' }) {
   const [isOpen, setIsOpen] = useState(false);
+  const t = (bg, en) => lang === 'en' ? en : bg;
 
   return (
     <div className="space-y-6">
@@ -14,9 +15,9 @@ export default function ConsentStep({ data, onChange, showErrors }) {
           <div className="flex items-start gap-3">
             <Shield className="h-6 w-6 text-blue-600 mt-0.5 flex-shrink-0" />
             <div>
-              <h3 className="font-semibold text-slate-900">Съгласие за използване на лични данни</h3>
+              <h3 className="font-semibold text-slate-900">{t('Съгласие за използване на лични данни', 'Consent for Personal Data Use')}</h3>
               <p className="text-sm text-slate-600">
-                Съгласно Закона за личните данни и Регламент (ЕС) 2016/679 (GDPR)
+                {t('Съгласно Закона за личните данни и Регламент (ЕС) 2016/679 (GDPR)', 'Pursuant to the Personal Data Act and Regulation (EU) 2016/679 (GDPR)')}
               </p>
             </div>
           </div>
@@ -56,68 +57,65 @@ export default function ConsentStep({ data, onChange, showErrors }) {
       </Collapsible>
 
       <div className="space-y-4">
-        <label 
-          className={`flex items-start gap-4 p-4 rounded-xl border-2 cursor-pointer transition-colors ${
-            showErrors && !data.gdpr_consent_a 
-              ? 'border-red-500 bg-red-50' 
-              : 'border-slate-200 hover:border-blue-300'
-          }`}
-          data-invalid={showErrors && !data.gdpr_consent_a ? "true" : undefined}
-        >
-          <Checkbox
-            checked={data.gdpr_consent_a || false}
-            onCheckedChange={(checked) => onChange('gdpr_consent_a', checked)}
-            className="mt-1"
-          />
-          <div>
-            <p className="font-medium text-slate-900">а) Финансов анализ и посредничество <span className="text-red-500">*</span></p>
-            <p className="text-sm text-slate-600 mt-1">
-              Съгласие за анализиране на личните ми финанси, финансово посредничество, 
-              предлагане и посредничество при избора на финансови продукти.
-            </p>
-          </div>
-        </label>
+      <label 
+        className={`flex items-start gap-4 p-4 rounded-xl border-2 cursor-pointer transition-colors ${
+          showErrors && !data.gdpr_consent_a 
+            ? 'border-red-500 bg-red-50' 
+            : 'border-slate-200 hover:border-blue-300'
+        }`}
+        data-invalid={showErrors && !data.gdpr_consent_a ? "true" : undefined}
+      >
+        <Checkbox
+          checked={data.gdpr_consent_a || false}
+          onCheckedChange={(checked) => onChange('gdpr_consent_a', checked)}
+          className="mt-1"
+        />
+        <div>
+          <p className="font-medium text-slate-900">{t('а) Финансов анализ и посредничество', 'a) Financial Analysis and Mediation')} <span className="text-red-500">*</span></p>
+          <p className="text-sm text-slate-600 mt-1">
+            {t('Съгласие за анализиране на личните ми финанси, финансово посредничество, предлагане и посредничество при избора на финансови продукти.', 'Consent for analysis of my personal finances, financial mediation, and intermediation in the selection of financial products.')}
+          </p>
+        </div>
+      </label>
 
-        <label 
-          className={`flex items-start gap-4 p-4 rounded-xl border-2 cursor-pointer transition-colors ${
-            showErrors && !data.gdpr_consent_c 
-              ? 'border-red-500 bg-red-50' 
-              : 'border-slate-200 hover:border-blue-300'
-          }`}
-          data-invalid={showErrors && !data.gdpr_consent_c ? "true" : undefined}
-        >
-          <Checkbox
-            checked={data.gdpr_consent_c || false}
-            onCheckedChange={(checked) => onChange('gdpr_consent_c', checked)}
-            className="mt-1"
-          />
-          <div>
-            <p className="font-medium text-slate-900">б) Предоставяне на трети лица <span className="text-red-500">*</span></p>
-            <p className="text-sm text-slate-600 mt-1">
-              Съгласие за предоставяне на личните ми данни на застраховател, кредитна институция, 
-              пенсионноосигурително дружество или инвестиционен посредник.
-            </p>
-          </div>
-        </label>
+      <label 
+        className={`flex items-start gap-4 p-4 rounded-xl border-2 cursor-pointer transition-colors ${
+          showErrors && !data.gdpr_consent_c 
+            ? 'border-red-500 bg-red-50' 
+            : 'border-slate-200 hover:border-blue-300'
+        }`}
+        data-invalid={showErrors && !data.gdpr_consent_c ? "true" : undefined}
+      >
+        <Checkbox
+          checked={data.gdpr_consent_c || false}
+          onCheckedChange={(checked) => onChange('gdpr_consent_c', checked)}
+          className="mt-1"
+        />
+        <div>
+          <p className="font-medium text-slate-900">{t('б) Предоставяне на трети лица', 'b) Disclosure to Third Parties')} <span className="text-red-500">*</span></p>
+          <p className="text-sm text-slate-600 mt-1">
+            {t('Съгласие за предоставяне на личните ми данни на застраховател, кредитна институция, пенсионноосигурително дружество или инвестиционен посредник.', 'Consent for sharing my personal data with an insurer, credit institution, pension fund, or investment intermediary.')}
+          </p>
+        </div>
+      </label>
 
-        <label className="flex items-start gap-4 p-4 rounded-xl border-2 border-slate-200 hover:border-blue-300 cursor-pointer transition-colors">
-          <Checkbox
-            checked={data.gdpr_consent_b || false}
-            onCheckedChange={(checked) => onChange('gdpr_consent_b', checked)}
-            className="mt-1"
-          />
-          <div>
-            <p className="font-medium text-slate-900">в) Маркетинг и информация</p>
-            <p className="text-sm text-slate-600 mt-1">
-              Съгласие за информиране относно условия по предоставяни услуги, други услуги и продукти, 
-              информация от финансовите пазари и директен маркетинг.
-            </p>
-          </div>
-        </label>
+      <label className="flex items-start gap-4 p-4 rounded-xl border-2 border-slate-200 hover:border-blue-300 cursor-pointer transition-colors">
+        <Checkbox
+          checked={data.gdpr_consent_b || false}
+          onCheckedChange={(checked) => onChange('gdpr_consent_b', checked)}
+          className="mt-1"
+        />
+        <div>
+          <p className="font-medium text-slate-900">{t('в) Маркетинг и информация', 'c) Marketing and Information')}</p>
+          <p className="text-sm text-slate-600 mt-1">
+            {t('Съгласие за информиране относно условия по предоставяни услуги, други услуги и продукти, информация от финансовите пазари и директен маркетинг.', 'Consent to be informed about service terms, other products and services, financial market information, and direct marketing.')}
+          </p>
+        </div>
+      </label>
       </div>
 
       <p className="text-xs text-slate-500 text-center">
-        Съгласието е валидно за срок от 2 години от датата на подписване.
+      {t('Съгласието е валидно за срок от 2 години от датата на подписване.', 'This consent is valid for 2 years from the date of signing.')}
       </p>
     </div>
   );

@@ -13,9 +13,10 @@ import {
 import { Baby, Car, Palmtree, SkipForward, Power } from 'lucide-react';
 import { cn } from "@/lib/utils";
 
-export default function ChildrenGoalsStep({ data, onChange, showErrors, plannerData }) {
+export default function ChildrenGoalsStep({ data, onChange, showErrors, plannerData, lang = 'bg' }) {
   // Helper to check if a field is invalid
   const isInvalid = (value) => showErrors && (value === undefined || value === '' || value === null);
+  const t = (bg, en) => lang === 'en' ? en : bg;
   
   // Get children data from Financial Planner
   const plannerChildrenCount = plannerData?.children_count || 0;
@@ -151,7 +152,7 @@ export default function ChildrenGoalsStep({ data, onChange, showErrors, plannerD
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center gap-2">
             <Palmtree className="h-5 w-5 text-blue-600" />
-            <h3 className="font-semibold text-slate-900">Други цели (кола, почивка...)</h3>
+            <h3 className="font-semibold text-slate-900">{t('Други цели (кола, почивка...)', 'Other goals (car, vacation...)')}</h3>
           </div>
           <Button 
             variant="outline" 
@@ -160,21 +161,21 @@ export default function ChildrenGoalsStep({ data, onChange, showErrors, plannerD
             className="rounded-full text-slate-600"
           >
             <Power className="h-4 w-4 mr-2" />
-            {(data.skip_other_goals_section ?? true) ? 'Активирай темата' : 'Пропусни темата'}
+            {(data.skip_other_goals_section ?? true) ? t('Активирай темата', 'Activate section') : t('Пропусни темата', 'Skip section')}
           </Button>
         </div>
 
         {(data.skip_other_goals_section ?? true) ? (
-          <p className="text-slate-500 text-center py-4">Няма други цели. Ако желаете да впишете такива активирайте темата.</p>
+          <p className="text-slate-500 text-center py-4">{t('Няма други цели. Ако желаете да впишете такива активирайте темата.', 'No other goals. Activate the section if you wish to add some.')}</p>
         ) : (
           <div className="space-y-4">
             <div className="grid grid-cols-3 gap-4 items-end">
               <div className="flex items-center gap-2">
                 <Car className="h-4 w-4 text-slate-500" />
-                <Label className="font-medium">Кола</Label>
+                <Label className="font-medium">{t('Кола', 'Car')}</Label>
               </div>
               <div className="space-y-1">
-                <Label className="text-xs text-slate-500 text-center block">Сума (€)</Label>
+                <Label className="text-xs text-slate-500 text-center block">{t('Сума (€)', 'Amount (€)')}</Label>
                 <Input
                   type="number"
                   min="0"
@@ -185,7 +186,7 @@ export default function ChildrenGoalsStep({ data, onChange, showErrors, plannerD
                 />
               </div>
               <div className="space-y-1">
-                <Label className="text-xs text-slate-500 text-center block">Хоризонт (години)</Label>
+                <Label className="text-xs text-slate-500 text-center block">{t('Хоризонт (години)', 'Horizon (years)')}</Label>
                 <Input
                   type="number"
                   min="1"
@@ -200,7 +201,7 @@ export default function ChildrenGoalsStep({ data, onChange, showErrors, plannerD
             <div className="grid grid-cols-3 gap-4 items-end">
               <div className="flex items-center gap-2">
                 <Palmtree className="h-4 w-4 text-slate-500" />
-                <Label className="font-medium">Почивка</Label>
+                <Label className="font-medium">{t('Почивка', 'Vacation')}</Label>
               </div>
               <div className="space-y-1">
                 <Label className="text-xs text-slate-500 text-center block">Сума (€)</Label>
@@ -227,12 +228,12 @@ export default function ChildrenGoalsStep({ data, onChange, showErrors, plannerD
             </div>
 
             <div className="grid grid-cols-4 gap-4 items-end">
-              <Label className="font-medium">Други</Label>
+              <Label className="font-medium">{t('Други', 'Other')}</Label>
               <div className="space-y-1">
-                <Label className="text-xs text-slate-500 text-center block">Описание</Label>
+                <Label className="text-xs text-slate-500 text-center block">{t('Описание', 'Description')}</Label>
                 <Input
                   type="text"
-                  placeholder="Опишете целта..."
+                  placeholder={t('Опишете целта...', 'Describe the goal...')}
                   value={data.other_goals_other_description || ''}
                   onChange={(e) => onChange('other_goals_other_description', e.target.value)}
                   className="rounded-lg text-center"
@@ -284,11 +285,11 @@ export default function ChildrenGoalsStep({ data, onChange, showErrors, plannerD
       <div className="space-y-8">
         <div className="bg-slate-50 rounded-xl p-6 text-center">
           <Baby className="h-12 w-12 text-slate-300 mx-auto mb-4" />
-          <h3 className="font-semibold text-slate-900 mb-2">Тази секция е пропусната</h3>
+          <h3 className="font-semibold text-slate-900 mb-2">{t('Тази секция е пропусната', 'This section is skipped')}</h3>
           <p className="text-slate-600 mb-4">
             {plannerChildrenCount === 0 
-              ? 'Отбелязали сте, че нямате деца и затова темата не е активна'
-              : 'Избрали сте да не попълвате секцията за финансово осигуряване на децата.'
+              ? t('Отбелязали сте, че нямате деца и затова темата не е активна', 'You indicated you have no children so this section is inactive')
+              : t('Избрали сте да не попълвате секцията за финансово осигуряване на децата.', "You chose not to fill in the children's financial security section.")
             }
           </p>
           <Button 
@@ -296,18 +297,18 @@ export default function ChildrenGoalsStep({ data, onChange, showErrors, plannerD
             onClick={() => onChange('skip_children_section', false)}
             className="rounded-full"
           >
-            Върни се към секцията
+            {t('Върни се към секцията', 'Return to section')}
           </Button>
         </div>
 
         {/* Referrals - always visible */}
         <div className="bg-slate-50 rounded-xl p-6">
-          <h3 className="font-semibold text-slate-900 mb-4">Кой от Вашите приятели и познати:</h3>
+          <h3 className="font-semibold text-slate-900 mb-4">{t('Кой от Вашите приятели и познати:', 'Which of your friends and acquaintances:')}</h3>
           
           <div className="grid md:grid-cols-2 gap-6">
             {/* Has children */}
             <div className="space-y-3">
-              <Label className="text-slate-700">Има деца?</Label>
+              <Label className="text-slate-700">{t('Има деца?', 'Has children?')}</Label>
               {(data.children_referrals_has_kids?.length > 0 ? data.children_referrals_has_kids : ['']).map((name, index) => {
                 const isDuplicate = isDuplicateName(name);
                 const list = data.children_referrals_has_kids?.length > 0 ? data.children_referrals_has_kids : [''];
@@ -381,7 +382,7 @@ export default function ChildrenGoalsStep({ data, onChange, showErrors, plannerD
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center gap-2">
             <Baby className="h-5 w-5 text-blue-600" />
-            <h3 className="font-semibold text-slate-900">Финансово осигуряване на децата</h3>
+            <h3 className="font-semibold text-slate-900">{t('Финансово осигуряване на децата', "Children's Financial Security")}</h3>
           </div>
           <Button 
             variant="outline" 
@@ -390,7 +391,7 @@ export default function ChildrenGoalsStep({ data, onChange, showErrors, plannerD
             className="rounded-full text-slate-600"
           >
             <SkipForward className="h-4 w-4 mr-2" />
-            Пропусни темата
+            {t('Пропусни темата', 'Skip section')}
           </Button>
         </div>
 
@@ -398,7 +399,7 @@ export default function ChildrenGoalsStep({ data, onChange, showErrors, plannerD
         {plannerChildrenCount === 0 && (
           <div className="space-y-6 mb-6 p-6 bg-white rounded-xl border border-blue-200">
             <div>
-              <Label>Брой деца <span className="text-red-500">*</span></Label>
+              <Label>{t('Брой деца', 'Number of children')} <span className="text-red-500">*</span></Label>
               <Input
                 type="number"
                 min="0"
@@ -449,7 +450,7 @@ export default function ChildrenGoalsStep({ data, onChange, showErrors, plannerD
         {/* Show children info from Financial Planner if available */}
         {plannerChildrenCount > 0 && (
           <div className="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
-            <p className="text-sm text-blue-800 font-medium mb-2">Деца от Financial Planner:</p>
+            <p className="text-sm text-blue-800 font-medium mb-2">{t('Деца от Financial Planner:', 'Children from Financial Planner:')}</p>
             <div className="space-y-1">
               {plannerChildrenNames.map((name, idx) => (
                 <p key={idx} className="text-sm text-blue-700">
@@ -461,14 +462,14 @@ export default function ChildrenGoalsStep({ data, onChange, showErrors, plannerD
         )}
 
         <p className="text-sm text-slate-600 mb-6">
-          Нуждите на децата растат заедно с тяхната възраст. Разходи, за които трябва да се подготвите:
+          {t("Нуждите на децата растат заедно с тяхната възраст. Разходи, за които трябва да се подготвите:", "Children's needs grow with age. Costs you need to prepare for:")}
         </p>
 
         <div className="space-y-4">
           <div className="grid grid-cols-2 gap-4 items-end">
             <div>
-              <Label className="font-medium">Разходи за раждане</Label>
-              <p className="text-xs text-slate-500">детска количка, пелени, медицински грижи...</p>
+              <Label className="font-medium">{t('Разходи за раждане', 'Birth costs')}</Label>
+              <p className="text-xs text-slate-500">{t('детска количка, пелени, медицински грижи...', 'pram, diapers, medical care...')}</p>
             </div>
             <div className="space-y-1">
               <Label className="text-xs text-slate-500 text-center block">Сума (€)</Label>
@@ -485,8 +486,8 @@ export default function ChildrenGoalsStep({ data, onChange, showErrors, plannerD
 
           <div className="grid grid-cols-2 gap-4 items-end" data-invalid={!data.skip_children_section && isInvalid(data.children_education_costs) ? "true" : undefined}>
             <div>
-              <Label className="font-medium">Висше образование <span className="text-red-500">*</span></Label>
-              <p className="text-xs text-slate-500">студентски такси, общежитие...</p>
+              <Label className="font-medium">{t('Висше образование', 'Higher education')} <span className="text-red-500">*</span></Label>
+              <p className="text-xs text-slate-500">{t('студентски такси, общежитие...', 'tuition fees, student housing...')}</p>
             </div>
             <div className="space-y-1">
               <Label className="text-xs text-slate-500 text-center block">Сума (€)</Label>
@@ -504,8 +505,8 @@ export default function ChildrenGoalsStep({ data, onChange, showErrors, plannerD
 
           <div className="grid grid-cols-2 gap-4 items-end">
             <div>
-              <Label className="font-medium">Старт в живота</Label>
-              <p className="text-xs text-slate-500">помощ за жилище, започване на бизнес</p>
+              <Label className="font-medium">{t('Старт в живота', 'Life start')}</Label>
+              <p className="text-xs text-slate-500">{t('помощ за жилище, започване на бизнес', 'housing assistance, starting a business')}</p>
             </div>
             <div className="space-y-1">
               <Label className="text-xs text-slate-500 text-center block">Сума (€)</Label>
@@ -522,14 +523,14 @@ export default function ChildrenGoalsStep({ data, onChange, showErrors, plannerD
 
           <div className="pt-4 border-t border-slate-200">
             <div className="flex items-center justify-between">
-              <span className="font-semibold text-slate-900">Общо:</span>
+              <span className="font-semibold text-slate-900">{t('Общо:', 'Total:')}</span>
               <span className="font-bold text-lg text-blue-600">{totalChildrenCosts.toLocaleString()} €</span>
             </div>
           </div>
 
           {/* Current savings for children goals */}
           <div className="grid grid-cols-2 gap-4 items-end pt-4" data-invalid={!data.skip_children_section && isInvalid(data.children_current_savings) ? "true" : undefined}>
-            <Label className="font-medium">Колко спестявания имате заделени за горните цели? <span className="text-red-500">*</span></Label>
+            <Label className="font-medium">{t('Колко спестявания имате заделени за горните цели?', 'How much savings do you have set aside for these goals?')} <span className="text-red-500">*</span></Label>
             <div className="space-y-1">
               <Label className="text-xs text-slate-500 text-center block">Сума (€)</Label>
               <Input
@@ -550,15 +551,15 @@ export default function ChildrenGoalsStep({ data, onChange, showErrors, plannerD
               {missingAmount > 0 && averageChildAge >= 0 ? (
                 <>
                   <p className="text-blue-800">
-                    За постигане на тези цели ще са нужни <span className="font-bold">{monthlyInvestment.toLocaleString()} €</span> месечна инвестиция. Във финансовия план ще откриете по-подробни предложения и проекции.
+                    {t('За постигане на тези цели ще са нужни', 'To achieve these goals you will need')} <span className="font-bold">{monthlyInvestment.toLocaleString()} €</span> {t('месечна инвестиция. Във финансовия план ще откриете по-подробни предложения и проекции.', 'monthly investment. Your financial plan will contain detailed proposals and projections.')}
                   </p>
                   <p className="text-xs text-blue-600 mt-2">
-                    (Изчислено при {investmentHorizon} години инвестиционен хоризонт и 8% средна годишна доходност)
+                    {t(`(Изчислено при ${investmentHorizon} години инвестиционен хоризонт и 8% средна годишна доходност)`, `(Calculated with ${investmentHorizon} year investment horizon and 8% avg. annual return)`)}
                   </p>
                 </>
               ) : missingAmount === 0 ? (
                 <p className="text-green-800 font-medium">
-                  Имате достатъчно спестявания за покриване на целите си! 🎉
+                  {t('Имате достатъчно спестявания за покриване на целите си! 🎉', 'You have enough savings to cover your goals! 🎉')}
                 </p>
               ) : null}
             </div>
@@ -568,12 +569,12 @@ export default function ChildrenGoalsStep({ data, onChange, showErrors, plannerD
 
       {/* Referrals - always visible */}
       <div className="bg-slate-50 rounded-xl p-6">
-        <h3 className="font-semibold text-slate-900 mb-4">Кой от Вашите приятели и познати:</h3>
+        <h3 className="font-semibold text-slate-900 mb-4">{t('Кой от Вашите приятели и познати:', 'Which of your friends and acquaintances:')}</h3>
         
         <div className="grid md:grid-cols-2 gap-6">
           {/* Has children */}
           <div className="space-y-3">
-            <Label className="text-slate-700">Има деца?</Label>
+            <Label className="text-slate-700">{t('Има деца?', 'Has children?')}</Label>
             {(data.children_referrals_has_kids?.length > 0 ? data.children_referrals_has_kids : ['']).map((name, index) => {
               const isDuplicate = isDuplicateName(name);
               const list = data.children_referrals_has_kids?.length > 0 ? data.children_referrals_has_kids : [''];
@@ -604,7 +605,7 @@ export default function ChildrenGoalsStep({ data, onChange, showErrors, plannerD
 
           {/* Recent wedding */}
           <div className="space-y-3">
-            <Label className="text-slate-700">Е имал сватба през последните три години?</Label>
+            <Label className="text-slate-700">{t('Е имал сватба през последните три години?', 'Had a wedding in the last three years?')}</Label>
             {(data.children_referrals_recent_wedding?.length > 0 ? data.children_referrals_recent_wedding : ['']).map((name, index) => {
               const isDuplicate = isDuplicateName(name);
               const list = data.children_referrals_recent_wedding?.length > 0 ? data.children_referrals_recent_wedding : [''];
@@ -642,11 +643,11 @@ export default function ChildrenGoalsStep({ data, onChange, showErrors, plannerD
             checked={data.include_children_in_plan || false}
             onCheckedChange={(checked) => onChange('include_children_in_plan', checked)}
           />
-          <span className="font-medium text-blue-800">Да бъде включено във финансовия план</span>
-        </label>
-      )}
+          <span className="font-medium text-blue-800">{t('Да бъде включено във финансовия план', 'Include in financial plan')}</span>
+          </label>
+          )}
 
-      {renderOtherGoalsSection()}
+          {renderOtherGoalsSection()}
     </div>
   );
 }

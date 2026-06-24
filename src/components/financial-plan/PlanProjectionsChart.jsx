@@ -57,10 +57,12 @@ export default function PlanProjectionsChart({ plan, offers, analysisData }) {
 
   // Monthly investment premium (UL products only)
   const monthlyInvestment = useMemo(() => {
-    if (!offers?.length) return plan?.total_monthly_premium || 0;
-    return offers
-      .filter(o => o.product_type === 'ul_investment' || o.product_type === 'education_plan' || o.product_type === 'pension_plan')
-      .reduce((s, o) => s + (o.monthly_premium || 0), 0) || (plan?.total_monthly_premium || 0);
+    const investmentTypes = ['ul_investment', 'education_plan', 'pension_plan'];
+    const fromOffers = (offers || [])
+      .filter(o => investmentTypes.includes(o.product_type))
+      .reduce((s, o) => s + (o.monthly_premium || 0), 0);
+    // If no investment products found, use available_for_investment from plan or a reasonable fallback
+    return fromOffers || plan?.available_for_investment || 0;
   }, [offers, plan]);
 
   // Growth data

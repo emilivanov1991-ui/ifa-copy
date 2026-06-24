@@ -1,0 +1,69 @@
+{
+  "name": "Session",
+  "type": "object",
+  "properties": {
+    "session_id": {
+      "type": "string",
+      "description": "Unique session identifier"
+    },
+    "user_id": {
+      "type": "string",
+      "description": "Reference to User entity (null for anonymous)"
+    },
+    "device_id": {
+      "type": "string",
+      "description": "Reference to Device entity"
+    },
+    "journey_id": {
+      "type": "string",
+      "description": "Reference to Journey entity (current active journey)"
+    },
+    "ip_address": {
+      "type": "string",
+      "description": "IP address at session start"
+    },
+    "user_agent": {
+      "type": "string",
+      "description": "Browser user agent"
+    },
+    "started_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Session start time"
+    },
+    "last_activity_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Last activity timestamp"
+    },
+    "expires_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Session expiration time (24 hours from last activity)"
+    },
+    "is_active": {
+      "type": "boolean",
+      "default": true,
+      "description": "Whether session is still active"
+    },
+    "session_type": {
+      "type": "string",
+      "enum": [
+        "anonymous",
+        "authenticated"
+      ],
+      "default": "anonymous",
+      "description": "Type of session"
+    },
+    "metadata": {
+      "type": "object",
+      "description": "Additional session metadata (e.g., entry point, referrer)",
+      "additionalProperties": true
+    }
+  },
+  "required": [
+    "session_id",
+    "started_at",
+    "expires_at"
+  ]
+}

@@ -135,12 +135,57 @@ Deno.serve(async (req) => {
 
     console.log(`Created FollowUpTask ${task.id} for journey ${journey_id}`);
 
+    // Send email notification to client
+    if (clientEmail) {
+      try {
+        const reasonLabels = {
+          'user_rejected_plan': 'нуждае от допълнително обсъждане',
+          'discovery_blocked': 'възникна проблем при попълване на данните',
+          'plan_auto_sell_blocked': 'нуждае от преглед от специалист',
+          'signing_declined': 'възникна проблем при подписването',
+          'payment_failed': 'възникна проблем с плащането',
+          'provider_submission_failed': 'възникна проблем с изпращането към застраховател',
+          'health_non_automatable': 'нуждае от медицинска оценка',
+          'other': 'нуждае от внимание',
+        };
+
+        const reasonLabel = reasonLabels[reason] || 'нуждае от внимание';
+        const journeyUrl = `https://app.integrityfinancial.bg/Journey/${journey_id}`;
+
+        await base44.integrations.Core.SendEmail({
+          to: clientEmail,
+          from_name: 'Integrity Financial Advisors',
+          subject: 'Вашият финансов план нуждае от внимание',
+          body: `
+Здравейте, ${clientName || 'Клиент'},
+
+Забелязахме, че вашият финансов план ${reasonLabel}.
+
+Наш консултант ще се свърже с Вас в най-кратки срокове за да обсъдим следващите стъпки.
+
+Ако имате въпроси или предпочитате да насрочим среща, моля отговорете на този имейл или се обадете на:
+📞 +359 89 222 2990
+📧 krassimir.stankov@ifa.bg
+
+Поздрави,
+Екип на Integrity Financial Advisors
+          `.trim(),
+        });
+
+        console.log(`Follow-up email sent to ${clientEmail} for journey ${journey_id}`);
+      } catch (emailError) {
+        console.error('Failed to send follow-up email:', emailError);
+        // Don't fail the task creation if email fails
+      }
+    }
+
     return Response.json({
       success: true,
       task_id: task.id,
       journey_id,
       reason,
       priority,
+      email_sent: !!clientEmail,
     });
 
   } catch (error) {

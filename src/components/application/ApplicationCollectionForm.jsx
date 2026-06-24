@@ -2,8 +2,9 @@ import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { base44 } from '@/api/base44Client';
-import { CheckCircle2, Loader2, User, CreditCard, Phone } from 'lucide-react';
+import { CheckCircle2, Loader2, User, CreditCard, Phone, FileText } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import HealthQuestionnaire from '@/components/analysis/HealthQuestionnaire';
 
 /**
  * ApplicationCollectionForm
@@ -11,9 +12,14 @@ import { cn } from '@/lib/utils';
  * Props: journeyId, planId, analysisData, onComplete(applicationId)
  */
 export default function ApplicationCollectionForm({ journeyId, planId, analysisData, onComplete }) {
-  const [step, setStep] = useState(1); // 1=beneficiaries, 2=bank, 3=confirm
+  const [step, setStep] = useState(1); // 1=beneficiaries, 2=bank, 3=health, 4=confirm
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState(null);
+  
+  // Health questionnaire data
+  const [healthData, setHealthData] = useState({
+    client_is_good_health: true,
+  });
 
   const [beneficiary, setBeneficiary] = useState({
     full_name: '',
@@ -30,10 +36,16 @@ export default function ApplicationCollectionForm({ journeyId, planId, analysisD
 
   const [paymentMethod, setPaymentMethod] = useState('bank_transfer');
 
+  const handleHealthChange = (key, value) => {
+    setHealthData(prev => ({ ...prev, [key]: value }));
+  };
+
   const handleSubmit = async () => {
     setSaving(true);
     setError(null);
     try {
+      const healthStatus = healthData.client_is_good_health ? 'completed' : 'requires_underwriting';
+      
       const appData = await base44.entities.ApplicationData.create({
         journey_id: journeyId,
         plan_id: planId,
@@ -45,7 +57,8 @@ export default function ApplicationCollectionForm({ journeyId, planId, analysisD
         },
         bank_account: bank,
         payment_method: paymentMethod,
-        health_questionnaire_status: 'not_started',
+        health_questionnaire_status: healthStatus,
+        additional_questions: healthData,
       });
 
       await base44.functions.invoke('advanceJourneyPublic', {
@@ -68,7 +81,7 @@ export default function ApplicationCollectionForm({ journeyId, planId, analysisD
     <div className="max-w-lg mx-auto bg-white rounded-2xl shadow-xl border border-slate-200 overflow-hidden">
       {/* Progress */}
       <div className="flex">
-        {[1, 2, 3].map(s => (
+        {[1, 2, 3, 4].map(s => (
           <div key={s} className={cn("flex-1 h-1.5 transition-colors", s <= step ? "bg-blue-600" : "bg-slate-200")} />
         ))}
       </div>
@@ -113,6 +126,38 @@ export default function ApplicationCollectionForm({ journeyId, planId, analysisD
             >
               Продължи
             </Button>
+          </motion.div>
+        )}
+
+        {/* Step 3: Health Questionnaire */}
+        {step === 3 && (
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+            <div className="flex items-center gap-2 mb-4">
+              <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center">
+                <FileText className="w-4 h-4 text-blue-600" />
+              </div>
+              <h3 className="font-bold text-slate-900">Здравен въпросник</h3>
+            </div>
+            <p className="text-xs text-slate-500 mb-4">Моля, отговорете на въпросите за здравословното си състояние.</p>
+
+            <div className="max-h-96 overflow-y-auto pr-2 mb-4">
+              <HealthQuestionnaire 
+                data={healthData} 
+                onChange={handleHealthChange} 
+                prefix="client"
+                showErrors={false}
+              />
+            </div>
+
+            <div className="flex gap-2 mt-4">
+              <Button variant="outline" className="flex-1 rounded-full" onClick={() => setStep(2)}>Назад</Button>
+              <Button
+                className="flex-1 bg-blue-600 hover:bg-blue-700 text-white rounded-full"
+                onClick={() => setStep(4)}
+              >
+                Продължи
+              </Button>
+            </div>
           </motion.div>
         )}
 
@@ -186,8 +231,8 @@ export default function ApplicationCollectionForm({ journeyId, planId, analysisD
           </motion.div>
         )}
 
-        {/* Step 3: Confirm */}
-        {step === 3 && (
+        {/* Step 4: Confirm */}
+        {step === 4 && (
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
             <div className="flex items-center gap-2 mb-4">
               <div className="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center">
@@ -211,12 +256,19 @@ export default function ApplicationCollectionForm({ journeyId, planId, analysisD
                 <p className="text-xs text-slate-500 mb-1">Плащане</p>
                 <p className="text-sm font-semibold text-slate-900">{paymentMethod === 'bank_transfer' ? 'Банков превод' : paymentMethod === 'credit_card' ? 'Кредитна карта' : 'Директен дебит'}</p>
               </div>
+              <div className="bg-slate-50 rounded-xl p-3">
+                <p className="text-xs text-slate-500 mb-1">Здравен статус</p>
+                <p className="text-sm font-semibold text-slate-900">{healthData.client_is_good_health ? 'В добро здраве' : 'Изисква медицинска оценка'}</p>
+                {!healthData.client_is_good_health && (
+                  <p className="text-xs text-slate-500 mt-1">Попълнен здравен въпросник с допълнителни въпроси</p>
+                )}
+              </div>
             </div>
 
             {error && <p className="text-red-500 text-xs mb-3">{error}</p>}
 
             <div className="flex gap-2">
-              <Button variant="outline" className="flex-1 rounded-full" onClick={() => setStep(2)}>Назад</Button>
+              <Button variant="outline" className="flex-1 rounded-full" onClick={() => setStep(3)}>Назад</Button>
               <Button
                 className="flex-1 bg-green-600 hover:bg-green-700 text-white rounded-full"
                 onClick={handleSubmit}

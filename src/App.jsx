@@ -12,6 +12,7 @@ import UserNotRegisteredError from '@/components/UserNotRegisteredError';
 import UsefulInfo from './pages/UsefulInfo';
 import FinancialPlanPresentation from './pages/FinancialPlanPresentation';
 import Onboarding from './pages/Onboarding';
+import ApplicationCollection from './pages/ApplicationCollection';
 
 const { Pages, Layout, mainPage } = pagesConfig;
 const mainPageKey = mainPage ?? Object.keys(Pages)[0];
@@ -65,6 +66,7 @@ const AuthenticatedApp = () => {
       ))}
       <Route path="/FinancialPlanPresentation" element={<FinancialPlanPresentation />} />
       <Route path="/Onboarding" element={<Onboarding />} />
+      <Route path="/ApplicationCollection/:journeyId" element={<ApplicationCollection />} />
       <Route path="*" element={<PageNotFound />} />
     </Routes>
   );

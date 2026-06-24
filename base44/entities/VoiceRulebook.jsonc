@@ -35,16 +35,12 @@
     "avatar_state": {
       "type": "string",
       "enum": [
-        "idle",
         "talking",
         "listening",
         "thinking",
         "celebrating",
         "concerned",
-        "live_presenter",
-        "idle_listening",
-        "loading",
-        "error"
+        "idle"
       ],
       "default": "talking",
       "description": "Visual state of the avatar while this audio plays"

@@ -2275,23 +2275,31 @@ export default function FinancialPlanner() {
                     if (clientId) { await base44.entities.Client.update(clientId, clientData); client = { id: clientId, ...clientData }; }
                     else { client = await base44.entities.Client.create(clientData); }
 
-                    // --- Journey init ---
+                    // --- Journey init via state machine ---
                     let journeyId = localStorage.getItem('active_journey_id');
                     if (!journeyId) {
                       const deviceId = localStorage.getItem('device_id') || `dev_${Date.now()}`;
                       localStorage.setItem('device_id', deviceId);
+
+                      // 1. Create journey at initial state (guards will validate transitions)
                       const journey = await base44.entities.Journey.create({
                         client_id: client.id,
                         device_id: deviceId,
                         language_code: 'bg',
-                        journey_state: 'discovery_collecting',
-                        discovery_started_at: new Date().toISOString(),
+                        journey_state: 'discovery_not_started',
                         last_activity_at: new Date().toISOString(),
                       });
                       journeyId = journey.id;
                       localStorage.setItem('active_journey_id', journeyId);
+
+                      // 2. Advance through state machine: not_started → collecting
+                      await base44.functions.invoke('advanceJourneyPublic', {
+                        journey_id: journeyId,
+                        to_state: 'discovery_collecting',
+                        extra_data: { discovery_started_at: new Date().toISOString() },
+                      });
                     }
-                    // --------------------
+                    // --------------------------------------
 
                     const plannerData = {
                       client_id: client.id, journey_id: journeyId, family_type: familyType,

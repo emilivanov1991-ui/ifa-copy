@@ -1,0 +1,39 @@
+{
+  "name": "PlanExplanation",
+  "type": "object",
+  "properties": {
+    "plan_id": {
+      "type": "string",
+      "description": "Reference to FinancialPlan"
+    },
+    "journey_id": {
+      "type": "string",
+      "description": "Reference to Journey"
+    },
+    "analysis_id": {
+      "type": "string",
+      "description": "Reference to FinancialAnalysisSubmission"
+    },
+    "language_code": {
+      "type": "string",
+      "enum": [
+        "bg",
+        "en"
+      ],
+      "default": "bg"
+    },
+    "explanation_json": {
+      "type": "object",
+      "description": "Full PLAN_EXPLANATION_JSON: overviewNarrative, keyNumberHighlights, perProductExplanations, warningsAndExclusions, ctaWording, objectionAnchors",
+      "additionalProperties": true
+    },
+    "generated_at": {
+      "type": "string",
+      "format": "date-time"
+    }
+  },
+  "required": [
+    "plan_id",
+    "language_code"
+  ]
+}

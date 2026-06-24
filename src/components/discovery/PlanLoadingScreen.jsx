@@ -23,7 +23,7 @@ const STEPS_MESSAGES = [
  *  - onBlocked() — called if auto_sell blocked
  *  - onError(msg) — called on hard error
  */
-export default function PlanLoadingScreen({ journeyId, analysisId, onPlanReady, onBlocked, onError }) {
+export default function PlanLoadingScreen({ journeyId, analysisId, languageCode = 'bg', onPlanReady, onBlocked, onError }) {
   const [messageIdx, setMessageIdx] = useState(0);
   const [done, setDone] = useState(false);
   const [error, setError] = useState(null);
@@ -56,6 +56,12 @@ export default function PlanLoadingScreen({ journeyId, analysisId, onPlanReady, 
 
         const data = res?.data;
         if (!data?.plan_id) throw new Error(data?.error || 'Планът не беше генериран.');
+
+        // Generate plan explanation for AI presentation agent (non-blocking)
+        base44.functions.invoke('generatePlanExplanation', {
+          plan_id: data.plan_id,
+          language_code: languageCode,
+        }).catch(e => console.warn('generatePlanExplanation failed (non-critical):', e.message));
 
         // Small delay so last message shows
         setTimeout(() => {

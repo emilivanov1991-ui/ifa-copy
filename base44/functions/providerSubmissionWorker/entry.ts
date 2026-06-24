@@ -27,19 +27,25 @@ Deno.serve(async (req) => {
     }
 
     // Fetch pending provider submissions
-    const pendingSubmissions = await base44.entities.ProviderSubmission.filter({
+    const allPending = await base44.asServiceRole.entities.ProviderSubmission.filter({
       status: 'pending',
     });
 
-    console.log(`Found ${pendingSubmissions.length} pending provider submissions`);
+    // Filter: only those where next_attempt_at is in the past (or not set)
+    const now = new Date();
+    const pendingSubmissions = allPending.filter(s =>
+      !s.next_attempt_at || new Date(s.next_attempt_at) <= now
+    );
+
+    console.log(`Found ${allPending.length} pending total, ${pendingSubmissions.length} due for attempt`);
 
     const results = [];
 
     for (const submission of pendingSubmissions) {
       try {
         // Check if max attempts reached
-        if (submission.attempt_number >= submission.max_attempts) {
-          await base44.entities.ProviderSubmission.update(submission.id, {
+        if (submission.attempt_number >= (submission.max_attempts || 5)) {
+          await base44.asServiceRole.entities.ProviderSubmission.update(submission.id, {
             status: 'permanent_failure',
             error_message: 'Max attempts reached',
             last_attempt_at: new Date().toISOString(),
@@ -53,7 +59,7 @@ Deno.serve(async (req) => {
         }
 
         // Get application and journey data
-        const applications = await base44.entities.ClientApplication.filter({
+        const applications = await base44.asServiceRole.entities.ApplicationData.filter({
           id: submission.application_id,
         });
         
@@ -64,7 +70,7 @@ Deno.serve(async (req) => {
 
         const application = applications[0];
 
-        const journeys = await base44.entities.Journey.filter({
+        const journeys = await base44.asServiceRole.entities.Journey.filter({
           id: submission.journey_id,
         });
 
@@ -76,7 +82,7 @@ Deno.serve(async (req) => {
         const journey = journeys[0];
 
         // Get client data
-        const clients = await base44.entities.Client.filter({
+        const clients = await base44.asServiceRole.entities.Client.filter({
           id: application.client_id || journey.client_id,
         });
 
@@ -148,15 +154,15 @@ Deno.serve(async (req) => {
           updateData.error_message = submissionResult.error_message;
         }
 
-        await base44.entities.ProviderSubmission.update(submission.id, updateData);
+        await base44.asServiceRole.entities.ProviderSubmission.update(submission.id, updateData);
 
         // If successful, update journey state
         if (submissionResult.status === 'success') {
           try {
             await base44.functions.invoke('journeyStateMachine', {
               journey_id: submission.journey_id,
-              new_state: 'completed',
-              metadata: {
+              to_state: 'completed',
+              extra_data: {
                 provider_submitted_at: new Date().toISOString(),
                 provider_name: submission.provider_name,
               },

@@ -12,6 +12,7 @@ import { useJourneyState } from '@/components/voice/JourneyStateManager';
 import { useContradictionCheck } from '@/components/discovery/useContradictionCheck';
 import { useVoiceManager } from '@/components/voice/VoiceManager';
 import ResponseBandFeedback from '@/components/discovery/ResponseBandFeedback';
+import LanguageSelectionStep from '@/components/discovery/LanguageSelectionStep';
 
 // ─── Journey state helpers ───────────────────────────────────────────────────
 const DISCOVERY_STATES_ORDER = [
@@ -191,8 +192,25 @@ export default function DiscoveryShell({
   onSubmit,
   isSubmitting,
   incompleteSteps = [],
-  languageCode = 'bg',
+  languageCode: propLanguageCode = 'bg',
 }) {
+  // Language selection: if journey has no language_code, show picker first
+  const [resolvedLang, setResolvedLang] = useState(() => {
+    return journey?.language_code || propLanguageCode || localStorage.getItem('ifa_lang') || null;
+  });
+
+  const handleLanguageSelect = async (lang) => {
+    localStorage.setItem('ifa_lang', lang);
+    setResolvedLang(lang);
+    if (journey?.id) {
+      try {
+        await base44.entities.Journey.update(journey.id, { language_code: lang, last_activity_at: new Date().toISOString() });
+        onJourneyUpdate?.({ ...journey, language_code: lang });
+      } catch { /* non-critical */ }
+    }
+  };
+
+  const languageCode = resolvedLang || propLanguageCode;
   const [currentStep, setCurrentStep] = useState(() => {
     if (journey?.last_section_id) {
       const found = DISCOVERY_STEPS.find(s => s.section_id === journey.last_section_id);
@@ -368,6 +386,11 @@ export default function DiscoveryShell({
   const StepComponent = stepComponents?.[currentStep];
   const isLastStep = currentIndex === DISCOVERY_STEPS.length - 1;
   const isFirstStep = currentIndex === 0;
+
+  // Show language selection if not yet chosen
+  if (!resolvedLang) {
+    return <LanguageSelectionStep onSelect={handleLanguageSelect} />;
+  }
 
   return (
     <div className="flex flex-col gap-4">

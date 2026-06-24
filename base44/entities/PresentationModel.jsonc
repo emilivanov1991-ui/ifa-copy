@@ -1,0 +1,76 @@
+{
+  "name": "PresentationModel",
+  "type": "object",
+  "properties": {
+    "plan_id": {
+      "type": "string",
+      "description": "Reference to FinancialPlan"
+    },
+    "journey_id": {
+      "type": "string",
+      "description": "Reference to Journey"
+    },
+    "analysis_id": {
+      "type": "string",
+      "description": "Reference to FinancialAnalysisSubmission"
+    },
+    "language_code": {
+      "type": "string",
+      "enum": [
+        "bg",
+        "en"
+      ],
+      "default": "bg"
+    },
+    "generated_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "client": {
+      "type": "object",
+      "description": "Sanitised client identity for the agent \u2014 no raw PII beyond name & age",
+      "additionalProperties": true
+    },
+    "summary": {
+      "type": "object",
+      "description": "Top-level plan summary numbers",
+      "additionalProperties": true
+    },
+    "products": {
+      "type": "array",
+      "description": "Presentation-ready product list",
+      "items": {
+        "type": "object",
+        "additionalProperties": true
+      }
+    },
+    "financial_context": {
+      "type": "object",
+      "description": "Key financial ratios and context figures for the agent",
+      "additionalProperties": true
+    },
+    "projections": {
+      "type": "object",
+      "description": "Long-term projection data at 4%, 7%, 10% returns",
+      "additionalProperties": true
+    },
+    "objection_anchors": {
+      "type": "array",
+      "description": "Pre-built objection \u2192 response pairs",
+      "items": {
+        "type": "object",
+        "additionalProperties": true
+      }
+    },
+    "cta_wording": {
+      "type": "string"
+    },
+    "overview_narrative": {
+      "type": "string",
+      "description": "2-3 sentence opener for the presentation"
+    }
+  },
+  "required": [
+    "plan_id"
+  ]
+}

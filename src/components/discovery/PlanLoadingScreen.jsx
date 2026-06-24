@@ -73,6 +73,12 @@ export default function PlanLoadingScreen({ journeyId, analysisId, languageCode 
           language_code: languageCode,
         }).catch(e => console.warn('generatePlanExplanation failed (non-critical):', e.message));
 
+        // Generate PRESENTATION_RENDER_MODEL — decouples agent from raw FinancialPlan schema (non-blocking)
+        base44.functions.invoke('generatePresentationModel', {
+          plan_id: data.plan_id,
+          language_code: languageCode,
+        }).catch(e => console.warn('generatePresentationModel failed (non-critical):', e.message));
+
         // Small delay so last message shows
         setTimeout(() => {
           setDone(true);

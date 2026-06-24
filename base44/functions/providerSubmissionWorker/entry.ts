@@ -19,43 +19,54 @@ Deno.serve(async (req) => {
     const base44 = createClientFromRequest(req);
     
     // This is called by automation — no user auth needed
-    // But we should verify it's called from a scheduled automation
     const authHeader = req.headers.get('Authorization');
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
-      // Allow calls from Base44 service role
-      console.log('Provider submission worker called without auth header');
+      console.log('Provider submission worker called by scheduled automation');
     }
 
-    // Fetch pending AND temporary_failure submissions (both need retrying)
     const now = new Date();
+    console.log(`Starting provider submission worker at ${now.toISOString()}`);
+
+    // Fetch pending AND temporary_failure submissions
     const [pendingBatch, retryBatch] = await Promise.all([
       base44.asServiceRole.entities.ProviderSubmission.filter({ status: 'pending' }, '-created_date', 50),
       base44.asServiceRole.entities.ProviderSubmission.filter({ status: 'temporary_failure' }, '-last_attempt_at', 50),
     ]);
 
-    // Filter both: only those where next_attempt_at is in the past (or not set)
-    const pendingSubmissions = [...pendingBatch, ...retryBatch].filter(s =>
+    // Filter: only process if next_attempt_at is due (or not set)
+    const dueSubmissions = [...pendingBatch, ...retryBatch].filter(s =>
       !s.next_attempt_at || new Date(s.next_attempt_at) <= now
     );
 
-    console.log(`Found ${allPending.length} pending total, ${pendingSubmissions.length} due for attempt`);
+    console.log(`Found ${pendingBatch.length} pending + ${retryBatch.length} retry = ${dueSubmissions.length} due for processing`);
 
     const results = [];
+    const processedIds = new Set(); // Idempotency: track processed submissions in this run
 
-    for (const submission of pendingSubmissions) {
+    for (const submission of dueSubmissions) {
+      // Idempotency check: skip if already processed in this run
+      if (processedIds.has(submission.id)) {
+        console.log(`Skipping duplicate submission ${submission.id}`);
+        continue;
+      }
+
       try {
+        console.log(`Processing submission ${submission.id} (attempt ${submission.attempt_number + 1}/${submission.max_attempts || 5})`);
+
         // Check if max attempts reached
         if (submission.attempt_number >= (submission.max_attempts || 5)) {
           await base44.asServiceRole.entities.ProviderSubmission.update(submission.id, {
             status: 'permanent_failure',
-            error_message: 'Max attempts reached',
+            error_message: `Max attempts (${submission.max_attempts || 5}) reached. Last error: ${submission.error_message}`,
             last_attempt_at: new Date().toISOString(),
           });
           results.push({
             submission_id: submission.id,
+            provider: submission.provider_name,
             status: 'permanent_failure',
             reason: 'Max attempts reached',
           });
+          processedIds.add(submission.id);
           continue;
         }
 
@@ -136,26 +147,32 @@ Deno.serve(async (req) => {
           throw new Error(`Unknown submission method: ${submission.submission_method}`);
         }
 
-        // Update submission record
-        const updateData: any = {
+        // Update submission record with idempotency key
+        const updateData = {
           attempt_number,
           last_attempt_at: new Date().toISOString(),
           status: submissionResult.status,
           response_code: submissionResult.response_code,
-          response_body: submissionResult.response_body,
+          response_body: submissionResult.response_body || '',
         };
 
         if (submissionResult.status === 'success') {
           updateData.submitted_at = new Date().toISOString();
+          // Clear retry fields on success
+          updateData.next_attempt_at = null;
+          updateData.error_message = null;
         } else if (submissionResult.status === 'permanent_failure') {
-          updateData.error_message = submissionResult.error_message;
+          updateData.error_message = `Permanent failure: ${submissionResult.error_message}`;
+          updateData.next_attempt_at = null;
         } else {
-          // temporary_failure — schedule next attempt
-          updateData.next_attempt_at = new Date(Date.now() + 5 * 60 * 1000).toISOString(); // 5 min
-          updateData.error_message = submissionResult.error_message;
+          // temporary_failure — exponential backoff retry
+          const backoffMinutes = Math.min(5 * Math.pow(2, attempt_number - 1), 60); // 5, 10, 20, 40, 60 min
+          updateData.next_attempt_at = new Date(Date.now() + backoffMinutes * 60 * 1000).toISOString();
+          updateData.error_message = `Attempt ${attempt_number} failed: ${submissionResult.error_message}`;
         }
 
         await base44.asServiceRole.entities.ProviderSubmission.update(submission.id, updateData);
+        processedIds.add(submission.id);
 
         // If successful, update journey state
         if (submissionResult.status === 'success') {
@@ -175,12 +192,23 @@ Deno.serve(async (req) => {
 
         results.push({
           submission_id: submission.id,
+          provider: submission.provider_name,
           status: submissionResult.status,
           attempt: attempt_number,
         });
 
       } catch (error) {
         console.error(`Error processing submission ${submission.id}:`, error);
+        // On unexpected error, mark as temporary_failure for retry
+        try {
+          await base44.asServiceRole.entities.ProviderSubmission.update(submission.id, {
+            status: 'temporary_failure',
+            error_message: `Worker error: ${error.message}`,
+            next_attempt_at: new Date(Date.now() + 5 * 60 * 1000).toISOString(),
+          });
+        } catch (updateError) {
+          console.error(`Failed to update submission ${submission.id}:`, updateError);
+        }
         results.push({
           submission_id: submission.id,
           status: 'error',
@@ -189,8 +217,17 @@ Deno.serve(async (req) => {
       }
     }
 
+    const successCount = results.filter(r => r.status === 'success').length;
+    const failureCount = results.filter(r => ['permanent_failure', 'temporary_failure'].includes(r.status)).length;
+    const errorCount = results.filter(r => r.status === 'error').length;
+
+    console.log(`Provider submission worker completed: ${successCount} success, ${failureCount} failures, ${errorCount} errors`);
+
     return Response.json({
       processed: results.length,
+      success: successCount,
+      failures: failureCount,
+      errors: errorCount,
       results,
     });
 

@@ -517,11 +517,15 @@ Deno.serve(async (req) => {
     let totalMonthlyPremium = 0;
     let remainingMonthlyBudget = protectionBudgetMonthly;
 
-    const addProduct = (product) => {
+    const addProduct = (product, ruleKey) => {
       planProducts.push(product);
       totalMonthlyPremium += product.monthly_premium || 0;
       remainingMonthlyBudget -= product.monthly_premium || 0;
+      if (ruleKey) rulesFired.push(ruleKey);
     };
+
+    // ── RULES FIRED LOG ──
+    const rulesFired = [];
 
     // ── STEP 1A: MetLife UL for client ──
     if (cAge < 65 && clientUsesUL && cAnnualSavings >= 300) {
@@ -552,7 +556,7 @@ Deno.serve(async (req) => {
           target_corpus: Math.round(targetPerPerson),
           projected_value_at_retirement: projectULFull(cAnnualSavings, cAge, cYears, 0.08, UL_FACE_AMOUNT, getMonthlyMortality),
         },
-      });
+      }, 'UL_CLIENT');
     }
 
     // ── STEP 1B: MetLife UL for partner ──
@@ -584,7 +588,7 @@ Deno.serve(async (req) => {
           target_corpus: Math.round(targetPerPerson),
           projected_value_at_retirement: projectULFull(pAnnualSavings, pAge, pYears, 0.08, UL_FACE_AMOUNT, getMonthlyMortality),
         },
-      });
+      }, 'UL_PARTNER');
     }
 
     // ── STEP 1C: MetLife Junior (children ≤ 11) ──
@@ -634,6 +638,7 @@ Deno.serve(async (req) => {
     if (cAge < 65 && !clientUsesUL && remainingMonthlyBudget >= DZI_ZAKRILA_PLATINUM.monthly) {
       addProduct({
         product_type: 'personal_accident',
+
         provider: 'ДЗИ',
         product_name: 'ДЗИ Закрила — Платинен пакет',
         beneficiary: 'partner1',
@@ -644,7 +649,7 @@ Deno.serve(async (req) => {
         coverage_amount: DZI_ZAKRILA_PLATINUM.coverages.deathAccident || 50000,
         is_active: true,
         details: { plan: 'Platinum', currency: 'EUR' },
-      });
+      }, 'DZI_ZAKRILA_FALLBACK');
     }
 
     // ── MetLife Credit Guard (при ипотека) ──
@@ -684,7 +689,7 @@ Deno.serve(async (req) => {
               loan_term_years: chosenTerm || cgTerm,
               package: 'Основен',
             },
-          });
+          }, 'CG_MORTGAGE_MATCH');
         }
       }
     }
@@ -704,7 +709,7 @@ Deno.serve(async (req) => {
         coverage_amount: 2242300,
         is_active: true,
         details: { plan: 'Europa', currency: 'EUR' },
-      });
+      }, 'UNIQA_CLIENT');
     }
 
     // ── УНИКА за партньор ──
@@ -723,7 +728,7 @@ Deno.serve(async (req) => {
           coverage_amount: 2242300,
           is_active: true,
           details: { plan: 'Europa', currency: 'EUR' },
-        });
+        }, 'UNIQA_PARTNER');
       }
     }
 
@@ -884,6 +889,15 @@ Deno.serve(async (req) => {
       });
     }
 
+    // ── AUTO-SELL ELIGIBILITY ──
+    const blockReasons = [];
+    if (totalIncome <= 0)            blockReasons.push('NO_INCOME');
+    if (maxMonthlyBudget <= 0)       blockReasons.push('NO_BUDGET');
+    if (cAge > 65)                   blockReasons.push('CLIENT_OVER_65');
+    if (planProducts.length === 0)   blockReasons.push('NO_PRODUCTS_GENERATED');
+    if (totalMonthlyPremium > maxMonthlyBudget * 2) blockReasons.push('BUDGET_EXCEEDED');
+    const auto_sell_eligible = blockReasons.length === 0;
+
     // ── SUMMARY ──
     const taxReliefAnnual = planProducts.filter(p => (p.monthly_premium || 0) > 0)
       .reduce((s, p) => s + (p.total_premium || 0), 0) * 0.10;
@@ -915,6 +929,7 @@ Deno.serve(async (req) => {
       total_monthly_premium: totalMonthlyPremium,
       total_coverage: planProducts.reduce((s, p) => s + (p.coverage_amount || 0), 0),
       total_expected_value: planProducts.reduce((s, p) => s + (p.expected_value || 0), 0),
+      auto_sell_eligible,
       notes: JSON.stringify({
         version: rulebookVersion,
         constitution_based: true,
@@ -925,6 +940,9 @@ Deno.serve(async (req) => {
         total_corpus: Math.round(totalCorpus),
         corpus_net: Math.round(corpusNet),
         target_per_person: Math.round(targetPerPerson),
+        auto_sell_eligible,
+        block_reasons: blockReasons,
+        list_of_rules_fired: rulesFired,
       }),
     };
 
@@ -940,8 +958,38 @@ Deno.serve(async (req) => {
         plan_id: savedPlan.id,
         ruleset_hash,
         rulebook_version: rulebookVersion,
+        auto_sell_eligible,
         last_activity_at: new Date().toISOString(),
       });
+
+      // Advance journey state based on eligibility
+      const targetState = auto_sell_eligible ? 'plan_ready' : 'plan_auto_sell_blocked';
+      try {
+        const smRes = await base44.functions.invoke('journeyStateMachine', {
+          journey_id,
+          to_state: targetState,
+          extra_data: {
+            auto_sell_eligible,
+            ...(blockReasons.length > 0 && { graceful_stop_reason: blockReasons.join(', ') }),
+          },
+        });
+        console.log(`Journey advanced to ${targetState}:`, smRes);
+      } catch (smErr) {
+        console.warn('journeyStateMachine advance failed (non-blocking):', smErr.message);
+      }
+
+      // If blocked, create a follow-up task
+      if (!auto_sell_eligible) {
+        try {
+          await base44.functions.invoke('createFollowUpTask', {
+            journey_id,
+            reason: 'plan_auto_sell_blocked',
+            notes: `Block reasons: ${blockReasons.join(', ')}`,
+          });
+        } catch (ftErr) {
+          console.warn('createFollowUpTask failed:', ftErr.message);
+        }
+      }
     }
 
     for (const product of planProducts) {

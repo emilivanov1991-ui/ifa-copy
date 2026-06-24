@@ -5,7 +5,7 @@ import { base44 } from '@/api/base44Client';
 import {
   MessageSquare, PhoneOff, Loader2,
   CheckCircle2, BarChart3, Shield, PiggyBank, Home, Baby,
-  Send, X, FileText, CreditCard
+  Send, X, FileText, CreditCard, AlertTriangle
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import AvatarFrame from '@/components/voice/AvatarFrame';
@@ -15,6 +15,7 @@ import ReactMarkdown from 'react-markdown';
 import ApplicationCollectionForm from '@/components/application/ApplicationCollectionForm';
 import SigningStatusPoller from '@/components/application/SigningStatusPoller';
 import PaymentCheckout from '@/components/application/PaymentCheckout';
+import JourneyCompletedScreen from '@/components/application/JourneyCompletedScreen';
 
 const AGENT_NAME = 'presentation_advisor';
 
@@ -211,6 +212,34 @@ export default function FinancialPlanPresentation() {
     );
   }
 
+  // Phase: completed
+  if (phase === 'completed') {
+    return <JourneyCompletedScreen journeyId={journeyId} plan={plan} />;
+  }
+
+  // plan_auto_sell_blocked screen
+  if (journey?.journey_state === 'plan_auto_sell_blocked') {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-amber-50 to-orange-50 flex flex-col items-center justify-center p-6">
+        <div className="bg-white rounded-3xl shadow-xl p-8 max-w-md w-full text-center">
+          <div className="w-16 h-16 bg-amber-100 rounded-full flex items-center justify-center mx-auto mb-5">
+            <Shield className="w-8 h-8 text-amber-600" />
+          </div>
+          <h2 className="text-xl font-bold text-slate-900 mb-3">Необходима е допълнителна консултация</h2>
+          <p className="text-slate-500 text-sm mb-6">
+            Вашият профил изисква индивидуален подход. Консултант ще се свърже с Вас в рамките на 24 часа за персонализирана среща.
+          </p>
+          <Button
+            onClick={() => window.location.href = createPageUrl('Home')}
+            className="w-full bg-amber-600 hover:bg-amber-700 text-white rounded-full"
+          >
+            Разбирам — върни ме към началото
+          </Button>
+        </div>
+      </div>
+    );
+  }
+
   // Phase 5 screens
   if (phase === 'application') {
     return (
@@ -282,7 +311,7 @@ export default function FinancialPlanPresentation() {
             journeyId={journeyId}
             applicationId={applicationId}
             plan={plan}
-            onSuccess={() => {}}
+            onSuccess={() => setPhase('completed')}
             onCancel={() => setPhase('presentation')}
           />
         </div>

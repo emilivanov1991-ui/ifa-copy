@@ -71,21 +71,21 @@ const bankOptions = [
 
   
 
-  function getBdayLabel(data, lang, t) {
+  function getBdayLabel(data, lang, t, months) {
   
     const clientBday = data.client_birthday_day && data.client_birthday_month
-      ? `${data.client_birthday_day}${lang === 'bg' ? '-ти' : ''} ${currentMonths[data.client_birthday_month - 1]}`
+      ? `${data.client_birthday_day}${lang === 'bg' ? '-ти' : ''} ${months[data.client_birthday_month - 1]}`
       : null;
     const partnerBday = data.include_partner && data.partner_birthday_day && data.partner_birthday_month
-      ? `${data.partner_birthday_day}${lang === 'bg' ? '-ти' : ''} ${currentMonths[data.partner_birthday_month - 1]}`
+      ? `${data.partner_birthday_day}${lang === 'bg' ? '-ти' : ''} ${months[data.partner_birthday_month - 1]}`
       : null;
   return clientBday
     ? (partnerBday ? `${clientBday} / ${partnerBday}` : clientBday)
     : t(' (въведете рожден ден)', ' (enter birthday)');
 }
 
-function BirthdayPlaceQuestion({ data, onChange, lang, t }) {
-  const bdayLabel = getBdayLabel(data, lang, t);
+function BirthdayPlaceQuestion({ data, onChange, lang, t, months }) {
+  const bdayLabel = getBdayLabel(data, lang, t, months);
   return (
     <div className="space-y-3">
       <Label className="text-slate-700">
@@ -112,13 +112,13 @@ function BirthdayPlaceQuestion({ data, onChange, lang, t }) {
   );
 }
 
-function BirthdayPartyQuestion({ data, lang, t }) {
+function BirthdayPartyQuestion({ data, lang, t, months }) {
   
     const clientBday = data.client_birthday_day && data.client_birthday_month
-      ? `${data.client_birthday_day}${lang === 'bg' ? '-ти' : ''} ${currentMonths[data.client_birthday_month - 1]}`
+      ? `${data.client_birthday_day}${lang === 'bg' ? '-ти' : ''} ${months[data.client_birthday_month - 1]}`
       : '';
     const partnerBday = data.include_partner && data.partner_birthday_day && data.partner_birthday_month
-      ? ` / ${data.partner_birthday_day}${lang === 'bg' ? '-ти' : ''} ${currentMonths[data.partner_birthday_month - 1]}`
+      ? ` / ${data.partner_birthday_day}${lang === 'bg' ? '-ти' : ''} ${months[data.partner_birthday_month - 1]}`
       : '';
   const preposition = /^[аъоуеиАЪОУЕИ]/.test(data.birthday_celebration_place || '') ? 'в' : 'на';
   return (
@@ -822,11 +822,11 @@ export default function HousingStep({ data, onChange, showErrors, plannerData, l
             </div>
 
             {/* Birthday question */}
-            <BirthdayPlaceQuestion data={data} onChange={onChange} />
+            <BirthdayPlaceQuestion data={data} onChange={onChange} lang={lang} t={t} months={currentMonths} />
 
             {data.birthday_celebration_place && data.birthday_place_ready && (
               <div className="space-y-3">
-                <BirthdayPartyQuestion data={data} />
+                <BirthdayPartyQuestion data={data} lang={lang} t={t} months={currentMonths} />
                 <Input
                   type="number"
                   min="0"

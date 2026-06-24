@@ -80,7 +80,14 @@ export function useJourneyState() {
           localStorage.setItem(JOURNEY_ID_KEY, journey.id);
           return { journey: resumedJourney, isResume: true };
         } else {
-          // Archive old journey — too old to resume
+          // Journey too old — transition to expired then archive
+          try {
+            await base44.functions.invoke('journeyStateMachine', {
+              journey_id: journey.id,
+              to_state: 'expired',
+              extra_data: { graceful_stop_reason: 'Session expired after 14 days' },
+            });
+          } catch { /* if SM fails, just archive */ }
           await base44.entities.Journey.update(journey.id, { is_archived: true });
         }
       }

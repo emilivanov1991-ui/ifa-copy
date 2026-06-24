@@ -2,12 +2,12 @@ import { createClientFromRequest } from 'npm:@base44/sdk@0.8.31';
 
 // Permitted state transitions: { from: [allowed_to, ...] }
 const ALLOWED_TRANSITIONS = {
-  discovery_not_started:                   ['discovery_intro_in_progress'],
-  discovery_intro_in_progress:             ['discovery_collecting', 'graceful_stop'],
-  discovery_collecting:                    ['discovery_ready_for_review', 'discovery_blocked', 'discovery_resumed_pending_reverification', 'graceful_stop'],
-  discovery_resumed_pending_reverification:['discovery_collecting', 'graceful_stop'],
-  discovery_ready_for_review:              ['analysis_approved', 'discovery_collecting', 'graceful_stop'],
-  discovery_blocked:                       ['graceful_stop'],
+  discovery_not_started:                   ['discovery_intro_in_progress', 'expired'],
+  discovery_intro_in_progress:             ['discovery_collecting', 'graceful_stop', 'expired'],
+  discovery_collecting:                    ['discovery_ready_for_review', 'discovery_blocked', 'discovery_resumed_pending_reverification', 'graceful_stop', 'expired'],
+  discovery_resumed_pending_reverification:['discovery_collecting', 'graceful_stop', 'expired'],
+  discovery_ready_for_review:              ['analysis_approved', 'discovery_collecting', 'graceful_stop', 'expired'],
+  discovery_blocked:                       ['graceful_stop', 'expired'],
   analysis_approved:                       ['plan_generating'],
   plan_generating:                         ['plan_ready', 'graceful_stop'],
   plan_ready:                              ['presentation_intro_pending', 'plan_auto_sell_blocked'],
@@ -25,6 +25,7 @@ const ALLOWED_TRANSITIONS = {
   provider_submission_in_progress:         ['completed', 'graceful_stop'],
   completed:                               [],
   graceful_stop:                           [],
+  expired:                                 [],
 };
 
 // Guards: extra conditions required for certain transitions

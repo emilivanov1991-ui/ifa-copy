@@ -3,13 +3,22 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { base44 } from '@/api/base44Client';
 import { Loader2, CheckCircle, TrendingUp, Shield, PiggyBank, Sparkles } from 'lucide-react';
 
-const STEPS_MESSAGES = [
-  { icon: Shield,      text: 'Анализираме нуждата от защита...', duration: 2800 },
-  { icon: PiggyBank,   text: 'Изчисляваме пенсионния дефицит...', duration: 2400 },
-  { icon: TrendingUp,  text: 'Определяме инвестиционен бюджет...', duration: 2200 },
-  { icon: Sparkles,    text: 'Подбираме оптимални продукти...', duration: 2600 },
-  { icon: CheckCircle, text: 'Финализираме Вашия план...', duration: 2000 },
-];
+const STEPS_MESSAGES = {
+  bg: [
+    { icon: Shield,      text: 'Анализираме нуждата от защита...', duration: 2800 },
+    { icon: PiggyBank,   text: 'Изчисляваме пенсионния дефицит...', duration: 2400 },
+    { icon: TrendingUp,  text: 'Определяме инвестиционен бюджет...', duration: 2200 },
+    { icon: Sparkles,    text: 'Подбираме оптимални продукти...', duration: 2600 },
+    { icon: CheckCircle, text: 'Финализираме Вашия план...', duration: 2000 },
+  ],
+  en: [
+    { icon: Shield,      text: 'Analysing protection needs...', duration: 2800 },
+    { icon: PiggyBank,   text: 'Calculating pension deficit...', duration: 2400 },
+    { icon: TrendingUp,  text: 'Determining investment budget...', duration: 2200 },
+    { icon: Sparkles,    text: 'Selecting optimal products...', duration: 2600 },
+    { icon: CheckCircle, text: 'Finalising your plan...', duration: 2000 },
+  ],
+};
 
 /**
  * PlanLoadingScreen
@@ -24,6 +33,7 @@ const STEPS_MESSAGES = [
  *  - onError(msg) — called on hard error
  */
 export default function PlanLoadingScreen({ journeyId, analysisId, languageCode = 'bg', onPlanReady, onBlocked, onError }) {
+  const msgs = STEPS_MESSAGES[languageCode] || STEPS_MESSAGES.bg;
   const [messageIdx, setMessageIdx] = useState(0);
   const [done, setDone] = useState(false);
   const [error, setError] = useState(null);
@@ -32,15 +42,15 @@ export default function PlanLoadingScreen({ journeyId, analysisId, languageCode 
   // Cycle through loading messages
   useEffect(() => {
     if (done || error) return;
-    const total = STEPS_MESSAGES.reduce((s, m) => s + m.duration, 0);
+    const total = msgs.reduce((s, m) => s + m.duration, 0);
     let elapsed = 0;
-    const timers = STEPS_MESSAGES.map((m, idx) => {
+    const timers = msgs.map((m, idx) => {
       const t = setTimeout(() => setMessageIdx(idx), elapsed);
       elapsed += m.duration;
       return t;
     });
     return () => timers.forEach(clearTimeout);
-  }, [done, error]);
+  }, [done, error, msgs]);
 
   // Trigger plan generation once
   useEffect(() => {
@@ -82,8 +92,12 @@ export default function PlanLoadingScreen({ journeyId, analysisId, languageCode 
     run();
   }, [analysisId, journeyId]);
 
-  const currentMsg = STEPS_MESSAGES[messageIdx];
+  const currentMsg = msgs[messageIdx];
   const Icon = currentMsg?.icon || Loader2;
+  const doneText = languageCode === 'en' ? 'Plan ready!' : 'Планът е готов!';
+  const generatingText = languageCode === 'en' ? 'Generating your plan' : 'Генерираме Вашия план';
+  const waitText = languageCode === 'en' ? 'Please wait — analysing your financial situation' : 'Моля изчакайте — анализираме Вашата финансова ситуация';
+  const redirectText = languageCode === 'en' ? 'You will be redirected automatically...' : 'Ще бъдете пренасочени автоматично...';
 
   if (error) {
     return (
@@ -147,15 +161,15 @@ export default function PlanLoadingScreen({ journeyId, analysisId, languageCode 
 
         {/* Title */}
         <h2 className="text-white text-2xl font-bold mb-2">
-          {done ? 'Планът е готов!' : 'Генерираме Вашия план'}
+          {done ? doneText : generatingText}
         </h2>
         <p className="text-blue-200 text-sm mb-8">
-          {done ? 'Ще бъдете пренасочени автоматично...' : 'Моля изчакайте — анализираме Вашата финансова ситуация'}
+          {done ? redirectText : waitText}
         </p>
 
         {/* Progress dots */}
         <div className="flex justify-center gap-2 mb-8">
-          {STEPS_MESSAGES.map((_, idx) => (
+          {msgs.map((_, idx) => (
             <motion.div
               key={idx}
               animate={{

@@ -1,0 +1,72 @@
+{
+  "name": "ObjectionEvent",
+  "type": "object",
+  "properties": {
+    "journey_id": {
+      "type": "string",
+      "description": "Reference to Journey"
+    },
+    "plan_id": {
+      "type": "string",
+      "description": "Reference to FinancialPlan"
+    },
+    "session_timestamp": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When the objection was raised"
+    },
+    "objection_text": {
+      "type": "string",
+      "description": "What the client said (summarized)"
+    },
+    "category": {
+      "type": "string",
+      "enum": [
+        "price",
+        "trust",
+        "timing",
+        "product_fit",
+        "competitor",
+        "need_more_time",
+        "family_decision",
+        "off_scope",
+        "other"
+      ],
+      "description": "Classified category of the objection"
+    },
+    "response_used": {
+      "type": "string",
+      "description": "The approved response script used to address the objection"
+    },
+    "outcome": {
+      "type": "string",
+      "enum": [
+        "resolved",
+        "escalated",
+        "graceful_stop",
+        "pending"
+      ],
+      "default": "pending",
+      "description": "Result of handling the objection"
+    },
+    "presentation_section": {
+      "type": "string",
+      "description": "Which section of the plan was being presented when objection occurred"
+    },
+    "language_code": {
+      "type": "string",
+      "enum": [
+        "bg",
+        "en"
+      ],
+      "default": "bg"
+    },
+    "notes": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "journey_id",
+    "category"
+  ]
+}

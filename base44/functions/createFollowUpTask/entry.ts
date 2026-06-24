@@ -19,6 +19,28 @@ Deno.serve(async (req) => {
       return Response.json({ error: 'Invalid payload' }, { status: 400 });
     }
 
+    // Handle ProviderSubmission permanent_failure (different entity trigger)
+    if (event?.entity_name === 'ProviderSubmission' || data?.idempotency_key !== undefined) {
+      const submission = data;
+      const journey_id = submission.journey_id;
+
+      const task = await base44.asServiceRole.entities.FollowUpTask.create({
+        journey_id: journey_id || null,
+        client_id: submission.client_id || null,
+        client_name: 'Unknown',
+        client_email: '',
+        reason: 'provider_submission_failed',
+        reason_detail: `Provider submission permanently failed after ${submission.attempt_number || 0} attempts. Provider: ${submission.provider_name || submission.provider_id || 'Unknown'}. Error: ${submission.error_message || 'Unknown error'}`,
+        priority: 'urgent',
+        assigned_queue: 'technical',
+        status: 'open',
+        notes: `Auto-created from ProviderSubmission permanent_failure\nSubmission ID: ${submission.id}\nIdempotency Key: ${submission.idempotency_key}`,
+      });
+
+      console.log(`Created FollowUpTask ${task.id} for ProviderSubmission ${submission.id}`);
+      return Response.json({ success: true, task_id: task.id, reason: 'provider_submission_failed' });
+    }
+
     const journey = data;
     const journey_id = journey.id;
 

@@ -78,7 +78,7 @@ const STEP_COMPONENTS = {
 
 export default function FinancialAnalysis() {
   const [journey, setJourney] = useState(null);
-  const [useDiscoveryShell, setUseDiscoveryShell] = useState(false);
+  const [useDiscoveryShell] = useState(true);
   const { playStep, avatarState, isPlaying, currentText } = useVoiceManager('bg');
   const { createOrResumeJourney } = useJourneyState();
   const [currentStep, setCurrentStep] = useState(1);

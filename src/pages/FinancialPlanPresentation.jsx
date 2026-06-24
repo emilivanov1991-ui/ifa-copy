@@ -5,7 +5,7 @@ import { base44 } from '@/api/base44Client';
 import {
   MessageSquare, PhoneOff, Loader2,
   CheckCircle2, BarChart3, Shield, PiggyBank, Home, Baby,
-  Send, X, FileText, CreditCard, AlertTriangle
+  Send, X, FileText, CreditCard, AlertTriangle, TrendingUp
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import AvatarFrame from '@/components/voice/AvatarFrame';
@@ -16,6 +16,7 @@ import ApplicationCollectionForm from '@/components/application/ApplicationColle
 import SigningStatusPoller from '@/components/application/SigningStatusPoller';
 import PaymentCheckout from '@/components/application/PaymentCheckout';
 import JourneyCompletedScreen from '@/components/application/JourneyCompletedScreen';
+import PlanProjectionsChart from '@/components/financial-plan/PlanProjectionsChart';
 
 const AGENT_NAME = 'presentation_advisor';
 
@@ -194,11 +195,12 @@ export default function FinancialPlanPresentation() {
   };
 
   const sections = [
-    { id: 'overview',    label: 'Обзор',    icon: BarChart3 },
-    { id: 'protection',  label: 'Защита',   icon: Shield },
-    { id: 'reserve',     label: 'Резерв',   icon: PiggyBank },
-    { id: 'housing',     label: 'Жилище',   icon: Home },
-    { id: 'children',    label: 'Деца',     icon: Baby },
+    { id: 'overview',     label: 'Обзор',      icon: BarChart3 },
+    { id: 'protection',   label: 'Защита',     icon: Shield },
+    { id: 'reserve',      label: 'Резерв',     icon: PiggyBank },
+    { id: 'housing',      label: 'Жилище',     icon: Home },
+    { id: 'children',     label: 'Деца',       icon: Baby },
+    { id: 'projections',  label: 'Проекции',   icon: TrendingUp },
   ];
 
   if (loading) {
@@ -376,35 +378,40 @@ export default function FinancialPlanPresentation() {
         {/* Plan Cards */}
         <AnimatePresence mode="wait">
           <motion.div key={currentSection} initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="space-y-4">
-            <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-              {offers.slice(0, 6).map((offer, idx) => (
-                <motion.div key={offer.id} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: idx * 0.08 }}
-                  className="bg-white rounded-2xl border border-slate-200 p-4 shadow-sm">
-                  <p className="text-xs text-slate-500 mb-1">{offer.provider}</p>
-                  <h3 className="text-sm font-semibold text-slate-900 mb-2 line-clamp-2">{offer.product_name}</h3>
-                  <div className="flex justify-between items-end">
-                    <div>
-                      <p className="text-xs text-slate-500">Месечна премия</p>
-                      <p className="text-lg font-bold text-blue-600">{offer.monthly_premium} €</p>
-                    </div>
-                    {offer.coverage_amount > 0 && (
-                      <div className="text-right">
-                        <p className="text-xs text-slate-500">Покритие</p>
-                        <p className="text-sm font-semibold text-slate-700">{(offer.coverage_amount / 1000).toFixed(0)}K €</p>
+            {sections[currentSection]?.id === 'projections' ? (
+              <PlanProjectionsChart plan={plan} offers={offers} analysisData={analysisData} />
+            ) : (
+              <div className="space-y-4">
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                  {offers.slice(0, 6).map((offer, idx) => (
+                    <motion.div key={offer.id} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: idx * 0.08 }}
+                      className="bg-white rounded-2xl border border-slate-200 p-4 shadow-sm">
+                      <p className="text-xs text-slate-500 mb-1">{offer.provider}</p>
+                      <h3 className="text-sm font-semibold text-slate-900 mb-2 line-clamp-2">{offer.product_name}</h3>
+                      <div className="flex justify-between items-end">
+                        <div>
+                          <p className="text-xs text-slate-500">Месечна премия</p>
+                          <p className="text-lg font-bold text-blue-600">{offer.monthly_premium} €</p>
+                        </div>
+                        {offer.coverage_amount > 0 && (
+                          <div className="text-right">
+                            <p className="text-xs text-slate-500">Покритие</p>
+                            <p className="text-sm font-semibold text-slate-700">{(offer.coverage_amount / 1000).toFixed(0)}K €</p>
+                          </div>
+                        )}
                       </div>
-                    )}
+                    </motion.div>
+                  ))}
+                </div>
+                {plan && (
+                  <div className="bg-gradient-to-r from-blue-600 to-indigo-600 rounded-2xl p-5 text-white">
+                    <p className="text-blue-100 text-sm mb-1">Общо месечна вноска</p>
+                    <p className="text-4xl font-bold">{plan.total_monthly_premium || '—'} €</p>
+                    <p className="text-blue-200 text-xs mt-2">
+                      Обща защита: {plan.total_coverage ? (plan.total_coverage / 1000).toFixed(0) + 'K €' : '—'}
+                    </p>
                   </div>
-                </motion.div>
-              ))}
-            </div>
-
-            {plan && (
-              <div className="bg-gradient-to-r from-blue-600 to-indigo-600 rounded-2xl p-5 text-white">
-                <p className="text-blue-100 text-sm mb-1">Общо месечна вноска</p>
-                <p className="text-4xl font-bold">{plan.total_monthly_premium || '—'} €</p>
-                <p className="text-blue-200 text-xs mt-2">
-                  Обща защита: {plan.total_coverage ? (plan.total_coverage / 1000).toFixed(0) + 'K €' : '—'}
-                </p>
+                )}
               </div>
             )}
           </motion.div>

@@ -39,6 +39,7 @@ import { cn } from "@/lib/utils";
 
 import ConsultantDashboard from '@/components/consultant/ConsultantDashboard';
 import ConsultantCRMAdvanced from '@/components/consultant/ConsultantCRMAdvanced';
+import JourneyStagesCRM from '@/components/consultant/JourneyStagesCRM';
 import ConsultantStatistics from '@/components/consultant/ConsultantStatistics';
 import ConsultantReports from '@/components/consultant/ConsultantReports';
 import ElearningPortal from '@/components/consultant/ElearningPortal';
@@ -53,11 +54,12 @@ import CommissionsManager from '@/components/consultant/CommissionsManager';
 import ProductCatalogManager from '@/components/admin/ProductCatalogManager';
 import DossiersManager from '@/components/consultant/DossiersManager';
 import ConsultantLogin from '@/components/consultant/ConsultantLogin';
-import { Package, FolderOpen } from 'lucide-react';
+import { Package, FolderOpen, Workflow } from 'lucide-react';
 
 const menuItems = [
   { id: 'dashboard', label: 'Табло', icon: LayoutDashboard, color: 'from-blue-500 to-blue-600' },
-  { id: 'crm', label: 'CRM / Клиенти', icon: Users, color: 'from-violet-500 to-violet-600' },
+  { id: 'journeys', label: 'Client Journeys', icon: Workflow, color: 'from-violet-500 to-violet-600' },
+  { id: 'crm', label: 'CRM / Клиенти', icon: Users, color: 'from-blue-500 to-cyan-600' },
   { id: 'dossiers', label: 'Flow', icon: FolderOpen, color: 'from-blue-500 to-cyan-600' },
   { id: 'performance-formula', label: 'Performance Formula', icon: BarChart3, color: 'from-cyan-500 to-cyan-600' },
   { id: 'analysis', label: 'Финансов анализ', icon: FileText, color: 'from-emerald-500 to-emerald-600' },
@@ -304,6 +306,7 @@ export default function ConsultantPortal() {
               className="space-y-6"
             >
               {activeTab === 'dashboard' && <ConsultantDashboard onNavigate={setActiveTab} />}
+              {activeTab === 'journeys' && <JourneyStagesCRM />}
               {activeTab === 'crm' && <ConsultantCRMAdvanced isAdmin={currentUser?.role === 'admin'} />}
               {activeTab === 'dossiers' && <DossiersManager />}
               {activeTab === 'performance-formula' && <ConsultantAnalytics />}

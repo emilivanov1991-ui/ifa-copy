@@ -11,6 +11,7 @@ import AvatarFrame from '@/components/voice/AvatarFrame';
 import { useJourneyState } from '@/components/voice/JourneyStateManager';
 import { useContradictionCheck } from '@/components/discovery/useContradictionCheck';
 import { useVoiceManager } from '@/components/voice/VoiceManager';
+import ResponseBandFeedback from '@/components/discovery/ResponseBandFeedback';
 
 // ─── Journey state helpers ───────────────────────────────────────────────────
 const DISCOVERY_STATES_ORDER = [
@@ -421,6 +422,13 @@ export default function DiscoveryShell({
               exit={{ opacity: 0, x: -20 }}
               transition={{ duration: 0.25 }}
             >
+              {/* Response band feedback */}
+              <ResponseBandFeedback
+                formData={formData}
+                currentStepId={currentStep}
+                languageCode={languageCode}
+              />
+
               {/* Contradiction warnings */}
               {contradictions.length > 0 && (
                 <div className="mb-4 space-y-2">

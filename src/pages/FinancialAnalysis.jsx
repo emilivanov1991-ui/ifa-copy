@@ -44,6 +44,8 @@ import FinancialFlowStep from '../components/analysis/FinancialFlowStep';
 import PrioritiesStep from '../components/analysis/PrioritiesStep';
 import ReferralsStep from '../components/analysis/ReferralsStep';
 import DiscoveryShell from '../components/discovery/DiscoveryShell';
+import DiscoveryReviewStep from '../components/discovery/DiscoveryReviewStep';
+import PlanLoadingScreen from '../components/discovery/PlanLoadingScreen';
 import AnalysisSuccessScreen from '../components/analysis/AnalysisSuccessScreen';
 import { useJourneyState } from '../components/voice/JourneyStateManager';
 import GuideAvatar from '../components/GuideAvatar';
@@ -82,6 +84,9 @@ export default function FinancialAnalysis() {
   const [currentStep, setCurrentStep] = useState(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const [showReview, setShowReview] = useState(false);
+  const [showPlanLoading, setShowPlanLoading] = useState(false);
+  const [planId, setPlanId] = useState(null);
   const [showValidationErrors, setShowValidationErrors] = useState(false);
   const [showSavingsDiscrepancyModal, setShowSavingsDiscrepancyModal] = useState(false);
   const [showReferralsStep, setShowReferralsStep] = useState(false);
@@ -1216,7 +1221,8 @@ export default function FinancialAnalysis() {
       // ─────────────────────────────────────────────────────────────
 
       setIsSubmitting(false);
-      setIsSubmitted(true);
+      // Go to Review step instead of directly submitted
+      setShowReview(true);
     } catch (error) {
       console.error('Грешка при изпращане на анализа:', error);
       alert('Възникна грешка при изпращане на анализа. Моля опитайте отново.');
@@ -1224,8 +1230,57 @@ export default function FinancialAnalysis() {
     }
   };
 
+  // Show Plan Loading screen
+  if (showPlanLoading) {
+    return (
+      <PlanLoadingScreen
+        journeyId={journey?.id}
+        analysisId={analysisRecordId}
+        onPlanReady={(pid) => {
+          setPlanId(pid);
+          setShowPlanLoading(false);
+          setIsSubmitted(true);
+        }}
+        onBlocked={() => {
+          setShowPlanLoading(false);
+          setIsSubmitted(true);
+        }}
+        onError={() => {
+          setShowPlanLoading(false);
+          setIsSubmitted(true);
+        }}
+      />
+    );
+  }
+
+  // Show Discovery Review step
+  if (showReview) {
+    return (
+      <div className="pt-20 min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
+        <div className="max-w-2xl mx-auto px-4 py-10">
+          <DiscoveryReviewStep
+            formData={formData}
+            journeyId={journey?.id}
+            analysisId={analysisRecordId}
+            onConfirm={() => {
+              setShowReview(false);
+              setShowPlanLoading(true);
+            }}
+            onEditSection={(sectionId) => {
+              setShowReview(false);
+              // Map section_id back to step number
+              const sectionToStep = { consent: 1, housing: 3, reserve: 4, pension: 5, children: 6, protection: 7, cashflow: 8, priorities: 9 };
+              const step = sectionToStep[sectionId] || 1;
+              setCurrentStep(step);
+            }}
+          />
+        </div>
+      </div>
+    );
+  }
+
   if (isSubmitted) {
-    return <AnalysisSuccessScreen formData={formData} analysisRecordId={analysisRecordId} />;
+    return <AnalysisSuccessScreen formData={formData} analysisRecordId={analysisRecordId} planId={planId} />;
   }
 
   return (

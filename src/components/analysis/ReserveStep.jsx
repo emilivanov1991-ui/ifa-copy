@@ -437,7 +437,7 @@ export default function ReserveStep({ data, onChange, showErrors, plannerData, l
 
                 {/* Пари в брой */}
                 <div className="grid grid-cols-3 gap-2 items-center" data-invalid={isFieldInvalid(data.partner_cash) ? "true" : undefined}>
-                  <Label className="text-sm">Пари в брой <span className="text-red-500">*</span></Label>
+                  <Label className="text-sm">{t('Пари в брой','Cash')} <span className="text-red-500">*</span></Label>
                   <Input
                     type="number"
                     min="0"
@@ -870,7 +870,7 @@ export default function ReserveStep({ data, onChange, showErrors, plannerData, l
               return (
                 <div key={`invest_${index}`}>
                   <Input
-                    placeholder="Име на познат"
+                    placeholder={t('Име на познат', 'Name of acquaintance')}
                     value={name}
                     onChange={(e) => {
                       const newList = [...(data.referrals_invest_regularly || [''])];

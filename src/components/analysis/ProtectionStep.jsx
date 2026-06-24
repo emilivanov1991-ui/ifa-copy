@@ -31,8 +31,8 @@ export default function ProtectionStep({ data, onChange, showErrors, plannerData
   const isFieldInvalid = (value) => showErrors && (value === undefined || value === '' || value === null);
   const t = (bg, en) => lang === 'en' ? en : bg;
 
-  const clientName = plannerData?.client_first_name || t('Клиент', 'Client');
-  const partnerName = plannerData?.partner_first_name || t('Партньор', 'Partner');
+  const clientName = plannerData?.client_first_name || data.client_first_name || t('Клиент', 'Client');
+  const partnerName = plannerData?.partner_first_name || data.partner_first_name || t('Партньор', 'Partner');
   const includePartner = plannerData?.family_type === 'family' || data.include_partner;
 
   const hasAnyProperty = data.has_property_1 || false;
@@ -472,11 +472,11 @@ export default function ProtectionStep({ data, onChange, showErrors, plannerData
               <div>
                 <div className="flex items-center gap-2 mb-4"><User className="h-4 w-4 text-slate-500" /><span className="font-medium text-slate-700">{clientName}</span></div>
                 <div className="space-y-4">
-                  <RiskRow label={t('Съкращение', 'Layoff')} field="client_risk_layoff" grossIncome={clientGrossIncome} netIncome={clientNetIncome} calcFn={calculateLayoffCompensation} />
-                  <RiskRow label={t('Отпуск по майчинство', 'Maternity leave')} field="client_risk_maternity" grossIncome={clientGrossIncome} netIncome={clientNetIncome} calcFn={calculateMaternityYear1} extraContent={MaternityContent} />
-                  <RiskRow label={t('Болнични', 'Sick leave')} field="client_risk_sick_leave" grossIncome={clientGrossIncome} netIncome={clientNetIncome} calcFn={calculateSickLeaveCompensation} />
-                  <RiskRow label={t('Инвалидност', 'Disability')} field="client_risk_disability" grossIncome={clientGrossIncome} netIncome={clientNetIncome} calcFn={calculateDisabilityCompensation} />
-                  <RiskRow label={t('Смърт', 'Death')} field="client_risk_death" grossIncome={clientGrossIncome} netIncome={clientNetIncome} calcFn={calculateDeathCompensation} />
+                  <RiskRow label={t('Съкращение', 'Layoff')} field="client_risk_layoff" grossIncome={clientGrossIncome} netIncome={clientNetIncome} calcFn={calculateLayoffCompensation} t={t} />
+                  <RiskRow label={t('Отпуск по майчинство', 'Maternity leave')} field="client_risk_maternity" grossIncome={clientGrossIncome} netIncome={clientNetIncome} calcFn={calculateMaternityYear1} extraContent={MaternityContent} t={t} />
+                  <RiskRow label={t('Болнични', 'Sick leave')} field="client_risk_sick_leave" grossIncome={clientGrossIncome} netIncome={clientNetIncome} calcFn={calculateSickLeaveCompensation} t={t} />
+                  <RiskRow label={t('Инвалидност', 'Disability')} field="client_risk_disability" grossIncome={clientGrossIncome} netIncome={clientNetIncome} calcFn={calculateDisabilityCompensation} t={t} />
+                  <RiskRow label={t('Смърт', 'Death')} field="client_risk_death" grossIncome={clientGrossIncome} netIncome={clientNetIncome} calcFn={calculateDeathCompensation} t={t} />
                   <IncomeProtectionBlock hasField="client_has_income_protection" insurerField="client_income_protection_insurer" dateField="client_income_protection_date" grossIncome={clientGrossIncome} netIncome={clientNetIncome} age={data.client_age} retirementAge={data.client_retirement_age} />
                 </div>
               </div>
@@ -486,11 +486,11 @@ export default function ProtectionStep({ data, onChange, showErrors, plannerData
                 <div>
                   <div className="flex items-center gap-2 mb-4"><Users className="h-4 w-4 text-slate-500" /><span className="font-medium text-slate-700">{partnerName}</span></div>
                   <div className="space-y-4">
-                    <RiskRow label={t('Съкращение', 'Layoff')} field="partner_risk_layoff" grossIncome={partnerGrossIncome} netIncome={partnerNetIncome} calcFn={calculateLayoffCompensation} />
-                    <RiskRow label={t('Отпуск по майчинство', 'Maternity leave')} field="partner_risk_maternity" grossIncome={partnerGrossIncome} netIncome={partnerNetIncome} calcFn={calculateMaternityYear1} extraContent={MaternityContent} />
-                    <RiskRow label={t('Болнични', 'Sick leave')} field="partner_risk_sick_leave" grossIncome={partnerGrossIncome} netIncome={partnerNetIncome} calcFn={calculateSickLeaveCompensation} />
-                    <RiskRow label={t('Инвалидност', 'Disability')} field="partner_risk_disability" grossIncome={partnerGrossIncome} netIncome={partnerNetIncome} calcFn={calculateDisabilityCompensation} />
-                    <RiskRow label={t('Смърт', 'Death')} field="partner_risk_death" grossIncome={partnerGrossIncome} netIncome={partnerNetIncome} calcFn={calculateDeathCompensation} />
+                    <RiskRow label={t('Съкращение', 'Layoff')} field="partner_risk_layoff" grossIncome={partnerGrossIncome} netIncome={partnerNetIncome} calcFn={calculateLayoffCompensation} t={t} />
+                    <RiskRow label={t('Отпуск по майчинство', 'Maternity leave')} field="partner_risk_maternity" grossIncome={partnerGrossIncome} netIncome={partnerNetIncome} calcFn={calculateMaternityYear1} extraContent={MaternityContent} t={t} />
+                    <RiskRow label={t('Болнични', 'Sick leave')} field="partner_risk_sick_leave" grossIncome={partnerGrossIncome} netIncome={partnerNetIncome} calcFn={calculateSickLeaveCompensation} t={t} />
+                    <RiskRow label={t('Инвалидност', 'Disability')} field="partner_risk_disability" grossIncome={partnerGrossIncome} netIncome={partnerNetIncome} calcFn={calculateDisabilityCompensation} t={t} />
+                    <RiskRow label={t('Смърт', 'Death')} field="partner_risk_death" grossIncome={partnerGrossIncome} netIncome={partnerNetIncome} calcFn={calculateDeathCompensation} t={t} />
                     <IncomeProtectionBlock hasField="partner_has_income_protection" insurerField="partner_income_protection_insurer" dateField="partner_income_protection_date" grossIncome={partnerGrossIncome} netIncome={partnerNetIncome} age={data.partner_age} retirementAge={data.partner_retirement_age} />
                   </div>
                 </div>
@@ -519,8 +519,8 @@ export default function ProtectionStep({ data, onChange, showErrors, plannerData
           { value: 'bulgaria_ins', label: 'ЗК „България Иншурънс" АД' },
           { value: 'unknown', label: 'Не знам, ще проверя' },
         ];
-        const cName = [data.client_first_name, data.client_last_name].filter(Boolean).join(' ') || t('Клиент', 'Client');
-        const pName = [data.partner_first_name, data.partner_last_name].filter(Boolean).join(' ') || t('Партньор', 'Partner');
+        const cName = data.client_first_name || t('Клиент', 'Client');
+        const pName = data.partner_first_name || t('Партньор', 'Partner');
         const HealthRow = ({ label, fieldHas, fieldInsurer }) => (
           <div className="space-y-3">
             <div className="flex items-center justify-between">

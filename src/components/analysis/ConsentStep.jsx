@@ -26,31 +26,46 @@ export default function ConsentStep({ data, onChange, showErrors, lang = 'bg' })
         <CollapsibleContent className="px-6 pb-6">
           <div className="bg-slate-50 rounded-lg p-4 text-sm text-slate-600 space-y-3 max-h-96 overflow-y-auto">
             <p>
-              С настоящото по смисъла на Закона за личните данни и на Регламент (ЕС) 2016/679 на Европейския парламент и на Съвета от 27 април 2016 година относно защитата на физическите лица във връзка с обработването на лични данни и относно свободното движение на такива данни и за отмяна на Директива 95/46/EО (Общ регламент относно защитата на данните) (по-долу наричан само „Приложимо законодателство") Давам съгласието си на "Интегрити Файненшъл Адвайзърс" ЕООД, с ЕИК: 208597115, със седалище и адрес на управление в гр. Бургас (8001), ул.Поморие, 20, ет. 5, ап. 1 ("Компанията") да обработва личните ми данни, посочени в този анализ.
+              {t(
+                'С настоящото по смисъла на Закона за личните данни и на Регламент (ЕС) 2016/679 на Европейския парламент и на Съвета от 27 април 2016 година относно защитата на физическите лица във връзка с обработването на лични данни и относно свободното движение на такива данни и за отмяна на Директива 95/46/EО (Общ регламент относно защитата на данните) (по-долу наричан само „Приложимо законодателство") Давам съгласието си на "Интегрити Файненшъл Адвайзърс" ЕООД, с ЕИК: 208597115, със седалище и адрес на управление в гр. Бургас (8001), ул.Поморие, 20, ет. 5, ап. 1 ("Компанията") да обработва личните ми данни, посочени в този анализ.',
+                'Hereby, within the meaning of the Personal Data Protection Act and Regulation (EU) 2016/679 of the European Parliament and of the Council of 27 April 2016 on the protection of natural persons with regard to the processing of personal data and on the free movement of such data, and repealing Directive 95/46/EC (General Data Protection Regulation) (hereinafter referred to as "Applicable Law"), I give my consent to "Integrity Financial Advisors" Ltd., with UIC: 208597115, with registered office and address of management in Burgas (8001), 20 Pomorie St., 5th floor, ap. 1 ("the Company") to process my personal data specified in this analysis.'
+              )}
             </p>
             <p>
-              Данните включва: Име, фамилия адрес на електронна поща, телефон и друг начин за връзка, финансово-икономическо състояние, данни на низходящи (деца), брой деца, кредитна информация, доходи.
+              {t(
+                'Данните включва: Име, фамилия адрес на електронна поща, телефон и друг начин за връзка, финансово-икономическо състояние, данни на низходящи (деца), брой деца, кредитна информация, доходи.',
+                'The data includes: Name, surname, e-mail address, telephone and other contact details, financial and economic status, data of descendants (children), number of children, credit information, income.'
+              )}
             </p>
             <p>
-              Декларирам, че съм взел предвид и съм съгласен/а, че Компанията има право, на основание на даденото с настоящото от мен изрично съгласие, да обработва личните ми данни в съответствие с Приложимото законодателство, най-вече използвайки автоматизирани и не автоматизирани средства.
+              {t(
+                'Декларирам, че съм взел предвид и съм съгласен/а, че Компанията има право, на основание на даденото с настоящото от мен изрично съгласие, да обработва личните ми данни в съответствие с Приложимото законодателство, най-вече използвайки автоматизирани и не автоматизирани средства.',
+                'I declare that I have taken into account and agree that the Company has the right, on the basis of my explicit consent given herein, to process my personal data in accordance with the Applicable Law, primarily using automated and non-automated means.'
+              )}
             </p>
             <p>
-              Своето съгласие за обработване на личните ми данни по смисъла на Приложимото право давам за определен срок, а именно за срока, необходим за обработването на предоставените от мен лични данни, но за не повече от 2 години.
+              {t(
+                'Своето съгласие за обработване на личните ми данни по смисъла на Приложимото право давам за определен срок, а именно за срока, необходим за обработването на предоставените от мен лични данни, но за не повече от 2 години.',
+                'I give my consent for the processing of my personal data within the meaning of the Applicable Law for a specified period, namely for the period necessary for the processing of the personal data I have provided, but for no more than 2 years.'
+              )}
             </p>
             <p>
-              С настоящото декларирам, че съм информиран и разбирам, че Компанията има основание да обработва моите лични данни и на база сключения с мен писмен договор.
+              {t(
+                'С настоящото декларирам, че съм информиран и разбирам, че Компанията има основание да обработва моите лични данни и на база сключения с мен писмен договор.',
+                'I hereby declare that I am informed and understand that the Company has grounds to process my personal data also on the basis of the written contract concluded with me.'
+              )}
             </p>
             <p className="font-medium text-slate-700">
-              Имам право с писмена молба от Компанията да изисквам:
+              {t('Имам право с писмена молба от Компанията да изисквам:', 'I have the right to request from the Company in writing:')}
             </p>
             <ul className="list-disc pl-5 space-y-1">
-              <li>удостоверение дали личните ми данни са обработени или не</li>
-              <li>информация за състоянието на обработката на личните ми данни</li>
-              <li>точна информация за източника, от който са били получени данните</li>
-              <li>списък на личните ми данни, които са обработвани</li>
-              <li>поправка или заличаване на неправилните, непълните или неактуалните ми лични данни</li>
-              <li>заличаване на личните ми данни, които са изпълнили своята цел</li>
-              <li>блокиране на личните ми данни поради оттегляне на съгласието ми</li>
+              <li>{t('удостоверение дали личните ми данни са обработени или не', 'a certificate whether my personal data is processed or not')}</li>
+              <li>{t('информация за състоянието на обработката на личните ми данни', 'information on the status of the processing of my personal data')}</li>
+              <li>{t('точна информация за източника, от който са били получени данните', 'exact information about the source from which the data was obtained')}</li>
+              <li>{t('списък на личните ми данни, които са обработвани', 'a list of my personal data that is being processed')}</li>
+              <li>{t('поправка или заличаване на неправилните, непълните или неактуалните ми лични данни', 'correction or deletion of my incorrect, incomplete or outdated personal data')}</li>
+              <li>{t('заличаване на личните ми данни, които са изпълнили своята цел', 'deletion of my personal data that has served its purpose')}</li>
+              <li>{t('блокиране на личните ми данни поради оттегляне на съгласието ми', 'blocking of my personal data due to withdrawal of my consent')}</li>
             </ul>
           </div>
         </CollapsibleContent>

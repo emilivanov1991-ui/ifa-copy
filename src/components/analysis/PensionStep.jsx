@@ -147,7 +147,7 @@ export default function PensionStep({ data, onChange, showErrors, plannerData, l
     }
   }, [data.partner_work_category, data.partner_retirement_age, data.partner_gross_income_pension, includePartner]);
 
-  const categoryOptions = [
+  const categoryOptions = (t) => [
     { value: 'third', label: t('Трета категория', 'Third category') },
     { value: 'second', label: t('Втора категория', 'Second category') },
     { value: 'first', label: t('Първа категория', 'First category') },
@@ -206,7 +206,7 @@ export default function PensionStep({ data, onChange, showErrors, plannerData, l
               <div className="space-y-2">
                 <Label>{t('Категория труд', 'Work category')}</Label>
                 <div className="flex gap-2">
-                  {categoryOptions.map((option) => (
+                  {categoryOptions(t).map((option) => (
                     <button
                       key={option.value}
                       type="button"
@@ -299,7 +299,7 @@ export default function PensionStep({ data, onChange, showErrors, plannerData, l
                 <div className="space-y-2">
                   <Label>{t('Категория труд', 'Work category')}</Label>
                   <div className="flex gap-2">
-                    {categoryOptions.map((option) => (
+                    {categoryOptions(t).map((option) => (
                       <button
                         key={option.value}
                         type="button"
@@ -365,13 +365,13 @@ export default function PensionStep({ data, onChange, showErrors, plannerData, l
                   />
                   {data.partner_pension_is_social && (
                     <p className="text-amber-600 text-sm">
-                      Калкулирана е социалната пенсия за страната поради липса на необходима пенсионна възраст
+                      {t('Калкулирана е социалната пенсия за страната поради липса на необходима пенсионна възраст','The social pension has been calculated due to insufficient retirement age')}
                     </p>
                   )}
                 </div>
                 <div className="p-3 bg-blue-100 rounded-lg">
                   <p className="text-sm text-blue-800">
-                    Разлика: <span className="font-semibold">
+                    {t('Разлика:', 'Gap:')} <span className="font-semibold">
                       {partnerDiff.toLocaleString()} €
                     </span>
                   </p>
@@ -499,9 +499,9 @@ export default function PensionStep({ data, onChange, showErrors, plannerData, l
                           options={VOLUNTARY_PENSION_FUND_OPTIONS}
                           value={data.client_voluntary_pension_fund || ''}
                           onValueChange={(value) => onChange('client_voluntary_pension_fund', value)}
-                          placeholder="Търси фонд..."
-                          searchPlaceholder="Търси..."
-                          emptyText="Няма намерен фонд."
+                          placeholder={t('Търси фонд...', 'Search fund...')}
+                          searchPlaceholder={t('Търси...', 'Search...')}
+                          emptyText={t('Няма намерен фонд.', 'No fund found.')}
                         />
                       </div>
                       <div className="space-y-2">
@@ -588,18 +588,18 @@ export default function PensionStep({ data, onChange, showErrors, plannerData, l
                   </div>
                   {(data.partner_pillar_2 ?? true) && (
                     <div className="ml-4 space-y-2" data-invalid={isFieldInvalid(data.partner_pension_fund) ? "true" : undefined}>
-                      <Label className="text-sm">Име на частен пенсионен фонд? <span className="text-red-500">*</span></Label>
+                      <Label className="text-sm">{t('Име на частен пенсионен фонд?','Name of private pension fund?')} <span className="text-red-500">*</span></Label>
                       <Combobox
                         options={PENSION_FUND_OPTIONS}
                         value={data.partner_pension_fund || ''}
                         onValueChange={(value) => onChange('partner_pension_fund', value)}
-                        placeholder="Търси фонд..."
-                        searchPlaceholder="Търси..."
-                        emptyText="Няма намерен фонд."
+                        placeholder={t('Търси фонд...', 'Search fund...')}
+                        searchPlaceholder={t('Търси...', 'Search...')}
+                        emptyText={t('Няма намерен фонд.', 'No fund found.')}
                         triggerClassName={`rounded-lg ${isFieldInvalid(data.partner_pension_fund) ? 'border-red-500 bg-red-50' : ''}`}
                       />
                       <p className="text-xs text-slate-500 mt-2">
-                        В случай, на необходимост за откриване на дружеството, което управлява Вашите средства: Телефон за информация на НОИ: <span className="font-bold">0700 10 292</span> !
+                        {t('В случай, на необходимост за откриване на дружеството, което управлява Вашите средства: Телефон за информация на НОИ:', 'To find the fund managing your assets, call the NSI information line:')} <span className="font-bold">0700 10 292</span> !
                       </p>
                     </div>
                   )}
@@ -608,7 +608,7 @@ export default function PensionStep({ data, onChange, showErrors, plannerData, l
                   {/* III. Pillar */}
                 <div className="space-y-3">
                   <div className="flex items-center gap-3">
-                    <Label className="flex-1">III. Стълб (доброволно осигуряване)</Label>
+                    <Label className="flex-1">{t('III. Стълб (доброволно осигуряване)','III. Pillar (voluntary insurance)')}</Label>
                     <div className="flex items-center gap-2">
                       <span className={cn("text-sm font-medium", (data.partner_pillar_3 ?? false) ? "text-green-600" : "text-slate-400")}>Да</span>
                       <button
@@ -635,13 +635,13 @@ export default function PensionStep({ data, onChange, showErrors, plannerData, l
                           options={VOLUNTARY_PENSION_FUND_OPTIONS}
                           value={data.partner_voluntary_pension_fund || ''}
                           onValueChange={(value) => onChange('partner_voluntary_pension_fund', value)}
-                          placeholder="Търси фонд..."
-                          searchPlaceholder="Търси..."
-                          emptyText="Няма намерен фонд."
+                          placeholder={t('Търси фонд...', 'Search fund...')}
+                          searchPlaceholder={t('Търси...', 'Search...')}
+                          emptyText={t('Няма намерен фонд.', 'No fund found.')}
                         />
                       </div>
                       <div className="space-y-2">
-                        <Label className="text-sm">Месечна вноска (€) <span className="text-red-500">*</span></Label>
+                        <Label className="text-sm">{t('Месечна вноска (€)','Monthly contribution (€)')} <span className="text-red-500">*</span></Label>
                         <Input
                           type="number"
                           min="0"
@@ -653,7 +653,7 @@ export default function PensionStep({ data, onChange, showErrors, plannerData, l
                         />
                       </div>
                       <div className="space-y-2">
-                        <Label className="text-sm">Обща стойност на партидата (ориентировъчна стойност) (€) <span className="text-red-500">*</span></Label>
+                        <Label className="text-sm">{t('Обща стойност на партидата (ориентировъчна стойност) (€)','Total account value (approximate) (€)')} <span className="text-red-500">*</span></Label>
                         <Input
                           type="number"
                           min="0"

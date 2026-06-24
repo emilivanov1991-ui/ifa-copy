@@ -419,17 +419,17 @@ export default function ChildrenGoalsStep({ data, onChange, showErrors, plannerD
                 {Array.from({ length: data.children_count }).map((_, idx) => (
                   <div key={idx} className="space-y-3">
                     <div>
-                      <Label>Име на дете {idx + 1} <span className="text-red-500">*</span></Label>
+                      <Label>{t('Име на дете', 'Child name')} {idx + 1} <span className="text-red-500">*</span></Label>
                       <Input
                         type="text"
-                        placeholder={`Име на дете ${idx + 1}`}
+                        placeholder={`${t('Име на дете', 'Child name')} ${idx + 1}`}
                         value={data[`child_${idx + 1}_name`] || ''}
                         onChange={(e) => onChange(`child_${idx + 1}_name`, e.target.value)}
                         className="rounded-lg mt-2"
                       />
                     </div>
                     <div>
-                      <Label>Възраст на дете {idx + 1} <span className="text-red-500">*</span></Label>
+                      <Label>{t('Възраст на дете', 'Child age')} {idx + 1} <span className="text-red-500">*</span></Label>
                       <Input
                         type="number"
                         min="0"
@@ -454,7 +454,7 @@ export default function ChildrenGoalsStep({ data, onChange, showErrors, plannerD
             <div className="space-y-1">
               {plannerChildrenNames.map((name, idx) => (
                 <p key={idx} className="text-sm text-blue-700">
-                  {name} ({plannerChildrenAges[idx]} години)
+                  {name} ({plannerChildrenAges[idx]} {t('години', 'years')})
                 </p>
               ))}
             </div>

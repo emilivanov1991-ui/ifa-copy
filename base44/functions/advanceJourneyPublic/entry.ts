@@ -8,6 +8,8 @@ import { createClientFromRequest } from 'npm:@base44/sdk@0.8.31';
 
 // Само тези преходи са разрешени от публична страница
 const PUBLIC_ALLOWED_TRANSITIONS = [
+  'discovery_collecting', // Added for FinancialPlanner init
+  'discovery_collecting', // Added for FinancialPlanner init
   'presentation_intro_pending',
   'presentation_in_progress',
   'presentation_stopped_boundary',

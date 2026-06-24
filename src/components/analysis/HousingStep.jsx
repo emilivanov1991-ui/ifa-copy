@@ -69,9 +69,10 @@ const bankOptions = [
     en: ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
   };
 
-  const currentMonths = MONTHS[lang] || MONTHS.bg;
+  
 
   function getBdayLabel(data, lang, t) {
+  
     const clientBday = data.client_birthday_day && data.client_birthday_month
       ? `${data.client_birthday_day}${lang === 'bg' ? '-ти' : ''} ${currentMonths[data.client_birthday_month - 1]}`
       : null;
@@ -112,6 +113,7 @@ function BirthdayPlaceQuestion({ data, onChange, lang, t }) {
 }
 
 function BirthdayPartyQuestion({ data, lang, t }) {
+  
     const clientBday = data.client_birthday_day && data.client_birthday_month
       ? `${data.client_birthday_day}${lang === 'bg' ? '-ти' : ''} ${currentMonths[data.client_birthday_month - 1]}`
       : '';
@@ -127,6 +129,7 @@ function BirthdayPartyQuestion({ data, lang, t }) {
 }
 
 export default function HousingStep({ data, onChange, showErrors, plannerData, lang = 'bg' }) {
+  const currentMonths = MONTHS[lang] || MONTHS.bg;
   const [showDownPaymentWarning, setShowDownPaymentWarning] = React.useState(false);
   const isFieldInvalid = (value) => showErrors && (value === undefined || value === '' || value === null);
   const t = (bg, en) => lang === 'en' ? en : bg;
@@ -729,11 +732,11 @@ export default function HousingStep({ data, onChange, showErrors, plannerData, l
             <div className="p-4 bg-white rounded-lg border border-slate-200 space-y-4">
               <div>
                 <Label className="text-slate-700 mb-2 block font-medium">
-                  Рожден ден на {data.client_first_name || 'Клиент'}
+                  {t('Рожден ден на', 'Birthday of')} {data.client_first_name || t('Клиент', 'Client')}
                 </Label>
                 <div className="flex items-center gap-3">
                   <div className="space-y-1">
-                    <Label className="text-xs text-slate-500">Ден</Label>
+                    <Label className="text-xs text-slate-500">{t('Ден', 'Day')}</Label>
                     <Input
                       type="number"
                       min="1"
@@ -774,11 +777,11 @@ export default function HousingStep({ data, onChange, showErrors, plannerData, l
               {data.include_partner && (
                 <div>
                   <Label className="text-slate-700 mb-2 block font-medium">
-                    Рожден ден на {data.partner_first_name || 'Партньор'}
+                    {t('Рожден ден на', 'Birthday of')} {data.partner_first_name || t('Партньор', 'Partner')}
                   </Label>
                   <div className="flex items-center gap-3">
                     <div className="space-y-1">
-                      <Label className="text-xs text-slate-500">Ден</Label>
+                      <Label className="text-xs text-slate-500">{t('Ден', 'Day')}</Label>
                       <Input
                         type="number"
                         min="1"

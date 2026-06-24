@@ -163,6 +163,15 @@ Deno.serve(async (req) => {
       }
     }
 
+    // Fallback: try FinancialAnalysisSubmission (covers anonymous journeys)
+    if (!clientEmail && journey.analysis_id) {
+      const analyses = await base44.asServiceRole.entities.FinancialAnalysisSubmission.filter({ id: journey.analysis_id });
+      if (analyses.length) {
+        clientEmail = analyses[0].client_email || '';
+        clientName = clientName || `${analyses[0].client_first_name || ''} ${analyses[0].client_last_name || ''}`.trim();
+      }
+    }
+
     if (!clientEmail) {
       console.log(`No client email for task ${task.id} — skipping notification`);
       return Response.json({ skipped: true, reason: 'No client email' });

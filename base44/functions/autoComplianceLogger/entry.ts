@@ -44,6 +44,7 @@ Deno.serve(async (req) => {
       'plan_ready':                  'plan_generated_at',
       'plan_auto_sell_blocked':      'plan_generated_at',
       'signing_in_progress':         null,
+      'payment_in_progress':         null,
       'completed':                   null,
     };
 
@@ -75,6 +76,17 @@ Deno.serve(async (req) => {
       }
     }
 
+    // Track payment_event_id when payment completes
+    if ((newState === 'payment_in_progress' || newState === 'completed') && journey.plan_id) {
+      const paymentEvents = await base44.asServiceRole.entities.PaymentEvent.filter({
+        journey_id: journeyId,
+        status: 'succeeded',
+      });
+      if (paymentEvents.length > 0) {
+        auditUpdate.payment_event_id = paymentEvents[paymentEvents.length - 1].id;
+      }
+    }
+
     if (old_data?.journey_state === 'discovery_resumed_pending_reverification') {
       auditUpdate.is_resumed_session = true;
       auditUpdate.reverification_performed = true;
@@ -92,7 +104,7 @@ Deno.serve(async (req) => {
       // Create new — include base fields from journey
       const newRecord = {
         journey_id: journeyId,
-        user_id: journey.user_id || '',
+        user_id: journey.user_id || journey.device_id || '',
         rulebook_version: journey.rulebook_version || '',
         ruleset_hash: journey.ruleset_hash || '',
         discovery_started_at: journey.discovery_started_at || now,

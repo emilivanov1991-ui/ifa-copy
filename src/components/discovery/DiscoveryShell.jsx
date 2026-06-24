@@ -29,19 +29,20 @@ function isDiscoveryActive(state) {
 
 // ─── Step definitions (mirrors FinancialAnalysis but with voice metadata) ────
 const DISCOVERY_STEPS = [
-  { id: 1,  section_id: 'consent',       title: 'Съгласие',          icon: ShieldCheck },
-  { id: 2,  section_id: 'personal_data', title: 'Лични данни',       icon: null },
-  { id: 3,  section_id: 'housing',       title: 'Жилище',            icon: null },
-  { id: 4,  section_id: 'reserve',       title: 'Резерв',            icon: null },
-  { id: 5,  section_id: 'pension',       title: 'Пенсия',            icon: null },
-  { id: 6,  section_id: 'children',      title: 'Деца и цели',       icon: null },
-  { id: 7,  section_id: 'protection',    title: 'Защита',            icon: null },
-  { id: 8,  section_id: 'cashflow',      title: 'Финансов поток',    icon: null },
-  { id: 9,  section_id: 'priorities',    title: 'Приоритети',        icon: null },
+  { id: 1,  section_id: 'consent',       titleBg: 'Съгласие',       titleEn: 'Consent',      icon: ShieldCheck },
+  { id: 2,  section_id: 'personal_data', titleBg: 'Лични данни',    titleEn: 'Personal',     icon: null },
+  { id: 3,  section_id: 'housing',       titleBg: 'Жилище',         titleEn: 'Housing',      icon: null },
+  { id: 4,  section_id: 'reserve',       titleBg: 'Резерв',         titleEn: 'Reserve',      icon: null },
+  { id: 5,  section_id: 'pension',       titleBg: 'Пенсия',         titleEn: 'Pension',      icon: null },
+  { id: 6,  section_id: 'children',      titleBg: 'Деца и цели',    titleEn: 'Children',     icon: null },
+  { id: 7,  section_id: 'protection',    titleBg: 'Защита',         titleEn: 'Protection',   icon: null },
+  { id: 8,  section_id: 'cashflow',      titleBg: 'Фин. поток',     titleEn: 'Cash Flow',    icon: null },
+  { id: 9,  section_id: 'priorities',    titleBg: 'Приоритети',     titleEn: 'Priorities',   icon: null },
 ];
 
 // ─── Reverification screen ────────────────────────────────────────────────────
-function ReverificationScreen({ journey, sections, onConfirm, onDeny }) {
+function ReverificationScreen({ journey, sections, onConfirm, onDeny, lang = 'bg' }) {
+  const isEN = lang === 'en';
   const [flags, setFlags] = useState({});
 
   const pendingSections = sections.filter(s => {
@@ -58,15 +59,15 @@ function ReverificationScreen({ journey, sections, onConfirm, onDeny }) {
       <div className="w-16 h-16 rounded-full bg-amber-100 flex items-center justify-center mx-auto mb-6">
         <RefreshCw className="h-8 w-8 text-amber-600" />
       </div>
-      <h2 className="text-2xl font-semibold text-slate-900 mb-3">Добре дошли обратно!</h2>
+      <h2 className="text-2xl font-semibold text-slate-900 mb-3">{isEN ? 'Welcome back!' : 'Добре дошли обратно!'}</h2>
       <p className="text-slate-600 mb-8">
-        Продължавате прекъснат анализ. Преди да продължим, моля потвърдете дали данните от тези секции са все още актуални:
+        {isEN ? 'You are continuing an interrupted analysis. Please confirm whether the data in these sections is still current:' : 'Продължавате прекъснат анализ. Преди да продължим, моля потвърдете дали данните от тези секции са все още актуални:'}
       </p>
 
       <div className="space-y-3 text-left mb-8">
         {pendingSections.map(sec => (
           <div key={sec.section_id} className="flex items-center justify-between p-4 rounded-xl border border-slate-200 bg-white shadow-sm">
-            <span className="font-medium text-slate-800">{sec.title}</span>
+            <span className="font-medium text-slate-800">{isEN ? sec.titleEn : sec.titleBg}</span>
             <div className="flex gap-2">
               <Button
                 size="sm"
@@ -74,7 +75,7 @@ function ReverificationScreen({ journey, sections, onConfirm, onDeny }) {
                 className={cn('rounded-full px-4', flags[sec.section_id] === true && 'bg-green-600 hover:bg-green-700')}
                 onClick={() => setFlags(f => ({ ...f, [sec.section_id]: true }))}
               >
-                Да, актуално
+                {isEN ? 'Yes, current' : 'Да, актуално'}
               </Button>
               <Button
                 size="sm"
@@ -82,7 +83,7 @@ function ReverificationScreen({ journey, sections, onConfirm, onDeny }) {
                 className="rounded-full px-4"
                 onClick={() => setFlags(f => ({ ...f, [sec.section_id]: false }))}
               >
-                Не
+                {isEN ? 'No' : 'Не'}
               </Button>
             </div>
           </div>
@@ -95,14 +96,14 @@ function ReverificationScreen({ journey, sections, onConfirm, onDeny }) {
           className="rounded-full px-6"
           onClick={() => onDeny(flags)}
         >
-          Нещо се е променило
+          {isEN ? 'Something changed' : 'Нещо се е променило'}
         </Button>
         <Button
           className="bg-blue-600 hover:bg-blue-700 rounded-full px-6"
           disabled={pendingSections.some(s => flags[s.section_id] === undefined)}
           onClick={() => onConfirm(flags)}
         >
-          Продължи <ArrowRight className="ml-2 h-4 w-4" />
+          {isEN ? 'Continue' : 'Продължи'} <ArrowRight className="ml-2 h-4 w-4" />
         </Button>
       </div>
     </motion.div>
@@ -110,7 +111,8 @@ function ReverificationScreen({ journey, sections, onConfirm, onDeny }) {
 }
 
 // ─── Step progress bar ────────────────────────────────────────────────────────
-function StepProgress({ steps, currentStepId, completedStepIds }) {
+function StepProgress({ steps, currentStepId, completedStepIds, lang = 'bg' }) {
+  const isEN = lang === 'en';
   return (
     <div className="flex items-center gap-1 overflow-x-auto pb-1">
       {steps.map((step, idx) => {
@@ -131,7 +133,7 @@ function StepProgress({ steps, currentStepId, completedStepIds }) {
                 'text-[10px] mt-0.5 text-center leading-tight',
                 isActive ? 'text-blue-600 font-medium' : isDone ? 'text-green-600' : 'text-slate-400',
               )}>
-                {step.title}
+                {isEN ? step.titleEn : step.titleBg}
               </span>
             </div>
             {idx < steps.length - 1 && (
@@ -148,7 +150,7 @@ function StepProgress({ steps, currentStepId, completedStepIds }) {
 }
 
 // ─── Voice bar ────────────────────────────────────────────────────────────────
-function VoiceBar({ avatarState, caption, isMuted, onToggleMute, isLoading }) {
+function VoiceBar({ avatarState, caption, isMuted, onToggleMute, isLoading, lang = 'bg' }) {
   return (
     <div className="flex items-center gap-4 p-3 rounded-2xl bg-slate-50 border border-slate-200 shadow-sm">
       <AvatarFrame
@@ -161,7 +163,7 @@ function VoiceBar({ avatarState, caption, isMuted, onToggleMute, isLoading }) {
         {isLoading ? (
           <div className="flex items-center gap-2 text-slate-500 text-sm">
             <Loader2 className="h-4 w-4 animate-spin" />
-            <span>Генерирам глас...</span>
+            <span>{lang === 'en' ? 'Loading audio...' : 'Генерирам глас...'}</span>
           </div>
         ) : (
           <p className="text-sm text-slate-700 leading-snug line-clamp-2">{caption || '…'}</p>
@@ -399,6 +401,7 @@ export default function DiscoveryShell({
         steps={DISCOVERY_STEPS}
         currentStepId={currentStep}
         completedStepIds={completedSteps}
+        lang={languageCode}
       />
 
       {/* Voice bar */}
@@ -408,6 +411,7 @@ export default function DiscoveryShell({
         isMuted={isMuted}
         onToggleMute={handleToggleMute}
         isLoading={isPlaying && !currentText}
+        lang={languageCode}
       />
 
       {/* Reverification overlay */}
@@ -425,6 +429,7 @@ export default function DiscoveryShell({
               sections={DISCOVERY_STEPS}
               onConfirm={handleReverificationConfirm}
               onDeny={handleReverificationDeny}
+              lang={languageCode}
             />
           </motion.div>
         )}
@@ -496,7 +501,7 @@ export default function DiscoveryShell({
               className="rounded-full px-6"
             >
               <ArrowLeft className="mr-2 h-4 w-4" />
-              Назад
+              {languageCode === 'en' ? 'Back' : 'Назад'}
             </Button>
 
             {!isLastStep ? (
@@ -504,7 +509,7 @@ export default function DiscoveryShell({
                 onClick={nextStep}
                 className="bg-blue-600 hover:bg-blue-700 rounded-full px-6"
               >
-                Напред
+                {languageCode === 'en' ? 'Next' : 'Напред'}
                 <ArrowRight className="ml-2 h-4 w-4" />
               </Button>
             ) : (
@@ -521,16 +526,16 @@ export default function DiscoveryShell({
                   className="bg-green-600 hover:bg-green-700 rounded-full px-8 disabled:opacity-50"
                 >
                   {isSubmitting ? (
-                    <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Изпращане...</>
+                    <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> {languageCode === 'en' ? 'Submitting...' : 'Изпращане...'}</>
                   ) : !canSubmit ? (
-                    <><AlertTriangle className="mr-2 h-4 w-4" /> Попълнете всички полета</>
+                    <><AlertTriangle className="mr-2 h-4 w-4" /> {languageCode === 'en' ? 'Fill all fields' : 'Попълнете всички полета'}</>
                   ) : (
-                    <><CheckCircle className="mr-2 h-4 w-4" /> Завърши анализа</>
+                    <><CheckCircle className="mr-2 h-4 w-4" /> {languageCode === 'en' ? 'Complete analysis' : 'Завърши анализа'}</>
                   )}
                 </Button>
                 {!canSubmit && incompleteSteps.length > 0 && (
                   <p className="text-xs text-red-500">
-                    Непопълнени: {incompleteSteps.join(', ')}
+                    {languageCode === 'en' ? 'Incomplete:' : 'Непопълнени:'} {incompleteSteps.join(', ')}
                   </p>
                 )}
               </div>

@@ -55,6 +55,7 @@ import ProductCatalogManager from '@/components/admin/ProductCatalogManager';
 import DossiersManager from '@/components/consultant/DossiersManager';
 import ConsultantLogin from '@/components/consultant/ConsultantLogin';
 import { Package, FolderOpen, Workflow } from 'lucide-react';
+import ConfigManager from '@/components/consultant/ConfigManager';
 
 const menuItems = [
   { id: 'dashboard', label: 'Табло', icon: LayoutDashboard, color: 'from-blue-500 to-blue-600' },
@@ -73,6 +74,7 @@ const menuItems = [
   { id: 'notifications', label: 'Известия', icon: Bell, color: 'from-sky-500 to-sky-600' },
   { id: 'product-catalog', label: 'Продуктов каталог', icon: Package, adminOnly: true, color: 'from-indigo-500 to-purple-600' },
   { id: 'rbac', label: 'Достъп', icon: Shield, adminOnly: true, color: 'from-slate-500 to-slate-600' },
+  { id: 'config', label: 'Config & Rules', icon: Settings, adminOnly: true, color: 'from-indigo-500 to-purple-600' },
 ];
 
 export default function ConsultantPortal() {
@@ -359,6 +361,7 @@ export default function ConsultantPortal() {
               {activeTab === 'notifications' && <ConsultantNotifications />}
               {activeTab === 'product-catalog' && currentUser?.role === 'admin' && <ProductCatalogManager />}
               {activeTab === 'rbac' && currentUser?.role === 'admin' && <RBACManager />}
+              {activeTab === 'config' && currentUser?.role === 'admin' && <ConfigManager />}
             </motion.div>
           </AnimatePresence>
         </div>

@@ -56,6 +56,7 @@ import DossiersManager from '@/components/consultant/DossiersManager';
 import ConsultantLogin from '@/components/consultant/ConsultantLogin';
 import { Package, FolderOpen, Workflow } from 'lucide-react';
 import ConfigManager from '@/components/consultant/ConfigManager';
+import ConsentManager from '@/components/consent/ConsentManager';
 
 const menuItems = [
   { id: 'dashboard', label: 'Табло', icon: LayoutDashboard, color: 'from-blue-500 to-blue-600' },
@@ -75,6 +76,7 @@ const menuItems = [
   { id: 'product-catalog', label: 'Продуктов каталог', icon: Package, adminOnly: true, color: 'from-indigo-500 to-purple-600' },
   { id: 'rbac', label: 'Достъп', icon: Shield, adminOnly: true, color: 'from-slate-500 to-slate-600' },
   { id: 'config', label: 'Config & Rules', icon: Settings, adminOnly: true, color: 'from-indigo-500 to-purple-600' },
+  { id: 'consent', label: 'Съгласия (GDPR)', icon: Shield, adminOnly: true, color: 'from-blue-600 to-blue-700' },
 ];
 
 export default function ConsultantPortal() {
@@ -362,6 +364,7 @@ export default function ConsultantPortal() {
               {activeTab === 'product-catalog' && currentUser?.role === 'admin' && <ProductCatalogManager />}
               {activeTab === 'rbac' && currentUser?.role === 'admin' && <RBACManager />}
               {activeTab === 'config' && currentUser?.role === 'admin' && <ConfigManager />}
+              {activeTab === 'consent' && currentUser?.role === 'admin' && <ConsentManager />}
             </motion.div>
           </AnimatePresence>
         </div>

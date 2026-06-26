@@ -1,0 +1,99 @@
+{
+  "name": "GeneratedDocument",
+  "type": "object",
+  "properties": {
+    "journey_id": {
+      "type": "string"
+    },
+    "application_id": {
+      "type": "string"
+    },
+    "plan_id": {
+      "type": "string"
+    },
+    "client_id": {
+      "type": "string"
+    },
+    "template_key": {
+      "type": "string",
+      "description": "Reference to DocumentTemplate.template_key"
+    },
+    "document_name": {
+      "type": "string"
+    },
+    "document_type": {
+      "type": "string",
+      "enum": [
+        "application_form",
+        "gdpr_consent",
+        "health_declaration",
+        "beneficiary_form",
+        "sepa_mandate",
+        "disclosure_document",
+        "policy_terms",
+        "plan_pdf"
+      ]
+    },
+    "provider": {
+      "type": "string"
+    },
+    "product_type": {
+      "type": "string"
+    },
+    "file_url": {
+      "type": "string",
+      "description": "URL to the generated PDF (public storage)"
+    },
+    "file_uri": {
+      "type": "string",
+      "description": "URI in private storage (for signed URLs)"
+    },
+    "generation_status": {
+      "type": "string",
+      "enum": [
+        "pending",
+        "generating",
+        "ready",
+        "error"
+      ],
+      "default": "pending"
+    },
+    "error_message": {
+      "type": "string"
+    },
+    "generated_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "signing_status": {
+      "type": "string",
+      "enum": [
+        "not_required",
+        "pending",
+        "signed",
+        "declined"
+      ],
+      "default": "not_required"
+    },
+    "signed_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "signing_session_id": {
+      "type": "string"
+    },
+    "version": {
+      "type": "string",
+      "default": "1.0"
+    },
+    "metadata": {
+      "type": "object",
+      "additionalProperties": true,
+      "description": "Additional info captured at generation time (e.g. template_version, data_snapshot_hash)"
+    }
+  },
+  "required": [
+    "journey_id",
+    "document_type"
+  ]
+}

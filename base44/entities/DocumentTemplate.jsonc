@@ -1,0 +1,164 @@
+{
+  "name": "DocumentTemplate",
+  "type": "object",
+  "properties": {
+    "template_key": {
+      "type": "string",
+      "description": "Unique key, e.g. 'metlife_ul_application', 'uniqa_health_application', 'gdpr_consent'"
+    },
+    "template_name": {
+      "type": "string",
+      "description": "Human-readable name"
+    },
+    "provider": {
+      "type": "string",
+      "description": "e.g. 'MetLife', 'Uniqa', 'DZI', 'Generali', 'internal'"
+    },
+    "product_type": {
+      "type": "string",
+      "enum": [
+        "ul_investment",
+        "term_life",
+        "health_insurance",
+        "pension_plan",
+        "education_plan",
+        "critical_illness",
+        "gdpr",
+        "general"
+      ],
+      "description": "Which product type this template applies to"
+    },
+    "document_type": {
+      "type": "string",
+      "enum": [
+        "application_form",
+        "gdpr_consent",
+        "health_declaration",
+        "beneficiary_form",
+        "sepa_mandate",
+        "disclosure_document",
+        "policy_terms"
+      ],
+      "description": "Type of document"
+    },
+    "language_code": {
+      "type": "string",
+      "enum": [
+        "bg",
+        "en"
+      ],
+      "default": "bg"
+    },
+    "template_fields": {
+      "type": "array",
+      "description": "Fields to be filled in from ApplicationData/FinancialAnalysisSubmission",
+      "items": {
+        "type": "object",
+        "properties": {
+          "field_key": {
+            "type": "string"
+          },
+          "label": {
+            "type": "string"
+          },
+          "source": {
+            "type": "string",
+            "enum": [
+              "analysis",
+              "application",
+              "plan",
+              "client",
+              "static"
+            ]
+          },
+          "source_field": {
+            "type": "string"
+          },
+          "required": {
+            "type": "boolean",
+            "default": true
+          },
+          "format": {
+            "type": "string",
+            "enum": [
+              "text",
+              "date",
+              "number",
+              "boolean",
+              "currency"
+            ]
+          }
+        }
+      }
+    },
+    "sections": {
+      "type": "array",
+      "description": "Document sections for PDF layout",
+      "items": {
+        "type": "object",
+        "properties": {
+          "section_id": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "fields": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "order": {
+            "type": "number"
+          }
+        }
+      }
+    },
+    "header_text": {
+      "type": "string",
+      "description": "Static text for document header"
+    },
+    "footer_text": {
+      "type": "string",
+      "description": "Static text for document footer (legal disclaimer)"
+    },
+    "requires_signature": {
+      "type": "boolean",
+      "default": true
+    },
+    "signature_fields": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "enum": [
+          "client",
+          "partner",
+          "witness",
+          "advisor"
+        ]
+      }
+    },
+    "version": {
+      "type": "string",
+      "default": "1.0"
+    },
+    "is_active": {
+      "type": "boolean",
+      "default": true
+    },
+    "sort_order": {
+      "type": "number",
+      "description": "Order in which documents should be generated and signed"
+    },
+    "notes": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "template_key",
+    "template_name",
+    "provider",
+    "document_type"
+  ]
+}

@@ -34,6 +34,7 @@ import {
 } from "@/components/ui/dialog";
 
 import ConsentStep from '../components/analysis/ConsentStep';
+import ConsentStepWrapper from '../components/analysis/ConsentStepWrapper';
 import PersonalDataStep from '../components/analysis/PersonalDataStep';
 import HousingStep from '../components/analysis/HousingStep';
 import ReserveStep from '../components/analysis/ReserveStep';
@@ -66,7 +67,7 @@ const steps = [
 
 // Step components map for DiscoveryShell
 const STEP_COMPONENTS = {
-  1: ConsentStep,
+  1: ConsentStepWrapper,
   2: PersonalDataStep,
   3: HousingStep,
   4: ReserveStep,
@@ -113,7 +114,11 @@ export default function FinancialAnalysis() {
     if (!parsed.client_id) return;
 
     createOrResumeJourney(parsed.client_id, 'bg')
-      .then(({ journey: j }) => setJourney(j))
+      .then(({ journey: j }) => {
+        setJourney(j);
+        // Expose journey_id to plannerData so ConsentStepWrapper can use it
+        setPlannerData(prev => prev ? { ...prev, journey_id: j.id } : { journey_id: j.id });
+      })
       .catch(() => {});
   }, []);
 

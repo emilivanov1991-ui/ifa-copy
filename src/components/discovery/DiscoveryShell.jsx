@@ -13,6 +13,7 @@ import { useContradictionCheck } from '@/components/discovery/useContradictionCh
 import { useVoiceManager } from '@/components/voice/VoiceManager';
 import ResponseBandFeedback from '@/components/discovery/ResponseBandFeedback';
 import LanguageSelectionStep from '@/components/discovery/LanguageSelectionStep';
+import MobileAudioBar from '@/components/voice/MobileAudioUX';
 
 // ─── Journey state helpers ───────────────────────────────────────────────────
 const DISCOVERY_STATES_ORDER = [
@@ -225,6 +226,8 @@ export default function DiscoveryShell({
   const [showValidationErrors, setShowValidationErrors] = useState(false);
   const [isMuted, setIsMuted] = useState(false);
   const [showReverification, setShowReverification] = useState(false);
+  const [audioError, setAudioError] = useState(null); // null | 'network' | 'audio' | 'tts'
+  const [isRecording, setIsRecording] = useState(false);
   
   // Calculate progress percent
   const progressPercent = Math.round((completedSteps.length / DISCOVERY_STEPS.length) * 100);
@@ -266,10 +269,19 @@ export default function DiscoveryShell({
     if (isMuted) return;
     const step = DISCOVERY_STEPS.find(s => s.id === stepId);
     if (!step) return;
-    // VoiceManager maps step_id → audio_url from VoiceRulebook entity
-    // Convention: analysis_step_<numeric_id> (e.g. analysis_step_3 for housing)
+
+    // Detect network state before attempting playback
+    if (!navigator.onLine) {
+      setAudioError('network');
+      return;
+    }
+
     const voiceStepId = `analysis_step_${step.id}`;
-    playStep(voiceStepId);
+    setAudioError(null);
+    playStep(voiceStepId, () => {
+      // onComplete — clear any lingering error
+      setAudioError(null);
+    });
 
     // Preload the next step's audio in background
     const nextIdx = DISCOVERY_STEPS.findIndex(s => s.id === stepId) + 1;
@@ -376,6 +388,20 @@ export default function DiscoveryShell({
     });
   };
 
+  // Network change detection
+  useEffect(() => {
+    const handleOffline = () => setAudioError('network');
+    const handleOnline = () => {
+      if (audioError === 'network') setAudioError(null);
+    };
+    window.addEventListener('offline', handleOffline);
+    window.addEventListener('online', handleOnline);
+    return () => {
+      window.removeEventListener('offline', handleOffline);
+      window.removeEventListener('online', handleOnline);
+    };
+  }, [audioError]);
+
   // ── Contradiction-aware onChange wrapper ───────────────────────────────────
   // Step components call onChange(field, value) — forward to parent and check contradictions
   const handleFormChange = useCallback((field, value) => {
@@ -404,14 +430,18 @@ export default function DiscoveryShell({
         lang={languageCode}
       />
 
-      {/* Voice bar */}
-      <VoiceBar
+      {/* Mobile-aware audio bar with PTT, error states, mic handling */}
+      <MobileAudioBar
         avatarState={avatarState}
         caption={currentText}
         isMuted={isMuted}
         onToggleMute={handleToggleMute}
         isLoading={isPlaying && !currentText}
         lang={languageCode}
+        audioError={audioError}
+        onRetryAudio={() => { setAudioError(null); fireVoice(currentStep); }}
+        onDismissError={() => setAudioError(null)}
+        isRecording={isRecording}
       />
 
       {/* Reverification overlay */}

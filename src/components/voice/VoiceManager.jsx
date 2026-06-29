@@ -91,9 +91,12 @@ export function useVoiceManager(languageCode = 'bg') {
       if (nextStepId) preloadStep(nextStepId);
       onComplete?.();
     };
-    audio.onerror = () => {
+    audio.onerror = (e) => {
       setIsPlaying(false); setAvatarState('listening');
-      currentAudioRef.current = null; onComplete?.();
+      currentAudioRef.current = null;
+      // Surface error type for consumers — 'network' if offline, else 'audio'
+      const errorType = navigator.onLine ? 'audio' : 'network';
+      onComplete?.(errorType);
     };
     currentAudioRef.current = audio;
     audio.play().catch(() => {

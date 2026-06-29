@@ -1,13 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
 import { base44 } from '@/api/base44Client';
-import { Loader2, CheckCircle2, XCircle, RefreshCw } from 'lucide-react';
+import { Loader2, CheckCircle2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { motion } from 'framer-motion';
 import ApplicationCollectionForm from '@/components/application/ApplicationCollectionForm';
 import JourneyCompletedScreen from '@/components/application/JourneyCompletedScreen';
 import PaymentCheckout from '@/components/application/PaymentCheckout';
 import SigningFlow from '@/components/application/SigningFlow';
+import GracefulStopScreen from '@/components/discovery/GracefulStopScreen';
 
 export default function ApplicationCollection() {
   const { journeyId } = useParams();
@@ -148,40 +149,12 @@ export default function ApplicationCollection() {
   // ── Payment Failed (max attempts) ────────────────────────────────────────
   if (screen === 'payment_failed') {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-red-50 to-rose-100 p-4">
-        <motion.div
-          initial={{ opacity: 0, scale: 0.9 }}
-          animate={{ opacity: 1, scale: 1 }}
-          className="max-w-md w-full bg-white rounded-2xl shadow-xl p-8 text-center"
-        >
-          <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
-            <XCircle className="w-9 h-9 text-red-500" />
-          </div>
-          <h2 className="text-2xl font-bold text-slate-900 mb-2">Плащането не успя</h2>
-          <p className="text-slate-500 mb-2">
-            Достигнат е лимитът от 3 неуспешни опита.
-          </p>
-          <p className="text-slate-500 mb-6">
-            Консултант ще се свърже с вас до <strong>24 часа</strong>, за да завърши процеса.
-          </p>
-          <div className="flex flex-col gap-3">
-            <Button
-              onClick={() => { setScreen('payment'); }}
-              variant="outline"
-              className="w-full border-slate-300 rounded-xl"
-            >
-              <RefreshCw className="w-4 h-4 mr-2" />
-              Опитай отново
-            </Button>
-            <Button
-              onClick={() => navigate('/')}
-              className="w-full bg-slate-800 hover:bg-slate-900 text-white rounded-xl"
-            >
-              Към началото
-            </Button>
-          </div>
-        </motion.div>
-      </div>
+      <GracefulStopScreen
+        reason="payment_failed"
+        lang={journey?.language_code || 'bg'}
+        journeyId={journeyId}
+        onRetry={() => setScreen('payment')}
+      />
     );
   }
 
@@ -215,24 +188,12 @@ export default function ApplicationCollection() {
   // ── Signing Failed ────────────────────────────────────────────────────────
   if (screen === 'signing_failed') {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 to-slate-100 p-4">
-        <motion.div
-          initial={{ opacity: 0, scale: 0.9 }}
-          animate={{ opacity: 1, scale: 1 }}
-          className="max-w-md w-full bg-white rounded-2xl shadow-xl p-8 text-center"
-        >
-          <div className="w-16 h-16 bg-orange-100 rounded-full flex items-center justify-center mx-auto mb-4">
-            <XCircle className="w-9 h-9 text-orange-500" />
-          </div>
-          <h2 className="text-2xl font-bold text-slate-900 mb-2">Подписването не беше завършено</h2>
-          <p className="text-slate-500 mb-6">
-            Консултант ще се свърже с вас до <strong>24 часа</strong>, за да завърши процеса.
-          </p>
-          <Button onClick={() => navigate('/')} className="w-full bg-slate-800 hover:bg-slate-900 text-white rounded-xl">
-            Към началото
-          </Button>
-        </motion.div>
-      </div>
+      <GracefulStopScreen
+        reason="signing_failed"
+        lang={journey?.language_code || 'bg'}
+        journeyId={journeyId}
+        onRetry={() => setScreen('signing')}
+      />
     );
   }
 

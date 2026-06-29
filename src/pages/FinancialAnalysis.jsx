@@ -46,6 +46,7 @@ import ReferralsStep from '../components/analysis/ReferralsStep';
 import DiscoveryShell from '../components/discovery/DiscoveryShell';
 import DiscoveryReviewStep from '../components/discovery/DiscoveryReviewStep';
 import PlanLoadingScreen from '../components/discovery/PlanLoadingScreen';
+import GracefulStopScreen from '../components/discovery/GracefulStopScreen';
 import AnalysisSuccessScreen from '../components/analysis/AnalysisSuccessScreen';
 import { useJourneyState } from '../components/voice/JourneyStateManager';
 import GuideAvatar from '../components/GuideAvatar';
@@ -1229,6 +1230,18 @@ export default function FinancialAnalysis() {
       setIsSubmitting(false);
     }
   };
+
+  // Show Graceful Stop screen if journey is blocked
+  if (journey?.journey_state === 'graceful_stop') {
+    return (
+      <GracefulStopScreen
+        reason={journey.graceful_stop_reason || 'discovery_blocked'}
+        lang={journey.language_code || 'bg'}
+        journeyId={journey.id}
+        clientName={formData.client_first_name || plannerData?.client_first_name}
+      />
+    );
+  }
 
   // Show Plan Loading screen
   if (showPlanLoading) {

@@ -1,6 +1,6 @@
 import { useCallback, useRef } from 'react';
 import { base44 } from '@/api/base44Client';
-import { getOrCreateDeviceId } from '@/lib/deviceId';
+import { getOrCreateDeviceId, syncDeviceWithBackend } from '@/lib/deviceId';
 
 const JOURNEY_ID_KEY = 'ifa_journey_id';
 const SESSION_MAX_DAYS = 14;
@@ -44,12 +44,24 @@ export function useJourneyState() {
   const createOrResumeJourney = useCallback(async (clientId, languageCode = 'bg') => {
     const deviceId = getOrCreateDeviceId();
 
-    // Look for the latest non-archived journey for this client
-    const existing = await base44.entities.Journey.filter(
-      { client_id: clientId, is_archived: false },
-      '-created_date',
-      1
-    );
+    // Look for the latest non-archived journey — first by client_id, then by device_id as fallback
+    let existing = clientId
+      ? await base44.entities.Journey.filter({ client_id: clientId, is_archived: false }, '-created_date', 1)
+      : [];
+
+    // Device-id fallback: covers cases where user returns without client_id in localStorage
+    if (existing.length === 0 && deviceId) {
+      existing = await base44.entities.Journey.filter({ device_id: deviceId, is_archived: false }, '-created_date', 1);
+    }
+
+    // Also check localStorage for a known journey_id as last resort
+    if (existing.length === 0) {
+      const storedId = localStorage.getItem(JOURNEY_ID_KEY);
+      if (storedId) {
+        const byId = await base44.entities.Journey.filter({ id: storedId, is_archived: false });
+        if (byId.length > 0) existing = byId;
+      }
+    }
 
     if (existing.length > 0) {
       const journey = existing[0];
@@ -78,6 +90,11 @@ export function useJourneyState() {
 
           journeyRef.current = resumedJourney;
           localStorage.setItem(JOURNEY_ID_KEY, journey.id);
+          // Keep Device record in sync with active journey
+          syncDeviceWithBackend(deviceId, resumedJourney.user_id).catch(() => {});
+          await base44.entities.Device.filter({ device_id: deviceId }).then(devs => {
+            if (devs.length > 0) base44.entities.Device.update(devs[0].id, { active_journey_id: journey.id }).catch(() => {});
+          }).catch(() => {});
           return { journey: resumedJourney, isResume: true };
         } else {
           // Journey too old — transition to expired then archive
@@ -113,6 +130,11 @@ export function useJourneyState() {
 
     journeyRef.current = newJourney;
     localStorage.setItem(JOURNEY_ID_KEY, newJourney.id);
+    // Keep Device record in sync with the new journey
+    syncDeviceWithBackend(deviceId, userId).catch(() => {});
+    await base44.entities.Device.filter({ device_id: deviceId }).then(devs => {
+      if (devs.length > 0) base44.entities.Device.update(devs[0].id, { active_journey_id: newJourney.id }).catch(() => {});
+    }).catch(() => {});
     return { journey: newJourney, isResume: false };
   }, [advanceState]);
 

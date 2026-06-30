@@ -402,11 +402,146 @@ Deno.serve(async (req) => {
       });
     }
 
+    // ──────────────────────────────────────────────────────────
+    // VOICE RULEBOOK — Discovery steps (bg + en)
+    // ──────────────────────────────────────────────────────────
+
+    const voiceEntries = [
+      // ── Planner steps ──
+      { step_id: 'planner_step_1', language_code: 'bg', trigger_type: 'step_enter', avatar_state: 'talking',
+        text_fallback: 'Здравейте! Аз съм вашият финансов асистент. Нека заедно разберем вашата финансова ситуация. Как се казвате?' },
+      { step_id: 'planner_step_2', language_code: 'bg', trigger_type: 'step_enter', avatar_state: 'talking',
+        text_fallback: 'Чудесно! Кажете ми малко повече за вашето семейно положение — живеете ли сами или имате партньор и деца?' },
+      { step_id: 'planner_step_3', language_code: 'bg', trigger_type: 'step_enter', avatar_state: 'talking',
+        text_fallback: 'Отлично. Сега нека поговорим за вашето жилище. Наемате ли, или имате собствен дом?' },
+      { step_id: 'planner_step_4', language_code: 'bg', trigger_type: 'step_enter', avatar_state: 'talking',
+        text_fallback: 'Разбрах. А имате ли автомобил? Ще ми е полезно да знам за вашите активи.' },
+      { step_id: 'planner_step_5', language_code: 'bg', trigger_type: 'step_enter', avatar_state: 'talking',
+        text_fallback: 'Сега нека поговорим за доходите ви. Какъв е вашият месечен нетен доход?' },
+      { step_id: 'planner_step_6', language_code: 'bg', trigger_type: 'step_enter', avatar_state: 'talking',
+        text_fallback: 'Много добре. Успявате ли да спестявате всеки месец и колко приблизително?' },
+      { step_id: 'planner_step_7', language_code: 'bg', trigger_type: 'step_enter', avatar_state: 'talking',
+        text_fallback: 'Страхотно. Каква е общата сума на вашите спестявания и инвестиции в момента?' },
+      { step_id: 'planner_step_8', language_code: 'bg', trigger_type: 'step_enter', avatar_state: 'talking',
+        text_fallback: 'А имате ли кредити или заеми? Ипотека, потребителски кредит или кредитна карта?' },
+      { step_id: 'planner_step_9', language_code: 'bg', trigger_type: 'step_enter', avatar_state: 'celebrating',
+        text_fallback: 'Благодаря ви! Събрах достатъчно информация, за да изготвя вашия финансов профил. Нека видим резултатите.' },
+
+      // ── Analysis steps ──
+      { step_id: 'analysis_step_1', language_code: 'bg', trigger_type: 'step_enter', avatar_state: 'talking',
+        text_fallback: 'Добре дошли в детайлния финансов анализ. Ще попълним заедно вашия пълен финансов профил. Нека започнем с личните данни.' },
+      { step_id: 'analysis_step_2', language_code: 'bg', trigger_type: 'step_enter', avatar_state: 'talking',
+        text_fallback: 'Сега ще попълним информация за вашето жилище и имоти. Това е важно за цялостната картина.' },
+      { step_id: 'analysis_step_3', language_code: 'bg', trigger_type: 'step_enter', avatar_state: 'talking',
+        text_fallback: 'Отлично. Нека разгледаме вашите финансови потоци — доходи и разходи месечно.' },
+      { step_id: 'analysis_step_4', language_code: 'bg', trigger_type: 'step_enter', avatar_state: 'talking',
+        text_fallback: 'Сега ще разгледаме вашите активи и пасиви — спестявания, инвестиции и кредити.' },
+      { step_id: 'analysis_step_5', language_code: 'bg', trigger_type: 'step_enter', avatar_state: 'talking',
+        text_fallback: 'Нека поговорим за вашата защита. Имате ли застраховки живот или здраве?' },
+      { step_id: 'analysis_step_6', language_code: 'bg', trigger_type: 'step_enter', avatar_state: 'talking',
+        text_fallback: 'Много важна тема — пенсионното планиране. Разкажете ми за вашите пенсионни очаквания.' },
+      { step_id: 'analysis_step_7', language_code: 'bg', trigger_type: 'step_enter', avatar_state: 'talking',
+        text_fallback: 'Ако имате деца, нека планираме и тяхното бъдеще — образование, старт в живота.' },
+      { step_id: 'analysis_step_8', language_code: 'bg', trigger_type: 'step_enter', avatar_state: 'talking',
+        text_fallback: 'Почти готово! Нека поговорим за вашите приоритети — кое е най-важно за вас в момента?' },
+      { step_id: 'analysis_step_9', language_code: 'bg', trigger_type: 'step_enter', avatar_state: 'celebrating',
+        text_fallback: 'Прекрасно! Успешно попълнихте финансовия анализ. Ще генерирам вашия персонален план.' },
+
+      // ── Response bands ──
+      { step_id: 'analysis_reserve_band_critical', language_code: 'bg', trigger_type: 'response_band', avatar_state: 'concerned',
+        text_fallback: 'Вашият резерв е под 1 месец. Това е критично — предлагам незабавно да изградим авариен фонд.' },
+      { step_id: 'analysis_reserve_band_low', language_code: 'bg', trigger_type: 'response_band', avatar_state: 'concerned',
+        text_fallback: 'Резервът ви е между 1 и 3 месеца. Препоръчвам увеличаване до поне 3-6 месечни разхода.' },
+      { step_id: 'analysis_reserve_band_ok', language_code: 'bg', trigger_type: 'response_band', avatar_state: 'talking',
+        text_fallback: 'Резервът ви е между 3 и 6 месеца. Добра основа! Можем да насочим допълнителни средства към инвестиции.' },
+      { step_id: 'analysis_reserve_band_excellent', language_code: 'bg', trigger_type: 'response_band', avatar_state: 'celebrating',
+        text_fallback: 'Отличен резерв — над 6 месеца! Можем смело да планираме агресивно инвестиционно портфолио.' },
+      { step_id: 'analysis_debt_band_high', language_code: 'bg', trigger_type: 'response_band', avatar_state: 'concerned',
+        text_fallback: 'Вашата задлъжнялост надвишава 40% от дохода. Ще включим оптимизация на кредитите в плана.' },
+      { step_id: 'analysis_debt_band_ok', language_code: 'bg', trigger_type: 'response_band', avatar_state: 'talking',
+        text_fallback: 'Вашите кредити са в разумни граници. Добре се справяте с управлението на дълга.' },
+      { step_id: 'analysis_pension_band_gap', language_code: 'bg', trigger_type: 'response_band', avatar_state: 'concerned',
+        text_fallback: 'Има значителна разлика между очакваната и желаната пенсия. Ще планираме допълнително спестяване.' },
+      { step_id: 'analysis_pension_band_ok', language_code: 'bg', trigger_type: 'response_band', avatar_state: 'talking',
+        text_fallback: 'Пенсионната ви ситуация е добра. Ще оптимизираме допълнително с Unit Linked продукт.' },
+
+      // ── Completion ──
+      { step_id: 'completion', language_code: 'bg', trigger_type: 'completion', avatar_state: 'celebrating',
+        text_fallback: 'Поздравления! Вашият финансов план е готов. Разгледайте го внимателно — той е изготвен специално за вас.' },
+
+      // ── Validation errors ──
+      { step_id: 'validation_income_missing', language_code: 'bg', trigger_type: 'validation_error', avatar_state: 'listening',
+        text_fallback: 'Нуждаем се от информация за вашия доход, за да продължим. Моля, попълнете полето.' },
+      { step_id: 'validation_age_missing', language_code: 'bg', trigger_type: 'validation_error', avatar_state: 'listening',
+        text_fallback: 'Моля, въведете вашата дата на раждане, за да продължим с анализа.' },
+
+      // ── EN versions ──
+      { step_id: 'planner_step_1', language_code: 'en', trigger_type: 'step_enter', avatar_state: 'talking',
+        text_fallback: 'Welcome! I am your financial assistant. Let us understand your financial situation together. What is your name?' },
+      { step_id: 'planner_step_2', language_code: 'en', trigger_type: 'step_enter', avatar_state: 'talking',
+        text_fallback: 'Great! Tell me a bit more about your family status — do you live alone or do you have a partner and children?' },
+      { step_id: 'planner_step_3', language_code: 'en', trigger_type: 'step_enter', avatar_state: 'talking',
+        text_fallback: 'Perfect. Now let us talk about your housing situation. Do you rent or own your home?' },
+      { step_id: 'planner_step_4', language_code: 'en', trigger_type: 'step_enter', avatar_state: 'talking',
+        text_fallback: 'Understood. Do you own a car? Knowing your assets will help me build a complete picture.' },
+      { step_id: 'planner_step_5', language_code: 'en', trigger_type: 'step_enter', avatar_state: 'talking',
+        text_fallback: 'Now let us talk about your income. What is your monthly net income?' },
+      { step_id: 'planner_step_6', language_code: 'en', trigger_type: 'step_enter', avatar_state: 'talking',
+        text_fallback: 'Very good. Are you able to save each month, and approximately how much?' },
+      { step_id: 'planner_step_7', language_code: 'en', trigger_type: 'step_enter', avatar_state: 'talking',
+        text_fallback: 'Excellent. What is the total amount of your current savings and investments?' },
+      { step_id: 'planner_step_8', language_code: 'en', trigger_type: 'step_enter', avatar_state: 'talking',
+        text_fallback: 'Do you have any loans or credit? A mortgage, consumer loan, or credit card?' },
+      { step_id: 'planner_step_9', language_code: 'en', trigger_type: 'step_enter', avatar_state: 'celebrating',
+        text_fallback: 'Thank you! I have gathered enough information to build your financial profile. Let us see the results.' },
+      { step_id: 'analysis_step_1', language_code: 'en', trigger_type: 'step_enter', avatar_state: 'talking',
+        text_fallback: 'Welcome to the detailed financial analysis. We will fill in your complete financial profile together. Let us start with your personal information.' },
+      { step_id: 'analysis_step_9', language_code: 'en', trigger_type: 'step_enter', avatar_state: 'celebrating',
+        text_fallback: 'Wonderful! You have successfully completed the financial analysis. I will now generate your personalized plan.' },
+      { step_id: 'analysis_reserve_band_critical', language_code: 'en', trigger_type: 'response_band', avatar_state: 'concerned',
+        text_fallback: 'Your reserve is below 1 month. This is critical — I strongly recommend building an emergency fund immediately.' },
+      { step_id: 'analysis_reserve_band_low', language_code: 'en', trigger_type: 'response_band', avatar_state: 'concerned',
+        text_fallback: 'Your reserve is between 1 and 3 months. I recommend increasing it to at least 3-6 months of expenses.' },
+      { step_id: 'analysis_reserve_band_ok', language_code: 'en', trigger_type: 'response_band', avatar_state: 'talking',
+        text_fallback: 'Your reserve is between 3 and 6 months. A solid foundation! We can direct extra funds toward investments.' },
+      { step_id: 'analysis_reserve_band_excellent', language_code: 'en', trigger_type: 'response_band', avatar_state: 'celebrating',
+        text_fallback: 'Excellent reserve — over 6 months! We can confidently plan an aggressive investment portfolio.' },
+      { step_id: 'completion', language_code: 'en', trigger_type: 'completion', avatar_state: 'celebrating',
+        text_fallback: 'Congratulations! Your financial plan is ready. Review it carefully — it has been crafted specifically for you.' },
+    ];
+
+    // Upsert each VoiceRulebook entry by step_id + language_code
+    let voiceCreated = 0, voiceUpdated = 0;
+    for (const entry of voiceEntries) {
+      const existing = await base44.asServiceRole.entities.VoiceRulebook.filter({
+        step_id: entry.step_id,
+        language_code: entry.language_code,
+      });
+      if (existing && existing.length > 0) {
+        await base44.asServiceRole.entities.VoiceRulebook.update(existing[0].id, {
+          trigger_type: entry.trigger_type,
+          text_fallback: entry.text_fallback,
+          avatar_state: entry.avatar_state,
+          is_active: true,
+          version: rulebookVersion,
+        });
+        voiceUpdated++;
+      } else {
+        await base44.asServiceRole.entities.VoiceRulebook.create({
+          ...entry,
+          is_active: true,
+          version: rulebookVersion,
+        });
+        voiceCreated++;
+      }
+    }
+
     return Response.json({
       success: true,
       message: 'Rulebook data seeded successfully',
       version: rulebookVersion,
       ruleset_hash,
+      voice_rulebook: { created: voiceCreated, updated: voiceUpdated, total: voiceEntries.length },
     });
 
   } catch (error) {

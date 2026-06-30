@@ -33,6 +33,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 
+import LanguageSelectionStep from '../components/discovery/LanguageSelectionStep';
 import ConsentStep from '../components/analysis/ConsentStep';
 import ConsentStepWrapper from '../components/analysis/ConsentStepWrapper';
 import PersonalDataStep from '../components/analysis/PersonalDataStep';
@@ -81,7 +82,9 @@ const STEP_COMPONENTS = {
 export default function FinancialAnalysis() {
   const [journey, setJourney] = useState(null);
   const [useDiscoveryShell] = useState(true);
-  const { playStep, avatarState, isPlaying, currentText } = useVoiceManager('bg');
+  // Language: read from localStorage first, fallback to null (triggers selection screen)
+  const [languageCode, setLanguageCode] = useState(() => localStorage.getItem('ifa_language') || null);
+  const { playStep, avatarState, isPlaying, currentText } = useVoiceManager(languageCode || 'bg');
   const { createOrResumeJourney } = useJourneyState();
   const [currentStep, setCurrentStep] = useState(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -113,9 +116,15 @@ export default function FinancialAnalysis() {
     const parsed = JSON.parse(storedData);
     if (!parsed.client_id) return;
 
-    createOrResumeJourney(parsed.client_id, 'bg')
+    const lang = localStorage.getItem('ifa_language') || 'bg';
+    createOrResumeJourney(parsed.client_id, lang)
       .then(({ journey: j }) => {
         setJourney(j);
+        // Sync language from journey if set
+        if (j.language_code && !localStorage.getItem('ifa_language')) {
+          setLanguageCode(j.language_code);
+          localStorage.setItem('ifa_language', j.language_code);
+        }
         // Expose journey_id to plannerData so ConsentStepWrapper can use it
         setPlannerData(prev => prev ? { ...prev, journey_id: j.id } : { journey_id: j.id });
       })
@@ -1236,12 +1245,28 @@ export default function FinancialAnalysis() {
     }
   };
 
+  // Handler: user selects language — save to localStorage and journey
+  const handleLanguageSelect = async (lang) => {
+    setLanguageCode(lang);
+    localStorage.setItem('ifa_language', lang);
+    if (journey?.id) {
+      try {
+        await base44.entities.Journey.update(journey.id, { language_code: lang });
+      } catch (_) {}
+    }
+  };
+
+  // ── MANDATORY: Language selection before Discovery ──
+  if (!languageCode) {
+    return <LanguageSelectionStep onSelect={handleLanguageSelect} />;
+  }
+
   // Show Graceful Stop screen if journey is blocked
   if (journey?.journey_state === 'graceful_stop') {
     return (
       <GracefulStopScreen
         reason={journey.graceful_stop_reason || 'discovery_blocked'}
-        lang={journey.language_code || 'bg'}
+        lang={languageCode}
         journeyId={journey.id}
         clientName={formData.client_first_name || plannerData?.client_first_name}
       />
@@ -1254,6 +1279,7 @@ export default function FinancialAnalysis() {
       <PlanLoadingScreen
         journeyId={journey?.id}
         analysisId={analysisRecordId}
+        languageCode={languageCode}
         onPlanReady={(pid) => {
           setPlanId(pid);
           setShowPlanLoading(false);
@@ -1351,7 +1377,7 @@ export default function FinancialAnalysis() {
             onSubmit={() => needsMoreReferrals ? setShowReferralsStep(true) : handleSubmit()}
             isSubmitting={isSubmitting}
             incompleteSteps={incompleteSteps.map(s => steps.find(st => st.id === s)?.title || s)}
-            languageCode="bg"
+            languageCode={languageCode}
           />
         )}
 

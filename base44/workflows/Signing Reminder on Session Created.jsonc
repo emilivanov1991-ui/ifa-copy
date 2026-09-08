@@ -1,0 +1,39 @@
+{
+  "name": "Signing Reminder on Session Created",
+  "description": "Sends signing reminder email when a new Evrotrust signing session is created",
+  "trigger": {
+    "condition": null,
+    "config": {
+      "trigger_type": "entity",
+      "events": [
+        "create"
+      ],
+      "entity_name": "SigningEvent"
+    }
+  },
+  "definition": {
+    "document": {
+      "dsl": "1.0.0",
+      "name": "signing_reminder_on_session_created",
+      "version": "1.0",
+      "namespace": "base44"
+    },
+    "do": [
+      {
+        "run_function": {
+          "call": "invoke_backend_function",
+          "with": {
+            "function_name": "sendNotification",
+            "args": {
+              "type": "signing_reminder"
+            }
+          },
+          "then": "end"
+        }
+      }
+    ]
+  },
+  "x-base44-migrated-from-automation": {
+    "legacy_payload_function": "sendNotification"
+  }
+}

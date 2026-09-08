@@ -1,0 +1,37 @@
+{
+  "name": "Provider Submission Failure \u2192 FollowUpTask",
+  "description": "Creates FollowUpTask when ProviderSubmission fails after max attempts",
+  "trigger": {
+    "condition": "${ (.trigger.data.status == \"permanent_failure\") }",
+    "config": {
+      "trigger_type": "entity",
+      "events": [
+        "update"
+      ],
+      "entity_name": "ProviderSubmission"
+    }
+  },
+  "definition": {
+    "document": {
+      "dsl": "1.0.0",
+      "name": "provider_submission_failure_followuptask",
+      "version": "1.0",
+      "namespace": "base44"
+    },
+    "do": [
+      {
+        "run_function": {
+          "call": "invoke_backend_function",
+          "with": {
+            "function_name": "createFollowUpTask",
+            "args": {}
+          },
+          "then": "end"
+        }
+      }
+    ]
+  },
+  "x-base44-migrated-from-automation": {
+    "legacy_payload_function": "createFollowUpTask"
+  }
+}
